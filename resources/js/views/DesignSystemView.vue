@@ -573,7 +573,7 @@
               </span>
             </div>
             <p class="text-sm text-slate-600 dark:text-slate-300 mt-2">
-              Sobrepõe quase todo o viewport (deixa margem arejada de 24px a 32px nas bordas), com backdrop blur escurecido, cantos arredondados finos, cabeçalho fixo com abas de contexto, corpo com scroll próprio e rodapé com ações permanentes. <strong>Substitui a necessidade de abrir novas páginas para formulários densos e complexos.</strong>
+              <strong>Largura horizontal maximizada</strong> com espaçamento externo simétrico e uniforme em todas as 4 bordas (<code>inset-3 sm:inset-5 md:inset-6 lg:inset-8</code>). Centraliza de modo responsivo em qualquer monitor e substitui páginas inteiras para formulários de alta densidade.
             </p>
           </div>
           <button
@@ -771,23 +771,24 @@
         </div>
       </template>
 
-      <!-- Conteúdo da Aba 1: Dados Contratuais -->
+      <!-- Conteúdo da Aba 1: Dados Contratuais (Grid amplo aproveitando a horizontalidade) -->
       <div v-if="activeFsTab === 'dados'" class="space-y-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div class="md:col-span-2">
+        <!-- Linha 1: 4 Colunas Amplas -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+          <div class="xl:col-span-2">
             <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">
               Cliente Titular / Razão Social
             </label>
             <input
               type="text"
-              value="Telecom Prime Infraestrutura de Redes Ltda"
+              value="Telecom Prime Infraestrutura de Redes e Conectividade Ltda"
               class="w-full h-10 px-3.5 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
             />
           </div>
 
           <div>
             <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">
-              CNPJ do Contrato
+              CNPJ da Contratante
             </label>
             <input
               type="text"
@@ -795,9 +796,21 @@
               class="w-full h-10 px-3.5 text-sm font-mono rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
             />
           </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">
+              Inscrição Estadual (IE)
+            </label>
+            <input
+              type="text"
+              value="062.198.344.0091"
+              class="w-full h-10 px-3.5 text-sm font-mono rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+            />
+          </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <!-- Linha 2: 5 Colunas Especializadas -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           <div>
             <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">Tipo de Circuito</label>
             <select class="w-full h-10 px-3 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100">
@@ -808,35 +821,52 @@
           </div>
 
           <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">Largura de Banda</label>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">Capacidade / Banda</label>
             <input type="text" value="1 Gbps Full Duplex" class="w-full h-10 px-3 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100" />
           </div>
 
           <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">Vigência Inicial</label>
-            <input type="text" value="36 Meses" class="w-full h-10 px-3 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100" />
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">Vigência do Contrato</label>
+            <input type="text" value="36 Meses (Fidelidade)" class="w-full h-10 px-3 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100" />
           </div>
 
           <div>
             <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">SLA de Atendimento</label>
-            <input type="text" value="4 Horas (24x7)" class="w-full h-10 px-3 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100" />
+            <input type="text" value="4 Horas (24x7 Crítico)" class="w-full h-10 px-3 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">Índice Reajuste</label>
+            <input type="text" value="IPCA Anual" class="w-full h-10 px-3 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100" />
           </div>
         </div>
 
-        <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 space-y-3">
-          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Parâmetros de Rede & Entrega</h4>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Linha 3: Card Expandido de Parâmetros de Conectividade e Engenharia -->
+        <div class="p-5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 space-y-4">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+              Parâmetros de Rede, Entrega & Equipamentos de Campo (NOC / FSM)
+            </h4>
+            <span class="text-xs font-mono text-slate-500">ID Circuito: RP-BHZ-2026-0981</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <label class="block text-xs text-slate-500 mb-1">Bloco IPv4 Alocado</label>
               <input type="text" value="187.23.10.0/29 (6 IPs úteis)" class="w-full h-9 px-3 text-xs font-mono rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100" />
             </div>
             <div>
-              <label class="block text-xs text-slate-500 mb-1">VLAN de Transporte</label>
-              <input type="text" value="VLAN 3420" class="w-full h-9 px-3 text-xs font-mono rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100" />
+              <label class="block text-xs text-slate-500 mb-1">Prefixo IPv6 Delegado</label>
+              <input type="text" value="2804:49c0:1002::/48" class="w-full h-9 px-3 text-xs font-mono rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100" />
             </div>
             <div>
-              <label class="block text-xs text-slate-500 mb-1">Equipamento CPE</label>
-              <input type="text" value="Huawei NetEngine AR651" class="w-full h-9 px-3 text-xs rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100" />
+              <label class="block text-xs text-slate-500 mb-1">VLAN de Transporte (QinQ)</label>
+              <input type="text" value="C-VLAN 100 / S-VLAN 3420" class="w-full h-9 px-3 text-xs font-mono rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100" />
+            </div>
+            <div>
+              <label class="block text-xs text-slate-500 mb-1">Roteador CPE Alocado</label>
+              <input type="text" value="Huawei NetEngine AR651 (10G SFP+)" class="w-full h-9 px-3 text-xs rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100" />
             </div>
           </div>
         </div>
