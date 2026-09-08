@@ -1,0 +1,339 @@
+# ESPECIFICAÇÃO TÉCNICA E FUNCIONAL DE PRODUTO (SYSTEM BLUEPRINT)
+## NEXT-GEN FIELD SERVICE MANAGEMENT (FSM), CRM OMNICHANNEL & ERP TELECOM SAAS
+### [Edição Debian 13 + MariaDB + Laravel 13.x API-First + Vue 3 / Tailwind]
+
+> **Finalidade do Documento:** Este blueprint é a especificação arquitetural definitiva para ser consumida por Inteligências Artificiais e engenheiros de software sênior. Ele define um produto SaaS B2B moderno, modular, com **Integridade Relacional Estrita (`ON DELETE RESTRICT`)** em todos os cadastros básicos, operando sobre **Debian 13**, **MariaDB**, **PHP 8.4 + Laravel 13.x (API-First / Headless)** e **Vue 3 (`<script setup>`) + Tailwind CSS**.
+
+---
+
+## 1. DIRETRIZ MANDATÓRIA: INTEGRIDADE RELACIONAL ESTRITA (RESTRICT)
+
+### 1.1 Regra de Ouro contra Corrupção e Órfãos de Dados
+- **Zero Exclusões em Cascata em Dados de Negócio:**
+  No banco MariaDB, todas as Foreign Keys de entidades de negócio utilizam obrigatoriamente **`ON DELETE RESTRICT`**.
+- **Comportamento do Sistema:**
+  Se um operador tentar excluir qualquer registro que possua dependências ativas ou históricas (ex: tentar excluir uma Pessoa que possui chamados, uma Cidade que possui clientes, um Material com movimentações ou uma Categoria Financeira com lançamentos), o banco de dados **rejeita a operação imediatamente** e a API retorna código HTTP `422 Unprocessable Entity` com mensagem semântica clara:
+  > *"Este registro não pode ser excluído pois possui vínculos ativos com [Entidade Vinculada]. Para desativá-lo, altere seu status para 'Inativo'."*
+- **Soft Deletes com Auditoria:** Entidades de cadastro suportam `SoftDeletes` (`deleted_at`), registrando o usuário que solicitou a inativação (`deleted_by_user_id`).
+
+### 1.2 Catálogo de Cadastros Básicos Canônicos do Sistema
+1. **Cidades e Estados Canônicos (`states`, `cities`):** Base canônica do IBGE com código oficial, UF e coordenadas centrais. Todos os endereços do sistema vinculam-se a `cities.id`.
+2. **Pessoas (`people`):** Cadastro único centralizado (PF/PJ, documentos, contatos, dados bancários).
+3. **Unidades de Medida (`units`):** Metros (MT), Unidade (UND), Peça (PC), Bobina (BOB), Kilômetro (KM), Rolo (RL), Par (PAR).
+4. **Departamentos e Setores (`departments`):** NOC, Suporte Externo, Almoxarifado, Financeiro, Infraestrutura.
+5. **Categorias e Motivos de Atendimento (`ticket_categories`, `ticket_reasons`).**
+6. **Centros de Custo e Plano de Contas (`financial_cost_centers`, `financial_categories`).**
+7. **Catálogo de Serviços e LPU (`service_catalog`, `lpu_items`).**
+8. **Tipos de Equipamentos de Telecom (`equipment_types`):** OLT, Switch, Retificador, No-Break, DIO, Roteador, ONU.
+9. **Veículos da Frota (`vehicles`):** Placa, modelo, ano, odômetro atual e vínculo com equipes.
+
+---
+
+## 2. OS DOIS GRANDES AXIOMAS DO SISTEMA
+
+### AXIOMA 1: O Sistema Gira em Torno de PESSOAS (`Person-Centric Engine`)
+No centro de todas as operações está a entidade **Pessoa (`people`)**. Uma Pessoa possui dados canônicos únicos (CPF/CNPJ, contatos, endereços) e assume simultaneamente um ou mais papéis dentro da plataforma:
+1. **Colaboradores / Técnicos (`Workers / Staff`):** Executam o trabalho de campo ou backoffice, possuem jornada, escalas, presença e banco de horas.
+2. **Fornecedores (`Suppliers`):** Fornecem cabos, ferragens, ONUs, equipamentos de rede ou prestam serviços à empresa.
+3. **Clientes (`Customers / Subscribers`):** Assinantes residenciais, corporativos (B2B) ou operadoras que contratam a infraestrutura.
+4. **Solicitantes (`Requesters`):** Entidades ou pessoas autorizadas a demandar chamados em nome de um cliente ou operadora parceira.
+
+### AXIOMA 2: Suprimentos Gira em Torno de DEPÓSITOS FÍSICOS & CLUSTERS REGIONAIS
+- **Depósitos Físicos (`depots`):** Todo local físico onde materiais estão fisicamente guardados (Almoxarifado Central, Bases Regionais, Carros dos Técnicos e Laboratórios).
+- **Clusters de Depósito / Posição Regional (`depot_clusters`):** Agrupamento geográfico de depósitos sob a mesma cobertura.
+- **Saldo Virtual Aglutinado (`Aggregated Virtual Balance`):** O gestor enxerga o saldo consolidado de toda a região em tempo real (soma da base regional + todos os carros dos técnicos do cluster).
+
+---
+
+## 3. INTRANET CORPORATIVA & CAMADAS DE COMUNICAÇÃO SEGMENTADA
+
+O sistema dispõe de uma **Camada de Comunicação e Intranet** com 4 portais específicos dedicados a cada persona:
+1. **Camada Colaboradores:** Mural de avisos, normas de EPIs, espelho de ponto diário e extrato de banco de horas simplificado.
+2. **Camada Fornecedores:** Upload de notas fiscais, pedidos de compra, cotações e comprovantes de pagamento.
+3. **Camada Clientes (White-label):** Rastreamento de acionamento em tempo real no mapa, 2ª via de boletos/PIX e histórico de chamados.
+4. **Camada Solicitantes:** Abertura de chamados em lote, acompanhamento de SLAs contratuais e download de laudos RFO em PDF.
+
+---
+
+## 4. O MÓDULO DE ACIONAMENTO: DESLOCAMENTO, JORNADA & BANCO DE HORAS
+
+O **Acionamento (`dispatches`)** é a Ordem de Serviço de campo com mobilização física de equipe:
+1. **Controle de Deslocamento:** Registro de início de viagem (`departed_at`), chegada no cliente (`arrived_at`), fotos de odômetro (KM inicial/final) e cálculo automático do **TMA de Deslocamento** vs **TMA de Atendimento**.
+2. **Presença Diária & Ponto Eletrônico:** Ponto no mobile com geolocalização e foto.
+3. **Banco de Horas Simplificado:** Apuração diária automática (horas previstas vs horas trabalhadas). Extrato transparente com créditos (extras), débitos (atrasos/saídas) e saldo acumulado atual com opção simples de compensação.
+4. **Fechamento RFO:** Checklist com watermark digital, medição óptica em dBm, speedtest, baixa de seriais do carro, assinatura digital na tela e emissão de laudo em PDF.
+
+---
+
+## 5. O NÚCLEO OPERACIONAL: O FUNIL EM 3 ESTÁGIOS
+
+1. **TAREFAS (`tasks`):** Ponto de entrada universal assíncrono (APIs, webhooks, IA, rotinas de POP, e-mails e chat).
+2. **CHAMADOS (`tickets`):** Pedidos formais de clientes e operadoras com controle de SLA e diagnóstico remoto.
+3. **ACIONAMENTOS (`dispatches`):** Ordens de serviço de campo com mobilização de técnicos, veículos, materiais e RFO.
+
+---
+
+## 6. SISTEMA FINANCEIRO COMPLETO (ERP FINANCEIRO)
+
+- **Contas a Pagar:** Integrado automaticamente à LPU de técnicos, contratos de POPs e compras do almoxarifado. Rateio por centros de custo e alçadas de aprovação.
+- **Contas a Receber:** Faturamento de contratos com Boletos e PIX com QR Code dinâmico, além de régua de cobrança automática via WhatsApp e E-mail.
+- **Fluxo de Caixa & DRE:** Fluxo diário e projetado (30/60/90 dias) e DRE gerencial em tempo real.
+- **Conciliação Bancária Automática:** Importação de extratos OFX e arquivos CNAB 240/400 com algoritmo de Smart Matching e conciliação em 1 clique.
+
+---
+
+## 7. SISTEMA DE TEMAS & WHITE-LABEL (THEMING ENGINE)
+
+- **White-Label por Tenant (`Organization.theme_settings`):** Logotipo, favicon, nome exibido e cor primária da marca. Os links de rastreamento do cliente e os PDFs de laudo RFO saem com a identidade do provedor.
+- **Dark Mode & Light Mode Nativo:** Alternância suave com respeito às preferências do sistema operacional.
+- **Densidade de Layout:** Modo Compacto (para NOC, financeiro e despachantes) vs Modo Confortável.
+- **Design Tokens com Tailwind CSS:** Zero cores fixas hardcoded, tudo controlado via CSS Custom Properties.
+
+---
+
+## 8. MODELO DE DADOS MARIADB COM INTEGRIDADE ESTRITA (`RESTRICT`)
+
+```sql
+-- ==============================================================================
+-- 1. CADASTROS BÁSICOS CANÔNICOS
+-- ==============================================================================
+
+CREATE TABLE states (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    code CHAR(2) NOT NULL UNIQUE, -- SP, MG, RJ...
+    name VARCHAR(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE cities (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    state_id INT UNSIGNED NOT NULL,
+    ibge_code VARCHAR(10) NOT NULL UNIQUE,
+    name VARCHAR(150) NOT NULL,
+    location POINT NOT NULL,
+    FOREIGN KEY (state_id) REFERENCES states(id) ON DELETE RESTRICT,
+    SPATIAL INDEX idx_city_location (location)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE units (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    code VARCHAR(10) NOT NULL UNIQUE, -- MT, UND, PC, BOB, KM, RL, PAR
+    name VARCHAR(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE departments (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE ticket_categories (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    department_id INT UNSIGNED NOT NULL,
+    name VARCHAR(150) NOT NULL,
+    FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE ticket_reasons (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    category_id INT UNSIGNED NOT NULL,
+    name VARCHAR(150) NOT NULL,
+    default_priority ENUM('LOW', 'MEDIUM', 'HIGH', 'CRITICAL') DEFAULT 'MEDIUM',
+    FOREIGN KEY (category_id) REFERENCES ticket_categories(id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ==============================================================================
+-- 2. CONTAS, PROVEDORES E PESSOAS (RESTRIÇÃO ESTRITA)
+-- ==============================================================================
+
+CREATE TABLE accounts (
+    id CHAR(36) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    trade_name VARCHAR(255) NULL,
+    document_number VARCHAR(20) NOT NULL UNIQUE,
+    slug VARCHAR(100) NOT NULL UNIQUE,
+    status ENUM('trial', 'active', 'past_due', 'suspended', 'canceled') DEFAULT 'trial',
+    plan_tier VARCHAR(50) DEFAULT 'starter',
+    active_seats_limit INT DEFAULT 5,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE organizations (
+    id CHAR(36) PRIMARY KEY,
+    account_id CHAR(36) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    code VARCHAR(50) NULL,
+    document_number VARCHAR(20) NULL,
+    logo_url VARCHAR(500) NULL,
+    theme_settings JSON NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE RESTRICT,
+    INDEX idx_org_account (account_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE people (
+    id CHAR(36) PRIMARY KEY,
+    account_id CHAR(36) NOT NULL,
+    organization_id CHAR(36) NOT NULL,
+    person_type ENUM('INDIVIDUAL', 'LEGAL_ENTITY') DEFAULT 'INDIVIDUAL',
+    name VARCHAR(255) NOT NULL,
+    trade_name VARCHAR(255) NULL,
+    document_number VARCHAR(20) NOT NULL,
+    email VARCHAR(255) NULL,
+    phone VARCHAR(20) NULL,
+    city_id INT UNSIGNED NOT NULL, -- Cidade obrigatória e relacional
+    address_street VARCHAR(255) NULL,
+    is_worker TINYINT(1) DEFAULT 0,
+    is_supplier TINYINT(1) DEFAULT 0,
+    is_customer TINYINT(1) DEFAULT 0,
+    is_requester TINYINT(1) DEFAULT 0,
+    status ENUM('active', 'inactive') DEFAULT 'active',
+    deleted_at TIMESTAMP NULL,
+    deleted_by_user_id CHAR(36) NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE RESTRICT,
+    FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE RESTRICT,
+    FOREIGN KEY (city_id) REFERENCES cities(id) ON DELETE RESTRICT,
+    INDEX idx_person_doc (account_id, organization_id, document_number)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ==============================================================================
+-- 3. SUPRIMENTOS & DEPÓSITOS (RESTRIÇÃO ESTRITA)
+-- ==============================================================================
+
+CREATE TABLE depot_clusters (
+    id CHAR(36) PRIMARY KEY,
+    account_id CHAR(36) NOT NULL,
+    organization_id CHAR(36) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    code VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE RESTRICT,
+    FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE workers (
+    id CHAR(36) PRIMARY KEY,
+    account_id CHAR(36) NOT NULL,
+    organization_id CHAR(36) NOT NULL,
+    person_id CHAR(36) NOT NULL,
+    cluster_id CHAR(36) NOT NULL,
+    employment_type ENUM('CLT', 'PJ', 'THIRD_PARTY') DEFAULT 'CLT',
+    last_location POINT NOT NULL,
+    status ENUM('active', 'inactive', 'on_leave') DEFAULT 'active',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (person_id) REFERENCES people(id) ON DELETE RESTRICT,
+    FOREIGN KEY (cluster_id) REFERENCES depot_clusters(id) ON DELETE RESTRICT,
+    SPATIAL INDEX idx_worker_location (last_location)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE depots (
+    id CHAR(36) PRIMARY KEY,
+    account_id CHAR(36) NOT NULL,
+    organization_id CHAR(36) NOT NULL,
+    cluster_id CHAR(36) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    type ENUM('CENTRAL', 'REGIONAL_BASE', 'VEHICLE', 'LAB_REPAIR') NOT NULL,
+    worker_id CHAR(36) NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (cluster_id) REFERENCES depot_clusters(id) ON DELETE RESTRICT,
+    FOREIGN KEY (worker_id) REFERENCES workers(id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE materials (
+    id CHAR(36) PRIMARY KEY,
+    account_id CHAR(36) NOT NULL,
+    organization_id CHAR(36) NOT NULL,
+    unit_id INT UNSIGNED NOT NULL,
+    code VARCHAR(50) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    has_serial TINYINT(1) DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (unit_id) REFERENCES units(id) ON DELETE RESTRICT,
+    FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE stock_balances (
+    id CHAR(36) PRIMARY KEY,
+    depot_id CHAR(36) NOT NULL,
+    material_id CHAR(36) NOT NULL,
+    quantity DECIMAL(12,2) DEFAULT 0,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_depot_material (depot_id, material_id),
+    FOREIGN KEY (depot_id) REFERENCES depots(id) ON DELETE RESTRICT,
+    FOREIGN KEY (material_id) REFERENCES materials(id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE stock_serials (
+    id CHAR(36) PRIMARY KEY,
+    account_id CHAR(36) NOT NULL,
+    organization_id CHAR(36) NOT NULL,
+    material_id CHAR(36) NOT NULL,
+    current_depot_id CHAR(36) NOT NULL,
+    serial_number VARCHAR(100) NOT NULL,
+    status ENUM('IN_STOCK', 'IN_TRANSIT', 'INSTALLED_CUSTOMER', 'DEFECTIVE', 'DISCARDED') DEFAULT 'IN_STOCK',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_serial_account (account_id, serial_number),
+    FOREIGN KEY (material_id) REFERENCES materials(id) ON DELETE RESTRICT,
+    FOREIGN KEY (current_depot_id) REFERENCES depots(id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ==============================================================================
+-- 4. FUNIL EM 3 ESTÁGIOS COM RESTRIÇÃO ESTRITA
+-- ==============================================================================
+
+CREATE TABLE tasks (
+    id CHAR(36) PRIMARY KEY,
+    account_id CHAR(36) NOT NULL,
+    organization_id CHAR(36) NOT NULL,
+    task_number VARCHAR(30) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    status ENUM('INBOX', 'TRIAGED', 'PROMOTED_TICKET', 'RESOLVED_INTERNAL', 'CANCELED') DEFAULT 'INBOX',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE tickets (
+    id CHAR(36) PRIMARY KEY,
+    account_id CHAR(36) NOT NULL,
+    organization_id CHAR(36) NOT NULL,
+    origin_task_id CHAR(36) NULL,
+    customer_person_id CHAR(36) NOT NULL,
+    requester_person_id CHAR(36) NULL,
+    city_id INT UNSIGNED NOT NULL,
+    department_id INT UNSIGNED NOT NULL,
+    category_id INT UNSIGNED NOT NULL,
+    reason_id INT UNSIGNED NOT NULL,
+    protocol VARCHAR(30) NOT NULL,
+    location POINT NOT NULL,
+    status ENUM('OPEN', 'IN_TRIAGE', 'WAITING_DISPATCH', 'RESOLVED_REMOTE', 'IN_FIELD', 'CLOSED', 'CANCELED') DEFAULT 'OPEN',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (customer_person_id) REFERENCES people(id) ON DELETE RESTRICT,
+    FOREIGN KEY (requester_person_id) REFERENCES people(id) ON DELETE RESTRICT,
+    FOREIGN KEY (city_id) REFERENCES cities(id) ON DELETE RESTRICT,
+    FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE RESTRICT,
+    FOREIGN KEY (category_id) REFERENCES ticket_categories(id) ON DELETE RESTRICT,
+    FOREIGN KEY (reason_id) REFERENCES ticket_reasons(id) ON DELETE RESTRICT,
+    FOREIGN KEY (origin_task_id) REFERENCES tasks(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE dispatches (
+    id CHAR(36) PRIMARY KEY,
+    account_id CHAR(36) NOT NULL,
+    organization_id CHAR(36) NOT NULL,
+    ticket_id CHAR(36) NOT NULL,
+    worker_id CHAR(36) NOT NULL,
+    depot_id CHAR(36) NOT NULL,
+    dispatch_number VARCHAR(30) NOT NULL,
+    status ENUM('DISPATCHED', 'ON_ROUTE', 'ARRIVED_SITE', 'IN_SERVICE', 'RFO_SUBMITTED', 'APPROVED', 'COMPLETED', 'CANCELED', 'FAILED') DEFAULT 'DISPATCHED',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE RESTRICT,
+    FOREIGN KEY (worker_id) REFERENCES workers(id) ON DELETE RESTRICT,
+    FOREIGN KEY (depot_id) REFERENCES depots(id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
