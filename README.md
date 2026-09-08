@@ -1,58 +1,198 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# ERP Rede Pronta
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="320" alt="ERP Rede Pronta Logo">
 </p>
 
-## About Laravel
+<p align="center">
+  <strong>Plataforma Integrada de Field Service Management (FSM), CRM Omnichannel, Suprimentos e ERP Financeiro para ISPs e Operadoras de Telecomunicações</strong>
+</p>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+<p align="center">
+  <img src="https://img.shields.io/badge/PHP-8.4-777BB4?style=for-the-badge&logo=php&logoColor=white" alt="PHP 8.4">
+  <img src="https://img.shields.io/badge/Laravel-13.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel 13">
+  <img src="https://img.shields.io/badge/MariaDB-10.11%2B-003545?style=for-the-badge&logo=mariadb&logoColor=white" alt="MariaDB">
+  <img src="https://img.shields.io/badge/Debian-13_(Trixie)-A81D33?style=for-the-badge&logo=debian&logoColor=white" alt="Debian 13">
+  <img src="https://img.shields.io/badge/Vue.js-3.x-4FC08D?style=for-the-badge&logo=vue.js&logoColor=white" alt="Vue 3">
+  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS">
+  <img src="https://img.shields.io/badge/Multi--Tenant-Ready-blueviolet?style=for-the-badge" alt="Multi Tenant">
+</p>
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 📌 Visão Geral
 
-## Learning Laravel
+O **ERP Rede Pronta** é uma solução de alto desempenho projetada especificamente para as demandas complexas do setor de telecomunicações e serviços de campo. Construído sobre uma arquitetura **API-First / Headless**, o sistema unifica em uma única plataforma modular:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- Gestão de Atendimento Omnichannel e Webmail Integrado;
+- Despacho e Mobilização de Equipes de Campo (FSM);
+- Controle Avançado de Almoxarifado com Saldo Regional Aglutinado;
+- Gestão Financeira Completa com Conciliação Bancária Inteligente;
+- Portais Dedicados e Segmentados para todas as Personas da Operação.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+## 💎 Os Dois Axiomas Centrais
 
-## Agentic Development
+A arquitetura do **ERP Rede Pronta** foi concebida sob duas premissas estruturais inegociáveis:
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+### 1. O Sistema Gira em Torno de PESSOAS (`people`)
+No ERP Rede Pronta, pessoas são o núcleo relacional universal. Em vez de tabelas isoladas e redundantes, uma única entidade mestre assume papéis polimórficos na operação, viabilizando **4 Portais / Intranets Segmentados**:
+- **Colaboradores**: Painel do funcionário com espelho de presença, horas trabalhadas, banco de horas simplificado e solicitações internas.
+- **Fornecedores**: Portal para envio de notas fiscais, conferência de pedidos de compra, medições de LPU técnica e acompanhamento de faturamento.
+- **Clientes**: Autoatendimento com emissão de 2ª via de boletos, código PIX dinâmico, visualização de contratos e abertura de chamados.
+- **Solicitantes**: Canal direto para pessoas físicas ou prepostos credenciados que registram pedidos de serviço e acompanham ordens de trabalho.
 
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+```
+                     ┌───────────────────────┐
+                     │    PESSOA (people)    │
+                     │ Identidade & Contatos │
+                     └───────────┬───────────┘
+         ┌───────────────────────┼───────────────────────┐
+         ▼                       ▼                       ▼
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│  COLABORADOR    │     │   FORNECEDOR    │     │     CLIENTE     │
+│  LPU / Presença │     │ Compras / Notas │     │ Contratos / SAC │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### 2. Suprimentos em Torno de Depósitos e Posições Regionais (`stock_clusters`)
+O controle de estoque físico e virtual reflete com precisão a geografia das operadoras:
+- **Depósitos Físicos**: Almoxarifado Central, Bases Operacionais Avançadas e Carros/Viaturas das equipes técnicas.
+- **Posição Regional (Cluster de Depósitos)**: Agrupamento geográfico de depósitos que calcula em tempo real o **Saldo Virtual Aglutinado** da região, permitindo alocação estratégica de materiais sem necessidade de transferências físicas imediatas.
+- **Rastreabilidade Serial Ponta a Ponta**: Acompanhamento unitário de ONUs, roteadores, bobinas de fibra e rádios por Número de Série, MAC Address e histórico de movimentações.
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## ⚡ Funil Operacional em 3 Estágios
 
-## Code of Conduct
+Toda demanda no ERP Rede Pronta percorre um ciclo de vida estruturado, evitando ruídos de comunicação e garantindo rastreabilidade:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```
+[ APIs / IA / E-mails / Chat ]
+              │
+              ▼
+   ┌─────────────────────┐
+   │ 1. TAREFAS (tasks)  │ ──► Ponto de entrada universal, triagem e roteamento inteligente
+   └──────────┬──────────┘
+              ▼
+   ┌─────────────────────┐
+   │2. CHAMADOS (tickets)│ ──► Demandas formais com catálogo de serviços e controle de SLA
+   └──────────┬──────────┘
+              ▼
+   ┌─────────────────────┐
+   │  3. ACIONAMENTOS    │ ──► Ordens de serviço de campo, mobilização de veículos e equipes
+   │    (dispatches)     │
+   └─────────────────────┘
+```
 
-## Security Vulnerabilities
+1. **Tarefas (`tasks`)**: Ponto de entrada universal. Qualquer requisição oriunda de integrações (APIs), agentes de Inteligência Artificial, e-mails recebidos ou mensagens de chat é convertida em Tarefa para classificação.
+2. **Chamados (`tickets`)**: Pedidos formais de clientes, provedores ou solicitantes com prazos de atendimento (SLA), catálogo de serviços e histórico auditável.
+3. **Acionamentos (`dispatches`)**: Atividade de campo mobilizada. Controla:
+   - **Deslocamento**: Horário de saída, odômetro inicial, horário de chegada ao destino, odômetro final e cálculo do TMA de viagem vs TMA de atendimento;
+   - **Presença e Jornada**: Registro de presença da equipe em campo;
+   - **Banco de Horas Simplificado**: Cômputo automático de horas trabalhadas em horas normais e excedentes por acionamento.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
 
-## License
+## 📦 Módulos do Sistema
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+| Módulo | Descrição & Funcionalidades Principais |
+| :--- | :--- |
+| **CRM Omnichannel** | Chat unificado ao vivo (WhatsApp multi-número, Telegram, Webchat e Chat Interno) e Cliente de E-mail (Webmail) integrado com conversão de mensagens em tarefas/chamados com 1 clique. |
+| **FSM & Despacho** | Mobilização de equipes, roteirização geográfica, controle de deslocamento (KM/Horários), fotos de evidência de campo e assinatura digital de OS. |
+| **WMS & Suprimentos** | Gestão de Depósitos e Clusters Regionais, saldo virtual aglutinado, rastreabilidade por número de série/MAC, cautelas de ferramental e inventário dinâmico. |
+| **ERP Financeiro** | Contas a Pagar (LPU de técnicos, aluguéis de POPs e compras), Contas a Receber, Fluxo de Caixa Realizado vs Previsto, DRE Gerencial e **Conciliação Bancária Automática (OFX/CNAB 240 e 400)**. |
+| **Contratos & Cobrança** | Gestão de assinaturas telecom, réguas de cobrança automatizadas via WhatsApp/E-mail, geração de boletos registrados e PIX dinâmico. |
+| **Portais & Intranet** | Camada de comunicação e autoatendimento segmentada para Colaboradores, Fornecedores, Clientes e Solicitantes. |
+| **NOC & Infraestrutura** | Monitoramento de POPs, torres, racks, caixas de emenda (CTOs) e relatórios de RFO (Relatório de Falha Operacional). |
+| **Theming Engine** | Alternância dinâmica de modo Claro/Escuro/Automático e controle de densidade de tela (*Compacto* para operadores de NOC e Despacho vs *Confortável* para telas administrativas). |
+
+---
+
+## 🛡️ Integridade Relacional e Segurança de Dados
+
+O banco de dados do **ERP Rede Pronta** adota uma política rigorosa de integridade relacional nativa no MariaDB:
+
+- **Proibição de `CASCADE` em Entidades Mestres**: Cláusulas `ON DELETE RESTRICT` são mandatórias em chaves estrangeiras vinculadas a pessoas, cidades IBGE, depósitos, materiais e centros de custo.
+- **Inativação Lógica e Soft Deletes**: Dados com dependências operacionais históricas não são excluídos fisicamente, preservando a integridade contábil e jurídica da operadora.
+- **Isolamento Multi-Tenant**: Toda consulta e persistência aplica automaticamente o escopo de `account_id` através do trait `BelongsToTenant`.
+
+---
+
+## 🛠️ Stack Tecnológico
+
+| Camada | Tecnologia | Detalhes |
+| :--- | :--- | :--- |
+| **Sistema Operacional** | Debian 13 (Trixie) | Servidor robusto, seguro e padronizado |
+| **Linguagem Backend** | PHP 8.4 | Tipagem estrita, performance otimizada e JIT |
+| **Framework Web** | Laravel 13.x | Arquitetura API-First com Camada de Serviços e FormRequests |
+| **Banco de Dados** | MariaDB 10.11+ / 11.x | Motor InnoDB com `utf8mb4_unicode_ci` e suporte a índices geoespaciais |
+| **Frontend** | Vue 3 + Tailwind CSS | Composition API (`<script setup>`), TypeScript e Design Tokens via CSS Variables |
+| **Ícones** | Lucide Icons | Pacote moderno e consistente de vetores SVG |
+| **Filas & Cache** | Redis / Database Queue | Processamento assíncrono de e-mails, webhooks e mensagens omnichannel |
+
+---
+
+## 🚀 Guia Rápido de Instalação
+
+### Pré-requisitos
+- Debian 13 (Trixie) ou distribuição compatível
+- PHP 8.4 com extensões: `php-fpm`, `php-mysql`, `php-mbstring`, `php-xml`, `php-curl`, `php-zip`, `php-bcmath`
+- MariaDB Server 10.11+
+- Composer 2.x
+- Node.js 20+ e NPM
+
+### 1. Clonar o Repositório
+```bash
+git clone git@github.com:omauriciofala/dev.redepronta.com.git /var/www/dev.redepronta.com
+cd /var/www/dev.redepronta.com
+```
+
+### 2. Configurar o Ambiente
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+
+Edite o arquivo `.env` para apontar para a sua instância do MariaDB:
+```ini
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=rp_saas_db
+DB_USERNAME=rp_user
+DB_PASSWORD=sua_senha_segura
+```
+
+### 3. Instalar Dependências e Executar Migrations
+```bash
+# Dependências PHP
+composer install --no-dev --optimize-autoloader
+
+# Permissões do Servidor Web
+sudo chown -R mol:www-data storage bootstrap/cache
+sudo chmod -R 775 storage bootstrap/cache
+
+# Execução das Migrations
+php artisan migrate --force
+
+# Dependências Frontend e Build
+npm install
+npm run build
+```
+
+---
+
+## �� Documentação Técnica e Roadmap
+
+Para aprofundamento na arquitetura, modelos de dados e execução ágil, consulte a pasta de documentação:
+
+- [**System Blueprint Completo**](docs/novo_produto_saas_blueprint.md): Especificação arquitetural com diagramas DDL completos, models Eloquent, endpoints RESTful e estrutura de temas.
+- [**Plano de Sprints e Checklists de Tarefas**](docs/plano_sprints_execucao.md): Divisão do desenvolvimento em 7 Sprints enxutos com critérios de aceitação e prompts objetivos para IA.
+
+---
+
+<p align="center">
+  Desenvolvido com excelência técnica pela equipe <strong>Rede Pronta</strong>.
+</p>
