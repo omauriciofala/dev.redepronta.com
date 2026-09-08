@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\PersonController;
 use App\Http\Controllers\Api\V1\GeoController;
+use App\Http\Controllers\Api\V1\ChangelogController;
 
 Route::prefix('v1')->group(function () {
     // Geografia e Referências Canônicas
@@ -13,4 +14,7 @@ Route::prefix('v1')->group(function () {
     // Pessoas
     Route::apiResource('people', PersonController::class);
     Route::patch('people/{person}/toggle-status', [PersonController::class, 'toggleStatus']);
+
+    // Change-log Vivo
+    Route::get('changelog', [ChangelogController::class, 'index']);
 });

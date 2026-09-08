@@ -30,11 +30,12 @@
         <span>Pessoas</span>
       </button>
 
-      <!-- Item Design System -->
-      <div class="pt-3 px-3 pb-2 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+      <!-- Desenvolvimento & Governança -->
+      <div class="pt-4 px-3 pb-2 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
         Desenvolvimento
       </div>
 
+      <!-- Item Design System -->
       <button
         type="button"
         @click="setView('design-system')"
@@ -45,6 +46,19 @@
       >
         <Palette class="w-5 h-5" :class="currentView === 'design-system' ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400'" />
         <span>Design System</span>
+      </button>
+
+      <!-- Item Change-log -->
+      <button
+        type="button"
+        @click="setView('changelog')"
+        :class="currentView === 'changelog'
+          ? 'bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-400 font-semibold shadow-2xs'
+          : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60'"
+        class="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm rounded-lg transition-colors cursor-pointer text-left"
+      >
+        <History class="w-5 h-5" :class="currentView === 'changelog' ? 'text-purple-600 dark:text-purple-400' : 'text-slate-400'" />
+        <span>Change-log</span>
       </button>
 
       <!-- Próximos Módulos -->
@@ -100,7 +114,7 @@
 </template>
 
 <script setup lang="ts">
-import { Users, Palette, Package, CheckSquare, CreditCard, MessageSquare, Sun, Moon } from 'lucide-vue-next';
+import { Users, Palette, History, Package, CheckSquare, CreditCard, MessageSquare, Sun, Moon } from 'lucide-vue-next';
 import { useTheme } from '../../composables/useTheme';
 import { useNavigation } from '../../composables/useNavigation';
 
