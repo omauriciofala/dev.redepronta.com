@@ -1,5 +1,5 @@
 <template>
-  <div class="p-8 max-w-7xl w-full mx-auto space-y-6">
+  <div class="py-8 w-full max-w-7xl space-y-6">
     <!-- Cabeçalho Confortável Integrado (Sem Top Bar) -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>

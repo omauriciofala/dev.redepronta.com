@@ -1,5 +1,5 @@
 <template>
-  <div class="p-8 max-w-7xl mx-auto space-y-12">
+  <div class="py-8 w-full max-w-7xl space-y-12">
     <!-- Header Principal do Design System -->
     <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-800/80">
       <div>

@@ -3,8 +3,8 @@
     <!-- Sidebar Fixa com 240px -->
     <Sidebar />
 
-    <!-- Conteúdo Central (SEM TOP BAR) -->
-    <main class="flex-1 flex flex-col h-full overflow-y-auto pb-10">
+    <!-- Conteúdo Central (SEM TOP BAR - Espaçamento rigoroso de 60px a partir da Sidebar) -->
+    <main class="flex-1 flex flex-col h-full overflow-y-auto pb-12 pl-[60px] pr-8 lg:pr-[60px]">
       <slot />
     </main>
 
