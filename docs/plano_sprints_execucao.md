@@ -41,7 +41,7 @@ Todas as Foreign Keys de entidades de negócio utilizam **`ON DELETE RESTRICT`**
 **Objetivo:** Banco MariaDB estruturado com integridade relacional estrita (`RESTRICT`), base canônica de cidades, cadastro central de Pessoas e Theming Engine.
 
 #### Checklist de Tarefas:
-- [ ] Configurar Laravel 13.x no Debian 13 com conexão MariaDB e Sanctum.
+- [x] Configurar Laravel 13.x no Debian 13 com conexão MariaDB e Sanctum.
 - [ ] Criar migrations com `ON DELETE RESTRICT` para os cadastros básicos: `states`, `cities` (IBGE), `units`, `departments`, `ticket_categories`, `ticket_reasons`.
 - [ ] Criar migrations e models `accounts` e `organizations` com Global Tenant Scope.
 - [ ] Criar migration e model canônica `people` vinculada obrigatoriamente a `cities.id` (flags: colaborador, fornecedor, cliente, solicitante) com `SoftDeletes`.
