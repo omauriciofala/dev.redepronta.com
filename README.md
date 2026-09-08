@@ -171,7 +171,7 @@ DB_PASSWORD=sua_senha_segura
 composer install --no-dev --optimize-autoloader
 
 # Permissões do Servidor Web
-sudo chown -R mol:www-data storage bootstrap/cache
+sudo chown -R www-data:www-data storage bootstrap/cache
 sudo chmod -R 775 storage bootstrap/cache
 
 # Execução das Migrations

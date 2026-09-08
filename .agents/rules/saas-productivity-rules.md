@@ -10,7 +10,7 @@ trigger: manual
 
 ## 🚀 1. CICLO DE EXECUÇÃO ENXUTO (SPRINTS & PROMPTS CURTOS)
 
-- **Foco Estrito por Sprint**: Cada ciclo de desenvolvimento deve abordar exclusivamente as tarefas do Sprint ativo mapeadas no [plano_sprints_execucao.md](file:///home/mol/.gemini/antigravity-ide/brain/c0134693-1ac6-4110-918a-349e0147d14f/plano_sprints_execucao.md).
+- **Foco Estrito por Sprint**: Cada ciclo de desenvolvimento deve abordar exclusivamente as tarefas do Sprint ativo mapeadas no [plano_sprints_execucao.md](docs/plano_sprints_execucao.md).
 - **Sem Prompts Gigantes**: Mantenha prompts curtos, objetivos e orientados aos checklists de tarefas `[ ]`. A IA deve responder com código direto, testável e sem explicações prolixas desnecessárias.
 - **Checklist Atualizado**: Ao finalizar um item do sprint, registre a conclusão na lista de verificação antes de passar para o próximo módulo.
 
