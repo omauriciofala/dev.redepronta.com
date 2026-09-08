@@ -11,11 +11,11 @@
             <div class="flex items-center gap-2.5">
               <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Design System</h1>
               <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
-                v1.0 Canônico
+                v1.1 Modais & Fullscreen
               </span>
             </div>
             <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-              Tokens visuais, tipografia ergonômica, superfícies adaptáveis e componentes do ERP Rede Pronta.
+              Tokens visuais, tipografia ergonômica, superfícies adaptáveis e biblioteca de modais do ERP Rede Pronta.
             </p>
           </div>
         </div>
@@ -157,7 +157,6 @@
       <div class="space-y-2 pt-2">
         <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Estados do ERP & Personas</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          <!-- Primária -->
           <div class="p-4 rounded-xl border border-blue-200 dark:border-blue-900/60 bg-blue-50 dark:bg-blue-950/40 text-blue-900 dark:text-blue-300">
             <div class="flex items-center justify-between">
               <span class="text-sm font-semibold">Primária / Ação</span>
@@ -167,7 +166,6 @@
             <p class="text-xs text-blue-700/80 dark:text-blue-400/80 mt-1">Botões de ação, links ativos, foco</p>
           </div>
 
-          <!-- Sucesso / PF -->
           <div class="p-4 rounded-xl border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-300">
             <div class="flex items-center justify-between">
               <span class="text-sm font-semibold">Sucesso / Ativo / PF</span>
@@ -177,7 +175,6 @@
             <p class="text-xs text-emerald-700/80 dark:text-emerald-400/80 mt-1">Status Ativo, Pessoa Física</p>
           </div>
 
-          <!-- Corporativo / PJ -->
           <div class="p-4 rounded-xl border border-cyan-200 dark:border-cyan-900/60 bg-cyan-50 dark:bg-cyan-950/40 text-cyan-900 dark:text-cyan-300">
             <div class="flex items-center justify-between">
               <span class="text-sm font-semibold">Corporativo / PJ</span>
@@ -187,7 +184,6 @@
             <p class="text-xs text-cyan-700/80 dark:text-cyan-400/80 mt-1">Pessoa Jurídica, Fornecedor</p>
           </div>
 
-          <!-- Alerta / Perigo -->
           <div class="p-4 rounded-xl border border-red-200 dark:border-red-900/60 bg-red-50 dark:bg-red-950/40 text-red-900 dark:text-red-300">
             <div class="flex items-center justify-between">
               <span class="text-sm font-semibold">Crítico / Inativo</span>
@@ -214,31 +210,26 @@
         <div>
           <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Variantes de Estilo</span>
           <div class="flex flex-wrap items-center gap-3 mt-3">
-            <!-- Primário -->
             <button class="h-10 px-4 text-sm font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-500 transition shadow-xs flex items-center gap-2 cursor-pointer">
               <Plus class="w-4 h-4" />
               <span>Botão Primário</span>
             </button>
 
-            <!-- Secundário / Outline -->
             <button class="h-10 px-4 text-sm font-medium rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/80 transition shadow-2xs flex items-center gap-2 cursor-pointer">
               <RefreshCw class="w-4 h-4" />
               <span>Secundário / Outline</span>
             </button>
 
-            <!-- Sucesso -->
             <button class="h-10 px-4 text-sm font-medium rounded-lg bg-emerald-600 text-white hover:bg-emerald-500 transition shadow-xs flex items-center gap-2 cursor-pointer">
               <Check class="w-4 h-4" />
               <span>Ação Sucesso</span>
             </button>
 
-            <!-- Perigo -->
             <button class="h-10 px-4 text-sm font-medium rounded-lg bg-red-600 text-white hover:bg-red-500 transition shadow-xs flex items-center gap-2 cursor-pointer">
               <Trash2 class="w-4 h-4" />
               <span>Perigo / Excluir</span>
             </button>
 
-            <!-- Ghost -->
             <button class="h-10 px-4 text-sm font-medium rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center gap-2 cursor-pointer">
               <ExternalLink class="w-4 h-4" />
               <span>Ghost / Neutro</span>
@@ -249,18 +240,15 @@
         <div>
           <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Estados (Desabilitado & Carregando)</span>
           <div class="flex flex-wrap items-center gap-3 mt-3">
-            <!-- Loading -->
             <button disabled class="h-10 px-4 text-sm font-medium rounded-lg bg-blue-600/70 text-white flex items-center gap-2 cursor-not-allowed opacity-80">
               <Loader2 class="w-4 h-4 animate-spin" />
               <span>Processando...</span>
             </button>
 
-            <!-- Disabled -->
             <button disabled class="h-10 px-4 text-sm font-medium rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/40 text-slate-400 dark:text-slate-600 cursor-not-allowed">
               Ação Desabilitada
             </button>
 
-            <!-- Ícone Quadrado Confortável -->
             <button class="w-10 h-10 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition cursor-pointer" title="Configurações">
               <Settings class="w-4 h-4" />
             </button>
@@ -281,7 +269,6 @@
 
       <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 space-y-6 shadow-xs">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <!-- Campo Normal -->
           <div>
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
               Nome Completo / Razão Social
@@ -295,7 +282,6 @@
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Nome cadastral canônico</p>
           </div>
 
-          <!-- Campo com Ícone (Busca) -->
           <div>
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
               Busca com Ícone
@@ -311,7 +297,6 @@
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Filtro em tempo real</p>
           </div>
 
-          <!-- Select -->
           <div>
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
               Seleção de Cidade / UF
@@ -325,9 +310,7 @@
           </div>
         </div>
 
-        <!-- Controles de Toggle e Checkbox -->
         <div class="pt-4 border-t border-slate-100 dark:border-slate-800/80 flex flex-wrap items-center gap-8">
-          <!-- Switch Interativo -->
           <div class="flex items-center gap-3">
             <button
               type="button"
@@ -345,7 +328,6 @@
             </span>
           </div>
 
-          <!-- Checkbox Amplo -->
           <label class="flex items-center gap-2.5 cursor-pointer">
             <input type="checkbox" checked class="w-4 h-4 rounded-sm border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-blue-500" />
             <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Aceite de notificações automáticas</span>
@@ -418,7 +400,6 @@
       </p>
 
       <div class="space-y-3">
-        <!-- Sucesso -->
         <div class="p-4 rounded-xl border border-emerald-200 dark:border-emerald-900/80 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-300 flex items-start gap-3">
           <CheckCircle2 class="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
           <div class="text-sm">
@@ -427,7 +408,6 @@
           </div>
         </div>
 
-        <!-- Informativo -->
         <div class="p-4 rounded-xl border border-blue-200 dark:border-blue-900/80 bg-blue-50 dark:bg-blue-950/40 text-blue-900 dark:text-blue-300 flex items-start gap-3">
           <Info class="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
           <div class="text-sm">
@@ -436,7 +416,6 @@
           </div>
         </div>
 
-        <!-- Atenção -->
         <div class="p-4 rounded-xl border border-amber-200 dark:border-amber-900/80 bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 flex items-start gap-3">
           <AlertTriangle class="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
           <div class="text-sm">
@@ -496,6 +475,482 @@
         </table>
       </div>
     </section>
+
+    <!-- SEÇÃO 8: MODAIS, DIÁLOGOS & FORMULÁRIOS EM TELA CHEIA (NOVO) -->
+    <section id="modais" class="space-y-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <Maximize2 class="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100">8. Modais, Diálogos & Formulários em Tela Cheia</h2>
+        </div>
+        <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
+          Biblioteca Canônica
+        </span>
+      </div>
+      <p class="text-sm text-slate-500 dark:text-slate-400">
+        Família completa de diálogos do ERP Rede Pronta. Destaque especial para o <strong>Modal de Tela Cheia</strong>, projetado para acomodar formulários densos, workflows multi-etapas e configurações complexas sem navegar para outra página.
+      </p>
+
+      <!-- Cartões de Demonstração Interativa dos 5 Tamanhos -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- 1. Modal Pequeno (Confirmação) -->
+        <div class="p-5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs flex flex-col justify-between space-y-4">
+          <div>
+            <div class="flex items-center justify-between">
+              <h3 class="text-base font-bold text-slate-900 dark:text-slate-100">1. Confirmação (sm)</h3>
+              <span class="text-xs font-mono font-semibold text-slate-400">max-w-md</span>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1.5">
+              Diálogos curtos, confirmação de exclusão ou ações irreversíveis.
+            </p>
+          </div>
+          <button
+            type="button"
+            @click="openModalSm = true"
+            class="w-full h-10 px-4 text-sm font-medium rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/80 transition cursor-pointer flex items-center justify-center gap-2"
+          >
+            <AlertCircle class="w-4 h-4 text-red-500" />
+            <span>Testar Modal de Confirmação</span>
+          </button>
+        </div>
+
+        <!-- 2. Modal Padrão (Cadastro Simples) -->
+        <div class="p-5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs flex flex-col justify-between space-y-4">
+          <div>
+            <div class="flex items-center justify-between">
+              <h3 class="text-base font-bold text-slate-900 dark:text-slate-100">2. Padrão (md / lg)</h3>
+              <span class="text-xs font-mono font-semibold text-slate-400">max-w-3xl</span>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1.5">
+              O modal clássico de cadastros de 2 colunas (ex: cadastro de pessoas do Sprint 1).
+            </p>
+          </div>
+          <button
+            type="button"
+            @click="openModalLg = true"
+            class="w-full h-10 px-4 text-sm font-medium rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/80 transition cursor-pointer flex items-center justify-center gap-2"
+          >
+            <Layers class="w-4 h-4 text-blue-500" />
+            <span>Testar Modal de Cadastro (lg)</span>
+          </button>
+        </div>
+
+        <!-- 3. Modal Amplo (Tabelas / Seleção) -->
+        <div class="p-5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs flex flex-col justify-between space-y-4">
+          <div>
+            <div class="flex items-center justify-between">
+              <h3 class="text-base font-bold text-slate-900 dark:text-slate-100">3. Amplo (xl)</h3>
+              <span class="text-xs font-mono font-semibold text-slate-400">max-w-5xl</span>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1.5">
+              Visualização de relatórios rápidos, conciliações ou seleção avançada de itens.
+            </p>
+          </div>
+          <button
+            type="button"
+            @click="openModalXl = true"
+            class="w-full h-10 px-4 text-sm font-medium rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/80 transition cursor-pointer flex items-center justify-center gap-2"
+          >
+            <Table class="w-4 h-4 text-emerald-500" />
+            <span>Testar Modal Amplo (xl)</span>
+          </button>
+        </div>
+
+        <!-- 4. ⭐ MODAL DE TELA CHEIA (FULLSCREEN OVERLAY) -->
+        <div class="p-5 rounded-xl border-2 border-blue-500/80 dark:border-blue-500/80 bg-blue-50/40 dark:bg-blue-950/30 shadow-md flex flex-col justify-between space-y-4 md:col-span-2">
+          <div>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="p-1 rounded-md bg-blue-600 text-white">
+                  <Maximize2 class="w-4 h-4" />
+                </span>
+                <h3 class="text-base font-bold text-blue-900 dark:text-blue-100">
+                  4. Modal de Tela Cheia (Fullscreen Overlay)
+                </h3>
+              </div>
+              <span class="text-xs font-semibold px-2 py-0.5 rounded-md bg-blue-600 text-white">
+                Destaque de Arquitetura
+              </span>
+            </div>
+            <p class="text-sm text-slate-600 dark:text-slate-300 mt-2">
+              Sobrepõe quase todo o viewport (deixa margem arejada de 24px a 32px nas bordas), com backdrop blur escurecido, cantos arredondados finos, cabeçalho fixo com abas de contexto, corpo com scroll próprio e rodapé com ações permanentes. <strong>Substitui a necessidade de abrir novas páginas para formulários densos e complexos.</strong>
+            </p>
+          </div>
+          <button
+            type="button"
+            @click="openModalFullscreen = true"
+            class="h-11 px-5 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-500 transition shadow-sm cursor-pointer flex items-center justify-center gap-2"
+          >
+            <Maximize2 class="w-4 h-4" />
+            <span>Abrir Modal de Tela Cheia (Formulário Complexo)</span>
+          </button>
+        </div>
+
+        <!-- 5. Drawer Lateral (Slide-Over) -->
+        <div class="p-5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs flex flex-col justify-between space-y-4">
+          <div>
+            <div class="flex items-center justify-between">
+              <h3 class="text-base font-bold text-slate-900 dark:text-slate-100">5. Drawer Lateral (Slide-over)</h3>
+              <span class="text-xs font-mono font-semibold text-slate-400">max-w-xl lateral</span>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1.5">
+              Painel deslizante à direita para inspeção ou edição rápida sem perder a listagem de fundo.
+            </p>
+          </div>
+          <button
+            type="button"
+            @click="openModalDrawer = true"
+            class="w-full h-10 px-4 text-sm font-medium rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/80 transition cursor-pointer flex items-center justify-center gap-2"
+          >
+            <SidebarIcon class="w-4 h-4 text-purple-500" />
+            <span>Testar Drawer Lateral</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- MODAIS REAIS INSTANCIADOS PARA DEMONSTRAÇÃO E TESTE VIVO -->
+    <!-- ========================================================= -->
+
+    <!-- 1. MODAL PEQUENO: CONFIRMAÇÃO -->
+    <BaseModal
+      v-model="openModalSm"
+      size="sm"
+      title="Confirmar Inativação"
+      description="Esta ação desativará temporariamente os acessos da entidade."
+    >
+      <div class="flex items-start gap-3 py-2">
+        <div class="p-2.5 rounded-full bg-red-100 dark:bg-red-950/60 text-red-600 shrink-0">
+          <AlertTriangle class="w-5 h-5" />
+        </div>
+        <div>
+          <p class="text-sm font-medium text-slate-800 dark:text-slate-200">
+            Deseja realmente inativar o cadastro de <strong>Telecom Prime Ltda</strong>?
+          </p>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            Nenhum dado será excluído. O registro apenas não aparecerá nas rotinas operacionais cotidianas.
+          </p>
+        </div>
+      </div>
+
+      <template #footer>
+        <button
+          type="button"
+          @click="openModalSm = false"
+          class="h-9 px-3.5 text-xs font-medium rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 transition cursor-pointer"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          @click="openModalSm = false"
+          class="h-9 px-4 text-xs font-semibold rounded-lg bg-red-600 text-white hover:bg-red-500 transition cursor-pointer"
+        >
+          Confirmar Inativação
+        </button>
+      </template>
+    </BaseModal>
+
+    <!-- 2. MODAL PADRÃO (LG): CADASTRO -->
+    <BaseModal
+      v-model="openModalLg"
+      size="lg"
+      title="Novo Cadastro de Pessoa"
+      description="Preencha os campos essenciais de identificação e localização."
+    >
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-semibold uppercase text-slate-600 dark:text-slate-400 mb-1">Nome / Razão Social</label>
+          <input type="text" placeholder="Nome completo" class="w-full h-10 px-3 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase text-slate-600 dark:text-slate-400 mb-1">CPF ou CNPJ</label>
+          <input type="text" placeholder="000.000.000-00" class="w-full h-10 px-3 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase text-slate-600 dark:text-slate-400 mb-1">E-mail</label>
+          <input type="email" placeholder="contato@empresa.com" class="w-full h-10 px-3 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase text-slate-600 dark:text-slate-400 mb-1">Telefone Principal</label>
+          <input type="text" placeholder="(31) 99999-0000" class="w-full h-10 px-3 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100" />
+        </div>
+      </div>
+
+      <template #footer>
+        <button
+          type="button"
+          @click="openModalLg = false"
+          class="h-9 px-4 text-xs font-medium rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 transition cursor-pointer"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          @click="openModalLg = false"
+          class="h-9 px-4 text-xs font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-500 transition cursor-pointer"
+        >
+          Salvar Pessoa
+        </button>
+      </template>
+    </BaseModal>
+
+    <!-- 3. MODAL AMPLO (XL): LISTAGEM / RELATÓRIO -->
+    <BaseModal
+      v-model="openModalXl"
+      size="xl"
+      title="Histórico de Auditoria & Alterações"
+      description="Visualização abrangente de logs operacionais para a conta selecionada."
+    >
+      <div class="rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead class="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800">
+            <tr>
+              <th class="py-2.5 px-4 font-bold text-slate-500 uppercase">Data/Hora</th>
+              <th class="py-2.5 px-4 font-bold text-slate-500 uppercase">Usuário</th>
+              <th class="py-2.5 px-4 font-bold text-slate-500 uppercase">Ação</th>
+              <th class="py-2.5 px-4 font-bold text-slate-500 uppercase">Entidade</th>
+              <th class="py-2.5 px-4 font-bold text-slate-500 uppercase">IP Origem</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 dark:divide-slate-800/80">
+            <tr v-for="i in 4" :key="i" class="hover:bg-slate-50/60 dark:hover:bg-slate-800/40">
+              <td class="py-3 px-4 text-slate-500 font-mono">08/09/2026 20:{{ 20 + i }}:15</td>
+              <td class="py-3 px-4 font-medium text-slate-800 dark:text-slate-200">admin@redepronta.com</td>
+              <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-sm font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-400">UPDATE</span></td>
+              <td class="py-3 px-4 text-slate-600 dark:text-slate-400">Pessoas #{{ 100 + i }}</td>
+              <td class="py-3 px-4 font-mono text-slate-500">187.23.10.4{{ i }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <template #footer>
+        <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">Exibindo 4 de 128 registros auditados</span>
+        <button
+          type="button"
+          @click="openModalXl = false"
+          class="h-9 px-4 text-xs font-semibold rounded-lg bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-900 transition cursor-pointer"
+        >
+          Fechar Auditoria
+        </button>
+      </template>
+    </BaseModal>
+
+    <!-- 4. ⭐ MODAL DE TELA CHEIA (FULLSCREEN OVERLAY PARA FORMULÁRIOS COMPLEXOS) -->
+    <BaseModal
+      v-model="openModalFullscreen"
+      size="fullscreen"
+      title="Contrato Corporativo & Ordem de Instalação FSM"
+      description="Formulário denso e complexo operado em tela cheia sem sair da página atual."
+    >
+      <template #header-badge>
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+          <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+          Modo Edição Avançada
+        </span>
+      </template>
+
+      <!-- Abas de Navegação Interna do Modal Complexo -->
+      <template #tabs>
+        <div class="flex items-center gap-2 overflow-x-auto text-sm">
+          <button
+            v-for="(tab, idx) in fsTabs"
+            :key="tab.id"
+            type="button"
+            @click="activeFsTab = tab.id"
+            :class="activeFsTab === tab.id
+              ? 'border-blue-600 text-blue-600 dark:text-blue-400 font-bold border-b-2'
+              : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 font-medium'"
+            class="px-4 py-3 border-b-2 transition whitespace-nowrap cursor-pointer flex items-center gap-2"
+          >
+            <component :is="tab.icon" class="w-4 h-4" />
+            <span>{{ idx + 1 }}. {{ tab.label }}</span>
+          </button>
+        </div>
+      </template>
+
+      <!-- Conteúdo da Aba 1: Dados Contratuais -->
+      <div v-if="activeFsTab === 'dados'" class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div class="md:col-span-2">
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">
+              Cliente Titular / Razão Social
+            </label>
+            <input
+              type="text"
+              value="Telecom Prime Infraestrutura de Redes Ltda"
+              class="w-full h-10 px-3.5 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+            />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">
+              CNPJ do Contrato
+            </label>
+            <input
+              type="text"
+              value="12.345.678/0001-90"
+              class="w-full h-10 px-3.5 text-sm font-mono rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+            />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">Tipo de Circuito</label>
+            <select class="w-full h-10 px-3 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100">
+              <option>Fibra Óptica Dedicada (Link IP)</option>
+              <option>MPLS / Ponto a Ponto L2</option>
+              <option>Banda Larga Corporativa</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">Largura de Banda</label>
+            <input type="text" value="1 Gbps Full Duplex" class="w-full h-10 px-3 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">Vigência Inicial</label>
+            <input type="text" value="36 Meses" class="w-full h-10 px-3 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">SLA de Atendimento</label>
+            <input type="text" value="4 Horas (24x7)" class="w-full h-10 px-3 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100" />
+          </div>
+        </div>
+
+        <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 space-y-3">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Parâmetros de Rede & Entrega</h4>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs text-slate-500 mb-1">Bloco IPv4 Alocado</label>
+              <input type="text" value="187.23.10.0/29 (6 IPs úteis)" class="w-full h-9 px-3 text-xs font-mono rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100" />
+            </div>
+            <div>
+              <label class="block text-xs text-slate-500 mb-1">VLAN de Transporte</label>
+              <input type="text" value="VLAN 3420" class="w-full h-9 px-3 text-xs font-mono rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100" />
+            </div>
+            <div>
+              <label class="block text-xs text-slate-500 mb-1">Equipamento CPE</label>
+              <input type="text" value="Huawei NetEngine AR651" class="w-full h-9 px-3 text-xs rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Conteúdo da Aba 2: Faturamento -->
+      <div v-if="activeFsTab === 'financeiro'" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Valor Mensal Recorrente (MRR)</label>
+            <input type="text" value="R$ 3.850,00" class="w-full h-10 px-3 text-sm font-semibold rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Taxa de Instalação (Setup)</label>
+            <input type="text" value="R$ 1.500,00" class="w-full h-10 px-3 text-sm font-semibold rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Dia de Vencimento</label>
+            <input type="text" value="Dia 10 de cada mês" class="w-full h-10 px-3 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Conteúdo da Aba 3: Ordem de Instalação FSM -->
+      <div v-if="activeFsTab === 'fsm'" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Equipe Técnica Responsável</label>
+            <select class="w-full h-10 px-3 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100">
+              <option>Equipe Alpha Fibra - Belo Horizonte / Central</option>
+              <option>Equipe Beta Infra - Betim / Contagem</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Janela de Instalação Agendada</label>
+            <input type="text" value="12/09/2026 das 08:00 às 12:00" class="w-full h-10 px-3 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Rodapé Fixo do Modal de Tela Cheia -->
+      <template #footer>
+        <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>Rascunho salvo automaticamente às 20:25</span>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button
+            type="button"
+            @click="openModalFullscreen = false"
+            class="h-10 px-4 text-sm font-medium rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 transition cursor-pointer"
+          >
+            Fechar sem Salvar
+          </button>
+          <button
+            type="button"
+            @click="openModalFullscreen = false"
+            class="h-10 px-4 text-sm font-medium rounded-lg border border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 hover:bg-blue-100 transition cursor-pointer"
+          >
+            Salvar Rascunho
+          </button>
+          <button
+            type="button"
+            @click="openModalFullscreen = false"
+            class="h-10 px-5 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-500 transition shadow-xs cursor-pointer flex items-center gap-2"
+          >
+            <Check class="w-4 h-4" />
+            <span>Emitir Contrato & Ordem de Instalação</span>
+          </button>
+        </div>
+      </template>
+    </BaseModal>
+
+    <!-- 5. MODAL LATERAL: DRAWER (SLIDE-OVER) -->
+    <BaseModal
+      v-model="openModalDrawer"
+      size="drawer"
+      title="Painel de Detalhes da Entidade"
+      description="Inspeção rápida de relacionamentos e atividades recentes."
+    >
+      <div class="space-y-5">
+        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2">
+          <p class="text-base font-bold text-slate-900 dark:text-slate-100">Rede Pronta Telecomunicações Ltda</p>
+          <p class="text-xs font-mono text-slate-500 dark:text-slate-400">CNPJ: 12.345.678/0001-90</p>
+          <div class="flex items-center gap-1.5 pt-1">
+            <span class="px-2 py-0.5 rounded-sm text-xs font-semibold bg-cyan-50 text-cyan-700 dark:bg-cyan-950/70 dark:text-cyan-400">PJ</span>
+            <span class="px-2 py-0.5 rounded-sm text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-400">Ativo</span>
+            <span class="px-2 py-0.5 rounded-sm text-xs font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950/70 dark:text-blue-400">Cliente</span>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Últimos Atendimentos</h4>
+          <div v-for="n in 3" :key="n" class="p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-1 text-xs">
+            <div class="flex items-center justify-between font-semibold text-slate-800 dark:text-slate-200">
+              <span>Instalação Ponto #{{ n }}</span>
+              <span class="text-emerald-600">Concluído</span>
+            </div>
+            <p class="text-slate-500">Atendido por Equipe Alpha • 0{{ n }}/09/2026</p>
+          </div>
+        </div>
+      </div>
+
+      <template #footer>
+        <button
+          type="button"
+          @click="openModalDrawer = false"
+          class="w-full h-10 text-xs font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-500 transition cursor-pointer"
+        >
+          Concluir Visualização
+        </button>
+      </template>
+    </BaseModal>
   </div>
 </template>
 
@@ -504,15 +959,33 @@ import { ref } from 'vue';
 import {
   Palette, Type, MousePointerClick, Sliders, Tag, Bell, Table,
   Sun, Moon, ArrowLeft, Plus, RefreshCw, Check, Trash2, ExternalLink,
-  Loader2, Settings, Search, CheckCircle2, Info, AlertTriangle
+  Loader2, Settings, Search, CheckCircle2, Info, AlertTriangle,
+  Maximize2, AlertCircle, Layers, Sidebar as SidebarIcon, FileText,
+  DollarSign, Wrench
 } from 'lucide-vue-next';
 import { useTheme } from '../composables/useTheme';
 import { useNavigation } from '../composables/useNavigation';
+import BaseModal from '../components/common/BaseModal.vue';
 
 const { theme, toggleTheme } = useTheme();
 const { setView } = useNavigation();
 
 const demoSwitch = ref(true);
+
+// Estados de abertura de modais
+const openModalSm = ref(false);
+const openModalLg = ref(false);
+const openModalXl = ref(false);
+const openModalFullscreen = ref(false);
+const openModalDrawer = ref(false);
+
+// Abas do Modal Fullscreen
+const activeFsTab = ref('dados');
+const fsTabs = [
+  { id: 'dados', label: 'Dados Contratuais & Circuito', icon: FileText },
+  { id: 'financeiro', label: 'Faturamento & Recorrência', icon: DollarSign },
+  { id: 'fsm', label: 'Ordem de Instalação FSM', icon: Wrench },
+];
 
 const sections = [
   { id: 'tipografia', label: '1. Tipografia' },
@@ -522,5 +995,6 @@ const sections = [
   { id: 'badges', label: '5. Badges & Personas' },
   { id: 'alertas', label: '6. Alertas' },
   { id: 'tabelas', label: '7. Tabelas' },
+  { id: 'modais', label: '8. Modais & Fullscreen ⭐' },
 ];
 </script>
