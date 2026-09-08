@@ -1,79 +1,79 @@
 <template>
-  <div class="p-6 max-w-7xl w-full mx-auto space-y-5">
-    <!-- Cabeçalho Integrado no Conteúdo (Sem Top Bar) -->
+  <div class="p-8 max-w-7xl w-full mx-auto space-y-6">
+    <!-- Cabeçalho Confortável Integrado (Sem Top Bar) -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
-        <h1 class="text-lg font-semibold text-slate-900 dark:text-slate-100 tracking-tight">
+        <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">
           Gestão de Pessoas
         </h1>
-        <p class="text-xs text-slate-500 dark:text-slate-400">
+        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
           Base canônica centralizada de colaboradores, clientes, fornecedores e solicitantes
         </p>
       </div>
 
       <button
         @click="openCreateModal"
-        class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium shadow-xs transition"
+        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shadow-sm transition"
       >
-        <Plus class="w-3.5 h-3.5" />
+        <Plus class="w-4 h-4" />
         <span>Nova Pessoa</span>
       </button>
     </div>
 
-    <!-- Barra de Filtros Minimalista -->
-    <div class="p-3 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs">
+    <!-- Barra de Filtros com Fontes Confortáveis -->
+    <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-4 text-sm shadow-2xs transition-colors duration-200">
       <!-- Busca Textual -->
-      <div class="relative flex-1 min-w-[220px]">
-        <Search class="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-slate-400" />
+      <div class="relative flex-1 min-w-[280px]">
+        <Search class="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400" />
         <input
           type="text"
           v-model="search"
           @input="debounceSearch"
           placeholder="Buscar por nome, CPF/CNPJ, e-mail ou telefone..."
-          class="w-full h-8 pl-8 pr-3 rounded border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:border-blue-500 text-xs"
+          class="w-full h-11 pl-10 pr-4 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-blue-500 text-sm transition"
         />
       </div>
 
-      <!-- Filtro por Persona -->
-      <div class="flex items-center gap-1 bg-slate-50 dark:bg-slate-950 p-0.5 rounded border border-slate-200 dark:border-slate-800">
+      <!-- Filtro por Persona (Tabs) -->
+      <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-950 p-1 rounded-lg border border-slate-200 dark:border-slate-800">
         <button
           v-for="p in personaFilters"
           :key="p.value"
           @click="selectPersona(p.value)"
-          :class="selectedPersona === p.value ? 'bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 font-medium shadow-xs' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'"
-          class="px-2.5 py-1 rounded text-[11px] transition"
+          :class="selectedPersona === p.value ? 'bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 font-semibold shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'"
+          class="px-3.5 py-1.5 rounded-md text-xs font-medium transition"
         >
           {{ p.label }}
         </button>
       </div>
     </div>
 
-    <!-- Tabela Minimalista com Linhas Finas -->
-    <div class="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs">
+    <!-- Tabela Confortável com Linhas Finas -->
+    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs transition-colors duration-200">
       <div class="overflow-x-auto">
-        <table class="w-full text-left text-xs border-collapse">
+        <table class="w-full text-left border-collapse text-sm">
           <thead>
-            <tr class="border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/40 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-              <th class="py-2.5 px-4">Nome / Razão Social</th>
-              <th class="py-2.5 px-4">Tipo & Documento</th>
-              <th class="py-2.5 px-4">Papéis (Personas)</th>
-              <th class="py-2.5 px-4">Contato</th>
-              <th class="py-2.5 px-4">Cidade / UF</th>
-              <th class="py-2.5 px-4">Status</th>
-              <th class="py-2.5 px-4 text-right">Ações</th>
+            <tr class="border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/50 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+              <th class="py-3.5 px-5">Nome / Razão Social</th>
+              <th class="py-3.5 px-5">Tipo & Documento</th>
+              <th class="py-3.5 px-5">Papéis (Personas)</th>
+              <th class="py-3.5 px-5">Contato</th>
+              <th class="py-3.5 px-5">Cidade / UF</th>
+              <th class="py-3.5 px-5">Status</th>
+              <th class="py-3.5 px-5 text-right">Ações</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100 dark:divide-slate-800/80">
             <!-- Loading -->
             <tr v-if="loading">
-              <td colspan="7" class="py-8 text-center text-slate-400">
+              <td colspan="7" class="py-12 text-center text-slate-400 text-sm">
                 <span class="inline-block animate-spin mr-2">⟳</span> Carregando registros...
               </td>
             </tr>
 
             <!-- Vazio -->
             <tr v-else-if="people.length === 0">
-              <td colspan="7" class="py-8 text-center text-slate-400">
+              <td colspan="7" class="py-12 text-center text-slate-400 text-sm">
                 Nenhuma pessoa encontrada com os filtros selecionados.
               </td>
             </tr>
@@ -83,72 +83,72 @@
               v-else
               v-for="person in people"
               :key="person.id"
-              class="hover:bg-slate-50/60 dark:hover:bg-slate-800/30 transition-colors"
+              class="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors"
             >
-              <td class="py-2.5 px-4">
-                <div class="font-medium text-slate-800 dark:text-slate-200">{{ person.name }}</div>
-                <div v-if="person.trade_name" class="text-[10px] text-slate-400">{{ person.trade_name }}</div>
+              <td class="py-4 px-5">
+                <div class="font-semibold text-slate-900 dark:text-slate-100 text-sm">{{ person.name }}</div>
+                <div v-if="person.trade_name" class="text-xs text-slate-500 dark:text-slate-400 font-medium">{{ person.trade_name }}</div>
               </td>
 
-              <td class="py-2.5 px-4 font-mono text-[11px]">
-                <span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-medium mr-1.5 uppercase"
-                      :class="person.person_type === 'individual' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-400' : 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-400'">
+              <td class="py-4 px-5 font-mono text-xs">
+                <span class="inline-block px-2 py-0.5 rounded text-xs font-bold mr-2 uppercase"
+                      :class="person.person_type === 'individual' ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-400' : 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-400'">
                   {{ person.person_type === 'individual' ? 'PF' : 'PJ' }}
                 </span>
-                <span>{{ person.document_number || '-' }}</span>
+                <span class="text-slate-700 dark:text-slate-300">{{ person.document_number || '-' }}</span>
               </td>
 
-              <td class="py-2.5 px-4">
-                <div class="flex flex-wrap gap-1">
-                  <span v-if="person.personas?.is_employee" class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400">
+              <td class="py-4 px-5">
+                <div class="flex flex-wrap gap-1.5">
+                  <span v-if="person.personas?.is_employee" class="px-2 py-0.5 rounded-md text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-950/70 dark:text-blue-300">
                     Colaborador
                   </span>
-                  <span v-if="person.personas?.is_supplier" class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-purple-50 text-purple-700 dark:bg-purple-950/50 dark:text-purple-400">
+                  <span v-if="person.personas?.is_supplier" class="px-2 py-0.5 rounded-md text-xs font-semibold bg-purple-100 text-purple-800 dark:bg-purple-950/70 dark:text-purple-300">
                     Fornecedor
                   </span>
-                  <span v-if="person.personas?.is_client" class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400">
+                  <span v-if="person.personas?.is_client" class="px-2 py-0.5 rounded-md text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300">
                     Cliente
                   </span>
-                  <span v-if="person.personas?.is_requester" class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-cyan-50 text-cyan-700 dark:bg-cyan-950/50 dark:text-cyan-400">
+                  <span v-if="person.personas?.is_requester" class="px-2 py-0.5 rounded-md text-xs font-semibold bg-cyan-100 text-cyan-800 dark:bg-cyan-950/70 dark:text-cyan-300">
                     Solicitante
                   </span>
                 </div>
               </td>
 
-              <td class="py-2.5 px-4 text-slate-600 dark:text-slate-400">
-                <div>{{ person.contact?.phone || person.contact?.whatsapp || '-' }}</div>
-                <div class="text-[10px] text-slate-400">{{ person.contact?.email || '' }}</div>
+              <td class="py-4 px-5 text-sm text-slate-700 dark:text-slate-300">
+                <div class="font-medium">{{ person.contact?.phone || person.contact?.whatsapp || '-' }}</div>
+                <div class="text-xs text-slate-500 dark:text-slate-400">{{ person.contact?.email || '' }}</div>
               </td>
 
-              <td class="py-2.5 px-4 text-slate-600 dark:text-slate-400">
+              <td class="py-4 px-5 text-sm font-medium text-slate-700 dark:text-slate-300">
                 {{ person.address?.city?.full_name || '-' }}
               </td>
 
-              <td class="py-2.5 px-4">
+              <td class="py-4 px-5">
                 <span
-                  class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium"
-                  :class="person.status === 'active' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'"
+                  class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
+                  :class="person.status === 'active' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300' : 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-400'"
                 >
-                  <span class="w-1 h-1 rounded-full" :class="person.status === 'active' ? 'bg-emerald-500' : 'bg-slate-400'"></span>
+                  <span class="w-1.5 h-1.5 rounded-full" :class="person.status === 'active' ? 'bg-emerald-500' : 'bg-slate-400'"></span>
                   {{ person.status === 'active' ? 'Ativo' : 'Inativo' }}
                 </span>
               </td>
 
-              <td class="py-2.5 px-4 text-right">
-                <div class="inline-flex items-center gap-1">
+              <td class="py-4 px-5 text-right">
+                <div class="inline-flex items-center gap-1.5">
                   <button
                     @click="openEditModal(person)"
-                    class="p-1 rounded text-slate-400 hover:text-blue-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                    class="p-1.5 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-800 transition"
                     title="Editar"
                   >
-                    <Edit2 class="w-3.5 h-3.5" />
+                    <Edit2 class="w-4 h-4" />
                   </button>
                   <button
                     @click="toggleStatus(person)"
-                    class="p-1 rounded text-slate-400 hover:text-amber-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                    class="p-1.5 rounded-lg text-slate-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-slate-800 transition"
                     :title="person.status === 'active' ? 'Inativar' : 'Ativar'"
                   >
-                    <Power class="w-3.5 h-3.5" />
+                    <Power class="w-4 h-4" />
                   </button>
                 </div>
               </td>
@@ -157,24 +157,24 @@
         </table>
       </div>
 
-      <!-- Paginação Minimalista -->
-      <div class="px-4 py-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+      <!-- Paginação Confortável -->
+      <div class="px-5 py-3.5 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs text-slate-600 dark:text-slate-400 bg-slate-50/50 dark:bg-slate-900/50">
         <div>
           Exibindo <strong>{{ people.length }}</strong> de <strong>{{ totalRecords }}</strong> pessoas
         </div>
-        <div class="flex items-center gap-1">
+        <div class="flex items-center gap-1.5">
           <button
             :disabled="currentPage <= 1"
             @click="changePage(currentPage - 1)"
-            class="px-2 py-1 rounded border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-40 transition"
+            class="px-3 py-1.5 rounded-md border border-slate-200 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-40 font-medium transition"
           >
             Anterior
           </button>
-          <span class="px-2 font-medium">{{ currentPage }} / {{ lastPage }}</span>
+          <span class="px-3 font-semibold text-slate-800 dark:text-slate-200">{{ currentPage }} / {{ lastPage }}</span>
           <button
             :disabled="currentPage >= lastPage"
             @click="changePage(currentPage + 1)"
-            class="px-2 py-1 rounded border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-40 transition"
+            class="px-3 py-1.5 rounded-md border border-slate-200 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-40 font-medium transition"
           >
             Próxima
           </button>

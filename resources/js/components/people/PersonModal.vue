@@ -1,93 +1,93 @@
 <template>
-  <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
-    <div class="w-full max-w-2xl bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
+  <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+    <div class="w-full max-w-3xl bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden flex flex-col max-h-[92vh] transition-colors duration-200">
       <!-- Cabeçalho do Modal -->
-      <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+      <div class="px-6 py-4.5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
         <div>
-          <h2 class="text-sm font-semibold text-slate-900 dark:text-slate-100">
+          <h2 class="text-base font-bold text-slate-900 dark:text-slate-100">
             {{ isEditing ? 'Editar Cadastro de Pessoa' : 'Novo Cadastro de Pessoa' }}
           </h2>
-          <p class="text-[11px] text-slate-500 dark:text-slate-400">
-            Defina o tipo, identificação, persona e localização canônica
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            Defina o tipo, identificação, personas e localização canônica
           </p>
         </div>
-        <button @click="close" class="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1">
-          <X class="w-4 h-4" />
+        <button @click="close" class="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+          <X class="w-5 h-5" />
         </button>
       </div>
 
-      <!-- Formulário com Scroll -->
-      <form @submit.prevent="submit" class="p-6 overflow-y-auto space-y-4 flex-1 text-xs">
+      <!-- Formulário com Scroll Confortável -->
+      <form @submit.prevent="submit" class="p-6 overflow-y-auto space-y-5 flex-1 text-sm">
         <!-- Alternador Tipo: PF ou PJ -->
-        <div class="flex items-center gap-4 p-2.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
-          <span class="text-[11px] font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Tipo:</span>
-          <label class="flex items-center gap-1.5 cursor-pointer">
-            <input type="radio" value="individual" v-model="form.person_type" class="text-blue-600 focus:ring-0" />
-            <span :class="form.person_type === 'individual' ? 'font-semibold text-blue-600' : 'text-slate-600 dark:text-slate-400'">
+        <div class="flex items-center gap-6 p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
+          <span class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Tipo de Registro:</span>
+          <label class="flex items-center gap-2 cursor-pointer select-none">
+            <input type="radio" value="individual" v-model="form.person_type" class="w-4 h-4 text-blue-600 focus:ring-0" />
+            <span :class="form.person_type === 'individual' ? 'font-bold text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 font-medium'">
               Pessoa Física (PF)
             </span>
           </label>
-          <label class="flex items-center gap-1.5 cursor-pointer">
-            <input type="radio" value="legal" v-model="form.person_type" class="text-blue-600 focus:ring-0" />
-            <span :class="form.person_type === 'legal' ? 'font-semibold text-blue-600' : 'text-slate-600 dark:text-slate-400'">
+          <label class="flex items-center gap-2 cursor-pointer select-none">
+            <input type="radio" value="legal" v-model="form.person_type" class="w-4 h-4 text-blue-600 focus:ring-0" />
+            <span :class="form.person_type === 'legal' ? 'font-bold text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 font-medium'">
               Pessoa Jurídica (PJ)
             </span>
           </label>
         </div>
 
         <!-- Campos Principais: Nome / Razão -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-[11px] font-medium text-slate-700 dark:text-slate-300 mb-1">
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
               {{ form.person_type === 'individual' ? 'Nome Completo *' : 'Razão Social *' }}
             </label>
             <input
               type="text"
               v-model="form.name"
               required
-              class="w-full h-8 px-2.5 rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500"
+              class="w-full h-10 px-3.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-500 text-sm transition"
             />
           </div>
 
           <div v-if="form.person_type === 'legal'">
-            <label class="block text-[11px] font-medium text-slate-700 dark:text-slate-300 mb-1">Nome Fantasia</label>
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">Nome Fantasia</label>
             <input
               type="text"
               v-model="form.trade_name"
-              class="w-full h-8 px-2.5 rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500"
+              class="w-full h-10 px-3.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-500 text-sm transition"
             />
           </div>
 
           <div>
-            <label class="block text-[11px] font-medium text-slate-700 dark:text-slate-300 mb-1">
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
               {{ form.person_type === 'individual' ? 'CPF' : 'CNPJ' }}
             </label>
             <input
               type="text"
               v-model="form.document_number"
               :placeholder="form.person_type === 'individual' ? '000.000.000-00' : '00.000.000/0000-00'"
-              class="w-full h-8 px-2.5 rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500"
+              class="w-full h-10 px-3.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-500 text-sm transition"
             />
           </div>
 
           <div>
-            <label class="block text-[11px] font-medium text-slate-700 dark:text-slate-300 mb-1">
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
               {{ form.person_type === 'individual' ? 'RG' : 'Inscrição Estadual' }}
             </label>
             <input
               type="text"
               v-model="form.rg_ie"
-              class="w-full h-8 px-2.5 rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500"
+              class="w-full h-10 px-3.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-500 text-sm transition"
             />
           </div>
 
           <div v-if="form.person_type === 'individual'">
-            <label class="block text-[11px] font-medium text-slate-700 dark:text-slate-300 mb-1">Gênero</label>
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">Gênero</label>
             <select
               v-model="form.gender_id"
-              class="w-full h-8 px-2 rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500"
+              class="w-full h-10 px-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-500 text-sm transition"
             >
-              <option :value="null">Selecione...</option>
+              <option :value="null">Selecione o Gênero...</option>
               <option v-for="g in genders" :key="g.id" :value="g.id">{{ g.name }}</option>
             </select>
           </div>
@@ -95,57 +95,57 @@
 
         <!-- Personas / Papéis no Sistema (Axioma 1) -->
         <div class="pt-2">
-          <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">
+          <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2.5">
             Papéis no Sistema (Personas)
           </label>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-            <label class="flex items-center gap-2 p-2 rounded border border-slate-200 dark:border-slate-800 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-950">
-              <input type="checkbox" v-model="form.is_employee" class="text-blue-600 rounded" />
-              <span class="text-xs">Colaborador</span>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <label class="flex items-center gap-2.5 p-3 rounded-lg border border-slate-200 dark:border-slate-800 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-950 transition">
+              <input type="checkbox" v-model="form.is_employee" class="w-4 h-4 text-blue-600 rounded" />
+              <span class="text-sm font-medium">Colaborador</span>
             </label>
-            <label class="flex items-center gap-2 p-2 rounded border border-slate-200 dark:border-slate-800 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-950">
-              <input type="checkbox" v-model="form.is_supplier" class="text-blue-600 rounded" />
-              <span class="text-xs">Fornecedor</span>
+            <label class="flex items-center gap-2.5 p-3 rounded-lg border border-slate-200 dark:border-slate-800 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-950 transition">
+              <input type="checkbox" v-model="form.is_supplier" class="w-4 h-4 text-blue-600 rounded" />
+              <span class="text-sm font-medium">Fornecedor</span>
             </label>
-            <label class="flex items-center gap-2 p-2 rounded border border-slate-200 dark:border-slate-800 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-950">
-              <input type="checkbox" v-model="form.is_client" class="text-blue-600 rounded" />
-              <span class="text-xs">Cliente</span>
+            <label class="flex items-center gap-2.5 p-3 rounded-lg border border-slate-200 dark:border-slate-800 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-950 transition">
+              <input type="checkbox" v-model="form.is_client" class="w-4 h-4 text-blue-600 rounded" />
+              <span class="text-sm font-medium">Cliente</span>
             </label>
-            <label class="flex items-center gap-2 p-2 rounded border border-slate-200 dark:border-slate-800 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-950">
-              <input type="checkbox" v-model="form.is_requester" class="text-blue-600 rounded" />
-              <span class="text-xs">Solicitante</span>
+            <label class="flex items-center gap-2.5 p-3 rounded-lg border border-slate-200 dark:border-slate-800 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-950 transition">
+              <input type="checkbox" v-model="form.is_requester" class="w-4 h-4 text-blue-600 rounded" />
+              <span class="text-sm font-medium">Solicitante</span>
             </label>
           </div>
         </div>
 
         <!-- Contato -->
         <div class="pt-2">
-          <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">
+          <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2.5">
             Contato
           </label>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label class="block text-[11px] font-medium text-slate-700 dark:text-slate-300 mb-1">E-mail</label>
+              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">E-mail</label>
               <input
                 type="email"
                 v-model="form.email"
-                class="w-full h-8 px-2.5 rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500"
+                class="w-full h-10 px-3.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-500 text-sm transition"
               />
             </div>
             <div>
-              <label class="block text-[11px] font-medium text-slate-700 dark:text-slate-300 mb-1">Telefone</label>
+              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Telefone</label>
               <input
                 type="text"
                 v-model="form.phone"
-                class="w-full h-8 px-2.5 rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500"
+                class="w-full h-10 px-3.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-500 text-sm transition"
               />
             </div>
             <div>
-              <label class="block text-[11px] font-medium text-slate-700 dark:text-slate-300 mb-1">WhatsApp</label>
+              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">WhatsApp</label>
               <input
                 type="text"
                 v-model="form.whatsapp"
-                class="w-full h-8 px-2.5 rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500"
+                class="w-full h-10 px-3.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-500 text-sm transition"
               />
             </div>
           </div>
@@ -153,44 +153,44 @@
 
         <!-- Endereço Canônico -->
         <div class="pt-2">
-          <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">
+          <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2.5">
             Localização Canônica (Cidades IBGE)
           </label>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div class="md:col-span-2">
-              <label class="block text-[11px] font-medium text-slate-700 dark:text-slate-300 mb-1">Cidade (IBGE)</label>
+              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Cidade (IBGE)</label>
               <select
                 v-model="form.city_id"
-                class="w-full h-8 px-2 rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500"
+                class="w-full h-10 px-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-500 text-sm transition"
               >
                 <option :value="null">Selecione a Cidade...</option>
                 <option v-for="c in cities" :key="c.id" :value="c.id">{{ c.full_name }} (IBGE: {{ c.ibge_code }})</option>
               </select>
             </div>
             <div>
-              <label class="block text-[11px] font-medium text-slate-700 dark:text-slate-300 mb-1">CEP</label>
+              <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">CEP</label>
               <input
                 type="text"
                 v-model="form.postal_code"
                 placeholder="00000-000"
-                class="w-full h-8 px-2.5 rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500"
+                class="w-full h-10 px-3.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-500 text-sm transition"
               />
             </div>
           </div>
         </div>
 
         <!-- Mensagens de Erro da API -->
-        <div v-if="errorMessage" class="p-2.5 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 rounded text-red-600 dark:text-red-400 text-xs">
+        <div v-if="errorMessage" class="p-3 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 rounded-lg text-red-700 dark:text-red-400 text-sm font-medium">
           {{ errorMessage }}
         </div>
       </form>
 
       <!-- Rodapé do Modal -->
-      <div class="px-6 py-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 flex items-center justify-end gap-2">
+      <div class="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/70 flex items-center justify-end gap-3">
         <button
           type="button"
           @click="close"
-          class="px-3 py-1.5 rounded text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition"
+          class="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition"
         >
           Cancelar
         </button>
@@ -198,7 +198,7 @@
           type="button"
           @click="submit"
           :disabled="isSubmitting"
-          class="px-4 py-1.5 rounded text-xs font-medium bg-blue-600 hover:bg-blue-700 text-white transition disabled:opacity-50"
+          class="px-5 py-2 rounded-lg text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white transition disabled:opacity-50 shadow-sm"
         >
           {{ isSubmitting ? 'Salvando...' : (isEditing ? 'Salvar Alterações' : 'Cadastrar Pessoa') }}
         </button>
@@ -208,7 +208,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch, onMounted } from 'vue';
+import { ref, reactive, watch } from 'vue';
 import { X } from 'lucide-vue-next';
 import axios from 'axios';
 
