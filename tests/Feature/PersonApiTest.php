@@ -525,4 +525,66 @@ class PersonApiTest extends TestCase
         $this->assertGreaterThanOrEqual(1, $filterReq->json('meta.counts.requester'));
         $this->assertGreaterThanOrEqual(1, $filterEmp->json('meta.counts.employee'));
     }
+
+    public function test_can_filter_by_status_person_type_state_city_and_group(): void
+    {
+        $groupA = \App\Models\PersonGroup::create([
+            'account_id' => $this->account->id,
+            'name' => 'Grupo Alfa',
+            'is_active' => true,
+        ]);
+        $groupB = \App\Models\PersonGroup::create([
+            'account_id' => $this->account->id,
+            'name' => 'Grupo Beta',
+            'is_active' => true,
+        ]);
+
+        $personA = Person::create([
+            'account_id' => $this->account->id,
+            'person_type' => 'individual',
+            'name' => 'Alice da Silva',
+            'status' => 'active',
+            'city_id' => $this->city->id,
+            'group_id' => $groupA->id,
+            'group_name' => 'Grupo Alfa',
+        ]);
+
+        $personB = Person::create([
+            'account_id' => $this->account->id,
+            'person_type' => 'legal',
+            'name' => 'Beta Telecom LTDA',
+            'status' => 'inactive',
+            'group_id' => $groupB->id,
+            'group_name' => 'Grupo Beta',
+        ]);
+
+        // Filtro por Status
+        $resStatus = $this->getJson('/api/v1/people?status=active');
+        $resStatus->assertOk();
+        $this->assertTrue(collect($resStatus->json('data'))->pluck('id')->contains($personA->id));
+        $this->assertFalse(collect($resStatus->json('data'))->pluck('id')->contains($personB->id));
+
+        // Filtro por Tipo de Pessoa
+        $resType = $this->getJson('/api/v1/people?person_type=legal');
+        $resType->assertOk();
+        $this->assertTrue(collect($resType->json('data'))->pluck('id')->contains($personB->id));
+        $this->assertFalse(collect($resType->json('data'))->pluck('id')->contains($personA->id));
+
+        // Filtro por Cidade
+        $resCity = $this->getJson('/api/v1/people?city_id=' . $this->city->id);
+        $resCity->assertOk();
+        $this->assertTrue(collect($resCity->json('data'))->pluck('id')->contains($personA->id));
+
+        // Filtro por Grupo (por ID)
+        $resGroup = $this->getJson('/api/v1/people?group_id=' . $groupA->id);
+        $resGroup->assertOk();
+        $this->assertTrue(collect($resGroup->json('data'))->pluck('id')->contains($personA->id));
+        $this->assertFalse(collect($resGroup->json('data'))->pluck('id')->contains($personB->id));
+
+        // Filtro por Grupo (por nome via group)
+        $resGroupName = $this->getJson('/api/v1/people?group=Grupo Beta');
+        $resGroupName->assertOk();
+        $this->assertTrue(collect($resGroupName->json('data'))->pluck('id')->contains($personB->id));
+        $this->assertFalse(collect($resGroupName->json('data'))->pluck('id')->contains($personA->id));
+    }
 }

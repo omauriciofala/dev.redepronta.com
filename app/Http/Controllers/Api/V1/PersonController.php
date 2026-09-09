@@ -22,7 +22,7 @@ class PersonController extends Controller
     {
         $filters = $request->only([
             'search', 'status', 'person_type', 'city_id', 'state_id', 'state_code',
-            'persona', 'sort_by', 'sort_direction'
+            'group_id', 'group_name', 'group', 'persona', 'sort_by', 'sort_direction'
         ]);
 
         $people = $this->personService->list(
@@ -42,7 +42,7 @@ class PersonController extends Controller
     public function store(StorePersonRequest $request): JsonResponse
     {
         $person = $this->personService->create($request->validated());
-        $person->load(['city.state', 'gender']);
+        $person->load(['city.state', 'gender', 'group']);
 
         return (new PersonResource($person))
             ->response()
@@ -51,7 +51,7 @@ class PersonController extends Controller
 
     public function show(Person $person): PersonResource
     {
-        $person->load(['city.state', 'gender']);
+        $person->load(['city.state', 'gender', 'group']);
         return new PersonResource($person);
     }
 
@@ -74,7 +74,7 @@ class PersonController extends Controller
     public function toggleStatus(Person $person): PersonResource
     {
         $updated = $this->personService->toggleStatus($person);
-        $updated->load(['city.state', 'gender']);
+        $updated->load(['city.state', 'gender', 'group']);
         return new PersonResource($updated);
     }
 }

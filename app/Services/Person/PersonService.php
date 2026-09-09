@@ -12,7 +12,7 @@ class PersonService
 {
     public function list(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        $query = Person::with(['city.state', 'gender']);
+        $query = Person::with(['city.state', 'gender', 'group']);
 
         if (!empty($filters['search'])) {
             $query->search($filters['search']);
@@ -28,6 +28,35 @@ class PersonService
 
         if (!empty($filters['city_id'])) {
             $query->where('people.city_id', $filters['city_id']);
+        }
+
+        if (!empty($filters['group_id'])) {
+            $query->where(function ($q) use ($filters) {
+                $q->where('people.group_id', $filters['group_id'])
+                  ->orWhere('people.group_name', function ($sub) use ($filters) {
+                      $sub->select('name')->from('person_groups')->where('id', $filters['group_id'])->limit(1);
+                  });
+            });
+        }
+
+        if (!empty($filters['group_name'])) {
+            $query->where(function ($q) use ($filters) {
+                $q->where('people.group_name', $filters['group_name'])
+                  ->orWhereHas('group', function ($gq) use ($filters) {
+                      $gq->where('name', $filters['group_name']);
+                  });
+            });
+        }
+
+        if (!empty($filters['group'])) {
+            $grp = $filters['group'];
+            $query->where(function ($q) use ($grp) {
+                $q->where('people.group_name', $grp)
+                  ->orWhere('people.group_id', $grp)
+                  ->orWhereHas('group', function ($gq) use ($grp) {
+                      $gq->where('name', $grp)->orWhere('id', $grp);
+                  });
+            });
         }
 
         if (!empty($filters['state_id'])) {

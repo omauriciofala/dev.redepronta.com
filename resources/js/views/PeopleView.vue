@@ -56,29 +56,84 @@
           </div>
         </div>
 
-        <!-- Botão de Filtros Secundários Avançados (Gaveta Retrátil) -->
-        <button
-          type="button"
-          @click="isFiltersOpen = !isFiltersOpen"
-          :class="activeSecondaryFiltersCount > 0
-            ? 'bg-[#FC6714]/10 text-[#FC6714] border-[#FC6714] font-semibold'
-            : 'bg-white dark:bg-[#03032E] text-slate-700 dark:text-slate-300 border-slate-200 dark:border-[#14147A] hover:bg-slate-50 dark:hover:bg-white/5'"
-          class="inline-flex items-center gap-2 h-11 px-4 rounded-lg border text-sm font-medium transition shadow-2xs cursor-pointer focus:ring-2 focus:ring-[#FC6714] focus:outline-none"
-          title="Abrir/fechar filtros secundários avançados"
-        >
-          <SlidersHorizontal class="w-4 h-4" :class="activeSecondaryFiltersCount > 0 ? 'text-[#FC6714]' : 'text-slate-500 dark:text-slate-400'" />
-          <span>Filtros</span>
-          <span
-            v-if="activeSecondaryFiltersCount > 0"
-            class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-[#FC6714] text-white"
+        <!-- Botão de Filtros com Menu Dropdown para Escolha de Campos -->
+        <div class="relative" ref="filtersDropdownContainerRef">
+          <button
+            type="button"
+            @click.stop="isFiltersMenuOpen = !isFiltersMenuOpen"
+            :class="activeFilterKeys.length > 0
+              ? 'bg-[#FC6714]/10 text-[#FC6714] border-[#FC6714] font-semibold ring-2 ring-[#FC6714]/20'
+              : 'bg-white dark:bg-[#03032E] text-slate-700 dark:text-slate-300 border-slate-200 dark:border-[#14147A] hover:bg-slate-50 dark:hover:bg-white/5'"
+            class="inline-flex items-center gap-2 h-11 px-4 rounded-lg border text-sm font-medium transition shadow-2xs cursor-pointer focus:ring-2 focus:ring-[#FC6714] focus:outline-none"
+            title="Escolher campos para filtrar a listagem"
+            aria-haspopup="true"
+            :aria-expanded="isFiltersMenuOpen"
           >
-            {{ activeSecondaryFiltersCount }}
-          </span>
-          <ChevronDown
-            class="w-3.5 h-3.5 transition-transform duration-200 text-slate-400"
-            :class="{ 'rotate-180': isFiltersOpen }"
-          />
-        </button>
+            <SlidersHorizontal class="w-4 h-4" :class="activeFilterKeys.length > 0 ? 'text-[#FC6714]' : 'text-slate-500 dark:text-slate-400'" />
+            <span>Filtros</span>
+            <span
+              v-if="activeFilterKeys.length > 0"
+              class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-[#FC6714] text-white"
+            >
+              {{ activeFilterKeys.length }}
+            </span>
+            <ChevronDown
+              class="w-3.5 h-3.5 transition-transform duration-200 text-slate-400"
+              :class="{ 'rotate-180': isFiltersMenuOpen }"
+            />
+          </button>
+
+          <!-- Menu Dropdown Flutuante de Seleção de Campos -->
+          <Transition
+            enter-active-class="transition duration-100 ease-out"
+            enter-from-class="transform scale-95 opacity-0"
+            enter-to-class="transform scale-100 opacity-100"
+            leave-active-class="transition duration-75 ease-in"
+            leave-from-class="transform scale-100 opacity-100"
+            leave-to-class="transform scale-95 opacity-0"
+          >
+            <div
+              v-if="isFiltersMenuOpen"
+              @click.stop
+              class="absolute right-0 mt-2 w-64 rounded-xl bg-white dark:bg-[#06064D] border border-slate-200 dark:border-[#14147A] shadow-2xl z-50 py-1.5 text-xs font-medium divide-y divide-slate-100 dark:divide-[#14147A]/60 focus:outline-hidden"
+            >
+              <div class="px-3.5 py-2 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center justify-between">
+                <span>Adicionar Campo de Filtro</span>
+                <span class="text-[10px] text-[#FC6714] font-semibold">{{ activeFilterKeys.length }}/5 ativos</span>
+              </div>
+              <div class="py-1">
+                <button
+                  v-for="field in AVAILABLE_FILTER_FIELDS"
+                  :key="field.key"
+                  type="button"
+                  @click="toggleFilterField(field.key)"
+                  class="w-full text-left px-3.5 py-2.5 flex items-center justify-between hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] transition cursor-pointer"
+                  :class="isFilterActive(field.key) ? 'text-[#FC6714] font-semibold bg-orange-50/50 dark:bg-[#FC6714]/10' : 'text-slate-700 dark:text-slate-200'"
+                >
+                  <div class="flex items-center gap-2.5">
+                    <component :is="field.icon" class="w-4 h-4" :class="isFilterActive(field.key) ? 'text-[#FC6714]' : 'text-slate-400'" />
+                    <span>{{ field.label }}</span>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <span v-if="isFilterActive(field.key)" class="text-[10px] text-[#FC6714] font-semibold">Incluído</span>
+                    <Check v-if="isFilterActive(field.key)" class="w-4 h-4 text-[#FC6714]" />
+                  </div>
+                </button>
+              </div>
+
+              <div v-if="activeFilterKeys.length > 0" class="p-1.5 bg-slate-50/50 dark:bg-white/5">
+                <button
+                  type="button"
+                  @click="clearAllFilters(); isFiltersMenuOpen = false;"
+                  class="w-full text-center px-3 py-1.5 rounded-lg text-xs font-semibold text-[#FC6714] hover:bg-[#FC6714]/10 transition cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <RotateCcw class="w-3.5 h-3.5" />
+                  <span>Limpar todos os filtros</span>
+                </button>
+              </div>
+            </div>
+          </Transition>
+        </div>
 
         <!-- Filtro por Persona (Tabs com Contadores Numéricos e Destaque Laranja Institucional) -->
         <div class="flex items-center gap-1 bg-slate-100 dark:bg-[#03032E] p-1 rounded-lg border border-slate-200 dark:border-[#14147A] overflow-x-auto max-w-full">
@@ -104,97 +159,221 @@
         </div>
       </div>
 
-      <!-- Painel Retrátil de Filtros Secundários Avançados -->
-      <div
-        v-if="isFiltersOpen"
-        class="p-4 bg-slate-50 dark:bg-[#06064D]/30 rounded-xl border border-slate-200 dark:border-[#14147A] animate-fadeIn transition-all shadow-xs"
+      <!-- Barra Dinâmica de Filtros Selecionados -->
+      <Transition
+        enter-active-class="transition duration-150 ease-out"
+        enter-from-class="opacity-0 -translate-y-2"
+        enter-to-class="opacity-100 translate-y-0"
+        leave-active-class="transition duration-100 ease-in"
+        leave-from-class="opacity-100 translate-y-0"
+        leave-to-class="opacity-0 -translate-y-2"
       >
-        <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-200 dark:border-[#14147A]">
-          <div class="flex items-center gap-2">
-            <SlidersHorizontal class="w-4 h-4 text-[#FC6714]" />
-            <span class="text-xs font-semibold font-heading uppercase tracking-wider text-slate-800 dark:text-slate-200">
-              Filtros Secundários Avançados
-            </span>
+        <div
+          v-if="activeFilterKeys.length > 0"
+          class="p-4 bg-slate-50 dark:bg-[#06064D]/30 rounded-xl border border-slate-200 dark:border-[#14147A] shadow-2xs transition-all space-y-3"
+        >
+          <!-- Barra Superior: Indicador de Filtros Ativos e Ações -->
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <SlidersHorizontal class="w-4 h-4 text-[#FC6714]" />
+              <span class="text-xs font-semibold font-heading uppercase tracking-wider text-slate-800 dark:text-slate-200">
+                Filtros Selecionados
+              </span>
+              <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#FC6714]/15 text-[#FC6714]">
+                {{ activeFilterKeys.length }} campo{{ activeFilterKeys.length > 1 ? 's' : '' }} ativo{{ activeFilterKeys.length > 1 ? 's' : '' }}
+              </span>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <!-- Botão Adicionar Mais Campos -->
+              <button
+                type="button"
+                @click.stop="isFiltersMenuOpen = !isFiltersMenuOpen"
+                class="text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-[#FC6714] dark:hover:text-[#FC6714] flex items-center gap-1 transition cursor-pointer"
+              >
+                <Plus class="w-3.5 h-3.5 text-[#FC6714]" />
+                <span>Adicionar campo</span>
+              </button>
+
+              <!-- Botão Limpar Filtros -->
+              <button
+                type="button"
+                @click="clearAllFilters"
+                class="text-xs font-semibold text-[#FC6714] hover:text-[#E0530A] flex items-center gap-1 transition cursor-pointer"
+                title="Limpar e remover todos os filtros"
+              >
+                <RotateCcw class="w-3.5 h-3.5" />
+                <span>Limpar Filtros</span>
+              </button>
+            </div>
           </div>
 
-          <button
-            v-if="activeSecondaryFiltersCount > 0"
-            @click="clearSecondaryFilters"
-            class="text-xs font-semibold text-[#FC6714] hover:text-[#E0530A] transition cursor-pointer flex items-center gap-1 focus:ring-2 focus:ring-[#FC6714]"
-          >
-            <RotateCcw class="w-3.5 h-3.5" />
-            <span>Limpar Filtros</span>
-          </button>
+          <!-- Grade de Controles dos Filtros Selecionados -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3.5 text-xs">
+            <!-- 1. Filtro: Status -->
+            <div
+              v-if="isFilterActive('status')"
+              class="p-3 bg-white dark:bg-[#03032E] rounded-lg border border-slate-200 dark:border-[#14147A] shadow-2xs space-y-1.5 transition-all relative group"
+            >
+              <div class="flex items-center justify-between text-slate-700 dark:text-slate-300">
+                <span class="font-bold uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                  <CheckCircle2 class="w-3.5 h-3.5 text-[#FC6714]" />
+                  Status
+                </span>
+                <button
+                  type="button"
+                  @click="removeFilter('status')"
+                  class="p-0.5 rounded text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 transition cursor-pointer"
+                  title="Remover filtro de Status"
+                >
+                  <X class="w-3.5 h-3.5" />
+                </button>
+              </div>
+              <select
+                v-model="filterStatus"
+                @change="applySecondaryFilters"
+                class="w-full h-9 px-2.5 rounded-md border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#06064D]/50 text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer text-xs"
+              >
+                <option value="">Todos os Status</option>
+                <option value="active">● Apenas Ativos</option>
+                <option value="inactive">○ Apenas Inativos</option>
+              </select>
+            </div>
+
+            <!-- 2. Filtro: Tipo de Pessoa -->
+            <div
+              v-if="isFilterActive('person_type')"
+              class="p-3 bg-white dark:bg-[#03032E] rounded-lg border border-slate-200 dark:border-[#14147A] shadow-2xs space-y-1.5 transition-all relative group"
+            >
+              <div class="flex items-center justify-between text-slate-700 dark:text-slate-300">
+                <span class="font-bold uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                  <Users class="w-3.5 h-3.5 text-[#FC6714]" />
+                  Tipo de Pessoa
+                </span>
+                <button
+                  type="button"
+                  @click="removeFilter('person_type')"
+                  class="p-0.5 rounded text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 transition cursor-pointer"
+                  title="Remover filtro de Tipo de Pessoa"
+                >
+                  <X class="w-3.5 h-3.5" />
+                </button>
+              </div>
+              <select
+                v-model="filterPersonType"
+                @change="applySecondaryFilters"
+                class="w-full h-9 px-2.5 rounded-md border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#06064D]/50 text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer text-xs"
+              >
+                <option value="">Todos os Tipos</option>
+                <option value="individual">Pessoa Física (PF)</option>
+                <option value="legal">Pessoa Jurídica (PJ)</option>
+              </select>
+            </div>
+
+            <!-- 3. Filtro: Estado (UF) -->
+            <div
+              v-if="isFilterActive('state')"
+              class="p-3 bg-white dark:bg-[#03032E] rounded-lg border border-slate-200 dark:border-[#14147A] shadow-2xs space-y-1.5 transition-all relative group"
+            >
+              <div class="flex items-center justify-between text-slate-700 dark:text-slate-300">
+                <span class="font-bold uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                  <MapPin class="w-3.5 h-3.5 text-[#FC6714]" />
+                  Estado (UF)
+                </span>
+                <button
+                  type="button"
+                  @click="removeFilter('state')"
+                  class="p-0.5 rounded text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 transition cursor-pointer"
+                  title="Remover filtro de Estado"
+                >
+                  <X class="w-3.5 h-3.5" />
+                </button>
+              </div>
+              <select
+                v-model="filterStateId"
+                @change="handleStateChange"
+                class="w-full h-9 px-2.5 rounded-md border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#06064D]/50 text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer text-xs truncate"
+              >
+                <option value="">Todos os Estados</option>
+                <option v-for="st in statesList" :key="st.id" :value="st.id">
+                  {{ st.code }} - {{ st.name }}
+                </option>
+              </select>
+            </div>
+
+            <!-- 4. Filtro: Município -->
+            <div
+              v-if="isFilterActive('city')"
+              class="p-3 bg-white dark:bg-[#03032E] rounded-lg border border-slate-200 dark:border-[#14147A] shadow-2xs space-y-1.5 transition-all relative group"
+            >
+              <div class="flex items-center justify-between text-slate-700 dark:text-slate-300">
+                <span class="font-bold uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                  <Building2 class="w-3.5 h-3.5 text-[#FC6714]" />
+                  Município
+                </span>
+                <button
+                  type="button"
+                  @click="removeFilter('city')"
+                  class="p-0.5 rounded text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 transition cursor-pointer"
+                  title="Remover filtro de Município"
+                >
+                  <X class="w-3.5 h-3.5" />
+                </button>
+              </div>
+              <select
+                v-if="filterStateId && citiesList.length > 0"
+                v-model="filterCityId"
+                @change="applySecondaryFilters"
+                class="w-full h-9 px-2.5 rounded-md border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#06064D]/50 text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer text-xs truncate"
+              >
+                <option value="">Todas as Cidades de {{ selectedStateCode }}</option>
+                <option v-for="ct in citiesList" :key="ct.id" :value="ct.id">
+                  {{ ct.name }}
+                </option>
+              </select>
+              <div v-else>
+                <CitySearchSelect
+                  v-model="filterCityId"
+                  :state-id="filterStateId"
+                  placeholder="Buscar município..."
+                  @update:modelValue="applySecondaryFilters"
+                />
+              </div>
+            </div>
+
+            <!-- 5. Filtro: Grupo -->
+            <div
+              v-if="isFilterActive('group')"
+              class="p-3 bg-white dark:bg-[#03032E] rounded-lg border border-slate-200 dark:border-[#14147A] shadow-2xs space-y-1.5 transition-all relative group"
+            >
+              <div class="flex items-center justify-between text-slate-700 dark:text-slate-300">
+                <span class="font-bold uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                  <FolderTree class="w-3.5 h-3.5 text-[#FC6714]" />
+                  Grupo
+                </span>
+                <button
+                  type="button"
+                  @click="removeFilter('group')"
+                  class="p-0.5 rounded text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 transition cursor-pointer"
+                  title="Remover filtro de Grupo"
+                >
+                  <X class="w-3.5 h-3.5" />
+                </button>
+              </div>
+              <select
+                v-model="filterGroup"
+                @change="applySecondaryFilters"
+                class="w-full h-9 px-2.5 rounded-md border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#06064D]/50 text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer text-xs truncate"
+              >
+                <option value="">Todos os Grupos</option>
+                <option v-for="g in groupsList" :key="g.id" :value="g.id">
+                  {{ g.name }}
+                </option>
+              </select>
+            </div>
+          </div>
         </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
-          <!-- Filtro por Status -->
-          <div>
-            <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-              Status do Registro
-            </label>
-            <select
-              v-model="filterStatus"
-              @change="applySecondaryFilters"
-              class="w-full h-9 px-3 rounded-lg border border-slate-300 dark:border-[#14147A] bg-white dark:bg-[#03032E] text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer"
-            >
-              <option value="">Todos os Status</option>
-              <option value="active">● Apenas Ativos</option>
-              <option value="inactive">○ Apenas Inativos</option>
-            </select>
-          </div>
-
-          <!-- Filtro por Tipo de Pessoa -->
-          <div>
-            <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-              Tipo de Pessoa
-            </label>
-            <select
-              v-model="filterPersonType"
-              @change="applySecondaryFilters"
-              class="w-full h-9 px-3 rounded-lg border border-slate-300 dark:border-[#14147A] bg-white dark:bg-[#03032E] text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer"
-            >
-              <option value="">Todos os Tipos</option>
-              <option value="individual">Pessoa Física (PF)</option>
-              <option value="legal">Pessoa Jurídica (PJ)</option>
-            </select>
-          </div>
-
-          <!-- Filtro por Estado (UF) -->
-          <div>
-            <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-              Estado (UF)
-            </label>
-            <select
-              v-model="filterStateId"
-              @change="handleStateChange"
-              class="w-full h-9 px-3 rounded-lg border border-slate-300 dark:border-[#14147A] bg-white dark:bg-[#03032E] text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer"
-            >
-              <option value="">Todos os Estados</option>
-              <option v-for="st in statesList" :key="st.id" :value="st.id">
-                {{ st.code }} - {{ st.name }}
-              </option>
-            </select>
-          </div>
-
-          <!-- Filtro por Cidade -->
-          <div>
-            <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-              Cidade
-            </label>
-            <select
-              v-model="filterCityId"
-              @change="applySecondaryFilters"
-              class="w-full h-9 px-3 rounded-lg border border-slate-300 dark:border-[#14147A] bg-white dark:bg-[#03032E] text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer"
-            >
-              <option value="">Todas as Cidades</option>
-              <option v-for="ct in citiesList" :key="ct.id" :value="ct.id">
-                {{ ct.name }}
-              </option>
-            </select>
-          </div>
-        </div>
-      </div>
+      </Transition>
     </div>
 
     <!-- Tabela Confortável com Linhas Finas e Ordenação Clicável nos Cabeçalhos -->
@@ -239,8 +418,6 @@
               </th>
 
 
-              <!-- Coluna 7: Status -->
-              <th class="py-3.5 px-5">Status</th>
 
               <!-- Coluna 8: Ações -->
               <th class="py-3.5 px-5 text-right">Ação</th>
@@ -249,14 +426,14 @@
           <tbody class="divide-y divide-slate-100 dark:divide-[#14147A]/60">
             <!-- Loading -->
             <tr v-if="loading">
-              <td colspan="6" class="py-12 text-center text-slate-400 text-sm">
+              <td colspan="5" class="py-12 text-center text-slate-400 text-sm">
                 <span class="inline-block animate-spin mr-2 text-[#FC6714]">⟳</span> Carregando registros...
               </td>
             </tr>
 
             <!-- Vazio -->
             <tr v-else-if="people.length === 0">
-              <td colspan="6" class="py-12 text-center text-slate-400 text-sm">
+              <td colspan="5" class="py-12 text-center text-slate-400 text-sm">
                 Nenhuma pessoa encontrada com os filtros selecionados.
               </td>
             </tr>
@@ -391,16 +568,6 @@
               </td>
 
 
-              <!-- Status -->
-              <td class="py-4 px-5">
-                <span
-                  class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
-                  :class="person.status === 'active' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300' : 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-400'"
-                >
-                  <span class="w-1.5 h-1.5 rounded-full" :class="person.status === 'active' ? 'bg-emerald-500' : 'bg-slate-400'"></span>
-                  {{ person.status === 'active' ? 'Ativo' : 'Inativo' }}
-                </span>
-              </td>
 
               <!-- Ação (Menu de Reticências) -->
               <td class="py-4 px-5 text-right relative">
@@ -516,10 +683,12 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import {
   Plus, Search, Edit2, Power, Copy, Check, Phone, Mail, X, MoreVertical, MoreHorizontal,
-  SlidersHorizontal, ChevronDown, RotateCcw, ArrowUpDown, ArrowUp, ArrowDown
+  SlidersHorizontal, ChevronDown, RotateCcw, ArrowUpDown, ArrowUp, ArrowDown,
+  CheckCircle2, Users, MapPin, Building2, FolderTree
 } from 'lucide-vue-next';
 import axios from 'axios';
 import PersonModal from '../components/people/PersonModal.vue';
+import CitySearchSelect from '../components/common/CitySearchSelect.vue';
 
 const people = ref<any[]>([]);
 const loading = ref(false);
@@ -563,24 +732,82 @@ const toggleSort = (col: string) => {
   fetchPeople();
 };
 
-// Filtros Secundários Avançados
-const isFiltersOpen = ref(false);
+// Filtros Dinâmicos por Campo
+const isFiltersMenuOpen = ref(false);
+const filtersDropdownContainerRef = ref<HTMLElement | null>(null);
+
+const AVAILABLE_FILTER_FIELDS = [
+  { key: 'status', label: 'Status', icon: CheckCircle2 },
+  { key: 'person_type', label: 'Tipo de Pessoa', icon: Users },
+  { key: 'state', label: 'Estado (UF)', icon: MapPin },
+  { key: 'city', label: 'Município', icon: Building2 },
+  { key: 'group', label: 'Grupo', icon: FolderTree },
+];
+
+const activeFilterKeys = ref<string[]>([]);
 const filterStatus = ref('');
 const filterPersonType = ref('');
 const filterStateId = ref('');
-const filterCityId = ref('');
+const filterCityId = ref<number | null | ''>('');
+const filterGroup = ref('');
 
 const statesList = ref<any[]>([]);
 const citiesList = ref<any[]>([]);
+const groupsList = ref<any[]>([]);
 
-const activeSecondaryFiltersCount = computed(() => {
-  let c = 0;
-  if (filterStatus.value) c++;
-  if (filterPersonType.value) c++;
-  if (filterStateId.value) c++;
-  if (filterCityId.value) c++;
-  return c;
+const selectedStateCode = computed(() => {
+  const st = statesList.value.find(s => s.id === Number(filterStateId.value));
+  return st ? st.code : '';
 });
+
+const isFilterActive = (key: string) => {
+  return activeFilterKeys.value.includes(key);
+};
+
+const toggleFilterField = (key: string) => {
+  if (activeFilterKeys.value.includes(key)) {
+    removeFilter(key);
+  } else {
+    activeFilterKeys.value.push(key);
+    if (key === 'state' || key === 'city') {
+      if (statesList.value.length === 0) {
+        loadStates();
+      }
+    }
+    if (key === 'group') {
+      if (groupsList.value.length === 0) {
+        loadGroups();
+      }
+    }
+    isFiltersMenuOpen.value = false;
+  }
+};
+
+const removeFilter = (key: string) => {
+  activeFilterKeys.value = activeFilterKeys.value.filter(k => k !== key);
+  if (key === 'status') filterStatus.value = '';
+  if (key === 'person_type') filterPersonType.value = '';
+  if (key === 'state') {
+    filterStateId.value = '';
+    citiesList.value = [];
+  }
+  if (key === 'city') filterCityId.value = '';
+  if (key === 'group') filterGroup.value = '';
+  currentPage.value = 1;
+  fetchPeople();
+};
+
+const clearAllFilters = () => {
+  activeFilterKeys.value = [];
+  filterStatus.value = '';
+  filterPersonType.value = '';
+  filterStateId.value = '';
+  filterCityId.value = '';
+  filterGroup.value = '';
+  citiesList.value = [];
+  currentPage.value = 1;
+  fetchPeople();
+};
 
 const loadStates = async () => {
   try {
@@ -591,13 +818,22 @@ const loadStates = async () => {
   }
 };
 
+const loadGroups = async () => {
+  try {
+    const res = await axios.get('/api/v1/person-groups');
+    groupsList.value = res.data.data || [];
+  } catch (err) {
+    console.error('Erro ao carregar grupos', err);
+  }
+};
+
 const handleStateChange = async () => {
   filterCityId.value = '';
   citiesList.value = [];
   if (filterStateId.value) {
     try {
       const res = await axios.get('/api/v1/cities', {
-        params: { state_id: filterStateId.value }
+        params: { state_id: filterStateId.value, all: 1 }
       });
       citiesList.value = res.data.data || [];
     } catch (err) {
@@ -608,16 +844,6 @@ const handleStateChange = async () => {
 };
 
 const applySecondaryFilters = () => {
-  currentPage.value = 1;
-  fetchPeople();
-};
-
-const clearSecondaryFilters = () => {
-  filterStatus.value = '';
-  filterPersonType.value = '';
-  filterStateId.value = '';
-  filterCityId.value = '';
-  citiesList.value = [];
   currentPage.value = 1;
   fetchPeople();
 };
@@ -829,10 +1055,14 @@ const fetchPeople = async () => {
     };
     if (search.value) params.search = search.value;
     if (selectedPersona.value) params.persona = selectedPersona.value;
-    if (filterStatus.value) params.status = filterStatus.value;
-    if (filterPersonType.value) params.person_type = filterPersonType.value;
-    if (filterStateId.value) params.state_id = filterStateId.value;
-    if (filterCityId.value) params.city_id = filterCityId.value;
+    if (activeFilterKeys.value.includes('status') && filterStatus.value) params.status = filterStatus.value;
+    if (activeFilterKeys.value.includes('person_type') && filterPersonType.value) params.person_type = filterPersonType.value;
+    if (activeFilterKeys.value.includes('state') && filterStateId.value) params.state_id = filterStateId.value;
+    if (activeFilterKeys.value.includes('city') && filterCityId.value) params.city_id = filterCityId.value;
+    if (activeFilterKeys.value.includes('group') && filterGroup.value) {
+      params.group = filterGroup.value;
+      params.group_id = filterGroup.value;
+    }
 
     const res = await axios.get('/api/v1/people', { params });
     people.value = res.data.data;
@@ -870,7 +1100,6 @@ const toggleStatus = async (person: any) => {
   }
 };
 
-
 // Controle do menu de reticências (Ação)
 const activeDropdownPersonId = ref<number | null>(null);
 
@@ -880,6 +1109,13 @@ const toggleActionsDropdown = (personId: number) => {
 
 const closeActionsDropdown = () => {
   activeDropdownPersonId.value = null;
+};
+
+const closeFiltersMenu = (event?: MouseEvent) => {
+  if (event && filtersDropdownContainerRef.value && filtersDropdownContainerRef.value.contains(event.target as Node)) {
+    return;
+  }
+  isFiltersMenuOpen.value = false;
 };
 
 const handleActionEdit = (person: any) => {
@@ -902,13 +1138,16 @@ const handleActionCopyId = (person: any) => {
 onMounted(() => {
   window.addEventListener('keydown', handleGlobalKeyDown);
   window.addEventListener('click', closeActionsDropdown);
+  window.addEventListener('click', closeFiltersMenu);
   loadStates();
+  loadGroups();
   fetchPeople();
 });
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleGlobalKeyDown);
   window.removeEventListener('click', closeActionsDropdown);
+  window.removeEventListener('click', closeFiltersMenu);
 });
 </script>
 

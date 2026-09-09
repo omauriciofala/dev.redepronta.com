@@ -45,8 +45,13 @@ class GeoController extends Controller
             $query->where('state_id', $request->input('state_id'));
         }
 
-        // Limite ergonômico de resultados para navegação ágil
-        $cities = $query->orderBy('name')->limit(30)->get(['id', 'state_id', 'ibge_code', 'name']);
+        // Limite ergonômico de resultados ou carga completa via all=1
+        if ($request->boolean('all')) {
+            $cities = $query->orderBy('name')->get(['id', 'state_id', 'ibge_code', 'name']);
+        } else {
+            $limit = $request->integer('limit', 30);
+            $cities = $query->orderBy('name')->limit($limit)->get(['id', 'state_id', 'ibge_code', 'name']);
+        }
 
         return response()->json(['data' => $cities]);
     }
@@ -113,5 +118,60 @@ class GeoController extends Controller
                 'message' => 'Falha de comunicação com o serviço ViaCEP: ' . $e->getMessage(),
             ], 502);
         }
+    }
+
+    public function storeState(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'code' => 'required|string|size:2|unique:states,code',
+            'name' => 'required|string|max:50',
+        ]);
+
+        $state = State::create([
+            'code' => strtoupper($validated['code']),
+            'name' => $validated['name'],
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Estado cadastrado com sucesso.',
+            'data' => $state,
+        ], 201);
+    }
+
+    public function storeCity(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'state_id' => 'required|exists:states,id',
+            'name' => 'required|string|max:100',
+            'ibge_code' => 'required|string|size:7|unique:cities,ibge_code',
+        ]);
+
+        $city = City::create($validated);
+        $city->load('state:id,code,name');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Município cadastrado com sucesso.',
+            'data' => $city,
+        ], 201);
+    }
+
+    public function updateCity(Request $request, City $city): JsonResponse
+    {
+        $validated = $request->validate([
+            'state_id' => 'sometimes|required|exists:states,id',
+            'name' => 'sometimes|required|string|max:100',
+            'ibge_code' => 'sometimes|required|string|size:7|unique:cities,ibge_code,' . $city->id,
+        ]);
+
+        $city->update($validated);
+        $city->load('state:id,code,name');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Município atualizado com sucesso.',
+            'data' => $city,
+        ]);
     }
 }

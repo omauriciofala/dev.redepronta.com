@@ -129,15 +129,17 @@ const props = withDefaults(defineProps<{
   placeholder?: string;
   disabled?: boolean;
   required?: boolean;
+  stateId?: number | string | null;
 }>(), {
   modelValue: null,
   initialCityName: '',
   initialStateCode: '',
   initialIbgeCode: '',
   label: '',
-  placeholder: 'Digite ao menos 3 letras da cidade (ex: Curitiba, Campinas)...',
+  placeholder: 'Digite ao menos 3 letras do município (ex: Curitiba, Campinas)...',
   disabled: false,
   required: false,
+  stateId: null,
 });
 
 const emit = defineEmits<{
@@ -188,9 +190,11 @@ const searchCities = async (searchTerm: string) => {
   hasSearched.value = true;
 
   try {
-    const response = await axios.get('/api/v1/cities', {
-      params: { q: searchTerm },
-    });
+    const params: Record<string, any> = { q: searchTerm };
+    if (props.stateId) {
+      params.state_id = props.stateId;
+    }
+    const response = await axios.get('/api/v1/cities', { params });
     results.value = response.data.data || [];
     highlightedIndex.value = results.value.length > 0 ? 0 : -1;
   } catch (error) {
