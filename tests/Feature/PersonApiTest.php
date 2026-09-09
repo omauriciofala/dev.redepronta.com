@@ -339,4 +339,141 @@ class PersonApiTest extends TestCase
             'commercial_longitude' => -46.651582,
         ]);
     }
+
+    public function test_index_returns_persona_counts_in_metadata(): void
+    {
+        Person::create([
+            'account_id' => $this->account->id,
+            'name' => 'Cliente Um',
+            'person_type' => 'individual',
+            'document_number' => $this->generateValidCpf(),
+            'is_client' => true,
+            'is_employee' => false,
+            'status' => 'active',
+        ]);
+
+        Person::create([
+            'account_id' => $this->account->id,
+            'name' => 'Colaborador Dois',
+            'person_type' => 'individual',
+            'document_number' => $this->generateValidCpf(),
+            'is_client' => false,
+            'is_employee' => true,
+            'status' => 'active',
+        ]);
+
+        $response = $this->getJson('/api/v1/people');
+
+        $response->assertOk()
+            ->assertJsonStructure([
+                'data',
+                'meta' => [
+                    'counts' => [
+                        'total',
+                        'client',
+                        'supplier',
+                        'employee',
+                        'outsourced',
+                        'seller',
+                        'driver',
+                        'carrier',
+                        'requester',
+                    ],
+                ],
+            ]);
+
+        $this->assertEquals(2, $response->json('meta.counts.total'));
+        $this->assertEquals(1, $response->json('meta.counts.client'));
+        $this->assertEquals(1, $response->json('meta.counts.employee'));
+    }
+
+    public function test_index_supports_state_and_status_filtering(): void
+    {
+        $rjState = State::create(['code' => 'RJ', 'name' => 'Rio de Janeiro']);
+        $rjCity = City::create([
+            'ibge_code' => '3304557',
+            'name' => 'Rio de Janeiro',
+            'state_id' => $rjState->id,
+        ]);
+
+        Person::create([
+            'account_id' => $this->account->id,
+            'name' => 'Paulista Ativo',
+            'person_type' => 'individual',
+            'document_number' => $this->generateValidCpf(),
+            'city_id' => $this->city->id,
+            'status' => 'active',
+        ]);
+
+        Person::create([
+            'account_id' => $this->account->id,
+            'name' => 'Carioca Inativo',
+            'person_type' => 'individual',
+            'document_number' => $this->generateValidCpf(),
+            'city_id' => $rjCity->id,
+            'status' => 'inactive',
+        ]);
+
+        // Filtro por Estado SP
+        $resSP = $this->getJson('/api/v1/people?state_code=SP');
+        $resSP->assertOk();
+        $this->assertCount(1, $resSP->json('data'));
+        $this->assertEquals('Paulista Ativo', $resSP->json('data.0.name'));
+
+        // Filtro por Status inactive
+        $resInactive = $this->getJson('/api/v1/people?status=inactive');
+        $resInactive->assertOk();
+        $this->assertCount(1, $resInactive->json('data'));
+        $this->assertEquals('Carioca Inativo', $resInactive->json('data.0.name'));
+    }
+
+    public function test_index_supports_sorting_by_name_city_and_date(): void
+    {
+        $cityA = City::create([
+            'ibge_code' => '3500105',
+            'name' => 'Adamantina',
+            'state_id' => $this->city->state_id,
+        ]);
+
+        $cityZ = City::create([
+            'ibge_code' => '3557204',
+            'name' => 'Zacarias',
+            'state_id' => $this->city->state_id,
+        ]);
+
+        Person::create([
+            'account_id' => $this->account->id,
+            'name' => 'Bruno Zacarias',
+            'person_type' => 'individual',
+            'document_number' => $this->generateValidCpf(),
+            'city_id' => $cityZ->id,
+            'registration_date' => '2026-01-01',
+            'status' => 'active',
+        ]);
+
+        Person::create([
+            'account_id' => $this->account->id,
+            'name' => 'Ana Adamantina',
+            'person_type' => 'individual',
+            'document_number' => $this->generateValidCpf(),
+            'city_id' => $cityA->id,
+            'registration_date' => '2026-05-01',
+            'status' => 'active',
+        ]);
+
+        // Ordenação por nome DESC
+        $resNameDesc = $this->getJson('/api/v1/people?sort_by=name&sort_direction=desc');
+        $resNameDesc->assertOk();
+        $this->assertEquals('Bruno Zacarias', $resNameDesc->json('data.0.name'));
+
+        // Ordenação por cidade ASC
+        $resCityAsc = $this->getJson('/api/v1/people?sort_by=city&sort_direction=asc');
+        $resCityAsc->assertOk();
+        $this->assertEquals('Ana Adamantina', $resCityAsc->json('data.0.name'));
+
+        // Ordenação por data DESC
+        $resDateDesc = $this->getJson('/api/v1/people?sort_by=date&sort_direction=desc');
+        $resDateDesc->assertOk();
+        $this->assertEquals('Ana Adamantina', $resDateDesc->json('data.0.name'));
+    }
 }

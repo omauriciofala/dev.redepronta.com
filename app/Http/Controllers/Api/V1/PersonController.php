@@ -20,12 +20,23 @@ class PersonController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
+        $filters = $request->only([
+            'search', 'status', 'person_type', 'city_id', 'state_id', 'state_code',
+            'persona', 'sort_by', 'sort_direction'
+        ]);
+
         $people = $this->personService->list(
-            $request->only(['search', 'status', 'person_type', 'city_id', 'persona']),
+            $filters,
             $request->integer('per_page', 15)
         );
 
-        return PersonResource::collection($people);
+        $counts = $this->personService->getCounts();
+
+        return PersonResource::collection($people)->additional([
+            'meta' => [
+                'counts' => $counts,
+            ],
+        ]);
     }
 
     public function store(StorePersonRequest $request): JsonResponse

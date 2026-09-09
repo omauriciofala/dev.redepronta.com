@@ -352,6 +352,190 @@
       </div>
 
       <!-- ========================================== -->
+      <!-- ABA 2: DOCUMENTOS & FILIAÇÃO (COMPLETA)   -->
+      <!-- ========================================== -->
+      <div v-show="activeTab === 'documentos'" class="space-y-6">
+        <!-- BLOCO 1: DOCUMENTOS GERAIS E FISCAIS -->
+        <div class="p-5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-2xs">
+          <div class="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+            <ShieldCheck class="w-4 h-4 text-blue-600 dark:text-blue-400" />
+            <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+              Documentos Gerais e Registros Fiscais
+            </h3>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+            <!-- Nº RG -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                Nº RG
+              </label>
+              <input
+                type="text"
+                v-model="form.rg_ie"
+                placeholder="Ex: 12.345.678-9"
+                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden transition"
+              />
+            </div>
+
+            <!-- Órgão Emissor -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                Órgão Emissor
+              </label>
+              <input
+                type="text"
+                v-model="form.rg_issuer"
+                placeholder="Ex: SSP/SP, DETRAN, PC"
+                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden transition"
+              />
+            </div>
+
+            <!-- Data Emissão -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                Data Emissão
+              </label>
+              <DateInput
+                v-model="form.rg_issue_date"
+                placeholder="DD/MM/AAAA"
+              />
+            </div>
+
+            <!-- Inscrição Estadual -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                Inscrição Estadual
+              </label>
+              <input
+                type="text"
+                v-model="form.state_registration"
+                placeholder="Ex: 123.456.789.110 ou Isento"
+                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden transition"
+              />
+            </div>
+
+            <!-- Inscrição Municipal -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                Inscrição Municipal
+              </label>
+              <input
+                type="text"
+                v-model="form.municipal_registration"
+                placeholder="Ex: 9876543-2"
+                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden transition"
+              />
+            </div>
+
+            <!-- CNAE -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                CNAE
+              </label>
+              <input
+                type="text"
+                v-model="form.cnae"
+                placeholder="Ex: 61.10-8-03"
+                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden transition"
+              />
+            </div>
+
+            <!-- Num. Inscr. SUFRAMA -->
+            <div class="sm:col-span-2 md:col-span-3">
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                Num. Inscr. SUFRAMA
+              </label>
+              <input
+                type="text"
+                v-model="form.suframa_registration"
+                placeholder="Número de inscrição na Superintendência da Zona Franca de Manaus"
+                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden transition"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- BLOCO 2: FILIAÇÃO, DADOS CIVIS E ORIGEM -->
+        <div class="p-5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-2xs">
+          <div class="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+            <Users class="w-4 h-4 text-purple-600 dark:text-purple-400" />
+            <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+              Filiação, Origem e Capital Social
+            </h3>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+            <!-- Nome da Mãe -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                Nome da Mãe
+              </label>
+              <input
+                type="text"
+                v-model="form.mother_name"
+                placeholder="Nome completo da mãe"
+                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden transition"
+              />
+            </div>
+
+            <!-- Nome do Pai -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                Nome do Pai
+              </label>
+              <input
+                type="text"
+                v-model="form.father_name"
+                placeholder="Nome completo do pai"
+                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden transition"
+              />
+            </div>
+
+            <!-- Data de Fundação ou Nascimento -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                {{ form.person_type === 'individual' ? 'Data de Nascimento' : 'Data de Fundação' }}
+              </label>
+              <DateInput
+                v-model="form.birth_or_foundation_date"
+                placeholder="DD/MM/AAAA"
+              />
+            </div>
+
+            <!-- Capital Social (PJ) -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                Capital Social (PJ)
+              </label>
+              <div class="relative">
+                <span class="absolute left-3 top-2.5 text-xs font-bold text-slate-400">R$</span>
+                <input
+                  type="text"
+                  v-model="form.share_capital"
+                  placeholder="0,00"
+                  class="w-full h-10 pl-9 pr-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden font-mono transition"
+                />
+              </div>
+            </div>
+
+            <!-- Naturalidade -->
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                Naturalidade
+              </label>
+              <input
+                type="text"
+                v-model="form.birth_place"
+                placeholder="Ex: São Paulo / SP, Belo Horizonte / MG"
+                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden transition"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================== -->
       <!-- ABA 2: CONTATOS & COMUNICAÇÃO              -->
       <!-- ========================================== -->
       <div v-show="activeTab === 'contatos'" class="space-y-6">
@@ -821,7 +1005,7 @@
 <script setup lang="ts">
 import { ref, reactive, watch } from 'vue';
 import {
-  FileText, Mail, MapPin, Tag, Users, Truck, Briefcase, Wrench,
+  FileText, ShieldCheck, Mail, MapPin, Tag, Users, Truck, Briefcase, Wrench,
   BadgePercent, Car, Package, Phone, MessageSquare, AlertCircle,
   Loader2, Check, Home, Building2, Search, Compass, Navigation, Zap
 } from 'lucide-vue-next';
@@ -868,6 +1052,7 @@ const commercialCityInfo = reactive({
 const activeTab = ref('principal');
 const tabs = [
   { id: 'principal', label: 'Principal', icon: FileText },
+  { id: 'documentos', label: 'Documentos', icon: ShieldCheck },
   { id: 'contatos', label: 'Contatos', icon: Mail },
   { id: 'endereco', label: 'Endereços', icon: MapPin },
 ];
@@ -1099,6 +1284,22 @@ watch(() => props.isOpen, (open) => {
         phone: p.contact?.phone || p.phone || '',
         whatsapp: p.contact?.whatsapp || p.whatsapp || '',
         notes: p.notes || '',
+
+        // Documentos e Registros Fiscais
+        rg_ie: p.documents?.rg_number || p.rg_ie || '',
+        rg_issuer: p.documents?.rg_issuer || p.rg_issuer || '',
+        rg_issue_date: p.documents?.rg_issue_date || p.rg_issue_date || '',
+        state_registration: p.documents?.state_registration || p.state_registration || '',
+        municipal_registration: p.documents?.municipal_registration || p.municipal_registration || '',
+        cnae: p.documents?.cnae || p.cnae || '',
+        suframa_registration: p.documents?.suframa_registration || p.suframa_registration || '',
+
+        // Filiação, Dados Civis e Origem
+        mother_name: p.filiation?.mother_name || p.mother_name || '',
+        father_name: p.filiation?.father_name || p.father_name || '',
+        birth_or_foundation_date: p.filiation?.birth_or_foundation_date || p.birth_or_foundation_date || '',
+        share_capital: p.filiation?.share_capital !== undefined && p.filiation?.share_capital !== null ? String(p.filiation.share_capital) : (p.share_capital || ''),
+        birth_place: p.filiation?.birth_place || p.birth_place || '',
       });
     } else {
       isEditing.value = false;

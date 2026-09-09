@@ -229,3 +229,11 @@ Para aprofundamento na arquitetura, modelos de dados e execução ágil, consult
   - Máscaras dinâmicas automáticas para CPF (`000.000.000-00`) e CNPJ (`00.000.000/0000-00`) com botão discreto de cópia rápida em 1 clique e feedback instantâneo.
   - Links operacionais de contato direto para discador (`tel:+55...`), WhatsApp (`https://wa.me/55...`) e e-mail (`mailto:...`) com cópia com 1 clique.
   - Badges semânticos com paleta estrita de cores por papel (Cliente, Fornecedor, Colaborador, Terceirizado, Vendedor, Motorista, Transportadora) e agrupamento `+N` para evitar sobrecarga visual com 3 ou mais papéis.
+
+- **Filtros, Contadores em Tempo Real, Busca Ágil e Ordenação Clicável**:
+  - Contadores numéricos em todas as abas de segmentação (`Todos (N)`, `Clientes (N)`, `Colaboradores (N)`, etc.).
+  - Atalhos globais de teclado `Ctrl + K` / `Cmd + K` e `/` com botão de limpeza rápida (`X`) e `Esc`.
+  - Painel retrátil de filtros secundários avançados por Status, Tipo de Pessoa (PF/PJ), Estado (UF) e Cidade.
+  - Ordenação interativa por Nome / Razão Social, Cidade / UF e Data de Cadastro com alternância ascendente e descendente.
+- **Nova Aba Documentos no Cadastro de Pessoas**:
+  - Aba completa com Nº RG, Órgão Emissor, Data Emissão (DD/MM/AAAA), Inscrição Estadual, Inscrição Municipal, CNAE, Num. Inscr. SUFRAMA, Filiação (Nome da Mãe e Pai), Data de Fundação/Nascimento, Capital Social PJ (R$) e Naturalidade.

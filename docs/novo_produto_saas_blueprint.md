@@ -496,3 +496,26 @@ Acesso direto pela barra lateral (ícone de rede / conexão), reunindo o invent�
     - **Transportadora**: Fúcsia (`fuchsia`)
     - **Solicitante**: Cinza chumbo (`slate`)
   - **Mecanismo Anti-Sobrecarga**: Quando um registro acumula 3 ou mais papéis, a interface exibe os 2 primeiros papéis com badge completo e um contador compacto `+N` (ex.: `+2`), permitindo expansão inline sob demanda ou consulta em tooltip, mantendo a altura uniforme das linhas da tabela.
+
+
+### 12. Filtros, Busca, Ordenação e Aba de Documentos Canônica
+- **Contadores em Tempo Real nas Abas de Segmentação**:
+  - Todas as abas de personas exibem a contagem exata de registros ativos: `Todos (N)`, `Clientes (N)`, `Fornecedores (N)`, `Colaboradores (N)`, `Terceirizados (N)`, `Vendedores (N)`, `Motoristas (N)`, `Transportadoras (N)` e `Solicitantes (N)`.
+  - Agregação SQL unificada de alta performance retornada em `meta.counts` da API.
+- **Atalhos Globais e Busca Ágil**:
+  - Suporte ao atalho global de teclado `Ctrl + K` (ou `Cmd + K`) e `/` para focar imediatamente no campo de busca com badge `<kbd>Ctrl K</kbd>`.
+  - Botão de limpeza de pesquisa com 1 clique (`X`) e tecla `Esc`.
+- **Filtros Secundários Avançados (Painel Retrátil)**:
+  - Gaveta colapsável que não polui a barra principal, contendo:
+    - Status: Todos, Ativos e Inativos.
+    - Tipo: Todos, Pessoa Física (PF) e Pessoa Jurídica (PJ).
+    - Estado (UF): Select canônico de estados federativos.
+    - Cidade: Select de cidades filtradas pelo estado selecionado.
+    - Botão "Limpar Filtros" e badge contador de filtros ativos no botão principal.
+- **Ordenação Clicável nas Colunas (Sorting)**:
+  - Cabeçalhos ordenáveis com 1 clique para `Nome / Razão Social` (`name`), `Cidade / UF` (`city`) e `Data de Cadastro` (`date`).
+  - Suporte a ordenação ascendente (`asc`) e descendente (`desc`) com ícones dinâmicos `ArrowUp`, `ArrowDown` e `ArrowUpDown`.
+- **Nova Aba "Documentos" no Cadastro de Pessoas**:
+  - Aba 2 `Documentos & Filiação` no modal de cadastro e edição de pessoas:
+    - Documentos e Registros Fiscais: Nº RG, Órgão Emissor, Data Emissão (DD/MM/AAAA), Inscrição Estadual, Inscrição Municipal, CNAE, Num. Inscr. SUFRAMA.
+    - Filiação, Origem e Dados Civis: Nome da Mãe, Nome do Pai, Data de Fundação ou Nascimento (DD/MM/AAAA), Capital Social PJ (R$), Naturalidade.

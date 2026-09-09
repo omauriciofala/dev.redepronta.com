@@ -13,67 +13,264 @@
 
       <button
         @click="openCreateModal"
-        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shadow-sm transition active:scale-98"
+        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shadow-sm transition active:scale-98 cursor-pointer"
       >
         <Plus class="w-4 h-4" />
         <span>Nova Pessoa</span>
       </button>
     </div>
 
-    <!-- Barra de Filtros com Fontes Confortáveis -->
-    <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-4 text-sm shadow-2xs transition-colors duration-200">
-      <!-- Busca Textual -->
-      <div class="relative flex-1 min-w-[280px]">
-        <Search class="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400" />
-        <input
-          type="text"
-          v-model="search"
-          @input="debounceSearch"
-          placeholder="Buscar por nome, CPF/CNPJ, e-mail ou telefone..."
-          class="w-full h-11 pl-10 pr-4 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-blue-500 text-sm transition"
-        />
+    <!-- Barra de Filtros e Busca Principal com Fontes Confortáveis -->
+    <div class="space-y-3">
+      <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-4 text-sm shadow-2xs transition-colors duration-200">
+        <!-- Busca Textual com Suporte a Atalho (Ctrl+K ou /) e Botão Limpar (X) -->
+        <div class="relative flex-1 min-w-[280px]">
+          <Search class="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400 pointer-events-none" />
+          <input
+            ref="searchInputRef"
+            type="text"
+            v-model="search"
+            @input="debounceSearch"
+            placeholder="Buscar por nome, CPF/CNPJ, e-mail ou telefone..."
+            class="w-full h-11 pl-10 pr-20 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-blue-500 text-sm transition"
+          />
+
+          <!-- Canto Direito da Busca: Botão Limpar (X) e Indicador de Atalho (Ctrl K) -->
+          <div class="absolute right-3 top-3 flex items-center gap-1.5">
+            <button
+              v-if="search"
+              @click="clearSearch"
+              class="p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition cursor-pointer"
+              title="Limpar pesquisa (Esc)"
+            >
+              <X class="w-3.5 h-3.5" />
+            </button>
+            <kbd
+              v-else
+              class="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-[10px] font-mono text-slate-400 select-none shadow-2xs"
+              title="Atalho de teclado: Ctrl+K ou /"
+            >
+              Ctrl K
+            </kbd>
+          </div>
+        </div>
+
+        <!-- Botão de Filtros Secundários Avançados (Gaveta Retrátil) -->
+        <button
+          type="button"
+          @click="isFiltersOpen = !isFiltersOpen"
+          :class="activeSecondaryFiltersCount > 0
+            ? 'bg-blue-50 text-blue-700 border-blue-300 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800 font-semibold'
+            : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'"
+          class="inline-flex items-center gap-2 h-11 px-4 rounded-lg border text-sm font-medium transition shadow-2xs cursor-pointer"
+          title="Abrir/fechar filtros secundários avançados"
+        >
+          <SlidersHorizontal class="w-4 h-4 text-slate-500 dark:text-slate-400" />
+          <span>Filtros</span>
+          <span
+            v-if="activeSecondaryFiltersCount > 0"
+            class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-blue-600 text-white"
+          >
+            {{ activeSecondaryFiltersCount }}
+          </span>
+          <ChevronDown
+            class="w-3.5 h-3.5 transition-transform duration-200 text-slate-400"
+            :class="{ 'rotate-180': isFiltersOpen }"
+          />
+        </button>
+
+        <!-- Filtro por Persona (Tabs com Contadores Numéricos) -->
+        <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-950 p-1 rounded-lg border border-slate-200 dark:border-slate-800 overflow-x-auto max-w-full">
+          <button
+            v-for="p in personaFilters"
+            :key="p.value"
+            @click="selectPersona(p.value)"
+            :class="selectedPersona === p.value
+              ? 'bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 font-bold shadow-xs'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 font-medium'"
+            class="px-3 py-1.5 rounded-md text-xs transition whitespace-nowrap cursor-pointer flex items-center gap-1.5"
+          >
+            <span>{{ p.label }}</span>
+            <span
+              :class="selectedPersona === p.value
+                ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300'
+                : 'bg-slate-200/80 text-slate-600 dark:bg-slate-800 dark:text-slate-400'"
+              class="px-1.5 py-0.2 rounded-full text-[10px] font-bold tracking-tight"
+            >
+              {{ counts[p.value || 'total'] ?? 0 }}
+            </span>
+          </button>
+        </div>
       </div>
 
-      <!-- Filtro por Persona (Tabs) -->
-      <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-950 p-1 rounded-lg border border-slate-200 dark:border-slate-800 overflow-x-auto max-w-full">
-        <button
-          v-for="p in personaFilters"
-          :key="p.value"
-          @click="selectPersona(p.value)"
-          :class="selectedPersona === p.value ? 'bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 font-semibold shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'"
-          class="px-3 py-1.5 rounded-md text-xs font-medium transition whitespace-nowrap"
-        >
-          {{ p.label }}
-        </button>
+      <!-- Painel Retrátil de Filtros Secundários Avançados (Sem Poluir a Barra Principal) -->
+      <div
+        v-if="isFiltersOpen"
+        class="p-4 bg-slate-50 dark:bg-slate-950/70 rounded-xl border border-slate-200 dark:border-slate-800 animate-fadeIn transition-all shadow-xs"
+      >
+        <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-200 dark:border-slate-800">
+          <div class="flex items-center gap-2">
+            <SlidersHorizontal class="w-4 h-4 text-blue-600 dark:text-blue-400" />
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+              Filtros Secundários Avançados
+            </span>
+          </div>
+
+          <button
+            v-if="activeSecondaryFiltersCount > 0"
+            @click="clearSecondaryFilters"
+            class="text-xs font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition cursor-pointer flex items-center gap-1"
+          >
+            <RotateCcw class="w-3.5 h-3.5" />
+            <span>Limpar Filtros</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+          <!-- Filtro por Status -->
+          <div>
+            <label class="block font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+              Status do Registro
+            </label>
+            <select
+              v-model="filterStatus"
+              @change="applySecondaryFilters"
+              class="w-full h-9 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-blue-500 cursor-pointer"
+            >
+              <option value="">Todos os Status</option>
+              <option value="active">● Apenas Ativos</option>
+              <option value="inactive">○ Apenas Inativos</option>
+            </select>
+          </div>
+
+          <!-- Filtro por Tipo de Pessoa -->
+          <div>
+            <label class="block font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+              Tipo de Pessoa
+            </label>
+            <select
+              v-model="filterPersonType"
+              @change="applySecondaryFilters"
+              class="w-full h-9 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-blue-500 cursor-pointer"
+            >
+              <option value="">Todos os Tipos</option>
+              <option value="individual">Pessoa Física (PF)</option>
+              <option value="legal">Pessoa Jurídica (PJ)</option>
+            </select>
+          </div>
+
+          <!-- Filtro por Estado (UF) -->
+          <div>
+            <label class="block font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+              Estado (UF)
+            </label>
+            <select
+              v-model="filterStateId"
+              @change="handleStateChange"
+              class="w-full h-9 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-blue-500 cursor-pointer"
+            >
+              <option value="">Todos os Estados</option>
+              <option v-for="st in statesList" :key="st.id" :value="st.id">
+                {{ st.code }} - {{ st.name }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Filtro por Cidade -->
+          <div>
+            <label class="block font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+              Cidade
+            </label>
+            <select
+              v-model="filterCityId"
+              @change="applySecondaryFilters"
+              class="w-full h-9 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-blue-500 cursor-pointer"
+            >
+              <option value="">Todas as Cidades</option>
+              <option v-for="ct in citiesList" :key="ct.id" :value="ct.id">
+                {{ ct.name }}
+              </option>
+            </select>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Tabela Confortável com Linhas Finas -->
+    <!-- Tabela Confortável com Linhas Finas e Ordenação Clicável nos Cabeçalhos -->
     <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs transition-colors duration-200">
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse text-sm">
           <thead>
-            <tr class="border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/50 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-              <th class="py-3.5 px-5">Nome / Razão Social</th>
+            <tr class="border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/50 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider select-none">
+              <!-- Coluna 1: Nome / Razão Social (Ordenável) -->
+              <th
+                @click="toggleSort('name')"
+                class="py-3.5 px-5 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition"
+                title="Clique para ordenar por Nome / Razão Social"
+              >
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Nome / Razão Social</span>
+                  <ArrowUp v-if="sortBy === 'name' && sortDirection === 'asc'" class="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                  <ArrowDown v-else-if="sortBy === 'name' && sortDirection === 'desc'" class="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                  <ArrowUpDown v-else class="w-3.5 h-3.5 text-slate-400 opacity-60" />
+                </div>
+              </th>
+
+              <!-- Coluna 2: Tipo & Documento -->
               <th class="py-3.5 px-5">Tipo & Documento</th>
+
+              <!-- Coluna 3: Papéis (Personas) -->
               <th class="py-3.5 px-5">Papéis (Personas)</th>
+
+              <!-- Coluna 4: Ações Rápidas de Contato -->
               <th class="py-3.5 px-5">Ações Rápidas de Contato</th>
-              <th class="py-3.5 px-5">Cidade / UF</th>
+
+              <!-- Coluna 5: Cidade / UF (Ordenável) -->
+              <th
+                @click="toggleSort('city')"
+                class="py-3.5 px-5 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition"
+                title="Clique para ordenar por Cidade"
+              >
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Cidade / UF</span>
+                  <ArrowUp v-if="sortBy === 'city' && sortDirection === 'asc'" class="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                  <ArrowDown v-else-if="sortBy === 'city' && sortDirection === 'desc'" class="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                  <ArrowUpDown v-else class="w-3.5 h-3.5 text-slate-400 opacity-60" />
+                </div>
+              </th>
+
+              <!-- Coluna 6: Data de Cadastro (Ordenável) -->
+              <th
+                @click="toggleSort('date')"
+                class="py-3.5 px-5 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition"
+                title="Clique para ordenar por Data de Cadastro"
+              >
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Cadastro</span>
+                  <ArrowUp v-if="sortBy === 'date' && sortDirection === 'asc'" class="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                  <ArrowDown v-else-if="sortBy === 'date' && sortDirection === 'desc'" class="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                  <ArrowUpDown v-else class="w-3.5 h-3.5 text-slate-400 opacity-60" />
+                </div>
+              </th>
+
+              <!-- Coluna 7: Status -->
               <th class="py-3.5 px-5">Status</th>
+
+              <!-- Coluna 8: Ações -->
               <th class="py-3.5 px-5 text-right">Ações</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100 dark:divide-slate-800/80">
             <!-- Loading -->
             <tr v-if="loading">
-              <td colspan="7" class="py-12 text-center text-slate-400 text-sm">
+              <td colspan="8" class="py-12 text-center text-slate-400 text-sm">
                 <span class="inline-block animate-spin mr-2">⟳</span> Carregando registros...
               </td>
             </tr>
 
             <!-- Vazio -->
             <tr v-else-if="people.length === 0">
-              <td colspan="7" class="py-12 text-center text-slate-400 text-sm">
+              <td colspan="8" class="py-12 text-center text-slate-400 text-sm">
                 Nenhuma pessoa encontrada com os filtros selecionados.
               </td>
             </tr>
@@ -87,8 +284,8 @@
             >
               <!-- Nome / Razão Social -->
               <td class="py-4 px-5">
-                <div class="font-semibold text-slate-900 dark:text-slate-100 text-sm flex items-center gap-1.5">
-                  <span>{{ person.name }}</span>
+                <div class="font-semibold text-slate-900 dark:text-slate-100 text-sm">
+                  {{ person.name }}
                 </div>
                 <div v-if="person.trade_name" class="text-xs text-slate-500 dark:text-slate-400 font-medium">
                   {{ person.trade_name }}
@@ -118,7 +315,7 @@
                   <button
                     v-if="person.document_number"
                     @click="copyToClipboard(person.document_number, 'doc-' + person.id)"
-                    class="p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition relative group"
+                    class="p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition relative group cursor-pointer"
                     :title="copiedKey === 'doc-' + person.id ? 'Copiado!' : 'Copiar documento'"
                   >
                     <Check v-if="copiedKey === 'doc-' + person.id" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
@@ -155,7 +352,7 @@
                   >
                     <button
                       @click="toggleExpandRoles(person.id)"
-                      class="px-1.5 py-0.5 rounded text-[11px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition flex items-center gap-0.5 shadow-2xs"
+                      class="px-1.5 py-0.5 rounded text-[11px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition flex items-center gap-0.5 shadow-2xs cursor-pointer"
                       :title="isRolesExpanded(person.id) ? 'Recolher papéis' : 'Ver todos: ' + getHiddenRoles(person).map(r => r.label).join(', ')"
                     >
                       <span>{{ isRolesExpanded(person.id) ? '−' : `+${getHiddenRoles(person).length}` }}</span>
@@ -207,7 +404,7 @@
                       :href="'https://wa.me/55' + sanitizePhone(person.contact?.whatsapp || person.contact?.phone)"
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="p-1 rounded text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/60 transition"
+                      class="p-1 rounded text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/60 transition cursor-pointer"
                       title="Abrir conversa no WhatsApp"
                     >
                       <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
@@ -218,7 +415,7 @@
                     <!-- Botão de Cópia de Telefone -->
                     <button
                       @click="copyToClipboard(person.contact?.phone || person.contact?.whatsapp, 'phone-' + person.id)"
-                      class="p-0.5 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition"
+                      class="p-0.5 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition cursor-pointer"
                       title="Copiar telefone"
                     >
                       <Check v-if="copiedKey === 'phone-' + person.id" class="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
@@ -241,7 +438,7 @@
                     <!-- Botão de Cópia de E-mail -->
                     <button
                       @click="copyToClipboard(person.contact?.email, 'email-' + person.id)"
-                      class="p-0.5 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition flex-shrink-0"
+                      class="p-0.5 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition flex-shrink-0 cursor-pointer"
                       title="Copiar e-mail"
                     >
                       <Check v-if="copiedKey === 'email-' + person.id" class="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
@@ -256,6 +453,16 @@
                 <div>{{ person.residential_address?.city_name || person.address?.city_name || person.address?.city?.name || '-' }}</div>
                 <div v-if="person.residential_address?.state_code || person.address?.state_code" class="text-xs text-slate-400">
                   {{ person.residential_address?.state_code || person.address?.state_code }}
+                </div>
+              </td>
+
+              <!-- Data de Cadastro -->
+              <td class="py-4 px-5 text-xs text-slate-600 dark:text-slate-400 whitespace-nowrap">
+                <div class="font-medium text-slate-800 dark:text-slate-200">
+                  {{ person.registration_date_formatted || person.created_at?.split(' ')[0] || '-' }}
+                </div>
+                <div class="text-[11px] text-slate-400">
+                  {{ person.created_at?.split(' ')[1] || '' }}
                 </div>
               </td>
 
@@ -275,14 +482,14 @@
                 <div class="inline-flex items-center gap-1.5">
                   <button
                     @click="openEditModal(person)"
-                    class="p-1.5 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-800 transition"
+                    class="p-1.5 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-800 transition cursor-pointer"
                     title="Editar"
                   >
                     <Edit2 class="w-4 h-4" />
                   </button>
                   <button
                     @click="toggleStatus(person)"
-                    class="p-1.5 rounded-lg text-slate-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-slate-800 transition"
+                    class="p-1.5 rounded-lg text-slate-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-slate-800 transition cursor-pointer"
                     :title="person.status === 'active' ? 'Inativar' : 'Ativar'"
                   >
                     <Power class="w-4 h-4" />
@@ -303,7 +510,7 @@
           <button
             :disabled="currentPage <= 1"
             @click="changePage(currentPage - 1)"
-            class="px-3 py-1.5 rounded-md border border-slate-200 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-40 font-medium transition"
+            class="px-3 py-1.5 rounded-md border border-slate-200 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-40 font-medium transition cursor-pointer"
           >
             Anterior
           </button>
@@ -311,7 +518,7 @@
           <button
             :disabled="currentPage >= lastPage"
             @click="changePage(currentPage + 1)"
-            class="px-3 py-1.5 rounded-md border border-slate-200 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-40 font-medium transition"
+            class="px-3 py-1.5 rounded-md border border-slate-200 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-40 font-medium transition cursor-pointer"
           >
             Próxima
           </button>
@@ -330,8 +537,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { Plus, Search, Edit2, Power, Copy, Check, Phone, Mail } from 'lucide-vue-next';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+import {
+  Plus, Search, Edit2, Power, Copy, Check, Phone, Mail, X,
+  SlidersHorizontal, ChevronDown, RotateCcw, ArrowUpDown, ArrowUp, ArrowDown
+} from 'lucide-vue-next';
 import axios from 'axios';
 import PersonModal from '../components/people/PersonModal.vue';
 
@@ -345,6 +555,132 @@ const totalRecords = ref(0);
 
 const isModalOpen = ref(false);
 const personEditing = ref<any | null>(null);
+
+// Input ref para atalho de teclado global
+const searchInputRef = ref<HTMLInputElement | null>(null);
+
+// Contadores por aba
+const counts = ref<Record<string, number>>({
+  total: 0,
+  client: 0,
+  supplier: 0,
+  employee: 0,
+  outsourced: 0,
+  seller: 0,
+  driver: 0,
+  carrier: 0,
+  requester: 0,
+});
+
+// Ordenação de Colunas
+const sortBy = ref('name');
+const sortDirection = ref<'asc' | 'desc'>('asc');
+
+const toggleSort = (col: string) => {
+  if (sortBy.value === col) {
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortBy.value = col;
+    sortDirection.value = 'asc';
+  }
+  currentPage.value = 1;
+  fetchPeople();
+};
+
+// Filtros Secundários Avançados
+const isFiltersOpen = ref(false);
+const filterStatus = ref('');
+const filterPersonType = ref('');
+const filterStateId = ref('');
+const filterCityId = ref('');
+
+const statesList = ref<any[]>([]);
+const citiesList = ref<any[]>([]);
+
+const activeSecondaryFiltersCount = computed(() => {
+  let c = 0;
+  if (filterStatus.value) c++;
+  if (filterPersonType.value) c++;
+  if (filterStateId.value) c++;
+  if (filterCityId.value) c++;
+  return c;
+});
+
+const loadStates = async () => {
+  try {
+    const res = await axios.get('/api/v1/states');
+    statesList.value = res.data.data || [];
+  } catch (err) {
+    console.error('Erro ao carregar estados', err);
+  }
+};
+
+const handleStateChange = async () => {
+  filterCityId.value = '';
+  citiesList.value = [];
+  if (filterStateId.value) {
+    try {
+      const res = await axios.get('/api/v1/cities', {
+        params: { state_id: filterStateId.value }
+      });
+      citiesList.value = res.data.data || [];
+    } catch (err) {
+      console.error('Erro ao carregar cidades do estado', err);
+    }
+  }
+  applySecondaryFilters();
+};
+
+const applySecondaryFilters = () => {
+  currentPage.value = 1;
+  fetchPeople();
+};
+
+const clearSecondaryFilters = () => {
+  filterStatus.value = '';
+  filterPersonType.value = '';
+  filterStateId.value = '';
+  filterCityId.value = '';
+  citiesList.value = [];
+  currentPage.value = 1;
+  fetchPeople();
+};
+
+// Limpar pesquisa
+const clearSearch = () => {
+  search.value = '';
+  currentPage.value = 1;
+  fetchPeople();
+  searchInputRef.value?.focus();
+};
+
+// Atalho de teclado global: Ctrl+K / Cmd+K ou /
+const handleGlobalKeyDown = (e: KeyboardEvent) => {
+  const isInputActive = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName || '');
+
+  // Ctrl+K ou Cmd+K
+  if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+    e.preventDefault();
+    searchInputRef.value?.focus();
+    searchInputRef.value?.select();
+  }
+
+  // Tecla / (quando fora de outros campos)
+  if (e.key === '/' && !isInputActive) {
+    e.preventDefault();
+    searchInputRef.value?.focus();
+    searchInputRef.value?.select();
+  }
+
+  // Tecla Esc para limpar se o campo de busca estiver focado
+  if (e.key === 'Escape' && document.activeElement === searchInputRef.value) {
+    if (search.value) {
+      clearSearch();
+    } else {
+      searchInputRef.value?.blur();
+    }
+  }
+};
 
 // Estado para controle de cópia rápida
 const copiedKey = ref<string | null>(null);
@@ -483,6 +819,7 @@ const personaFilters = [
   { label: 'Vendedores', value: 'seller' },
   { label: 'Motoristas', value: 'driver' },
   { label: 'Transportadoras', value: 'carrier' },
+  { label: 'Solicitantes', value: 'requester' },
 ];
 
 let searchTimeout: any = null;
@@ -511,15 +848,26 @@ const fetchPeople = async () => {
     const params: any = {
       page: currentPage.value,
       per_page: 15,
+      sort_by: sortBy.value,
+      sort_direction: sortDirection.value,
     };
     if (search.value) params.search = search.value;
     if (selectedPersona.value) params.persona = selectedPersona.value;
+    if (filterStatus.value) params.status = filterStatus.value;
+    if (filterPersonType.value) params.person_type = filterPersonType.value;
+    if (filterStateId.value) params.state_id = filterStateId.value;
+    if (filterCityId.value) params.city_id = filterCityId.value;
 
     const res = await axios.get('/api/v1/people', { params });
     people.value = res.data.data;
     currentPage.value = res.data.meta.current_page;
     lastPage.value = res.data.meta.last_page;
     totalRecords.value = res.data.meta.total;
+
+    // Atualiza contadores numéricos de segmentação
+    if (res.data.meta.counts) {
+      counts.value = { ...counts.value, ...res.data.meta.counts };
+    }
   } catch (err) {
     console.error('Erro ao buscar pessoas', err);
   } finally {
@@ -547,16 +895,22 @@ const toggleStatus = async (person: any) => {
 };
 
 onMounted(() => {
+  window.addEventListener('keydown', handleGlobalKeyDown);
+  loadStates();
   fetchPeople();
+});
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleGlobalKeyDown);
 });
 </script>
 
 <style scoped>
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-2px); }
+  from { opacity: 0; transform: translateY(-4px); }
   to { opacity: 1; transform: translateY(0); }
 }
 .animate-fadeIn {
-  animation: fadeIn 0.15s ease-out forwards;
+  animation: fadeIn 0.2s ease-out forwards;
 }
 </style>
