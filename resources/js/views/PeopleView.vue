@@ -452,14 +452,21 @@
               :key="person.id"
               class="hover:bg-slate-50/70 dark:hover:bg-white/5 transition-colors"
             >
-              <!-- Nome -->
+              <!-- Nome (Clicável para abrir edição) -->
               <td class="py-4 px-5">
-                <div class="font-semibold text-slate-900 dark:text-slate-100 text-sm">
-                  {{ person.name }}
-                </div>
-                <div v-if="person.trade_name" class="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                  {{ person.trade_name }}
-                </div>
+                <button
+                  type="button"
+                  @click="openEditModal(person)"
+                  class="text-left group cursor-pointer focus:outline-none block"
+                  title="Clique para editar este cadastro"
+                >
+                  <div class="font-semibold text-slate-900 dark:text-slate-100 text-sm group-hover:text-[#FC6714] dark:group-hover:text-[#FC6714] transition-colors">
+                    {{ person.name }}
+                  </div>
+                  <div v-if="person.trade_name" class="text-xs text-slate-500 dark:text-slate-400 font-medium group-hover:text-[#FC6714]/80 transition-colors">
+                    {{ person.trade_name }}
+                  </div>
+                </button>
                 <div v-if="person.group_name && person.group_name !== 'Geral'" class="text-[11px] font-semibold text-[#FC6714] mt-0.5">
                   Grupo: {{ person.group_name }}
                 </div>
