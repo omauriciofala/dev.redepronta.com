@@ -199,7 +199,7 @@
 
     <!-- Tabela Confortável com Linhas Finas e Ordenação Clicável nos Cabeçalhos -->
     <div class="bg-white dark:bg-[#06064D]/50 rounded-xl border border-slate-200 dark:border-[#14147A] overflow-hidden shadow-xs transition-colors duration-200">
-      <div class="overflow-x-auto">
+      <div class="overflow-x-auto min-h-[280px]">
         <table class="w-full text-left border-collapse text-sm">
           <thead>
             <tr class="border-b border-slate-200 dark:border-[#14147A] bg-slate-50/80 dark:bg-[#03032E]/70 text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider select-none">
@@ -277,7 +277,7 @@
             <!-- Linha da Tabela -->
             <tr
               v-else
-              v-for="person in people"
+              v-for="(person, index) in people"
               :key="person.id"
               class="hover:bg-slate-50/70 dark:hover:bg-white/5 transition-colors"
             >
@@ -425,19 +425,24 @@
               </td>
 
               <!-- Ação (Menu de Reticências) -->
-              <td class="py-4 px-5 text-right relative" @click.stop>
-                <div class="inline-block text-left">
+              <td class="py-4 px-5 text-right relative">
+                <div class="inline-block text-left relative">
                   <button
                     type="button"
-                    @click="toggleActionsDropdown(person.id)"
+                    @click.stop="toggleActionsDropdown(person.id)"
                     class="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:text-[#FC6714] hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 transition cursor-pointer focus:outline-hidden focus:ring-2 focus:ring-[#FC6714]"
                     :class="{ 'bg-orange-50 dark:bg-[#FC6714]/15 text-[#FC6714] ring-2 ring-[#FC6714]/40': activeDropdownPersonId === person.id }"
-                    title="Opções da pessoa"
-                    aria-label="Opções"
+                    title="Mais opções"
+                    aria-label="Mais opções"
                     aria-haspopup="true"
                     :aria-expanded="activeDropdownPersonId === person.id"
                   >
-                    <MoreVertical class="w-4 h-4" />
+                    <!-- Três pontos verticais (Reticências) nativos e nítidos -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                      <circle cx="12" cy="5" r="2"></circle>
+                      <circle cx="12" cy="12" r="2"></circle>
+                      <circle cx="12" cy="19" r="2"></circle>
+                    </svg>
                   </button>
 
                   <!-- Dropdown Menu Flutuante -->
@@ -451,7 +456,9 @@
                   >
                     <div
                       v-if="activeDropdownPersonId === person.id"
-                      class="absolute right-5 mt-1.5 w-48 rounded-xl bg-white dark:bg-[#06064D] border border-slate-200 dark:border-[#14147A] shadow-xl z-50 py-1 text-xs font-medium divide-y divide-slate-100 dark:divide-[#14147A]/60 focus:outline-hidden"
+                      @click.stop
+                      class="absolute right-0 w-48 rounded-xl bg-white dark:bg-[#06064D] border border-slate-200 dark:border-[#14147A] shadow-2xl z-50 py-1 text-xs font-medium divide-y divide-slate-100 dark:divide-[#14147A]/60 focus:outline-hidden"
+                      :class="index >= people.length - 2 && people.length > 2 ? 'bottom-full mb-1.5' : 'top-full mt-1.5'"
                     >
                       <div class="py-1">
                         <button
@@ -460,7 +467,7 @@
                           class="w-full text-left px-3.5 py-2 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] dark:hover:text-orange-300 transition cursor-pointer"
                         >
                           <Edit2 class="w-3.5 h-3.5 text-[#FC6714]" />
-                          <span>Editar pessoa</span>
+                          <span>Editar cadastro</span>
                         </button>
 
                         <button
@@ -530,7 +537,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import {
-  Plus, Search, Edit2, Power, Copy, Check, Phone, Mail, X,
+  Plus, Search, Edit2, Power, Copy, Check, Phone, Mail, X, MoreVertical, MoreHorizontal,
   SlidersHorizontal, ChevronDown, RotateCcw, ArrowUpDown, ArrowUp, ArrowDown
 } from 'lucide-vue-next';
 import axios from 'axios';
