@@ -845,20 +845,30 @@
 
     <!-- Modal de Confirmação de Exclusão de Pessoa -->
     <BaseModal
-      :isOpen="isDeleteModalOpen"
+      v-model="isDeleteModalOpen"
       title="Confirmar Exclusão de Pessoa"
       size="sm"
       @close="closeDeleteModal"
     >
       <div class="space-y-4">
-        <div class="p-3.5 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/60 text-red-800 dark:text-red-200 text-xs leading-relaxed flex items-start gap-3">
+        <div class="p-4 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/60 text-red-800 dark:text-red-200 text-xs leading-relaxed flex items-start gap-3">
           <AlertTriangle class="w-5 h-5 shrink-0 text-red-600 dark:text-red-400 mt-0.5" />
-          <div class="space-y-1">
+          <div class="space-y-2 flex-1">
             <p class="font-bold text-sm text-red-900 dark:text-red-100">
-              Excluir {{ personToDelete?.name }}?
+              Tem certeza que deseja excluir esta pessoa?
             </p>
-            <p>
-              Esta pessoa só poderá ser excluída se <strong>não estiver vinculada em nenhuma outra parte do sistema</strong> (contratos, ordens de serviço, financeiro ou operadores).
+            <div class="p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-red-100 dark:border-red-900/40 text-slate-800 dark:text-slate-200">
+              <div class="font-semibold text-sm text-slate-900 dark:text-white">{{ personToDelete?.name }}</div>
+              <div class="text-xs text-slate-500 dark:text-slate-400 mt-1 flex flex-wrap items-center gap-2">
+                <span>ID: #{{ personToDelete?.id }}</span>
+                <span v-if="personToDelete?.document">• Doc: {{ personToDelete.document }}</span>
+                <span v-if="personToDelete?.person_type">
+                  • {{ personToDelete.person_type === 'individual' ? 'Pessoa Física' : 'Pessoa Jurídica' }}
+                </span>
+              </div>
+            </div>
+            <p class="text-slate-600 dark:text-slate-400 text-xs">
+              Esta ação removerá o cadastro permanentemente. A exclusão só será permitida se <strong>não houver vínculos em nenhuma outra parte do sistema</strong> (contratos, ordens de serviço, financeiro ou usuários).
             </p>
           </div>
         </div>
@@ -875,7 +885,7 @@
             type="button"
             @click="closeDeleteModal"
             :disabled="isDeleting"
-            class="h-9 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 transition text-xs font-semibold cursor-pointer"
+            class="h-9 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 transition text-xs font-semibold cursor-pointer disabled:opacity-50"
           >
             Cancelar
           </button>

@@ -1,10 +1,10 @@
 <template>
   <Teleport to="body">
-    <div v-if="modelValue" class="relative z-50">
+    <div v-if="isVisible" class="relative z-50">
       <!-- Backdrop Escuro com Blur Suave -->
       <Transition name="modal-fade">
         <div
-          v-if="modelValue"
+          v-if="isVisible"
           class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs transition-opacity duration-200"
           @click="handleBackdropClick"
           aria-hidden="true"
@@ -15,7 +15,7 @@
       <!-- Espaçamento externo perfeitamente igual em todos os lados (topo, base, esquerda, direita) e sem restrição estreita de largura -->
       <Transition v-if="size === 'fullscreen'" name="modal-scale">
         <div
-          v-if="modelValue"
+          v-if="isVisible"
           class="fixed inset-3 sm:inset-5 md:inset-6 lg:inset-8 z-50 flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl rounded-2xl overflow-hidden transition-colors duration-200 focus:outline-hidden"
           role="dialog"
           aria-modal="true"
@@ -73,7 +73,7 @@
       <!-- CASO 2: DRAWER LATERAL (SLIDE-OVER) -->
       <Transition v-else-if="size === 'drawer'" name="drawer-slide">
         <div
-          v-if="modelValue"
+          v-if="isVisible"
           class="fixed inset-y-0 right-0 z-50 w-full max-w-lg md:max-w-xl h-full flex flex-col bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-2xl rounded-l-2xl overflow-hidden transition-colors duration-200 focus:outline-hidden"
           role="dialog"
           aria-modal="true"
@@ -129,7 +129,7 @@
       >
         <Transition name="modal-scale">
           <div
-            v-if="modelValue"
+            v-if="isVisible"
             class="relative flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl rounded-2xl overflow-hidden transition-colors duration-200"
             :class="modalSizeClasses"
             role="dialog"
@@ -192,7 +192,9 @@ export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | 'fullscreen' | 'drawer';
 
 const props = withDefaults(
   defineProps<{
-    modelValue: boolean;
+    modelValue?: boolean;
+    isOpen?: boolean;
+    show?: boolean;
     title?: string;
     description?: string;
     size?: ModalSize;
@@ -201,6 +203,9 @@ const props = withDefaults(
     showCloseButton?: boolean;
   }>(),
   {
+    modelValue: undefined,
+    isOpen: undefined,
+    show: undefined,
     size: 'lg',
     closeOnBackdrop: true,
     closeOnEsc: true,
@@ -210,11 +215,17 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void;
+  (e: 'update:isOpen', value: boolean): void;
+  (e: 'update:show', value: boolean): void;
   (e: 'close'): void;
 }>();
 
+const isVisible = computed(() => Boolean(props.modelValue ?? props.isOpen ?? props.show ?? false));
+
 const close = () => {
   emit('update:modelValue', false);
+  emit('update:isOpen', false);
+  emit('update:show', false);
   emit('close');
 };
 
@@ -231,7 +242,7 @@ const handleEsc = () => {
 };
 
 const onKeyDown = (e: KeyboardEvent) => {
-  if (e.key === 'Escape' && props.modelValue && props.closeOnEsc) {
+  if (e.key === 'Escape' && isVisible.value && props.closeOnEsc) {
     close();
   }
 };
