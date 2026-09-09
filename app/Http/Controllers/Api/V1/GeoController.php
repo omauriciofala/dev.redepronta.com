@@ -174,4 +174,58 @@ class GeoController extends Controller
             'data' => $city,
         ]);
     }
+
+    public function updateState(Request $request, State $state): JsonResponse
+    {
+        $validated = $request->validate([
+            'code' => 'sometimes|required|string|size:2|unique:states,code,' . $state->id,
+            'name' => 'sometimes|required|string|max:50',
+        ]);
+
+        if (isset($validated['code'])) {
+            $validated['code'] = strtoupper($validated['code']);
+        }
+
+        $state->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Estado atualizado com sucesso.',
+            'data' => $state,
+        ]);
+    }
+
+    public function destroyState(State $state): JsonResponse
+    {
+        if ($state->cities()->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Não é possível excluir este Estado pois existem municípios vinculados a ele.',
+            ], 422);
+        }
+
+        $state->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Estado excluído com sucesso.',
+        ]);
+    }
+
+    public function destroyCity(City $city): JsonResponse
+    {
+        if ($city->people()->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Não é possível excluir este Município pois existem pessoas vinculadas a ele.',
+            ], 422);
+        }
+
+        $city->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Município excluído com sucesso.',
+        ]);
+    }
 }

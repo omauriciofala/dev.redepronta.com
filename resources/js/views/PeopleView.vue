@@ -11,14 +11,104 @@
         </p>
       </div>
 
-      <!-- Botão de Ação Primária Institucional (Laranja #FC6714) -->
-      <button
-        @click="openCreateModal"
-        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#FC6714] hover:bg-[#E0530A] active:bg-[#C94605] text-white text-sm font-semibold shadow-sm transition active:scale-98 cursor-pointer focus:ring-2 focus:ring-[#FC6714] focus:ring-offset-2 focus:outline-none"
-      >
-        <Plus class="w-4 h-4" />
-        <span>Nova Pessoa</span>
-      </button>
+      <!-- Ações do Cabeçalho -->
+      <div class="flex items-center gap-2 shrink-0">
+        <!-- Botão de Ação Primária Institucional (Laranja #FC6714) -->
+        <button
+          @click="openCreateModal"
+          class="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-[#FC6714] hover:bg-[#E0530A] active:bg-[#C94605] text-white text-sm font-semibold shadow-sm transition active:scale-98 cursor-pointer focus:ring-2 focus:ring-[#FC6714] focus:ring-offset-2 focus:outline-none"
+        >
+          <Plus class="w-4 h-4" />
+          <span>Nova Pessoa</span>
+        </button>
+
+        <!-- Menu de Cadastros Base / Tabelas de Apoio (Três Pontos Verticais ⋮) -->
+        <div class="relative" ref="headerMenuContainerRef">
+          <button
+            type="button"
+            @click.stop="isHeaderMenuOpen = !isHeaderMenuOpen"
+            class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition shadow-2xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#FC6714]"
+            :class="{ 'bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white ring-2 ring-[#FC6714]/30': isHeaderMenuOpen }"
+            title="Cadastros de Apoio e Tabelas Base"
+            aria-label="Cadastros de Apoio e Tabelas Base"
+            aria-haspopup="true"
+            :aria-expanded="isHeaderMenuOpen"
+          >
+            <!-- Três pontos verticais (Reticências) nativos e nítidos -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="12" cy="5" r="2"></circle>
+              <circle cx="12" cy="12" r="2"></circle>
+              <circle cx="12" cy="19" r="2"></circle>
+            </svg>
+          </button>
+
+          <!-- Dropdown Flutuante de Cadastros Base -->
+          <Transition
+            enter-active-class="transition duration-100 ease-out"
+            enter-from-class="transform scale-95 opacity-0"
+            enter-to-class="transform scale-100 opacity-100"
+            leave-active-class="transition duration-75 ease-in"
+            leave-from-class="transform scale-100 opacity-100"
+            leave-to-class="transform scale-95 opacity-0"
+          >
+            <div
+              v-if="isHeaderMenuOpen"
+              @click.stop
+              class="absolute right-0 mt-2 w-56 rounded-xl bg-white dark:bg-[#06064D] border border-slate-200 dark:border-[#14147A] shadow-2xl z-50 py-1 text-xs font-medium divide-y divide-slate-100 dark:divide-[#14147A]/60 focus:outline-hidden"
+            >
+              <div class="px-3.5 py-2 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">
+                <span>Cadastros de Apoio</span>
+              </div>
+              <div class="py-1">
+                <button
+                  type="button"
+                  @click="openAuxModal('states')"
+                  class="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] dark:hover:text-orange-300 transition cursor-pointer"
+                >
+                  <MapPin class="w-4 h-4 text-slate-400" />
+                  <span>UF</span>
+                </button>
+
+                <button
+                  type="button"
+                  @click="openAuxModal('cities')"
+                  class="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] dark:hover:text-orange-300 transition cursor-pointer"
+                >
+                  <Building2 class="w-4 h-4 text-slate-400" />
+                  <span>Cidade</span>
+                </button>
+
+                <button
+                  type="button"
+                  @click="openAuxModal('neighborhoods')"
+                  class="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] dark:hover:text-orange-300 transition cursor-pointer"
+                >
+                  <Home class="w-4 h-4 text-slate-400" />
+                  <span>Bairro</span>
+                </button>
+
+                <button
+                  type="button"
+                  @click="openAuxModal('groups')"
+                  class="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] dark:hover:text-orange-300 transition cursor-pointer"
+                >
+                  <FolderTree class="w-4 h-4 text-slate-400" />
+                  <span>Grupos de Pessoas</span>
+                </button>
+
+                <button
+                  type="button"
+                  @click="openAuxModal('cnaes')"
+                  class="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] dark:hover:text-orange-300 transition cursor-pointer"
+                >
+                  <FileText class="w-4 h-4 text-slate-400" />
+                  <span>CNAEs</span>
+                </button>
+              </div>
+            </div>
+          </Transition>
+        </div>
+      </div>
     </div>
 
     <!-- Barra de Filtros e Busca Principal -->
@@ -683,12 +773,43 @@
       </div>
     </div>
 
-    <!-- Modal de Cadastro/Edição -->
+    <!-- Modal de Cadastro/Edição de Pessoa -->
     <PersonModal
       :isOpen="isModalOpen"
       :personToEdit="personEditing"
       @close="isModalOpen = false"
       @saved="fetchPeople"
+    />
+
+    <!-- Modais de Apoio / Cadastros Base -->
+    <StateCrudModal
+      :isOpen="isStateModalOpen"
+      @close="isStateModalOpen = false"
+      @updated="handleAuxUpdated('states')"
+    />
+
+    <CityCrudModal
+      :isOpen="isCityModalOpen"
+      @close="isCityModalOpen = false"
+      @updated="handleAuxUpdated('cities')"
+    />
+
+    <NeighborhoodCrudModal
+      :isOpen="isNeighborhoodModalOpen"
+      @close="isNeighborhoodModalOpen = false"
+      @updated="handleAuxUpdated('neighborhoods')"
+    />
+
+    <PersonGroupCrudModal
+      :isOpen="isGroupModalOpen"
+      @close="isGroupModalOpen = false"
+      @updated="handleAuxUpdated('groups')"
+    />
+
+    <CnaeCrudModal
+      :isOpen="isCnaeModalOpen"
+      @close="isCnaeModalOpen = false"
+      @updated="handleAuxUpdated('cnaes')"
     />
   </div>
 </template>
@@ -698,11 +819,16 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import {
   Plus, Search, Edit2, Power, Copy, Check, Phone, Mail, X, MoreVertical, MoreHorizontal,
   SlidersHorizontal, ChevronDown, RotateCcw, ArrowUpDown, ArrowUp, ArrowDown,
-  CheckCircle2, Users, MapPin, Building2, FolderTree, UserCheck
+  CheckCircle2, Users, MapPin, Building2, FolderTree, UserCheck, Home, FileText
 } from 'lucide-vue-next';
 import axios from 'axios';
 import PersonModal from '../components/people/PersonModal.vue';
 import CitySearchSelect from '../components/common/CitySearchSelect.vue';
+import StateCrudModal from '../components/people/auxiliary/StateCrudModal.vue';
+import CityCrudModal from '../components/people/auxiliary/CityCrudModal.vue';
+import NeighborhoodCrudModal from '../components/people/auxiliary/NeighborhoodCrudModal.vue';
+import PersonGroupCrudModal from '../components/people/auxiliary/PersonGroupCrudModal.vue';
+import CnaeCrudModal from '../components/people/auxiliary/CnaeCrudModal.vue';
 
 const people = ref<any[]>([]);
 const loading = ref(false);
@@ -713,6 +839,38 @@ const totalRecords = ref(0);
 
 const isModalOpen = ref(false);
 const personEditing = ref<any | null>(null);
+
+// Controle do Menu de Cadastros Base do Cabeçalho
+const isHeaderMenuOpen = ref(false);
+const headerMenuContainerRef = ref<HTMLElement | null>(null);
+
+// Modais dos Cadastros Auxiliares
+const isStateModalOpen = ref(false);
+const isCityModalOpen = ref(false);
+const isNeighborhoodModalOpen = ref(false);
+const isGroupModalOpen = ref(false);
+const isCnaeModalOpen = ref(false);
+
+const openAuxModal = (type: 'states' | 'cities' | 'neighborhoods' | 'groups' | 'cnaes') => {
+  isHeaderMenuOpen.value = false;
+  if (type === 'states') isStateModalOpen.value = true;
+  if (type === 'cities') isCityModalOpen.value = true;
+  if (type === 'neighborhoods') isNeighborhoodModalOpen.value = true;
+  if (type === 'groups') isGroupModalOpen.value = true;
+  if (type === 'cnaes') isCnaeModalOpen.value = true;
+};
+
+const handleAuxUpdated = (type: string) => {
+  if (type === 'states') {
+    loadStates();
+  }
+  if (type === 'groups') {
+    loadGroups();
+  }
+  if (activeFilterKeys.value.includes('city') || activeFilterKeys.value.includes('group') || activeFilterKeys.value.includes('state')) {
+    fetchPeople();
+  }
+};
 
 // Input ref para atalho de teclado global
 const searchInputRef = ref<HTMLInputElement | null>(null);
@@ -1131,6 +1289,13 @@ const closeFiltersMenu = (event?: MouseEvent) => {
   isFiltersMenuOpen.value = false;
 };
 
+const closeHeaderMenu = (event?: MouseEvent) => {
+  if (event && headerMenuContainerRef.value && headerMenuContainerRef.value.contains(event.target as Node)) {
+    return;
+  }
+  isHeaderMenuOpen.value = false;
+};
+
 const handleActionEdit = (person: any) => {
   closeActionsDropdown();
   openEditModal(person);
@@ -1152,6 +1317,7 @@ onMounted(() => {
   window.addEventListener('keydown', handleGlobalKeyDown);
   window.addEventListener('click', closeActionsDropdown);
   window.addEventListener('click', closeFiltersMenu);
+  window.addEventListener('click', closeHeaderMenu);
   loadStates();
   loadGroups();
   fetchPeople();
@@ -1161,6 +1327,7 @@ onUnmounted(() => {
   window.removeEventListener('keydown', handleGlobalKeyDown);
   window.removeEventListener('click', closeActionsDropdown);
   window.removeEventListener('click', closeFiltersMenu);
+  window.removeEventListener('click', closeHeaderMenu);
 });
 </script>
 

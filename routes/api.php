@@ -17,9 +17,13 @@ Route::prefix('v1')->group(function () {
     // Geografia e Referências Canônicas
     Route::get('states', [GeoController::class, 'states']);
     Route::post('states', [GeoController::class, 'storeState']);
+    Route::put('states/{state}', [GeoController::class, 'updateState']);
+    Route::delete('states/{state}', [GeoController::class, 'destroyState']);
+
     Route::get('cities', [GeoController::class, 'cities']);
     Route::post('cities', [GeoController::class, 'storeCity']);
     Route::put('cities/{city}', [GeoController::class, 'updateCity']);
+    Route::delete('cities/{city}', [GeoController::class, 'destroyCity']);
     Route::get('genders', [GeoController::class, 'genders']);
     Route::get('cep/{postal_code}', [GeoController::class, 'cep']);
 
