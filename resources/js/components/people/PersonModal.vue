@@ -424,16 +424,24 @@
       </div>
 
       <!-- ========================================== -->
-      <!-- ABA 2: DOCUMENTOS & FILIAÇÃO (COMPLETA)   -->
+      <!-- ABA 2: DOCUMENTOS & DADOS COMPLEMENTARES   -->
       <!-- ========================================== -->
       <div v-show="activeTab === 'documentos'" class="space-y-6">
-        <!-- BLOCO 1: DOCUMENTOS GERAIS E FISCAIS -->
-        <div class="p-5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-2xs">
-          <div class="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
-            <ShieldCheck class="w-4 h-4 text-[#FC6714]" />
-            <h3 class="text-sm font-semibold font-heading text-slate-800 dark:text-slate-200 uppercase tracking-wider">
-              Documentos Gerais e Registros Fiscais
-            </h3>
+        <!-- PARTE DE CIMA: DOCUMENTOS E FILIAÇÃO (PESSOA FÍSICA - PF) -->
+        <div
+          v-if="form.person_type === 'individual' || !form.person_type"
+          class="p-5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-2xs transition-all"
+        >
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+            <div class="flex items-center gap-2">
+              <ShieldCheck class="w-4 h-4 text-[#FC6714]" />
+              <h3 class="text-sm font-semibold font-heading text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+                Documentos Pessoais e Filiação (Pessoa Física)
+              </h3>
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200/80 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/60">
+              Pessoa Física (PF)
+            </span>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
@@ -466,7 +474,7 @@
             <!-- Data Emissão -->
             <div>
               <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                Data Emissão
+                Data de Emissão (RG)
               </label>
               <DateInput
                 v-model="form.rg_issue_date"
@@ -474,72 +482,32 @@
               />
             </div>
 
-            <!-- Inscrição Estadual -->
+            <!-- Data de Nascimento -->
             <div>
               <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                Inscrição Estadual
+                Data de Nascimento
               </label>
-              <input
-                type="text"
-                v-model="form.state_registration"
-                placeholder="Ex: 123.456.789.110 ou Isento"
-                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden transition"
+              <DateInput
+                v-model="form.birth_or_foundation_date"
+                placeholder="DD/MM/AAAA"
               />
             </div>
 
-            <!-- Inscrição Municipal -->
-            <div>
+            <!-- Naturalidade -->
+            <div class="sm:col-span-2">
               <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                Inscrição Municipal
+                Naturalidade
               </label>
               <input
                 type="text"
-                v-model="form.municipal_registration"
-                placeholder="Ex: 9876543-2"
+                v-model="form.birth_place"
+                placeholder="Ex: São Paulo / SP, Belo Horizonte / MG"
                 class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden transition"
               />
             </div>
 
-            <!-- CNAE -->
-            <div>
-              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                CNAE
-              </label>
-              <input
-                type="text"
-                v-model="form.cnae"
-                placeholder="Ex: 61.10-8-03"
-                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden transition"
-              />
-            </div>
-
-            <!-- Num. Inscr. SUFRAMA -->
-            <div class="sm:col-span-2 md:col-span-3">
-              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                Num. Inscr. SUFRAMA
-              </label>
-              <input
-                type="text"
-                v-model="form.suframa_registration"
-                placeholder="Número de inscrição na Superintendência da Zona Franca de Manaus"
-                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden transition"
-              />
-            </div>
-          </div>
-        </div>
-
-        <!-- BLOCO 2: FILIAÇÃO, DADOS CIVIS E ORIGEM -->
-        <div class="p-5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-2xs">
-          <div class="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
-            <Users class="w-4 h-4 text-purple-600 dark:text-purple-400" />
-            <h3 class="text-sm font-semibold font-heading text-slate-800 dark:text-slate-200 uppercase tracking-wider">
-              Filiação, Origem e Capital Social
-            </h3>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
             <!-- Nome da Mãe -->
-            <div>
+            <div class="sm:col-span-1 md:col-span-1">
               <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                 Nome da Mãe
               </label>
@@ -552,7 +520,7 @@
             </div>
 
             <!-- Nome do Pai -->
-            <div>
+            <div class="sm:col-span-2 md:col-span-2">
               <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                 Nome do Pai
               </label>
@@ -563,11 +531,70 @@
                 class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden transition"
               />
             </div>
+          </div>
+        </div>
 
-            <!-- Data de Fundação ou Nascimento -->
+        <!-- PARTE DE BAIXO: REGISTROS FISCAIS E EMPRESARIAIS (PESSOA JURÍDICA - PJ) -->
+        <div
+          v-if="form.person_type === 'legal' || !form.person_type"
+          class="p-5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-2xs transition-all"
+        >
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+            <div class="flex items-center gap-2">
+              <Building2 class="w-4 h-4 text-[#FC6714]" />
+              <h3 class="text-sm font-semibold font-heading text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+                Registros Fiscais e Dados Empresariais (Pessoa Jurídica)
+              </h3>
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200/80 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800/60">
+              Pessoa Jurídica (PJ)
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+            <!-- Inscrição Estadual -->
             <div>
               <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                {{ form.person_type === 'individual' ? 'Data de Nascimento' : 'Data de Fundação' }}
+                Inscrição Estadual (IE)
+              </label>
+              <input
+                type="text"
+                v-model="form.state_registration"
+                placeholder="Ex: 123.456.789.110 ou Isento"
+                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden transition"
+              />
+            </div>
+
+            <!-- Inscrição Municipal -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                Inscrição Municipal (IM)
+              </label>
+              <input
+                type="text"
+                v-model="form.municipal_registration"
+                placeholder="Ex: 9876543-2"
+                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden transition"
+              />
+            </div>
+
+            <!-- CNAE -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                CNAE Principal
+              </label>
+              <input
+                type="text"
+                v-model="form.cnae"
+                placeholder="Ex: 61.10-8-03"
+                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden transition"
+              />
+            </div>
+
+            <!-- Data de Fundação / Abertura -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                Data de Fundação / Abertura
               </label>
               <DateInput
                 v-model="form.birth_or_foundation_date"
@@ -591,15 +618,15 @@
               </div>
             </div>
 
-            <!-- Naturalidade -->
-            <div class="sm:col-span-2">
+            <!-- Num. Inscr. SUFRAMA -->
+            <div>
               <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                Naturalidade
+                Inscrição SUFRAMA
               </label>
               <input
                 type="text"
-                v-model="form.birth_place"
-                placeholder="Ex: São Paulo / SP, Belo Horizonte / MG"
+                v-model="form.suframa_registration"
+                placeholder="Nº Inscrição Zona Franca"
                 class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden transition"
               />
             </div>
@@ -1453,6 +1480,18 @@ const submit = async () => {
 
   try {
     const payload = { ...form };
+
+    // Higienização e coerência cadastral por Natureza (PF vs PJ)
+    if (payload.person_type === 'individual') {
+      payload.birth_date = payload.birth_or_foundation_date || null;
+      payload.share_capital = null;
+    } else if (payload.person_type === 'legal') {
+      payload.mother_name = null;
+      payload.father_name = null;
+      payload.birth_place = null;
+      payload.rg_issuer = null;
+      payload.rg_issue_date = null;
+    }
 
     // Se comercial for o mesmo que residencial, espelha todos os campos de localização e georreferenciamento
     if (payload.commercial_same_as_residential) {
