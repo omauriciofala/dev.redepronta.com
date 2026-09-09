@@ -33,15 +33,6 @@
           <RefreshCw class="w-4 h-4" :class="{ 'animate-spin': isLoading }" />
           <span>Recarregar</span>
         </button>
-
-        <button
-          type="button"
-          @click="setView('people')"
-          class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-[#FC6714] text-white hover:bg-blue-500 transition shadow-xs cursor-pointer"
-        >
-          <ArrowLeft class="w-4 h-4" />
-          <span>Voltar para Pessoas</span>
-        </button>
       </div>
     </header>
 
@@ -195,13 +186,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import {
-  History, RefreshCw, ArrowLeft, GitCommit, Clock, Search,
+  History, RefreshCw, GitCommit, Clock, Search,
   Check, Loader2, ShieldCheck
 } from 'lucide-vue-next';
 import axios from 'axios';
-import { useNavigation } from '../composables/useNavigation';
-
-const { setView } = useNavigation();
 
 interface CommitItem {
   hash: string;

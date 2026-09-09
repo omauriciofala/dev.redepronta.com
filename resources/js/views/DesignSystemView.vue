@@ -32,15 +32,6 @@
           <Moon v-else class="w-4 h-4 text-slate-600" />
           <span>Alternar: {{ theme === 'dark' ? 'Tema Escuro Ativo' : 'Tema Claro Ativo' }}</span>
         </button>
-
-        <button
-          type="button"
-          @click="setView('people')"
-          class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-[#FC6714] text-white hover:bg-[#E0530A] active:bg-[#C94605] transition shadow-xs cursor-pointer"
-        >
-          <ArrowLeft class="w-4 h-4" />
-          <span>Voltar para Pessoas</span>
-        </button>
       </div>
     </header>
 
@@ -1180,20 +1171,18 @@
 import { ref } from 'vue';
 import {
   Palette, Type, MousePointerClick, Sliders, Tag, Bell, Table,
-  Sun, Moon, ArrowLeft, Plus, RefreshCw, Check, Trash2, ExternalLink,
+  Sun, Moon, Plus, RefreshCw, Check, Trash2, ExternalLink,
   Loader2, Settings, Search, CheckCircle2, Info, AlertTriangle,
   Maximize2, AlertCircle, Layers, Sidebar as SidebarIcon, FileText,
   DollarSign, Wrench, LayoutTemplate
 } from 'lucide-vue-next';
 import { useTheme } from '../composables/useTheme';
-import { useNavigation } from '../composables/useNavigation';
 import BaseModal from '../components/common/BaseModal.vue';
 import CitySearchSelect from '../components/common/CitySearchSelect.vue';
 import DateInput from '../components/common/DateInput.vue';
 import BaseSelect from '../components/common/BaseSelect.vue';
 
 const { theme, toggleTheme } = useTheme();
-const { setView } = useNavigation();
 
 const demoSwitch = ref(true);
 const demoCityId = ref<number | null>(null);
