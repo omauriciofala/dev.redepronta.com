@@ -97,9 +97,8 @@
               @click.stop
               class="absolute right-0 mt-2 w-64 rounded-xl bg-white dark:bg-[#06064D] border border-slate-200 dark:border-[#14147A] shadow-2xl z-50 py-1.5 text-xs font-medium divide-y divide-slate-100 dark:divide-[#14147A]/60 focus:outline-hidden"
             >
-              <div class="px-3.5 py-2 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center justify-between">
+              <div class="px-3.5 py-2 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 <span>Adicionar Campo de Filtro</span>
-                <span class="text-[10px] text-[#FC6714] font-semibold">{{ activeFilterKeys.length }}/5 ativos</span>
               </div>
               <div class="py-1">
                 <button

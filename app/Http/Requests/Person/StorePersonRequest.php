@@ -96,6 +96,7 @@ class StorePersonRequest extends FormRequest
 
             'gender_id' => ['nullable', 'exists:genders,id'],
             'city_id' => ['nullable', 'exists:cities,id'],
+            'group_id' => ['nullable', 'exists:person_groups,id'],
             'email' => ['nullable', 'email', 'max:150'],
             'phone' => ['nullable', 'string', 'max:30'],
             'whatsapp' => ['nullable', 'string', 'max:30'],

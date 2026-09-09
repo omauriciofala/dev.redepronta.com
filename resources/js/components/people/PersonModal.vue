@@ -167,7 +167,7 @@
                 <Tag class="w-4 h-4" />
               </div>
               <div>
-                <h3 class="text-sm font-bold text-slate-900 dark:text-slate-100">Papéis do Cadastro (checkboxes)</h3>
+                <h3 class="text-sm font-bold text-slate-900 dark:text-slate-100">Papéis do Cadastro</h3>
                 <p class="text-xs text-slate-500 dark:text-slate-400">
                   Defina os papéis da pessoa no sistema. Múltiplos papéis podem ser marcados simultaneamente.
                 </p>
@@ -178,206 +178,247 @@
             </span>
           </div>
 
-          <!-- Grade dos 8 Papéis do Cadastro -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5">
-            <!-- 1. Cliente (S/N) -->
-            <label
+          <!-- Grade dos 8 Papéis do Cadastro (Switches Liga / Desliga) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <!-- 1. Cliente -->
+            <div
+              @click="form.is_client = !form.is_client"
               :class="form.is_client
-                ? 'border-blue-500 bg-blue-50/70 dark:bg-blue-950/40 ring-2 ring-blue-500/20'
+                ? 'border-blue-500 bg-blue-50/70 dark:bg-blue-950/40 shadow-xs ring-1 ring-blue-500/30'
                 : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 hover:border-slate-300 dark:hover:border-slate-700'"
-              class="p-3.5 rounded-xl border flex items-start gap-3 cursor-pointer transition select-none shadow-2xs"
+              class="p-3 rounded-xl border flex items-center justify-between gap-3 cursor-pointer transition select-none"
             >
-              <input type="checkbox" v-model="form.is_client" class="w-4 h-4 mt-0.5 rounded-sm border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-[#FC6714] cursor-pointer" />
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-                    <Users class="w-3.5 h-3.5 text-[#FC6714] shrink-0" />
-                    Cliente
-                  </span>
-                  <span class="text-[11px] font-bold px-1.5 py-0.2 rounded" :class="form.is_client ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'">
-                    {{ form.is_client ? 'SIM' : 'NÃO' }}
-                  </span>
+              <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" :class="form.is_client ? 'bg-blue-500 text-white' : 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400'">
+                  <Users class="w-3.5 h-3.5" />
                 </div>
-                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-snug truncate">
-                  Contratante de serviços ou planos
-                </p>
+                <span class="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
+                  Cliente
+                </span>
               </div>
-            </label>
+              <button
+                type="button"
+                role="switch"
+                :aria-checked="form.is_client"
+                class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+                :class="form.is_client ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-700'"
+              >
+                <span
+                  class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-xs ring-0 transition duration-200 ease-in-out"
+                  :class="form.is_client ? 'translate-x-4' : 'translate-x-0'"
+                />
+              </button>
+            </div>
 
-            <!-- 2. Fornecedor (S/N) -->
-            <label
+            <!-- 2. Fornecedor -->
+            <div
+              @click="form.is_supplier = !form.is_supplier"
               :class="form.is_supplier
-                ? 'border-purple-500 bg-purple-50/70 dark:bg-purple-950/40 ring-2 ring-purple-500/20'
+                ? 'border-purple-500 bg-purple-50/70 dark:bg-purple-950/40 shadow-xs ring-1 ring-purple-500/30'
                 : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 hover:border-slate-300 dark:hover:border-slate-700'"
-              class="p-3.5 rounded-xl border flex items-start gap-3 cursor-pointer transition select-none shadow-2xs"
+              class="p-3 rounded-xl border flex items-center justify-between gap-3 cursor-pointer transition select-none"
             >
-              <input type="checkbox" v-model="form.is_supplier" class="w-4 h-4 mt-0.5 rounded-sm border-slate-300 dark:border-slate-700 text-purple-600 focus:ring-purple-500 cursor-pointer" />
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-                    <Truck class="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 shrink-0" />
-                    Fornecedor
-                  </span>
-                  <span class="text-[11px] font-bold px-1.5 py-0.2 rounded" :class="form.is_supplier ? 'bg-purple-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'">
-                    {{ form.is_supplier ? 'SIM' : 'NÃO' }}
-                  </span>
+              <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" :class="form.is_supplier ? 'bg-purple-500 text-white' : 'bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400'">
+                  <Truck class="w-3.5 h-3.5" />
                 </div>
-                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-snug truncate">
-                  Vendedor de cabos, equipamentos ou link
-                </p>
+                <span class="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
+                  Fornecedor
+                </span>
               </div>
-            </label>
+              <button
+                type="button"
+                role="switch"
+                :aria-checked="form.is_supplier"
+                class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+                :class="form.is_supplier ? 'bg-purple-600' : 'bg-slate-200 dark:bg-slate-700'"
+              >
+                <span
+                  class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-xs ring-0 transition duration-200 ease-in-out"
+                  :class="form.is_supplier ? 'translate-x-4' : 'translate-x-0'"
+                />
+              </button>
+            </div>
 
-            <!-- 3. Funcionário (S/N) -->
-            <label
+            <!-- 3. Funcionário -->
+            <div
+              @click="form.is_employee = !form.is_employee"
               :class="form.is_employee
-                ? 'border-amber-500 bg-amber-50/70 dark:bg-amber-950/40 ring-2 ring-amber-500/20'
+                ? 'border-amber-500 bg-amber-50/70 dark:bg-amber-950/40 shadow-xs ring-1 ring-amber-500/30'
                 : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 hover:border-slate-300 dark:hover:border-slate-700'"
-              class="p-3.5 rounded-xl border flex items-start gap-3 cursor-pointer transition select-none shadow-2xs"
+              class="p-3 rounded-xl border flex items-center justify-between gap-3 cursor-pointer transition select-none"
             >
-              <input type="checkbox" v-model="form.is_employee" class="w-4 h-4 mt-0.5 rounded-sm border-slate-300 dark:border-slate-700 text-amber-600 focus:ring-amber-500 cursor-pointer" />
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-                    <Briefcase class="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
-                    Funcionário
-                  </span>
-                  <span class="text-[11px] font-bold px-1.5 py-0.2 rounded" :class="form.is_employee ? 'bg-amber-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'">
-                    {{ form.is_employee ? 'SIM' : 'NÃO' }}
-                  </span>
+              <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" :class="form.is_employee ? 'bg-amber-500 text-white' : 'bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400'">
+                  <Briefcase class="w-3.5 h-3.5" />
                 </div>
-                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-snug truncate">
-                  Colaborador interno com CLT ou fixo
-                </p>
+                <span class="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
+                  Funcionário
+                </span>
               </div>
-            </label>
+              <button
+                type="button"
+                role="switch"
+                :aria-checked="form.is_employee"
+                class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+                :class="form.is_employee ? 'bg-amber-600' : 'bg-slate-200 dark:bg-slate-700'"
+              >
+                <span
+                  class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-xs ring-0 transition duration-200 ease-in-out"
+                  :class="form.is_employee ? 'translate-x-4' : 'translate-x-0'"
+                />
+              </button>
+            </div>
 
             <!-- 4. Terceirizado -->
-            <label
+            <div
+              @click="form.is_outsourced = !form.is_outsourced"
               :class="form.is_outsourced
-                ? 'border-orange-500 bg-orange-50/70 dark:bg-orange-950/40 ring-2 ring-orange-500/20'
+                ? 'border-orange-500 bg-orange-50/70 dark:bg-orange-950/40 shadow-xs ring-1 ring-orange-500/30'
                 : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 hover:border-slate-300 dark:hover:border-slate-700'"
-              class="p-3.5 rounded-xl border flex items-start gap-3 cursor-pointer transition select-none shadow-2xs"
+              class="p-3 rounded-xl border flex items-center justify-between gap-3 cursor-pointer transition select-none"
             >
-              <input type="checkbox" v-model="form.is_outsourced" class="w-4 h-4 mt-0.5 rounded-sm border-slate-300 dark:border-slate-700 text-orange-600 focus:ring-orange-500 cursor-pointer" />
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-                    <Wrench class="w-3.5 h-3.5 text-orange-600 dark:text-orange-400 shrink-0" />
-                    Terceirizado
-                  </span>
-                  <span class="text-[11px] font-bold px-1.5 py-0.2 rounded" :class="form.is_outsourced ? 'bg-orange-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'">
-                    {{ form.is_outsourced ? 'SIM' : 'NÃO' }}
-                  </span>
+              <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" :class="form.is_outsourced ? 'bg-orange-500 text-white' : 'bg-orange-50 dark:bg-orange-950/60 text-orange-600 dark:text-orange-400'">
+                  <Wrench class="w-3.5 h-3.5" />
                 </div>
-                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-snug truncate">
-                  Prestador de serviço terceirizado ou PJ
-                </p>
+                <span class="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
+                  Terceirizado
+                </span>
               </div>
-            </label>
+              <button
+                type="button"
+                role="switch"
+                :aria-checked="form.is_outsourced"
+                class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+                :class="form.is_outsourced ? 'bg-orange-600' : 'bg-slate-200 dark:bg-slate-700'"
+              >
+                <span
+                  class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-xs ring-0 transition duration-200 ease-in-out"
+                  :class="form.is_outsourced ? 'translate-x-4' : 'translate-x-0'"
+                />
+              </button>
+            </div>
 
-            <!-- 5. Vendedor (S/N) -->
-            <label
+            <!-- 5. Vendedor -->
+            <div
+              @click="form.is_seller = !form.is_seller"
               :class="form.is_seller
-                ? 'border-emerald-500 bg-emerald-50/70 dark:bg-emerald-950/40 ring-2 ring-emerald-500/20'
+                ? 'border-emerald-500 bg-emerald-50/70 dark:bg-emerald-950/40 shadow-xs ring-1 ring-emerald-500/30'
                 : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 hover:border-slate-300 dark:hover:border-slate-700'"
-              class="p-3.5 rounded-xl border flex items-start gap-3 cursor-pointer transition select-none shadow-2xs"
+              class="p-3 rounded-xl border flex items-center justify-between gap-3 cursor-pointer transition select-none"
             >
-              <input type="checkbox" v-model="form.is_seller" class="w-4 h-4 mt-0.5 rounded-sm border-slate-300 dark:border-slate-700 text-emerald-600 focus:ring-emerald-500 cursor-pointer" />
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-                    <BadgePercent class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                    Vendedor
-                  </span>
-                  <span class="text-[11px] font-bold px-1.5 py-0.2 rounded" :class="form.is_seller ? 'bg-emerald-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'">
-                    {{ form.is_seller ? 'SIM' : 'NÃO' }}
-                  </span>
+              <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" :class="form.is_seller ? 'bg-emerald-500 text-white' : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'">
+                  <BadgePercent class="w-3.5 h-3.5" />
                 </div>
-                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-snug truncate">
-                  Agente comercial ou consultor de vendas
-                </p>
+                <span class="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
+                  Vendedor
+                </span>
               </div>
-            </label>
+              <button
+                type="button"
+                role="switch"
+                :aria-checked="form.is_seller"
+                class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+                :class="form.is_seller ? 'bg-emerald-600' : 'bg-slate-200 dark:bg-slate-700'"
+              >
+                <span
+                  class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-xs ring-0 transition duration-200 ease-in-out"
+                  :class="form.is_seller ? 'translate-x-4' : 'translate-x-0'"
+                />
+              </button>
+            </div>
 
             <!-- 6. Motorista -->
-            <label
+            <div
+              @click="form.is_driver = !form.is_driver"
               :class="form.is_driver
-                ? 'border-cyan-500 bg-cyan-50/70 dark:bg-cyan-950/40 ring-2 ring-cyan-500/20'
+                ? 'border-cyan-500 bg-cyan-50/70 dark:bg-cyan-950/40 shadow-xs ring-1 ring-cyan-500/30'
                 : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 hover:border-slate-300 dark:hover:border-slate-700'"
-              class="p-3.5 rounded-xl border flex items-start gap-3 cursor-pointer transition select-none shadow-2xs"
+              class="p-3 rounded-xl border flex items-center justify-between gap-3 cursor-pointer transition select-none"
             >
-              <input type="checkbox" v-model="form.is_driver" class="w-4 h-4 mt-0.5 rounded-sm border-slate-300 dark:border-slate-700 text-cyan-600 focus:ring-cyan-500 cursor-pointer" />
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-                    <Car class="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400 shrink-0" />
-                    Motorista
-                  </span>
-                  <span class="text-[11px] font-bold px-1.5 py-0.2 rounded" :class="form.is_driver ? 'bg-cyan-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'">
-                    {{ form.is_driver ? 'SIM' : 'NÃO' }}
-                  </span>
+              <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" :class="form.is_driver ? 'bg-cyan-500 text-white' : 'bg-cyan-50 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400'">
+                  <Car class="w-3.5 h-3.5" />
                 </div>
-                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-snug truncate">
-                  Condutor da frota veicular ou logística
-                </p>
+                <span class="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
+                  Motorista
+                </span>
               </div>
-            </label>
+              <button
+                type="button"
+                role="switch"
+                :aria-checked="form.is_driver"
+                class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+                :class="form.is_driver ? 'bg-cyan-600' : 'bg-slate-200 dark:bg-slate-700'"
+              >
+                <span
+                  class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-xs ring-0 transition duration-200 ease-in-out"
+                  :class="form.is_driver ? 'translate-x-4' : 'translate-x-0'"
+                />
+              </button>
+            </div>
 
             <!-- 7. Transportadora -->
-            <label
+            <div
+              @click="form.is_carrier = !form.is_carrier"
               :class="form.is_carrier
-                ? 'border-indigo-500 bg-indigo-50/70 dark:bg-indigo-950/40 ring-2 ring-indigo-500/20'
+                ? 'border-indigo-500 bg-indigo-50/70 dark:bg-indigo-950/40 shadow-xs ring-1 ring-indigo-500/30'
                 : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 hover:border-slate-300 dark:hover:border-slate-700'"
-              class="p-3.5 rounded-xl border flex items-start gap-3 cursor-pointer transition select-none shadow-2xs"
+              class="p-3 rounded-xl border flex items-center justify-between gap-3 cursor-pointer transition select-none"
             >
-              <input type="checkbox" v-model="form.is_carrier" class="w-4 h-4 mt-0.5 rounded-sm border-slate-300 dark:border-slate-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer" />
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-                    <Package class="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
-                    Transportadora
-                  </span>
-                  <span class="text-[11px] font-bold px-1.5 py-0.2 rounded" :class="form.is_carrier ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'">
-                    {{ form.is_carrier ? 'SIM' : 'NÃO' }}
-                  </span>
+              <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" :class="form.is_carrier ? 'bg-indigo-500 text-white' : 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400'">
+                  <Package class="w-3.5 h-3.5" />
                 </div>
-                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-snug truncate">
-                  Empresa parceira de frete e entregas
-                </p>
+                <span class="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
+                  Transportadora
+                </span>
               </div>
-            </label>
+              <button
+                type="button"
+                role="switch"
+                :aria-checked="form.is_carrier"
+                class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+                :class="form.is_carrier ? 'bg-indigo-600' : 'bg-slate-200 dark:bg-slate-700'"
+              >
+                <span
+                  class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-xs ring-0 transition duration-200 ease-in-out"
+                  :class="form.is_carrier ? 'translate-x-4' : 'translate-x-0'"
+                />
+              </button>
+            </div>
 
-            <!-- 8. Solicitante (S/N) -->
-            <label
+            <!-- 8. Solicitante -->
+            <div
+              @click="form.is_requester = !form.is_requester"
               :class="form.is_requester
-                ? 'border-[#FC6714] bg-orange-50/70 dark:bg-[#FC6714]/15 ring-2 ring-[#FC6714]/20'
+                ? 'border-[#FC6714] bg-orange-50/70 dark:bg-[#FC6714]/15 shadow-xs ring-1 ring-[#FC6714]/30'
                 : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 hover:border-slate-300 dark:hover:border-slate-700'"
-              class="p-3.5 rounded-xl border flex items-start gap-3 cursor-pointer transition select-none shadow-2xs"
+              class="p-3 rounded-xl border flex items-center justify-between gap-3 cursor-pointer transition select-none"
             >
-              <input
-                type="checkbox"
-                v-model="form.is_requester"
-                class="w-4 h-4 mt-0.5 rounded-sm border-slate-300 dark:border-slate-700 text-[#FC6714] focus:ring-[#FC6714] cursor-pointer"
-              />
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-                    <UserCheck class="w-3.5 h-3.5 text-[#FC6714] shrink-0" />
-                    Solicitante
-                  </span>
-                  <span
-                    class="text-[11px] font-bold px-1.5 py-0.2 rounded"
-                    :class="form.is_requester ? 'bg-[#FC6714] text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'"
-                  >
-                    {{ form.is_requester ? 'SIM' : 'NÃO' }}
-                  </span>
+              <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" :class="form.is_requester ? 'bg-[#FC6714] text-white' : 'bg-orange-50 dark:bg-[#FC6714]/15 text-[#FC6714]'">
+                  <UserCheck class="w-3.5 h-3.5" />
                 </div>
-                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-snug truncate">
-                  Abertura de chamados, tickets e pedidos
-                </p>
+                <span class="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
+                  Solicitante
+                </span>
               </div>
-            </label>
+              <button
+                type="button"
+                role="switch"
+                :aria-checked="form.is_requester"
+                class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+                :class="form.is_requester ? 'bg-[#FC6714]' : 'bg-slate-200 dark:bg-slate-700'"
+              >
+                <span
+                  class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-xs ring-0 transition duration-200 ease-in-out"
+                  :class="form.is_requester ? 'translate-x-4' : 'translate-x-0'"
+                />
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -740,8 +781,8 @@
                 :initial-city-name="residentialCityInfo.name"
                 :initial-state-code="residentialCityInfo.state_code"
                 :initial-ibge-code="residentialCityInfo.ibge_code"
-                label="Cidade Canônica (IBGE)"
-                placeholder="Digite 3 letras da cidade..."
+                label="Município"
+                placeholder="Digite 3 letras do município..."
               />
             </div>
           </div>
@@ -936,8 +977,8 @@
                 :initial-city-name="commercialCityInfo.name"
                 :initial-state-code="commercialCityInfo.state_code"
                 :initial-ibge-code="commercialCityInfo.ibge_code"
-                label="Cidade Comercial (IBGE)"
-                placeholder="Digite 3 letras da cidade..."
+                label="Município"
+                placeholder="Digite 3 letras do município..."
               />
             </div>
           </div>

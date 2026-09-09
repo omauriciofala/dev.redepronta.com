@@ -16,6 +16,7 @@ class Person extends Model
         'account_id',
         'city_id',
         'gender_id',
+        'group_id',
         'person_type',
         'name',
         'trade_name',
@@ -105,6 +106,11 @@ class Person extends Model
     public function gender(): BelongsTo
     {
         return $this->belongsTo(Gender::class);
+    }
+
+    public function group(): BelongsTo
+    {
+        return $this->belongsTo(PersonGroup::class, 'group_id');
     }
 
     // Scopes de busca e papéis

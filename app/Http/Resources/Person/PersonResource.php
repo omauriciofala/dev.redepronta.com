@@ -124,6 +124,12 @@ class PersonResource extends JsonResource
                 'city' => new CityResource($this->whenLoaded($this->commercial_same_as_residential ? 'city' : 'commercialCity')),
             ],
             'status' => $this->status,
+            'group_id' => $this->group_id,
+            'group' => $this->group ? [
+                'id' => $this->group->id,
+                'name' => $this->group->name,
+                'color' => $this->group->color,
+            ] : null,
             'notes' => $this->notes,
             'created_at' => $this->created_at?->format('d/m/Y H:i'),
             'updated_at' => $this->updated_at?->format('d/m/Y H:i'),
