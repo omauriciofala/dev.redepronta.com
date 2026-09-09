@@ -470,3 +470,29 @@ Acesso direto pela barra lateral (ícone de rede / conexão), reunindo o invent�
 4. **GPS & Georreferenciamento W3C:**
    - Captura de coordenadas geográficas via hardware/satélite.
 5. **Roadmap de Expansão:** Gateways de pagamento (PIX/Boleto), mensageria (WhatsApp/SMS) e TR-069 ACS.
+
+
+### 11. Ergonomia e Tratamento de Dados na Listagem de Pessoas (`#people`)
+- **Máscaras Dinâmicas de Documento**:
+  - Exibição de documento formatado com máscara canônica de acordo com a tipificação:
+    - **Pessoa Física (PF)**: Máscara `000.000.000-00`
+    - **Pessoa Jurídica (PJ)**: Máscara `00.000.000/0000-00`
+  - Badge semântico de tipo: `PF` em tom âmbar e `PJ` em tom índigo.
+  - **Botão de Cópia Rápida com 1 Clique**: Ícone discreto de cópia ao lado do número do documento com feedback visual instantâneo (`Copiado!` e ícone `Check` verde por 2 segundos).
+- **Ações Rápidas de Contato (Links Operacionais Diretos)**:
+  - Substituição de texto puro por links operacionais com clique único:
+    - **Telefone**: Link direto `tel:+55...` com acionamento imediato de discador/softphone e formatação `(XX) XXXXX-XXXX` ou `(XX) XXXX-XXXX`.
+    - **WhatsApp**: Link direto `https://wa.me/55...` com ícone dedicado da marca para abertura imediata de chat web ou aplicativo.
+    - **E-mail**: Link direto `mailto:...` com ícone de envelope e truncamento elegante com tooltip.
+    - **Cópia Rápida de Contato**: Botões discretos de 1 clique para cópia de telefone e e-mail.
+- **Badges Semânticos de Papéis (Personas) com Prevenção de Sobrecarga Visual**:
+  - Paleta semântica estrita para cada papel/persona:
+    - **Cliente**: Verde (`emerald`)
+    - **Fornecedor**: Roxo (`purple`)
+    - **Colaborador / Funcionário**: Azul (`blue`)
+    - **Terceirizado**: Âmbar (`amber`)
+    - **Vendedor**: Ciano (`cyan`)
+    - **Motorista**: Índigo (`indigo`)
+    - **Transportadora**: Fúcsia (`fuchsia`)
+    - **Solicitante**: Cinza chumbo (`slate`)
+  - **Mecanismo Anti-Sobrecarga**: Quando um registro acumula 3 ou mais papéis, a interface exibe os 2 primeiros papéis com badge completo e um contador compacto `+N` (ex.: `+2`), permitindo expansão inline sob demanda ou consulta em tooltip, mantendo a altura uniforme das linhas da tabela.

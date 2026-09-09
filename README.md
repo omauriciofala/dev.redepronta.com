@@ -224,3 +224,8 @@ Para aprofundamento na arquitetura, modelos de dados e execução ágil, consult
   - Autopreenchimento instantâneo de Razão Social, Nome Fantasia, CNAE, Capital Social, Fundação e Endereço completo amarrado ao código IBGE do município.
 - **Menu APIs & Integrações (`/admin/integrations`):**
   - Painel de controle e testes interativos para ViaCEP, CNPJá, IBGE e GPS.
+
+- **Listagem Canônica de Pessoas com Ergonomia Aprimorada**:
+  - Máscaras dinâmicas automáticas para CPF (`000.000.000-00`) e CNPJ (`00.000.000/0000-00`) com botão discreto de cópia rápida em 1 clique e feedback instantâneo.
+  - Links operacionais de contato direto para discador (`tel:+55...`), WhatsApp (`https://wa.me/55...`) e e-mail (`mailto:...`) com cópia com 1 clique.
+  - Badges semânticos com paleta estrita de cores por papel (Cliente, Fornecedor, Colaborador, Terceirizado, Vendedor, Motorista, Transportadora) e agrupamento `+N` para evitar sobrecarga visual com 3 ou mais papéis.
