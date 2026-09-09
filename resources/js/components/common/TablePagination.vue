@@ -22,75 +22,63 @@
       </span>
     </div>
 
-    <!-- BLOCO CENTRAL: NAVEGAÇÃO SEQUENCIAL & INTERVALO -->
-    <div class="flex flex-col items-center gap-1 order-1 md:order-2">
-      <div class="flex items-center gap-2">
-        <!-- Botão ‹ Anterior -->
-        <button
-          type="button"
-          :disabled="currentPage <= 1 || loading"
-          @click="changePage(currentPage - 1)"
-          class="inline-flex items-center justify-center h-8 px-3 rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 hover:border-[#FC6714] hover:text-[#FC6714] disabled:opacity-40 disabled:hover:border-slate-300 dark:disabled:hover:border-slate-700 disabled:hover:bg-transparent disabled:hover:text-inherit font-medium text-xs transition cursor-pointer disabled:cursor-not-allowed shadow-2xs select-none focus:outline-none focus:ring-2 focus:ring-[#FC6714]/30"
-        >
-          <span>‹ Anterior</span>
-        </button>
+    <!-- BLOCO CENTRAL: NAVEGAÇÃO SEQUENCIAL & NÚMEROS DE PÁGINA -->
+    <div class="flex items-center gap-1.5 flex-wrap justify-center order-1 md:order-2">
+      <!-- Botão ‹ Anterior -->
+      <button
+        type="button"
+        :disabled="currentPage <= 1 || loading"
+        @click="changePage(currentPage - 1)"
+        class="inline-flex items-center justify-center h-8 px-3 rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 hover:border-[#FC6714] hover:text-[#FC6714] disabled:opacity-40 disabled:hover:border-slate-300 dark:disabled:hover:border-slate-700 disabled:hover:bg-transparent disabled:hover:text-inherit font-medium text-xs transition cursor-pointer disabled:cursor-not-allowed shadow-2xs select-none focus:outline-none focus:ring-2 focus:ring-[#FC6714]/30"
+      >
+        <span>‹ Anterior</span>
+      </button>
 
-        <!-- Lista de Badges / Botões Numéricos de Páginas -->
-        <div class="flex items-center gap-1">
-          <template v-for="(item, index) in visiblePages" :key="index">
-            <!-- Reticências (...) -->
-            <span
-              v-if="item === '...'"
-              class="w-6 h-8 flex items-center justify-center text-xs font-bold text-slate-400 select-none"
-            >
-              …
-            </span>
+      <!-- Lista de Badges / Botões Numéricos de Páginas -->
+      <div class="flex items-center gap-1">
+        <template v-for="(item, index) in visiblePages" :key="index">
+          <!-- Reticências (...) -->
+          <span
+            v-if="item === '...'"
+            class="w-6 h-8 flex items-center justify-center text-xs font-bold text-slate-400 select-none"
+          >
+            …
+          </span>
 
-            <!-- Página Atual (Destaque Ativo) -->
-            <button
-              v-else-if="item === currentPage"
-              type="button"
-              disabled
-              class="min-w-8 h-8 px-2.5 flex items-center justify-center rounded-lg font-bold text-xs bg-[#FC6714] text-white border border-[#FC6714] shadow-2xs select-none cursor-default"
-              :title="`Página ${item} (Atual)`"
-            >
-              {{ item }}
-            </button>
+          <!-- Página Atual (Destaque Ativo) -->
+          <button
+            v-else-if="item === currentPage"
+            type="button"
+            disabled
+            class="min-w-8 h-8 px-2.5 flex items-center justify-center rounded-lg font-bold text-xs bg-[#FC6714] text-white border border-[#FC6714] shadow-2xs select-none cursor-default"
+            :title="`Página ${item} (Atual)`"
+          >
+            {{ item }}
+          </button>
 
-            <!-- Outras Páginas Clicáveis -->
-            <button
-              v-else
-              type="button"
-              :disabled="loading"
-              @click="changePage(Number(item))"
-              class="min-w-8 h-8 px-2 flex items-center justify-center rounded-lg font-semibold text-xs border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 hover:bg-orange-50/50 dark:hover:bg-[#FC6714]/10 hover:border-[#FC6714] hover:text-[#FC6714] dark:hover:text-orange-400 disabled:opacity-50 transition cursor-pointer shadow-2xs select-none focus:outline-none focus:ring-2 focus:ring-[#FC6714]/30"
-              :title="`Ir para página ${item}`"
-            >
-              {{ item }}
-            </button>
-          </template>
-        </div>
-
-        <!-- Botão Próximo › -->
-        <button
-          type="button"
-          :disabled="currentPage >= lastPage || loading"
-          @click="changePage(currentPage + 1)"
-          class="inline-flex items-center justify-center h-8 px-3 rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 hover:border-[#FC6714] hover:text-[#FC6714] disabled:opacity-40 disabled:hover:border-slate-300 dark:disabled:hover:border-slate-700 disabled:hover:bg-transparent disabled:hover:text-inherit font-medium text-xs transition cursor-pointer disabled:cursor-not-allowed shadow-2xs select-none focus:outline-none focus:ring-2 focus:ring-[#FC6714]/30"
-        >
-          <span>Próximo ›</span>
-        </button>
-      </div>
-
-      <!-- Texto Centralizado Indicando Intervalo Exibido -->
-      <div class="text-[11px] text-slate-500 dark:text-slate-400 font-normal select-none text-center">
-        <template v-if="totalRecords > 0">
-          Mostrando <strong class="text-slate-700 dark:text-slate-300 font-semibold">{{ displayFrom }}</strong> – <strong class="text-slate-700 dark:text-slate-300 font-semibold">{{ displayTo }}</strong> de <strong class="text-slate-700 dark:text-slate-300 font-semibold">{{ totalRecords }}</strong> registros
-        </template>
-        <template v-else>
-          Nenhum registro para exibir
+          <!-- Outras Páginas Clicáveis -->
+          <button
+            v-else
+            type="button"
+            :disabled="loading"
+            @click="changePage(Number(item))"
+            class="min-w-8 h-8 px-2 flex items-center justify-center rounded-lg font-semibold text-xs border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 hover:bg-orange-50/50 dark:hover:bg-[#FC6714]/10 hover:border-[#FC6714] hover:text-[#FC6714] dark:hover:text-orange-400 disabled:opacity-50 transition cursor-pointer shadow-2xs select-none focus:outline-none focus:ring-2 focus:ring-[#FC6714]/30"
+            :title="`Ir para página ${item}`"
+          >
+            {{ item }}
+          </button>
         </template>
       </div>
+
+      <!-- Botão Próximo › -->
+      <button
+        type="button"
+        :disabled="currentPage >= lastPage || loading"
+        @click="changePage(currentPage + 1)"
+        class="inline-flex items-center justify-center h-8 px-3 rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 hover:border-[#FC6714] hover:text-[#FC6714] disabled:opacity-40 disabled:hover:border-slate-300 dark:disabled:hover:border-slate-700 disabled:hover:bg-transparent disabled:hover:text-inherit font-medium text-xs transition cursor-pointer disabled:cursor-not-allowed shadow-2xs select-none focus:outline-none focus:ring-2 focus:ring-[#FC6714]/30"
+      >
+        <span>Próximo ›</span>
+      </button>
     </div>
 
     <!-- BLOCO DIREITO: IR PARA PÁGINA ESPECÍFICA -->
@@ -158,22 +146,6 @@ const targetPageInput = ref<number>(props.currentPage);
 
 watch(() => props.currentPage, (val) => {
   targetPageInput.value = val;
-});
-
-const displayFrom = computed(() => {
-  if (props.fromRecord !== undefined && props.fromRecord !== null) {
-    return props.fromRecord;
-  }
-  if (props.totalRecords === 0) return 0;
-  return (props.currentPage - 1) * props.perPage + 1;
-});
-
-const displayTo = computed(() => {
-  if (props.toRecord !== undefined && props.toRecord !== null) {
-    return props.toRecord;
-  }
-  if (props.totalRecords === 0) return 0;
-  return Math.min(props.currentPage * props.perPage, props.totalRecords);
 });
 
 const isTargetPageValid = computed(() => {
