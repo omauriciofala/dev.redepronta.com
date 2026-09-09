@@ -249,30 +249,6 @@
           </button>
         </div>
       </div>
-
-      <!-- 5. GOVERNANÇA, DESENVOLVEDOR & HISTÓRICO -->
-      <div class="space-y-2.5">
-        <h4 class="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-          <Terminal class="w-3.5 h-3.5 text-[#FC6714]" />
-          <span>Governança & Desenvolvedor</span>
-        </h4>
-        <div class="space-y-2">
-          <button
-            type="button"
-            @click="goToDeveloper"
-            class="w-full p-3 rounded-xl border border-orange-200 dark:border-[#FC6714]/30 bg-orange-50/40 dark:bg-[#FC6714]/10 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 transition flex items-center justify-between text-left cursor-pointer shadow-2xs"
-          >
-            <div class="flex items-center gap-2.5">
-              <Terminal class="w-4 h-4 text-[#FC6714]" />
-              <div>
-                <div class="font-bold text-[#FC6714]">Painel do Desenvolvedor</div>
-                <div class="text-[11px] text-slate-500 dark:text-slate-400">Resetar banco e popular pessoas fictícias</div>
-              </div>
-            </div>
-            <ChevronRight class="w-4 h-4 text-[#FC6714]" />
-          </button>
-        </div>
-      </div>
     </div>
 
     <!-- Rodapé Fixo do Drawer -->
@@ -318,12 +294,10 @@ import {
   MapPin,
   Home,
   FileText,
-  Terminal,
   RotateCcw,
   Loader2,
 } from 'lucide-vue-next';
 import BaseModal from '../common/BaseModal.vue';
-import { useNavigation } from '../../composables/useNavigation';
 import axios from 'axios';
 
 const props = defineProps<{
@@ -344,8 +318,6 @@ const emit = defineEmits<{
   (e: 'resetFilters'): void;
   (e: 'toast', msg: string, type: 'success' | 'error'): void;
 }>();
-
-const { setView } = useNavigation();
 
 const isOpenModel = computed({
   get: () => props.modelValue ?? props.isOpen ?? false,
@@ -371,11 +343,6 @@ const applyRoleFilter = (role: string) => {
 const openAuxModal = (modalName: string) => {
   close();
   emit('openAuxModal', modalName);
-};
-
-const goToDeveloper = () => {
-  close();
-  setView('developer');
 };
 
 const exportCsv = async () => {
