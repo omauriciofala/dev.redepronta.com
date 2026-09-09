@@ -23,14 +23,33 @@ class PersonResource extends JsonResource
             'rg_ie' => $this->rg_ie,
             'birth_date' => $this->birth_date?->format('Y-m-d'),
             'birth_date_formatted' => $this->birth_date?->format('d/m/Y'),
+            'registration_date' => $this->registration_date?->format('Y-m-d'),
+            'registration_date_formatted' => $this->registration_date ? $this->registration_date->format('d/m/Y') : $this->created_at?->format('d/m/Y'),
+            'group_name' => $this->group_name,
             'gender_id' => $this->gender_id,
             'gender_name' => $this->gender?->name,
+
+            // Papéis do Cadastro Canônicos (S/N)
             'personas' => [
-                'is_employee' => (bool) $this->is_employee,
-                'is_supplier' => (bool) $this->is_supplier,
                 'is_client' => (bool) $this->is_client,
+                'is_supplier' => (bool) $this->is_supplier,
+                'is_employee' => (bool) $this->is_employee,
+                'is_outsourced' => (bool) $this->is_outsourced,
+                'is_seller' => (bool) $this->is_seller,
+                'is_driver' => (bool) $this->is_driver,
+                'is_carrier' => (bool) $this->is_carrier,
                 'is_requester' => (bool) $this->is_requester,
             ],
+            'roles' => [
+                'client' => (bool) $this->is_client,
+                'supplier' => (bool) $this->is_supplier,
+                'employee' => (bool) $this->is_employee,
+                'outsourced' => (bool) $this->is_outsourced,
+                'seller' => (bool) $this->is_seller,
+                'driver' => (bool) $this->is_driver,
+                'carrier' => (bool) $this->is_carrier,
+            ],
+
             'contact' => [
                 'email' => $this->email,
                 'phone' => $this->phone,

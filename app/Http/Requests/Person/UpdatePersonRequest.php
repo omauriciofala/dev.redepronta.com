@@ -34,6 +34,13 @@ class UpdatePersonRequest extends FormRequest
             }
         }
 
+        if ($this->has('registration_date') && is_string($this->registration_date)) {
+            $cleanReg = trim($this->registration_date);
+            if (preg_match('/^(\d{2})\/(\d{2})\/(\d{4})$/', $cleanReg, $m)) {
+                $merges['registration_date'] = "{$m[3]}-{$m[2]}-{$m[1]}";
+            }
+        }
+
         if (!empty($merges)) {
             $this->merge($merges);
         }
@@ -58,6 +65,19 @@ class UpdatePersonRequest extends FormRequest
             ],
             'rg_ie' => ['nullable', 'string', 'max:30'],
             'birth_date' => ['nullable', 'date'],
+            'registration_date' => ['nullable', 'date'],
+            'group_name' => ['nullable', 'string', 'max:100'],
+
+            // Papéis do Cadastro
+            'is_client' => ['boolean'],
+            'is_supplier' => ['boolean'],
+            'is_employee' => ['boolean'],
+            'is_outsourced' => ['boolean'],
+            'is_seller' => ['boolean'],
+            'is_driver' => ['boolean'],
+            'is_carrier' => ['boolean'],
+            'is_requester' => ['boolean'],
+
             'gender_id' => ['nullable', 'exists:genders,id'],
             'city_id' => ['nullable', 'exists:cities,id'],
             'email' => ['nullable', 'email', 'max:150'],
@@ -78,10 +98,6 @@ class UpdatePersonRequest extends FormRequest
             'commercial_neighborhood' => ['nullable', 'string', 'max:100'],
             'commercial_city_id' => ['nullable', 'exists:cities,id'],
 
-            'is_employee' => ['boolean'],
-            'is_supplier' => ['boolean'],
-            'is_client' => ['boolean'],
-            'is_requester' => ['boolean'],
             'status' => ['in:active,inactive'],
             'notes' => ['nullable', 'string'],
         ];

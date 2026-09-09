@@ -31,10 +31,14 @@ class PersonService
 
         if (!empty($filters['persona'])) {
             match ($filters['persona']) {
-                'employee' => $query->employees(),
-                'supplier' => $query->suppliers(),
-                'client' => $query->clients(),
-                'requester' => $query->requesters(),
+                'client' => $query->where('is_client', true),
+                'supplier' => $query->where('is_supplier', true),
+                'employee' => $query->where('is_employee', true),
+                'outsourced' => $query->where('is_outsourced', true),
+                'seller' => $query->where('is_seller', true),
+                'driver' => $query->where('is_driver', true),
+                'carrier' => $query->where('is_carrier', true),
+                'requester' => $query->where('is_requester', true),
                 default => null,
             };
         }

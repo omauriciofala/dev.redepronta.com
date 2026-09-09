@@ -200,4 +200,45 @@ class PersonApiTest extends TestCase
         $responseMatch->assertStatus(200);
         $this->assertNotEmpty($responseMatch->json('data'));
     }
+
+    public function test_can_create_person_with_all_simplified_roles_and_registration_date(): void
+    {
+        $payload = [
+            'person_type' => 'individual',
+            'name' => 'Roberto Operador de Campo',
+            'trade_name' => 'Beto Técnico',
+            'document_number' => '44455566677',
+            'registration_date' => '08/09/2026',
+            'group_name' => 'Técnicos Próprios & Parceiros',
+            'is_client' => false,
+            'is_supplier' => false,
+            'is_employee' => true,
+            'is_outsourced' => true,
+            'is_seller' => true,
+            'is_driver' => true,
+            'is_carrier' => false,
+            'city_id' => $this->city->id,
+        ];
+
+        $response = $this->postJson('/api/v1/people', $payload);
+
+        $response->assertStatus(201)
+            ->assertJsonPath('data.name', 'Roberto Operador de Campo')
+            ->assertJsonPath('data.trade_name', 'Beto Técnico')
+            ->assertJsonPath('data.registration_date_formatted', '08/09/2026')
+            ->assertJsonPath('data.group_name', 'Técnicos Próprios & Parceiros')
+            ->assertJsonPath('data.roles.employee', true)
+            ->assertJsonPath('data.roles.outsourced', true)
+            ->assertJsonPath('data.roles.seller', true)
+            ->assertJsonPath('data.roles.driver', true)
+            ->assertJsonPath('data.roles.carrier', false);
+
+        $this->assertDatabaseHas('people', [
+            'document_number' => '44455566677',
+            'group_name' => 'Técnicos Próprios & Parceiros',
+            'is_employee' => 1,
+            'is_outsourced' => 1,
+            'is_driver' => 1,
+        ]);
+    }
 }

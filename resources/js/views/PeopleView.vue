@@ -88,6 +88,9 @@
               <td class="py-4 px-5">
                 <div class="font-semibold text-slate-900 dark:text-slate-100 text-sm">{{ person.name }}</div>
                 <div v-if="person.trade_name" class="text-xs text-slate-500 dark:text-slate-400 font-medium">{{ person.trade_name }}</div>
+                <div v-if="person.group_name && person.group_name !== 'Geral'" class="text-[11px] font-medium text-blue-600 dark:text-blue-400 mt-0.5">
+                  Grupo: {{ person.group_name }}
+                </div>
               </td>
 
               <td class="py-4 px-5 font-mono text-xs">
@@ -100,17 +103,26 @@
 
               <td class="py-4 px-5">
                 <div class="flex flex-wrap gap-1.5">
-                  <span v-if="person.personas?.is_employee" class="px-2 py-0.5 rounded-md text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-950/70 dark:text-blue-300">
-                    Colaborador
-                  </span>
-                  <span v-if="person.personas?.is_supplier" class="px-2 py-0.5 rounded-md text-xs font-semibold bg-purple-100 text-purple-800 dark:bg-purple-950/70 dark:text-purple-300">
-                    Fornecedor
-                  </span>
-                  <span v-if="person.personas?.is_client" class="px-2 py-0.5 rounded-md text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300">
+                  <span v-if="person.roles?.client || person.personas?.is_client" class="px-2 py-0.5 rounded-md text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-950/70 dark:text-blue-300">
                     Cliente
                   </span>
-                  <span v-if="person.personas?.is_requester" class="px-2 py-0.5 rounded-md text-xs font-semibold bg-cyan-100 text-cyan-800 dark:bg-cyan-950/70 dark:text-cyan-300">
-                    Solicitante
+                  <span v-if="person.roles?.supplier || person.personas?.is_supplier" class="px-2 py-0.5 rounded-md text-xs font-semibold bg-purple-100 text-purple-800 dark:bg-purple-950/70 dark:text-purple-300">
+                    Fornecedor
+                  </span>
+                  <span v-if="person.roles?.employee || person.personas?.is_employee" class="px-2 py-0.5 rounded-md text-xs font-semibold bg-amber-100 text-amber-800 dark:bg-amber-950/70 dark:text-amber-300">
+                    Funcionário
+                  </span>
+                  <span v-if="person.roles?.outsourced || person.personas?.is_outsourced" class="px-2 py-0.5 rounded-md text-xs font-semibold bg-orange-100 text-orange-800 dark:bg-orange-950/70 dark:text-orange-300">
+                    Terceirizado
+                  </span>
+                  <span v-if="person.roles?.seller || person.personas?.is_seller" class="px-2 py-0.5 rounded-md text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300">
+                    Vendedor
+                  </span>
+                  <span v-if="person.roles?.driver || person.personas?.is_driver" class="px-2 py-0.5 rounded-md text-xs font-semibold bg-cyan-100 text-cyan-800 dark:bg-cyan-950/70 dark:text-cyan-300">
+                    Motorista
+                  </span>
+                  <span v-if="person.roles?.carrier || person.personas?.is_carrier" class="px-2 py-0.5 rounded-md text-xs font-semibold bg-indigo-100 text-indigo-800 dark:bg-indigo-950/70 dark:text-indigo-300">
+                    Transportadora
                   </span>
                 </div>
               </td>
@@ -214,10 +226,13 @@ const personEditing = ref<any | null>(null);
 
 const personaFilters = [
   { label: 'Todos', value: '' },
-  { label: 'Colaboradores', value: 'employee' },
-  { label: 'Fornecedores', value: 'supplier' },
   { label: 'Clientes', value: 'client' },
-  { label: 'Solicitantes', value: 'requester' },
+  { label: 'Fornecedores', value: 'supplier' },
+  { label: 'Funcionários', value: 'employee' },
+  { label: 'Terceirizados', value: 'outsourced' },
+  { label: 'Vendedores', value: 'seller' },
+  { label: 'Motoristas', value: 'driver' },
+  { label: 'Transportadoras', value: 'carrier' },
 ];
 
 let searchTimeout: any = null;
