@@ -2,15 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Traits\BelongsToTenant;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Person extends Model
 {
-    use SoftDeletes, BelongsToTenant;
-
-    protected $table = 'people';
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'account_id',
@@ -34,6 +33,13 @@ class Person extends Model
         'number',
         'complement',
         'neighborhood',
+        'commercial_same_as_residential',
+        'commercial_postal_code',
+        'commercial_street',
+        'commercial_number',
+        'commercial_complement',
+        'commercial_neighborhood',
+        'commercial_city_id',
         'status',
         'notes',
     ];
@@ -44,62 +50,57 @@ class Person extends Model
         'is_supplier' => 'boolean',
         'is_client' => 'boolean',
         'is_requester' => 'boolean',
+        'commercial_same_as_residential' => 'boolean',
     ];
 
-    public function city()
+    public function account(): BelongsTo
+    {
+        return $this->belongsTo(Account::class);
+    }
+
+    public function city(): BelongsTo
     {
         return $this->belongsTo(City::class);
     }
 
-    public function gender()
+    public function commercialCity(): BelongsTo
+    {
+        return $this->belongsTo(City::class, 'commercial_city_id');
+    }
+
+    public function gender(): BelongsTo
     {
         return $this->belongsTo(Gender::class);
     }
 
-    // Scopes de Personas
-    public function scopeEmployees($query)
+    public function setBirthDateAttribute($value): void
     {
-        return $query->where('is_employee', true);
-    }
-
-    public function scopeSuppliers($query)
-    {
-        return $query->where('is_supplier', true);
-    }
-
-    public function scopeClients($query)
-    {
-        return $query->where('is_client', true);
-    }
-
-    public function scopeRequesters($query)
-    {
-        return $query->where('is_requester', true);
-    }
-
-    public function scopeActive($query)
-    {
-        return $query->where('status', 'active');
-    }
-
-    public function scopeSearch($query, ?string $term)
-    {
-        if (empty($term)) {
-            return $query;
+        if (empty($value)) {
+            $this->attributes['birth_date'] = null;
+            return;
         }
 
-        $cleanedTerm = preg_replace('/\D/', '', $term);
-
-        return $query->where(function ($q) use ($term, $cleanedTerm) {
-            $q->where('name', 'like', "%{$term}%")
-              ->orWhere('trade_name', 'like', "%{$term}%")
-              ->orWhere('email', 'like', "%{$term}%")
-              ->orWhere('phone', 'like', "%{$term}%")
-              ->orWhere('whatsapp', 'like', "%{$term}%");
-
-            if (!empty($cleanedTerm)) {
-                $q->orWhere('document_number', 'like', "%{$cleanedTerm}%");
+        if (is_string($value)) {
+            // Formato brasileiro DD/MM/AAAA
+            if (preg_match('/^(\d{2})\/(\d{2})\/(\d{4})$/', trim($value), $matches)) {
+                $this->attributes['birth_date'] = "{$matches[3]}-{$matches[2]}-{$matches[1]}";
+                return;
             }
-        });
+            // Formato ISO ou datetime
+            try {
+                $this->attributes['birth_date'] = \Carbon\Carbon::parse($value)->format('Y-m-d');
+                return;
+            } catch (\Exception $e) {
+                // fallback
+            }
+        }
+
+        $this->attributes['birth_date'] = $value;
     }
+
+    public function getBirthDateFormattedAttribute(): ?string
+    {
+        return $this->birth_date ? \Carbon\Carbon::parse($this->birth_date)->format('d/m/Y') : null;
+    }
+
 }

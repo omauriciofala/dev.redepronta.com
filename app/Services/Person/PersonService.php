@@ -45,6 +45,9 @@ class PersonService
     public function create(array $data): Person
     {
         return DB::transaction(function () use ($data) {
+            if (empty($data['account_id'])) {
+                $data['account_id'] = session('active_account_id') ?? \App\Models\Account::first()?->id ?? 1;
+            }
             return Person::create($data);
         });
     }

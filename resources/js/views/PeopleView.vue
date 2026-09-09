@@ -121,7 +121,10 @@
               </td>
 
               <td class="py-4 px-5 text-sm font-medium text-slate-700 dark:text-slate-300">
-                {{ person.address?.city?.full_name || '-' }}
+                <div>{{ person.residential_address?.city_name || person.address?.city_name || person.address?.city?.name || '-' }}</div>
+                <div v-if="person.residential_address?.state_code || person.address?.state_code" class="text-xs text-slate-400">
+                  {{ person.residential_address?.state_code || person.address?.state_code }}
+                </div>
               </td>
 
               <td class="py-4 px-5">

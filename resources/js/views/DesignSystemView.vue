@@ -267,7 +267,8 @@
         Labels destacadas, inputs de altura confortável `h-10`, texto em `text-sm` e contraste nítido em ambos os temas.
       </p>
 
-      <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 space-y-6 shadow-xs">
+      <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 space-y-8 shadow-xs">
+        <!-- Inputs Básicos -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
           <div>
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
@@ -284,7 +285,7 @@
 
           <div>
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-              Busca com Ícone
+              Busca com Ícone à Esquerda
             </label>
             <div class="relative">
               <Search class="w-4 h-4 absolute left-3.5 top-3 text-slate-400" />
@@ -294,19 +295,84 @@
                 class="w-full h-10 pl-10 pr-3.5 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden transition"
               />
             </div>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Filtro em tempo real</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Filtro em tempo real de tabelas</p>
           </div>
 
           <div>
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-              Seleção de Cidade / UF
+              Select Padrão com Seta
             </label>
             <select class="w-full h-10 px-3.5 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden transition">
               <option>Belo Horizonte / MG (IBGE: 3106200)</option>
               <option>São Paulo / SP (IBGE: 3550308)</option>
               <option>Rio de Janeiro / RJ (IBGE: 3304557)</option>
             </select>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Integridade relacional com código IBGE</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Seleção estática simples</p>
+          </div>
+        </div>
+
+        <!-- COMPONENTES ESPECIALIZADOS DO DESIGN SYSTEM -->
+        <div class="pt-6 border-t border-slate-100 dark:border-slate-800/80 space-y-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
+                Componentes Canônicos Especializados
+              </h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Padrões universais do ERP para seleção de municípios e entrada estrita de datas.
+              </p>
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-900">
+              Padrão ERP v2
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-5 rounded-2xl bg-slate-50/70 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800">
+            <!-- 1. CitySearchSelect -->
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 font-mono">
+                  &lt;CitySearchSelect /&gt;
+                </span>
+                <span class="text-[11px] px-2 py-0.5 rounded-sm bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold">
+                  5.570 Cidades IBGE
+                </span>
+              </div>
+              <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                Busca ativada ao digitar <strong>3 caracteres</strong> com <strong>ícone de Lupa (🔍) na extremidade DIREITA</strong> do campo (substituindo a seta convencional).
+              </p>
+              <CitySearchSelect
+                v-model="demoCityId"
+                label="Busca de Cidades do Brasil"
+                placeholder="Digite ao menos 3 letras (ex: Bel, Cur, São)..."
+              />
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+                ID da Cidade Selecionada: <strong class="text-blue-600 dark:text-blue-400">{{ demoCityId || 'Nenhuma selecionada' }}</strong>
+              </p>
+            </div>
+
+            <!-- 2. DateInput -->
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 font-mono">
+                  &lt;DateInput /&gt;
+                </span>
+                <span class="text-[11px] px-2 py-0.5 rounded-sm bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 font-semibold border border-emerald-200 dark:border-emerald-800">
+                  Dia, Mês e Ano (DD/MM/AAAA)
+                </span>
+              </div>
+              <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                Regra canônica do ERP: <strong>datas são sempre Dia, Mês e Ano</strong> com máscara inteligente na digitação e badge pt-BR.
+              </p>
+              <DateInput
+                v-model="demoDate"
+                label="Data Canônica (Nascimento / Fundação / Ativação)"
+              />
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+                Valor Formatado: <strong class="text-emerald-600 dark:text-emerald-400">{{ demoDate || 'Vazio' }}</strong>
+              </p>
+            </div>
           </div>
         </div>
 
@@ -996,11 +1062,15 @@ import {
 import { useTheme } from '../composables/useTheme';
 import { useNavigation } from '../composables/useNavigation';
 import BaseModal from '../components/common/BaseModal.vue';
+import CitySearchSelect from '../components/common/CitySearchSelect.vue';
+import DateInput from '../components/common/DateInput.vue';
 
 const { theme, toggleTheme } = useTheme();
 const { setView } = useNavigation();
 
 const demoSwitch = ref(true);
+const demoCityId = ref<number | null>(null);
+const demoDate = ref('25/12/1990');
 
 // Estados de abertura de modais
 const openModalSm = ref(false);
