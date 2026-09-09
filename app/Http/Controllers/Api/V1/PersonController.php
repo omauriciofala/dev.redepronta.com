@@ -63,12 +63,19 @@ class PersonController extends Controller
 
     public function destroy(Person $person): JsonResponse
     {
-        $this->personService->delete($person);
+        try {
+            $this->personService->delete($person);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Pessoa removida com sucesso.',
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Pessoa excluída com sucesso.',
+            ]);
+        } catch (\DomainException|\InvalidArgumentException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 422);
+        }
     }
 
     public function toggleStatus(Person $person): PersonResource

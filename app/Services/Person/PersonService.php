@@ -6,6 +6,8 @@ use App\Models\City;
 use App\Models\Person;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use DomainException;
 use InvalidArgumentException;
 
 class PersonService
@@ -168,17 +170,82 @@ class PersonService
         });
     }
 
+    /**
+     * Verifica se a pessoa possui vínculos ou dependências em qualquer parte do sistema.
+     */
+    public function hasSystemDependencies(Person $person): bool
+    {
+        // 1. Vínculo com Usuários do Sistema (autenticação/operadores)
+        if (Schema::hasColumn('users', 'person_id')) {
+            if (DB::table('users')->where('person_id', $person->id)->exists()) {
+                return true;
+            }
+        }
+        if (!empty($person->email)) {
+            if (DB::table('users')->where('email', $person->email)->exists()) {
+                return true;
+            }
+        }
+
+        // 2. Busca dinâmica no banco por tabelas com chave person_id (exceto people)
+        try {
+            $tables = DB::select("
+                SELECT TABLE_NAME 
+                FROM information_schema.COLUMNS 
+                WHERE TABLE_SCHEMA = DATABASE() 
+                  AND COLUMN_NAME = 'person_id' 
+                  AND TABLE_NAME != 'people'
+            ");
+
+            foreach ($tables as $t) {
+                $tableName = $t->TABLE_NAME ?? $t->table_name ?? null;
+                if ($tableName && Schema::hasTable($tableName)) {
+                    if (DB::table($tableName)->where('person_id', $person->id)->exists()) {
+                        return true;
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            // Em caso de restrição em information_schema, prossegue para verificação declarativa
+        }
+
+        // 3. Mapeamento declarativo de tabelas do ERP (Contratos, FSM, Financeiro, Estoque)
+        $domainTables = [
+            'contracts' => ['client_id', 'person_id'],
+            'work_orders' => ['client_id', 'technician_id', 'person_id'],
+            'service_orders' => ['client_id', 'technician_id', 'person_id'],
+            'invoices' => ['client_id', 'person_id'],
+            'receivables' => ['client_id', 'person_id'],
+            'payables' => ['supplier_id', 'person_id'],
+            'financial_transactions' => ['person_id'],
+            'financial_entries' => ['person_id'],
+            'inventory_movements' => ['person_id', 'responsible_id'],
+            'serials' => ['assigned_person_id', 'person_id'],
+        ];
+
+        foreach ($domainTables as $table => $columns) {
+            if (Schema::hasTable($table)) {
+                foreach ($columns as $column) {
+                    if (Schema::hasColumn($table, $column)) {
+                        if (DB::table($table)->where($column, $person->id)->exists()) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
     public function delete(Person $person): bool
     {
         return DB::transaction(function () use ($person) {
-            $hasDependencies = false;
-
-            if ($hasDependencies) {
-                $person->update(['status' => 'inactive']);
-                throw new InvalidArgumentException('A pessoa possui dependências ativas e não pode ser excluída fisicamente. O cadastro foi marcado como inativo.');
+            if ($this->hasSystemDependencies($person)) {
+                throw new DomainException('Não é possível excluir esta pessoa pois ela já possui vínculos no sistema (ex: usuário, contratos ou lançamentos). Interrompa seu uso alterando o status para inativo.');
             }
 
-            return $person->delete();
+            return (bool) $person->delete();
         });
     }
 

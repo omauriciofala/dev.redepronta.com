@@ -1066,29 +1066,48 @@
 
     <!-- Rodapé Fixo do Modal de Tela Cheia -->
     <template #footer>
-      <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-        <span class="w-2 h-2 rounded-full bg-[#FC6714]"></span>
-        <span>Cadastro Canônico de Pessoas • ERP Rede Pronta (Sprint 1)</span>
-      </div>
+      <div class="flex items-center justify-between w-full">
+        <div class="flex items-center gap-4">
+          <div class="hidden sm:flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+            <span class="w-2 h-2 rounded-full bg-[#FC6714]"></span>
+            <span>Cadastro Canônico de Pessoas • ERP Rede Pronta (Sprint 1)</span>
+          </div>
 
-      <div class="flex items-center gap-3">
-        <button
-          type="button"
-          @click="close"
-          class="h-10 px-4 rounded-lg text-sm font-medium border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 transition cursor-pointer"
-        >
-          Cancelar
-        </button>
-        <button
-          type="submit"
-          form="personForm"
-          :disabled="isSubmitting"
-          class="h-10 px-5 rounded-lg text-sm font-semibold bg-[#FC6714] hover:bg-[#E0530A] active:bg-[#C94605] text-white transition disabled:opacity-50 shadow-xs flex items-center gap-2 cursor-pointer"
-        >
-          <Loader2 v-if="isSubmitting" class="w-4 h-4 animate-spin" />
-          <Check v-else class="w-4 h-4" />
-          <span>{{ isSubmitting ? 'Salvando...' : (isEditing ? 'Salvar Alterações' : 'Concluir Cadastro de Pessoa') }}</span>
-        </button>
+          <!-- Botão Excluir Cadastro (apenas em edição) -->
+          <button
+            v-if="isEditing && personToEdit"
+            type="button"
+            @click="handleDeletePerson"
+            :disabled="isSubmitting || isDeleting"
+            class="h-10 px-3.5 rounded-lg text-xs font-semibold border border-red-300 dark:border-red-900/60 bg-red-50/60 dark:bg-red-950/30 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/50 transition flex items-center gap-2 cursor-pointer disabled:opacity-50"
+            title="Excluir cadastro caso não possua vínculos no sistema"
+          >
+            <Loader2 v-if="isDeleting" class="w-3.5 h-3.5 animate-spin" />
+            <Trash2 v-else class="w-3.5 h-3.5 text-red-500" />
+            <span>{{ isDeleting ? 'Excluindo...' : 'Excluir Cadastro' }}</span>
+          </button>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button
+            type="button"
+            @click="close"
+            :disabled="isSubmitting || isDeleting"
+            class="h-10 px-4 rounded-lg text-sm font-medium border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 transition cursor-pointer"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            form="personForm"
+            :disabled="isSubmitting || isDeleting"
+            class="h-10 px-5 rounded-lg text-sm font-semibold bg-[#FC6714] hover:bg-[#E0530A] active:bg-[#C94605] text-white transition disabled:opacity-50 shadow-xs flex items-center gap-2 cursor-pointer"
+          >
+            <Loader2 v-if="isSubmitting" class="w-4 h-4 animate-spin" />
+            <Check v-else class="w-4 h-4" />
+            <span>{{ isSubmitting ? 'Salvando...' : (isEditing ? 'Salvar Alterações' : 'Concluir Cadastro de Pessoa') }}</span>
+          </button>
+        </div>
       </div>
     </template>
   </BaseModal>
@@ -1099,7 +1118,7 @@ import { ref, reactive, watch } from 'vue';
 import {
   FileText, ShieldCheck, Mail, MapPin, Tag, Users, Truck, Briefcase, Wrench, UserCheck,
   BadgePercent, Car, Package, Phone, MessageSquare, AlertCircle,
-  Loader2, Check, Home, Building2, Search, Compass, Navigation, Zap
+  Loader2, Check, Home, Building2, Search, Compass, Navigation, Zap, Trash2
 } from 'lucide-vue-next';
 import axios from 'axios';
 import BaseModal from '../common/BaseModal.vue';
@@ -1117,6 +1136,7 @@ const emit = defineEmits(['close', 'saved']);
 
 const isEditing = ref(false);
 const isSubmitting = ref(false);
+const isDeleting = ref(false);
 const errorMessage = ref('');
 
 // Estados de busca de CEP ViaCEP
@@ -1509,6 +1529,26 @@ const handleCnpjaData = (d: any) => {
 
 const close = () => {
   emit('close');
+};
+
+const handleDeletePerson = async () => {
+  if (!props.personToEdit?.id) return;
+  const personName = form.name || 'esta pessoa';
+  const confirmed = window.confirm(`Deseja realmente excluir o cadastro de "${personName}"?\n\nEsta operação só é permitida caso o registro não possua vínculos em outras partes do sistema.`);
+  if (!confirmed) return;
+
+  isDeleting.value = true;
+  errorMessage.value = '';
+
+  try {
+    await axios.delete(`/api/v1/people/${props.personToEdit.id}`);
+    emit('saved');
+    close();
+  } catch (err: any) {
+    errorMessage.value = err.response?.data?.message || 'Não é possível excluir esta pessoa pois ela possui vínculos no sistema.';
+  } finally {
+    isDeleting.value = false;
+  }
 };
 
 const submit = async () => {

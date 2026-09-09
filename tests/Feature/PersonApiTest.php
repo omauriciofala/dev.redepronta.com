@@ -593,4 +593,52 @@ class PersonApiTest extends TestCase
         $this->assertTrue(collect($resGroupName->json('data'))->pluck('id')->contains($personB->id));
         $this->assertFalse(collect($resGroupName->json('data'))->pluck('id')->contains($personA->id));
     }
+
+    public function test_can_delete_person_without_dependencies(): void
+    {
+        $person = Person::create([
+            'account_id' => $this->account->id,
+            'person_type' => 'individual',
+            'name' => 'Pessoa Sem Vinculos',
+            'document_number' => $this->generateValidCpf(),
+            'email' => 'sem.vinculo@exemplo.com',
+        ]);
+
+        $response = $this->deleteJson("/api/v1/people/{$person->id}");
+
+        $response->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('message', 'Pessoa excluída com sucesso.');
+
+        $this->assertSoftDeleted('people', ['id' => $person->id]);
+    }
+
+    public function test_cannot_delete_person_with_system_dependencies(): void
+    {
+        $email = 'operador.sistema@exemplo.com';
+        $person = Person::create([
+            'account_id' => $this->account->id,
+            'person_type' => 'individual',
+            'name' => 'Operador Vinculado',
+            'document_number' => $this->generateValidCpf(),
+            'email' => $email,
+        ]);
+
+        // Cria dependência no sistema: usuário com o mesmo email
+        \App\Models\User::factory()->create([
+            'account_id' => $this->account->id,
+            'email' => $email,
+        ]);
+
+        $response = $this->deleteJson("/api/v1/people/{$person->id}");
+
+        $response->assertStatus(422)
+            ->assertJsonPath('success', false);
+
+        $this->assertDatabaseHas('people', [
+            'id' => $person->id,
+            'deleted_at' => null,
+        ]);
+    }
 }
+

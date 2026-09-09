@@ -739,6 +739,17 @@
                           <span>Copiar ID (#{{ person.id }})</span>
                         </button>
                       </div>
+
+                      <div class="py-1 border-t border-slate-100 dark:border-[#14147A]/60">
+                        <button
+                          type="button"
+                          @click="handleActionDelete(person)"
+                          class="w-full text-left px-3.5 py-2 flex items-center gap-2.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition cursor-pointer font-medium"
+                        >
+                          <Trash2 class="w-3.5 h-3.5 text-red-500" />
+                          <span>Excluir pessoa</span>
+                        </button>
+                      </div>
                     </div>
                   </Transition>
                 </div>
@@ -811,6 +822,76 @@
       @close="isCnaeModalOpen = false"
       @updated="handleAuxUpdated('cnaes')"
     />
+
+    <!-- Toast de Notificação Temporário -->
+    <Transition
+      enter-active-class="transition duration-200 ease-out"
+      enter-from-class="opacity-0 -translate-y-2"
+      enter-to-class="opacity-100 translate-y-0"
+      leave-active-class="transition duration-150 ease-in"
+      leave-from-class="opacity-100 translate-y-0"
+      leave-to-class="opacity-0 -translate-y-2"
+    >
+      <div
+        v-if="toastMessage"
+        class="fixed top-5 right-5 z-50 max-w-md p-4 rounded-xl shadow-2xl border flex items-center gap-3 text-sm font-semibold"
+        :class="toastType === 'success' ? 'bg-emerald-50 dark:bg-emerald-950/90 text-emerald-800 dark:text-emerald-200 border-emerald-300 dark:border-emerald-800' : 'bg-red-50 dark:bg-red-950/90 text-red-800 dark:text-red-200 border-red-300 dark:border-red-800'"
+      >
+        <CheckCircle2 v-if="toastType === 'success'" class="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+        <AlertCircle v-else class="w-5 h-5 text-red-600 dark:text-red-400 shrink-0" />
+        <span>{{ toastMessage }}</span>
+      </div>
+    </Transition>
+
+    <!-- Modal de Confirmação de Exclusão de Pessoa -->
+    <BaseModal
+      :isOpen="isDeleteModalOpen"
+      title="Confirmar Exclusão de Pessoa"
+      size="sm"
+      @close="closeDeleteModal"
+    >
+      <div class="space-y-4">
+        <div class="p-3.5 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/60 text-red-800 dark:text-red-200 text-xs leading-relaxed flex items-start gap-3">
+          <AlertTriangle class="w-5 h-5 shrink-0 text-red-600 dark:text-red-400 mt-0.5" />
+          <div class="space-y-1">
+            <p class="font-bold text-sm text-red-900 dark:text-red-100">
+              Excluir {{ personToDelete?.name }}?
+            </p>
+            <p>
+              Esta pessoa só poderá ser excluída se <strong>não estiver vinculada em nenhuma outra parte do sistema</strong> (contratos, ordens de serviço, financeiro ou operadores).
+            </p>
+          </div>
+        </div>
+
+        <div v-if="deleteErrorMessage" class="p-3 rounded-lg bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200 text-xs font-semibold flex items-center gap-2">
+          <AlertCircle class="w-4 h-4 shrink-0 text-red-600 dark:text-red-400" />
+          <span>{{ deleteErrorMessage }}</span>
+        </div>
+      </div>
+
+      <template #footer>
+        <div class="flex items-center justify-end gap-2.5 w-full">
+          <button
+            type="button"
+            @click="closeDeleteModal"
+            :disabled="isDeleting"
+            class="h-9 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 transition text-xs font-semibold cursor-pointer"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            @click="executeDeletePerson"
+            :disabled="isDeleting"
+            class="h-9 px-4 rounded-lg bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-semibold text-xs shadow-xs transition flex items-center gap-2 cursor-pointer disabled:opacity-50"
+          >
+            <Loader2 v-if="isDeleting" class="w-3.5 h-3.5 animate-spin" />
+            <Trash2 v-else class="w-3.5 h-3.5" />
+            <span>{{ isDeleting ? 'Excluindo...' : 'Sim, Excluir Pessoa' }}</span>
+          </button>
+        </div>
+      </template>
+    </BaseModal>
   </div>
 </template>
 
@@ -819,9 +900,11 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import {
   Plus, Search, Edit2, Power, Copy, Check, Phone, Mail, X, MoreVertical, MoreHorizontal,
   SlidersHorizontal, ChevronDown, RotateCcw, ArrowUpDown, ArrowUp, ArrowDown,
-  CheckCircle2, Users, MapPin, Building2, FolderTree, UserCheck, Home, FileText
+  CheckCircle2, Users, MapPin, Building2, FolderTree, UserCheck, Home, FileText,
+  Trash2, AlertTriangle, Loader2, AlertCircle
 } from 'lucide-vue-next';
 import axios from 'axios';
+import BaseModal from '../components/common/BaseModal.vue';
 import PersonModal from '../components/people/PersonModal.vue';
 import CitySearchSelect from '../components/common/CitySearchSelect.vue';
 import StateCrudModal from '../components/people/auxiliary/StateCrudModal.vue';
@@ -839,6 +922,26 @@ const totalRecords = ref(0);
 
 const isModalOpen = ref(false);
 const personEditing = ref<any | null>(null);
+
+// Controle de Exclusão de Pessoa
+const isDeleteModalOpen = ref(false);
+const personToDelete = ref<any | null>(null);
+const isDeleting = ref(false);
+const deleteErrorMessage = ref('');
+
+// Feedback Toast
+const toastMessage = ref('');
+const toastType = ref<'success' | 'error'>('success');
+
+const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
+  toastMessage.value = msg;
+  toastType.value = type;
+  setTimeout(() => {
+    if (toastMessage.value === msg) {
+      toastMessage.value = '';
+    }
+  }, 4500);
+};
 
 // Controle do Menu de Cadastros Base do Cabeçalho
 const isHeaderMenuOpen = ref(false);
@@ -1310,6 +1413,38 @@ const handleActionCopyId = (person: any) => {
   closeActionsDropdown();
   if (navigator.clipboard) {
     navigator.clipboard.writeText(String(person.id));
+  }
+};
+
+const handleActionDelete = (person: any) => {
+  closeActionsDropdown();
+  personToDelete.value = person;
+  deleteErrorMessage.value = '';
+  isDeleteModalOpen.value = true;
+};
+
+const closeDeleteModal = () => {
+  if (isDeleting.value) return;
+  isDeleteModalOpen.value = false;
+  personToDelete.value = null;
+  deleteErrorMessage.value = '';
+};
+
+const executeDeletePerson = async () => {
+  if (!personToDelete.value) return;
+  isDeleting.value = true;
+  deleteErrorMessage.value = '';
+
+  try {
+    const res = await axios.delete(`/api/v1/people/${personToDelete.value.id}`);
+    showToast(res.data?.message || 'Pessoa excluída com sucesso!', 'success');
+    isDeleteModalOpen.value = false;
+    personToDelete.value = null;
+    await fetchPeople();
+  } catch (err: any) {
+    deleteErrorMessage.value = err.response?.data?.message || 'Não foi possível excluir a pessoa.';
+  } finally {
+    isDeleting.value = false;
   }
 };
 
