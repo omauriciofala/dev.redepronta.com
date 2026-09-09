@@ -14,7 +14,7 @@
           <div class="w-36">
             <select
               v-model="filterStateId"
-              @change="loadCities"
+              @change="onStateFilterChange"
               class="w-full h-10 px-2.5 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714] outline-none"
             >
               <option value="">Todas as UFs</option>
@@ -29,10 +29,20 @@
             <Search class="w-4 h-4 absolute left-3 top-3 text-slate-400 pointer-events-none" />
             <input
               v-model="searchTerm"
+              @input="onSearchInput"
               type="text"
               placeholder="Buscar cidade por nome ou código IBGE..."
-              class="w-full h-10 pl-9 pr-4 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714] focus:outline-none transition"
+              class="w-full h-10 pl-9 pr-8 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714] focus:outline-none transition"
             />
+            <button
+              v-if="searchTerm"
+              type="button"
+              @click="clearSearch"
+              class="absolute right-2.5 top-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+              title="Limpar busca"
+            >
+              <X class="w-4 h-4" />
+            </button>
           </div>
         </div>
 
@@ -168,13 +178,13 @@
                   <span class="inline-block animate-spin mr-1.5 text-[#FC6714]">⟳</span> Carregando cidades...
                 </td>
               </tr>
-              <tr v-else-if="filteredCities.length === 0">
+              <tr v-else-if="cities.length === 0">
                 <td colspan="4" class="py-8 text-center text-slate-400">
                   Nenhuma cidade encontrada.
                 </td>
               </tr>
               <tr
-                v-for="ct in filteredCities"
+                v-for="ct in cities"
                 :key="ct.id"
                 class="hover:bg-slate-50/70 dark:hover:bg-white/5 transition"
               >
@@ -212,6 +222,65 @@
               </tr>
             </tbody>
           </table>
+        </div>
+
+        <!-- Barra de Paginação da Tabela de Cidades -->
+        <div class="px-4 py-2.5 border-t border-slate-200 dark:border-[#14147A] flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600 dark:text-slate-400 bg-slate-50/70 dark:bg-[#03032E]/60">
+          <div class="flex items-center gap-2">
+            <span>
+              Exibindo <strong>{{ fromRecord }}-{{ toRecord }}</strong> de <strong>{{ totalCities.toLocaleString('pt-BR') }}</strong> cidades
+            </span>
+            <select
+              v-model="perPage"
+              @change="currentPage = 1; loadCities()"
+              class="h-7 px-2 rounded-md border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D] text-slate-700 dark:text-slate-300 text-xs focus:ring-2 focus:ring-[#FC6714] outline-none cursor-pointer"
+            >
+              <option :value="10">10 por pág.</option>
+              <option :value="15">15 por pág.</option>
+              <option :value="25">25 por pág.</option>
+              <option :value="50">50 por pág.</option>
+            </select>
+          </div>
+
+          <div class="flex items-center gap-1.5">
+            <button
+              type="button"
+              :disabled="currentPage <= 1 || loading"
+              @click="changePage(1)"
+              class="px-2 py-1 rounded-md border border-slate-200 dark:border-[#14147A] hover:bg-white dark:hover:bg-[#06064D] hover:border-[#FC6714] hover:text-[#FC6714] disabled:opacity-40 font-medium transition cursor-pointer"
+              title="Primeira página"
+            >
+              &laquo;
+            </button>
+            <button
+              type="button"
+              :disabled="currentPage <= 1 || loading"
+              @click="changePage(currentPage - 1)"
+              class="px-2.5 py-1 rounded-md border border-slate-200 dark:border-[#14147A] hover:bg-white dark:hover:bg-[#06064D] hover:border-[#FC6714] hover:text-[#FC6714] disabled:opacity-40 font-medium transition cursor-pointer"
+            >
+              Anterior
+            </button>
+            <span class="px-2 font-semibold text-slate-800 dark:text-slate-200">
+              {{ currentPage }} / {{ lastPage }}
+            </span>
+            <button
+              type="button"
+              :disabled="currentPage >= lastPage || loading"
+              @click="changePage(currentPage + 1)"
+              class="px-2.5 py-1 rounded-md border border-slate-200 dark:border-[#14147A] hover:bg-white dark:hover:bg-[#06064D] hover:border-[#FC6714] hover:text-[#FC6714] disabled:opacity-40 font-medium transition cursor-pointer"
+            >
+              Próxima
+            </button>
+            <button
+              type="button"
+              :disabled="currentPage >= lastPage || loading"
+              @click="changePage(lastPage)"
+              class="px-2 py-1 rounded-md border border-slate-200 dark:border-[#14147A] hover:bg-white dark:hover:bg-[#06064D] hover:border-[#FC6714] hover:text-[#FC6714] disabled:opacity-40 font-medium transition cursor-pointer"
+              title="Última página"
+            >
+              &raquo;
+            </button>
+          </div>
         </div>
       </div>
 
@@ -285,6 +354,14 @@ const feedbackMessage = ref('');
 const feedbackType = ref<'success' | 'error'>('success');
 const cityToDelete = ref<any | null>(null);
 
+// Paginação
+const currentPage = ref(1);
+const perPage = ref(15);
+const totalCities = ref(0);
+const lastPage = ref(1);
+const fromRecord = ref(0);
+const toRecord = ref(0);
+
 const form = reactive({
   state_id: '' as any,
   name: '',
@@ -296,16 +373,32 @@ const getStateCode = (stateId: number) => {
   return s ? s.code : '-';
 };
 
-const filteredCities = computed(() => {
-  let list = cities.value;
-  if (searchTerm.value) {
-    const t = searchTerm.value.toLowerCase();
-    list = list.filter(
-      c => c.name?.toLowerCase().includes(t) || c.ibge_code?.includes(t)
-    );
-  }
-  return list;
-});
+let searchDebounceTimer: any = null;
+
+const onSearchInput = () => {
+  if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+  searchDebounceTimer = setTimeout(() => {
+    currentPage.value = 1;
+    loadCities();
+  }, 300);
+};
+
+const clearSearch = () => {
+  searchTerm.value = '';
+  currentPage.value = 1;
+  loadCities();
+};
+
+const onStateFilterChange = () => {
+  currentPage.value = 1;
+  loadCities();
+};
+
+const changePage = (page: number) => {
+  if (page < 1 || page > lastPage.value || page === currentPage.value) return;
+  currentPage.value = page;
+  loadCities();
+};
 
 const loadStates = async () => {
   try {
@@ -319,12 +412,29 @@ const loadStates = async () => {
 const loadCities = async () => {
   loading.value = true;
   try {
-    const params: any = { all: 1 };
+    const params: any = {
+      page: currentPage.value,
+      per_page: perPage.value,
+    };
     if (filterStateId.value) {
       params.state_id = filterStateId.value;
     }
+    if (searchTerm.value.trim()) {
+      params.search = searchTerm.value.trim();
+    }
     const res = await axios.get('/api/v1/cities', { params });
     cities.value = res.data.data || [];
+    if (res.data.meta) {
+      totalCities.value = res.data.meta.total || 0;
+      lastPage.value = res.data.meta.last_page || 1;
+      fromRecord.value = res.data.meta.from || 0;
+      toRecord.value = res.data.meta.to || 0;
+    } else {
+      totalCities.value = cities.value.length;
+      lastPage.value = 1;
+      fromRecord.value = cities.value.length ? 1 : 0;
+      toRecord.value = cities.value.length;
+    }
   } catch (err: any) {
     console.error('Erro ao carregar cidades', err);
   } finally {
@@ -434,6 +544,9 @@ watch(
       closeForm();
       cityToDelete.value = null;
       feedbackMessage.value = '';
+      currentPage.value = 1;
+      searchTerm.value = '';
+      filterStateId.value = '';
       await loadStates();
       await loadCities();
     }

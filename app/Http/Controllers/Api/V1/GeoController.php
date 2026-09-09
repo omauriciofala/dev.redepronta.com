@@ -28,21 +28,35 @@ class GeoController extends Controller
         }
 
         // Busca por termo (nome ou código IBGE)
-        if ($request->filled('q')) {
-            $term = trim($request->input('q'));
-            if (mb_strlen($term) >= 3) {
+        if ($request->filled('q') || $request->filled('search')) {
+            $term = trim($request->input('search') ?? $request->input('q'));
+            if (!empty($term)) {
                 $query->where(function ($q) use ($term) {
-                    $q->where('name', 'like', "{$term}%")
-                      ->orWhere('name', 'like', "%{$term}%")
-                      ->orWhere('ibge_code', 'like', "{$term}%");
+                    $q->where('name', 'like', "%{$term}%")
+                      ->orWhere('ibge_code', 'like', "%{$term}%");
                 });
-            } else {
-                return response()->json(['data' => []]);
             }
         }
 
         if ($request->filled('state_id')) {
             $query->where('state_id', $request->input('state_id'));
+        }
+
+        // Paginação oficial do Laravel
+        if ($request->boolean('paginate') || $request->has('page')) {
+            $perPage = $request->integer('per_page', 15);
+            $paginated = $query->orderBy('name')->paginate($perPage, ['id', 'state_id', 'ibge_code', 'name']);
+            return response()->json([
+                'data' => $paginated->items(),
+                'meta' => [
+                    'current_page' => $paginated->currentPage(),
+                    'last_page' => $paginated->lastPage(),
+                    'per_page' => $paginated->perPage(),
+                    'total' => $paginated->total(),
+                    'from' => $paginated->firstItem(),
+                    'to' => $paginated->lastItem(),
+                ]
+            ]);
         }
 
         // Limite ergonômico de resultados ou carga completa via all=1
