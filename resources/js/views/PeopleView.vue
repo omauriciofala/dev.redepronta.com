@@ -2,13 +2,18 @@
   <div class="py-8 w-full space-y-6">
     <!-- Cabeçalho Confortável Integrado (Sem Top Bar) -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-      <div>
-        <h1 class="text-2xl font-semibold font-heading text-[#06064D] dark:text-white tracking-tight">
-          Gestão de Pessoas
-        </h1>
-        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 font-medium">
-          Base canônica centralizada de funcionários, solicitantes, clientes, fornecedores e parceiros
-        </p>
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 shadow-2xs shrink-0">
+          <Users class="w-6 h-6" />
+        </div>
+        <div>
+          <h1 class="text-2xl font-semibold font-heading text-[#06064D] dark:text-white tracking-tight">
+            Gestão de Pessoas
+          </h1>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
+            Base canônica centralizada de funcionários, solicitantes, clientes, fornecedores e parceiros
+          </p>
+        </div>
       </div>
 
       <!-- Ações do Cabeçalho -->
