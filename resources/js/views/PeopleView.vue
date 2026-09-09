@@ -108,6 +108,19 @@
             </div>
           </Transition>
         </div>
+
+        <!-- Menu Hambúrguer (☰) — Abre Sidebar / Drawer do Módulo de Pessoas -->
+        <button
+          type="button"
+          @click="isModuleDrawerOpen = true"
+          class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition shadow-2xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#FC6714]"
+          :class="{ 'bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white ring-2 ring-[#FC6714]/30': isModuleDrawerOpen }"
+          title="Menu do Módulo de Pessoas (☰)"
+          aria-label="Menu do Módulo de Pessoas"
+        >
+          <!-- Ícone Hambúrguer (Menu) -->
+          <Menu class="w-5 h-5" />
+        </button>
       </div>
     </div>
 
@@ -823,6 +836,20 @@
       @updated="handleAuxUpdated('cnaes')"
     />
 
+    <!-- Sidebar / Drawer do Módulo de Pessoas (☰) -->
+    <PeopleModuleDrawer
+      v-model="isModuleDrawerOpen"
+      :totalRecords="totalRecords"
+      :activeRecords="activePeopleCount"
+      :inactiveRecords="inactivePeopleCount"
+      @close="isModuleDrawerOpen = false"
+      @filterRole="handleDrawerFilterRole"
+      @openAuxModal="openAuxModal"
+      @openImport="showToast('Funcionalidade de importação em lote em fase de homologação.', 'success')"
+      @resetFilters="clearAllFilters"
+      @toast="showToast"
+    />
+
     <!-- Toast de Notificação Temporário -->
     <Transition
       enter-active-class="transition duration-200 ease-out"
@@ -911,11 +938,12 @@ import {
   Plus, Search, Edit2, Power, Copy, Check, Phone, Mail, X, MoreVertical, MoreHorizontal,
   SlidersHorizontal, ChevronDown, RotateCcw, ArrowUpDown, ArrowUp, ArrowDown,
   CheckCircle2, Users, MapPin, Building2, FolderTree, UserCheck, Home, FileText,
-  Trash2, AlertTriangle, Loader2, AlertCircle
+  Trash2, AlertTriangle, Loader2, AlertCircle, Menu
 } from 'lucide-vue-next';
 import axios from 'axios';
 import BaseModal from '../components/common/BaseModal.vue';
 import PersonModal from '../components/people/PersonModal.vue';
+import PeopleModuleDrawer from '../components/people/PeopleModuleDrawer.vue';
 import CitySearchSelect from '../components/common/CitySearchSelect.vue';
 import StateCrudModal from '../components/people/auxiliary/StateCrudModal.vue';
 import CityCrudModal from '../components/people/auxiliary/CityCrudModal.vue';
@@ -932,6 +960,11 @@ const totalRecords = ref(0);
 
 const isModalOpen = ref(false);
 const personEditing = ref<any | null>(null);
+
+// Controle do Menu Geral / Drawer do Módulo de Pessoas
+const isModuleDrawerOpen = ref(false);
+const activePeopleCount = computed(() => people.value.filter(p => p.status === 'active').length);
+const inactivePeopleCount = computed(() => people.value.filter(p => p.status === 'inactive').length);
 
 // Controle de Exclusão de Pessoa
 const isDeleteModalOpen = ref(false);
@@ -1104,6 +1137,15 @@ const clearAllFilters = () => {
   filterCityId.value = '';
   filterGroup.value = '';
   citiesList.value = [];
+  currentPage.value = 1;
+  fetchPeople();
+};
+
+const handleDrawerFilterRole = (role: string) => {
+  if (!activeFilterKeys.value.includes('role')) {
+    activeFilterKeys.value.push('role');
+  }
+  filterRole.value = role;
   currentPage.value = 1;
   fetchPeople();
 };
