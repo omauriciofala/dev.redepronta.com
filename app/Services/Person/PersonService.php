@@ -69,8 +69,9 @@ class PersonService
             });
         }
 
-        if (!empty($filters['persona'])) {
-            match ($filters['persona']) {
+        $roleFilter = $filters['role'] ?? $filters['persona'] ?? null;
+        if (!empty($roleFilter)) {
+            match ($roleFilter) {
                 'client' => $query->where('is_client', true),
                 'supplier' => $query->where('is_supplier', true),
                 'employee' => $query->where('is_employee', true),

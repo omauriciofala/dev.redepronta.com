@@ -22,7 +22,7 @@ class PersonController extends Controller
     {
         $filters = $request->only([
             'search', 'status', 'person_type', 'city_id', 'state_id', 'state_code',
-            'group_id', 'group_name', 'group', 'persona', 'sort_by', 'sort_direction'
+            'group_id', 'group_name', 'group', 'persona', 'role', 'sort_by', 'sort_direction'
         ]);
 
         $people = $this->personService->list(

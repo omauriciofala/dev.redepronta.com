@@ -521,6 +521,12 @@ class PersonApiTest extends TestCase
         $this->assertTrue($namesEmp->contains('João Técnico Funcionário CLT'));
         $this->assertFalse($namesEmp->contains('Maria Solicitante de Chamados'));
 
+        // 4.1 Filtrar via parâmetro role=employee
+        $filterRoleEmp = $this->getJson('/api/v1/people?role=employee');
+        $filterRoleEmp->assertOk();
+        $this->assertTrue(collect($filterRoleEmp->json('data'))->pluck('name')->contains('João Técnico Funcionário CLT'));
+        $this->assertFalse(collect($filterRoleEmp->json('data'))->pluck('name')->contains('Maria Solicitante de Chamados'));
+
         // 5. Validar contadores separados na resposta
         $this->assertGreaterThanOrEqual(1, $filterReq->json('meta.counts.requester'));
         $this->assertGreaterThanOrEqual(1, $filterEmp->json('meta.counts.employee'));

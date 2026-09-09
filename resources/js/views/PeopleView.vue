@@ -133,29 +133,6 @@
             </div>
           </Transition>
         </div>
-
-        <!-- Filtro por Persona (Tabs com Contadores Numéricos e Destaque Laranja Institucional) -->
-        <div class="flex items-center gap-1 bg-slate-100 dark:bg-[#03032E] p-1 rounded-lg border border-slate-200 dark:border-[#14147A] overflow-x-auto max-w-full">
-          <button
-            v-for="p in personaFilters"
-            :key="p.value"
-            @click="selectPersona(p.value)"
-            :class="selectedPersona === p.value
-              ? 'bg-[#FC6714] text-white font-bold shadow-xs'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 font-medium'"
-            class="px-3 py-1.5 rounded-md text-xs transition whitespace-nowrap cursor-pointer flex items-center gap-1.5 focus:ring-2 focus:ring-[#FC6714] focus:outline-none"
-          >
-            <span>{{ p.label }}</span>
-            <span
-              :class="selectedPersona === p.value
-                ? 'bg-white/25 text-white'
-                : 'bg-slate-200/80 text-slate-600 dark:bg-slate-800 dark:text-slate-400'"
-              class="px-1.5 py-0.2 rounded-full text-[10px] font-bold tracking-tight"
-            >
-              {{ counts[p.value || 'total'] ?? 0 }}
-            </span>
-          </button>
-        </div>
       </div>
 
       <!-- Barra Dinâmica de Filtros Selecionados -->
@@ -208,7 +185,38 @@
           </div>
 
           <!-- Grade de Controles dos Filtros Selecionados -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3.5 text-xs">
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3.5 text-xs">
+            <!-- 0. Filtro: Papel -->
+            <div
+              v-if="isFilterActive('role')"
+              class="p-3 bg-white dark:bg-[#03032E] rounded-lg border border-slate-200 dark:border-[#14147A] shadow-2xs space-y-1.5 transition-all relative group"
+            >
+              <div class="flex items-center justify-between text-slate-700 dark:text-slate-300">
+                <span class="font-bold uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                  <UserCheck class="w-3.5 h-3.5 text-[#FC6714]" />
+                  Papel
+                </span>
+                <button
+                  type="button"
+                  @click="removeFilter('role')"
+                  class="p-0.5 rounded text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 transition cursor-pointer"
+                  title="Remover filtro de Papel"
+                >
+                  <X class="w-3.5 h-3.5" />
+                </button>
+              </div>
+              <select
+                v-model="filterRole"
+                @change="applySecondaryFilters"
+                class="w-full h-9 px-2.5 rounded-md border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#06064D]/50 text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer text-xs truncate"
+              >
+                <option value="">Todos os Papéis</option>
+                <option v-for="r in roleOptions" :key="r.value" :value="r.value">
+                  {{ r.label }} {{ counts[r.value] !== undefined ? `(${counts[r.value]})` : '' }}
+                </option>
+              </select>
+            </div>
+
             <!-- 1. Filtro: Status -->
             <div
               v-if="isFilterActive('status')"
@@ -683,7 +691,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import {
   Plus, Search, Edit2, Power, Copy, Check, Phone, Mail, X, MoreVertical, MoreHorizontal,
   SlidersHorizontal, ChevronDown, RotateCcw, ArrowUpDown, ArrowUp, ArrowDown,
-  CheckCircle2, Users, MapPin, Building2, FolderTree
+  CheckCircle2, Users, MapPin, Building2, FolderTree, UserCheck
 } from 'lucide-vue-next';
 import axios from 'axios';
 import PersonModal from '../components/people/PersonModal.vue';
@@ -692,7 +700,6 @@ import CitySearchSelect from '../components/common/CitySearchSelect.vue';
 const people = ref<any[]>([]);
 const loading = ref(false);
 const search = ref('');
-const selectedPersona = ref('');
 const currentPage = ref(1);
 const lastPage = ref(1);
 const totalRecords = ref(0);
@@ -736,6 +743,7 @@ const isFiltersMenuOpen = ref(false);
 const filtersDropdownContainerRef = ref<HTMLElement | null>(null);
 
 const AVAILABLE_FILTER_FIELDS = [
+  { key: 'role', label: 'Papel', icon: UserCheck },
   { key: 'status', label: 'Status', icon: CheckCircle2 },
   { key: 'person_type', label: 'Tipo de Pessoa', icon: Users },
   { key: 'state', label: 'Estado (UF)', icon: MapPin },
@@ -743,7 +751,19 @@ const AVAILABLE_FILTER_FIELDS = [
   { key: 'group', label: 'Grupo', icon: FolderTree },
 ];
 
+const roleOptions = [
+  { label: 'Funcionário', value: 'employee' },
+  { label: 'Solicitante', value: 'requester' },
+  { label: 'Cliente', value: 'client' },
+  { label: 'Fornecedor', value: 'supplier' },
+  { label: 'Vendedor', value: 'seller' },
+  { label: 'Terceirizado', value: 'outsourced' },
+  { label: 'Motorista', value: 'driver' },
+  { label: 'Transportadora', value: 'carrier' },
+];
+
 const activeFilterKeys = ref<string[]>([]);
+const filterRole = ref('');
 const filterStatus = ref('');
 const filterPersonType = ref('');
 const filterStateId = ref('');
@@ -784,6 +804,7 @@ const toggleFilterField = (key: string) => {
 
 const removeFilter = (key: string) => {
   activeFilterKeys.value = activeFilterKeys.value.filter(k => k !== key);
+  if (key === 'role') filterRole.value = '';
   if (key === 'status') filterStatus.value = '';
   if (key === 'person_type') filterPersonType.value = '';
   if (key === 'state') {
@@ -798,6 +819,7 @@ const removeFilter = (key: string) => {
 
 const clearAllFilters = () => {
   activeFilterKeys.value = [];
+  filterRole.value = '';
   filterStatus.value = '';
   filterPersonType.value = '';
   filterStateId.value = '';
@@ -1011,18 +1033,6 @@ const copyToClipboard = async (text: string, key: string) => {
   }
 };
 
-const personaFilters = [
-  { label: 'Todos', value: '' },
-  { label: 'Funcionários', value: 'employee' },
-  { label: 'Solicitantes', value: 'requester' },
-  { label: 'Clientes', value: 'client' },
-  { label: 'Fornecedores', value: 'supplier' },
-  { label: 'Vendedores', value: 'seller' },
-  { label: 'Terceirizados', value: 'outsourced' },
-  { label: 'Motoristas', value: 'driver' },
-  { label: 'Transportadoras', value: 'carrier' },
-];
-
 let searchTimeout: any = null;
 const debounceSearch = () => {
   clearTimeout(searchTimeout);
@@ -1030,12 +1040,6 @@ const debounceSearch = () => {
     currentPage.value = 1;
     fetchPeople();
   }, 300);
-};
-
-const selectPersona = (val: string) => {
-  selectedPersona.value = val;
-  currentPage.value = 1;
-  fetchPeople();
 };
 
 const changePage = (page: number) => {
@@ -1053,7 +1057,10 @@ const fetchPeople = async () => {
       sort_direction: sortDirection.value,
     };
     if (search.value) params.search = search.value;
-    if (selectedPersona.value) params.persona = selectedPersona.value;
+    if (activeFilterKeys.value.includes('role') && filterRole.value) {
+      params.role = filterRole.value;
+      params.persona = filterRole.value;
+    }
     if (activeFilterKeys.value.includes('status') && filterStatus.value) params.status = filterStatus.value;
     if (activeFilterKeys.value.includes('person_type') && filterPersonType.value) params.person_type = filterPersonType.value;
     if (activeFilterKeys.value.includes('state') && filterStateId.value) params.state_id = filterStateId.value;
