@@ -178,7 +178,7 @@
             </span>
           </div>
 
-          <!-- Grade dos 7 Papéis Obrigatórios -->
+          <!-- Grade dos 8 Papéis do Cadastro -->
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5">
             <!-- 1. Cliente (S/N) -->
             <label
@@ -344,6 +344,37 @@
                 </div>
                 <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-snug truncate">
                   Empresa parceira de frete e entregas
+                </p>
+              </div>
+            </label>
+
+            <!-- 8. Solicitante (S/N) -->
+            <label
+              :class="form.is_requester
+                ? 'border-[#FC6714] bg-orange-50/70 dark:bg-[#FC6714]/15 ring-2 ring-[#FC6714]/20'
+                : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 hover:border-slate-300 dark:hover:border-slate-700'"
+              class="p-3.5 rounded-xl border flex items-start gap-3 cursor-pointer transition select-none shadow-2xs"
+            >
+              <input
+                type="checkbox"
+                v-model="form.is_requester"
+                class="w-4 h-4 mt-0.5 rounded-sm border-slate-300 dark:border-slate-700 text-[#FC6714] focus:ring-[#FC6714] cursor-pointer"
+              />
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                    <UserCheck class="w-3.5 h-3.5 text-[#FC6714] shrink-0" />
+                    Solicitante
+                  </span>
+                  <span
+                    class="text-[11px] font-bold px-1.5 py-0.2 rounded"
+                    :class="form.is_requester ? 'bg-[#FC6714] text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'"
+                  >
+                    {{ form.is_requester ? 'SIM' : 'NÃO' }}
+                  </span>
+                </div>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-snug truncate">
+                  Abertura de chamados, tickets e pedidos
                 </p>
               </div>
             </label>
@@ -1005,7 +1036,7 @@
 <script setup lang="ts">
 import { ref, reactive, watch } from 'vue';
 import {
-  FileText, ShieldCheck, Mail, MapPin, Tag, Users, Truck, Briefcase, Wrench,
+  FileText, ShieldCheck, Mail, MapPin, Tag, Users, Truck, Briefcase, Wrench, UserCheck,
   BadgePercent, Car, Package, Phone, MessageSquare, AlertCircle,
   Loader2, Check, Home, Building2, Search, Compass, Navigation, Zap
 } from 'lucide-vue-next';

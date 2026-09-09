@@ -476,4 +476,53 @@ class PersonApiTest extends TestCase
         $resDateDesc->assertOk();
         $this->assertEquals('Ana Adamantina', $resDateDesc->json('data.0.name'));
     }
+
+    public function test_requester_and_employee_are_distinct_roles_and_can_be_filtered_separately(): void
+    {
+        $cpfRequester = $this->generateValidCpf();
+        $cpfEmployee = $this->generateValidCpf();
+
+        // 1. Cadastrar Solicitante (sem ser funcionário)
+        $resReq = $this->postJson('/api/v1/people', [
+            'person_type' => 'individual',
+            'name' => 'Maria Solicitante de Chamados',
+            'document_number' => $cpfRequester,
+            'is_requester' => true,
+            'is_employee' => false,
+            'is_client' => true,
+        ]);
+        $resReq->assertCreated()
+            ->assertJsonPath('data.personas.is_requester', true)
+            ->assertJsonPath('data.personas.is_employee', false);
+
+        // 2. Cadastrar Funcionário (sem ser solicitante)
+        $resEmp = $this->postJson('/api/v1/people', [
+            'person_type' => 'individual',
+            'name' => 'João Técnico Funcionário CLT',
+            'document_number' => $cpfEmployee,
+            'is_requester' => false,
+            'is_employee' => true,
+        ]);
+        $resEmp->assertCreated()
+            ->assertJsonPath('data.personas.is_requester', false)
+            ->assertJsonPath('data.personas.is_employee', true);
+
+        // 3. Filtrar por persona=requester
+        $filterReq = $this->getJson('/api/v1/people?persona=requester');
+        $filterReq->assertOk();
+        $namesReq = collect($filterReq->json('data'))->pluck('name');
+        $this->assertTrue($namesReq->contains('Maria Solicitante de Chamados'));
+        $this->assertFalse($namesReq->contains('João Técnico Funcionário CLT'));
+
+        // 4. Filtrar por persona=employee
+        $filterEmp = $this->getJson('/api/v1/people?persona=employee');
+        $filterEmp->assertOk();
+        $namesEmp = collect($filterEmp->json('data'))->pluck('name');
+        $this->assertTrue($namesEmp->contains('João Técnico Funcionário CLT'));
+        $this->assertFalse($namesEmp->contains('Maria Solicitante de Chamados'));
+
+        // 5. Validar contadores separados na resposta
+        $this->assertGreaterThanOrEqual(1, $filterReq->json('meta.counts.requester'));
+        $this->assertGreaterThanOrEqual(1, $filterEmp->json('meta.counts.employee'));
+    }
 }

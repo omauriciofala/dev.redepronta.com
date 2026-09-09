@@ -7,7 +7,7 @@
           Gestão de Pessoas
         </h1>
         <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 font-medium">
-          Base canônica centralizada de colaboradores, clientes, fornecedores e solicitantes
+          Base canônica centralizada de funcionários, solicitantes, clientes, fornecedores e parceiros
         </p>
       </div>
 
@@ -711,7 +711,7 @@ const ROLE_CONFIGS = [
   {
     key: 'employee',
     personaKey: 'is_employee',
-    label: 'Colaborador',
+    label: 'Funcionário',
     badgeClass: 'bg-blue-50 text-blue-700 border-blue-200/80 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800/60',
   },
   {
@@ -742,7 +742,7 @@ const ROLE_CONFIGS = [
     key: 'requester',
     personaKey: 'is_requester',
     label: 'Solicitante',
-    badgeClass: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700',
+    badgeClass: 'bg-orange-50 text-[#FC6714] border-orange-200/80 dark:bg-[#FC6714]/10 dark:text-orange-300 dark:border-[#FC6714]/30',
   },
 ];
 
@@ -810,14 +810,14 @@ const copyToClipboard = async (text: string, key: string) => {
 
 const personaFilters = [
   { label: 'Todos', value: '' },
+  { label: 'Funcionários', value: 'employee' },
+  { label: 'Solicitantes', value: 'requester' },
   { label: 'Clientes', value: 'client' },
   { label: 'Fornecedores', value: 'supplier' },
-  { label: 'Colaboradores', value: 'employee' },
-  { label: 'Terceirizados', value: 'outsourced' },
   { label: 'Vendedores', value: 'seller' },
+  { label: 'Terceirizados', value: 'outsourced' },
   { label: 'Motoristas', value: 'driver' },
   { label: 'Transportadoras', value: 'carrier' },
-  { label: 'Solicitantes', value: 'requester' },
 ];
 
 let searchTimeout: any = null;

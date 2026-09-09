@@ -239,6 +239,19 @@ Para aprofundamento na arquitetura, modelos de dados e execução ágil, consult
   - Aba completa com Nº RG, Órgão Emissor, Data Emissão (DD/MM/AAAA), Inscrição Estadual, Inscrição Municipal, CNAE, Num. Inscr. SUFRAMA, Filiação (Nome da Mãe e Pai), Data de Fundação/Nascimento, Capital Social PJ (R$) e Naturalidade.
 
 
+
+#### 👥 Papéis do Cadastro (Personas Polimórficas)
+O sistema implementa 8 papéis canônicos independentes, permitindo que uma mesma pessoa física ou jurídica acumule múltiplas funções sem duplicação de cadastro:
+1. **Cliente (`is_client`):** Destinatário de faturas, assinante de contratos ou tomador de serviços.
+2. **Fornecedor (`is_supplier`):** Fornecedor de insumos, materiais seriais ou prestador PJ.
+3. **Funcionário (`is_employee`):** Colaborador interno da empresa (técnico de campo, operador, atendente ou analista CLT/fixo).
+4. **Solicitante (`is_requester`):** Contato habilitado para abertura e acompanhamento de chamados, tickets, ordens de serviço ou requisições (distinto de funcionário, podendo ser um contato externo do cliente ou representante).
+5. **Terceirizado (`is_outsourced`):** Prestador de serviço terceirizado ou subcontratado.
+6. **Vendedor (`is_seller`):** Consultor comercial, vendedor interno ou parceiro comissionado.
+7. **Motorista (`is_driver`):** Condutor habilitado da frota veicular ou logística de campo.
+8. **Transportadora (`is_carrier`):** Empresa parceira de frete e logística de distribuição.
+
+
 ### 📋 Estrutura da Grid de Pessoas
 
 - **Grid Canônica de Pessoas:**
