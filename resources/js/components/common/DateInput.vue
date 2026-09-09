@@ -25,7 +25,7 @@
         :class="[
           hasError
             ? 'border-red-400 focus:ring-red-400 dark:border-red-800'
-            : 'border-slate-300 dark:border-slate-700 focus:ring-blue-500',
+            : 'border-slate-300 dark:border-slate-700 focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714]',
           disabled ? 'opacity-60 cursor-not-allowed' : ''
         ]"
         class="w-full h-10 pl-10 pr-12 rounded-lg border bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:ring-2 focus:border-transparent outline-hidden text-sm font-mono transition"

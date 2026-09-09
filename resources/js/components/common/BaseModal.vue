@@ -29,7 +29,7 @@
           >
             <slot name="header">
               <div>
-                <h3 class="text-xl font-bold text-slate-900 dark:text-slate-100 tracking-tight flex items-center gap-2.5">
+                <h3 class="text-xl font-heading font-semibold text-[#06064D] dark:text-white tracking-tight flex items-center gap-2.5">
                   {{ title }}
                   <slot name="header-badge" />
                 </h3>
@@ -43,7 +43,7 @@
               v-if="showCloseButton"
               type="button"
               @click="close"
-              class="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer shrink-0"
+              class="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer shrink-0 focus:outline-hidden focus:ring-2 focus:ring-[#FC6714]/40"
               title="Fechar modal (Esc)"
             >
               <X class="w-5 h-5" />
@@ -87,7 +87,7 @@
           >
             <slot name="header">
               <div>
-                <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 tracking-tight flex items-center gap-2.5">
+                <h3 class="text-lg font-heading font-semibold text-[#06064D] dark:text-white tracking-tight flex items-center gap-2.5">
                   {{ title }}
                   <slot name="header-badge" />
                 </h3>
@@ -101,7 +101,7 @@
               v-if="showCloseButton"
               type="button"
               @click="close"
-              class="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer shrink-0"
+              class="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer shrink-0 focus:outline-hidden focus:ring-2 focus:ring-[#FC6714]/40"
               title="Fechar (Esc)"
             >
               <X class="w-5 h-5" />
@@ -144,7 +144,7 @@
             >
               <slot name="header">
                 <div>
-                  <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 tracking-tight flex items-center gap-2.5">
+                  <h3 class="text-lg font-heading font-semibold text-[#06064D] dark:text-white tracking-tight flex items-center gap-2.5">
                     {{ title }}
                     <slot name="header-badge" />
                   </h3>
@@ -158,7 +158,7 @@
                 v-if="showCloseButton"
                 type="button"
                 @click="close"
-                class="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer shrink-0"
+                class="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer shrink-0 focus:outline-hidden focus:ring-2 focus:ring-[#FC6714]/40"
                 title="Fechar modal (Esc)"
               >
                 <X class="w-5 h-5" />

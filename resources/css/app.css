@@ -6,33 +6,130 @@
 @source '../js/**/*.{vue,js,ts}';
 
 @theme {
-    --font-sans: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-sans: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-heading: 'Kanit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Kanit', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Paleta Institucional Canônica Rede Pronta (BrandBook) */
+  --color-brand-orange: #FC6714;
+  --color-brand-orange-hover: #E0530A;
+  --color-brand-orange-active: #C94605;
+  --color-brand-orange-subtle: rgba(252, 103, 20, 0.12);
+
+  --color-brand-navy: #06064D;
+  --color-brand-navy-light: #0B0B68;
+  --color-brand-navy-dark: #03032E;
+  --color-brand-navy-border: #14147A;
 }
 
-/* Tokens Semânticos do Design System */
+/* ==========================================================================
+   1. TIPOGRAFIA INSTITUCIONAL (BRANDBOOK REDE PRONTA)
+   - Kanit (peso SemiBold 600): Exclusivamente para títulos, cabeçalhos de
+     seção e chamadas de destaque.
+   - Montserrat (pesos Medium 500 e Bold 700): Todo o texto corrido,
+     parágrafos, tabelas, rótulos (labels) e campos de formulário.
+   ========================================================================== */
+
+h1, h2, h3, h4, h5, h6,
+.font-heading,
+.brand-heading,
+[data-brand-heading] {
+  font-family: 'Kanit', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-weight: 600 !important; /* SemiBold obrigatório */
+  letter-spacing: -0.015em;
+}
+
+body,
+p,
+span,
+a,
+label,
+input,
+select,
+textarea,
+button,
+table,
+td,
+th,
+.font-body {
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ==========================================================================
+   2. ESTADOS DE FOCO E INTERAÇÃO (FOCUS RING LARANJA #FC6714)
+   Garante conformidade com as diretrizes de acessibilidade e identidade visual
+   ========================================================================== */
+
+*:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(252, 103, 20, 0.45) !important;
+  border-color: #FC6714 !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none !important;
+  border-color: #FC6714 !important;
+  box-shadow: 0 0 0 2px rgba(252, 103, 20, 0.25) !important;
+}
+
+/* Controles de Formulário Nativos */
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: #FC6714 !important;
+}
+
+/* ==========================================================================
+   3. BOTÕES E COMPONENTES INSTITUCIONAIS
+   ========================================================================== */
+
+/* Botão de Ação Primária */
+.btn-primary {
+  background-color: #FC6714 !important;
+  color: #FFFFFF !important;
+  font-weight: 600 !important;
+  transition: all 0.15s ease-in-out !important;
+}
+.btn-primary:hover {
+  background-color: #E0530A !important;
+}
+.btn-primary:active {
+  background-color: #C94605 !important;
+  transform: scale(0.98);
+}
+.btn-primary:focus-visible {
+  box-shadow: 0 0 0 3px rgba(252, 103, 20, 0.5) !important;
+}
+
+/* Tokens de Variáveis Globais */
 :root {
   --bg-canvas: #f8fafc;
   --bg-surface: #ffffff;
   --bg-surface-hover: #f1f5f9;
   --border-subtle: #e2e8f0;
-  --text-main: #0f172a;
+  --text-main: #06064D;
+  --text-body: #1e293b;
   --text-muted: #64748b;
-  --primary: #2563eb;
-  --primary-hover: #1d4ed8;
+  --primary: #FC6714;
+  --primary-hover: #E0530A;
+  --brand-navy: #06064D;
 }
 
 .dark {
-  --bg-canvas: #090d16;
-  --bg-surface: #111827;
-  --bg-surface-hover: #1f2937;
-  --border-subtle: #1e293b;
-  --text-main: #f8fafc;
+  --bg-canvas: #03032E;
+  --bg-surface: #06064D;
+  --bg-surface-hover: #0B0B68;
+  --border-subtle: #14147A;
+  --text-main: #ffffff;
+  --text-body: #e2e8f0;
   --text-muted: #94a3b8;
-  --primary: #3b82f6;
-  --primary-hover: #60a5fa;
+  --primary: #FC6714;
+  --primary-hover: #E0530A;
+  --brand-navy: #06064D;
 }
 
-/* Scrollbar minimalista e ergonômica */
+/* Scrollbar minimalista */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -45,5 +142,5 @@
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.65);
+  background: rgba(252, 103, 20, 0.5);
 }

@@ -4,12 +4,12 @@
     <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-800/80">
       <div>
         <div class="flex items-center gap-3">
-          <div class="p-2 rounded-xl bg-blue-600/10 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400">
+          <div class="p-2 rounded-xl bg-blue-600/10 dark:bg-blue-500/10 text-[#FC6714] dark:text-orange-400">
             <Palette class="w-6 h-6" />
           </div>
           <div>
             <div class="flex items-center gap-2.5">
-              <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Design System</h1>
+              <h1 class="text-2xl font-heading font-semibold tracking-tight text-[#06064D] dark:text-white">Design System & BrandBook</h1>
               <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
                 v1.1 Modais & Fullscreen
               </span>
@@ -36,7 +36,7 @@
         <button
           type="button"
           @click="setView('people')"
-          class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-500 transition shadow-xs cursor-pointer"
+          class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-[#FC6714] text-white hover:bg-[#E0530A] active:bg-[#C94605] transition shadow-xs cursor-pointer"
         >
           <ArrowLeft class="w-4 h-4" />
           <span>Voltar para Pessoas</span>
@@ -59,8 +59,8 @@
     <!-- SEÇÃO 1: TIPOGRAFIA ERGONÔMICA -->
     <section id="tipografia" class="space-y-4">
       <div class="flex items-center gap-2.5">
-        <Type class="w-5 h-5 text-blue-600 dark:text-blue-400" />
-        <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100">1. Escala Tipográfica Ergonômica</h2>
+        <Type class="w-5 h-5 text-[#FC6714] dark:text-orange-400" />
+        <h2 class="text-lg font-heading font-semibold text-[#06064D] dark:text-white">1. Escala Tipográfica Ergonômica</h2>
       </div>
       <p class="text-sm text-slate-500 dark:text-slate-400">
         Desenvolvida para operadores de rotina contínua. Fontes microscópicas foram banidas; a leitura padrão do ERP opera entre 14px e 16px.
@@ -123,8 +123,8 @@
     <!-- SEÇÃO 2: PALETA DE CORES & TOKENS SEMÂNTICOS -->
     <section id="cores" class="space-y-4">
       <div class="flex items-center gap-2.5">
-        <Palette class="w-5 h-5 text-blue-600 dark:text-blue-400" />
-        <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100">2. Paleta de Cores & Tokens Semânticos</h2>
+        <Palette class="w-5 h-5 text-[#FC6714] dark:text-orange-400" />
+        <h2 class="text-lg font-heading font-semibold text-[#06064D] dark:text-white">2. Paleta de Cores & Tokens Semânticos</h2>
       </div>
       <p class="text-sm text-slate-500 dark:text-slate-400">
         Cores calibradas para garantir conformidade de contraste WCAG AA tanto no modo escuro quanto no modo claro.
@@ -199,8 +199,8 @@
     <!-- SEÇÃO 3: BOTÕES & CONTROLES -->
     <section id="botoes" class="space-y-4">
       <div class="flex items-center gap-2.5">
-        <MousePointerClick class="w-5 h-5 text-blue-600 dark:text-blue-400" />
-        <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100">3. Botões & Ações Interativas</h2>
+        <MousePointerClick class="w-5 h-5 text-[#FC6714] dark:text-orange-400" />
+        <h2 class="text-lg font-heading font-semibold text-[#06064D] dark:text-white">3. Botões & Ações Interativas</h2>
       </div>
       <p class="text-sm text-slate-500 dark:text-slate-400">
         Altura ergonômica mínima de 40px (`h-10`) para cliques seguros e operação rápida em telas sensíveis ou de alta resolução.
@@ -210,7 +210,7 @@
         <div>
           <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Variantes de Estilo</span>
           <div class="flex flex-wrap items-center gap-3 mt-3">
-            <button class="h-10 px-4 text-sm font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-500 transition shadow-xs flex items-center gap-2 cursor-pointer">
+            <button class="h-10 px-4 text-sm font-medium rounded-lg bg-[#FC6714] text-white hover:bg-[#E0530A] active:bg-[#C94605] transition shadow-xs flex items-center gap-2 cursor-pointer">
               <Plus class="w-4 h-4" />
               <span>Botão Primário</span>
             </button>
@@ -260,8 +260,8 @@
     <!-- SEÇÃO 4: FORMULÁRIOS & INPUTS ERGONÔMICOS -->
     <section id="formularios" class="space-y-4">
       <div class="flex items-center gap-2.5">
-        <Sliders class="w-5 h-5 text-blue-600 dark:text-blue-400" />
-        <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100">4. Formulários & Inputs Ergonômicos</h2>
+        <Sliders class="w-5 h-5 text-[#FC6714] dark:text-orange-400" />
+        <h2 class="text-lg font-heading font-semibold text-[#06064D] dark:text-white">4. Formulários & Inputs Ergonômicos</h2>
       </div>
       <p class="text-sm text-slate-500 dark:text-slate-400">
         Labels destacadas, inputs de altura confortável `h-10`, texto em `text-sm` e contraste nítido em ambos os temas.
@@ -278,7 +278,7 @@
               type="text"
               placeholder="Ex: Maria Silva Sauro"
               value="Maria Silva Sauro"
-              class="w-full h-10 px-3.5 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden transition"
+              class="w-full h-10 px-3.5 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] focus:border-transparent outline-hidden transition"
             />
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Nome cadastral canônico</p>
           </div>
@@ -292,7 +292,7 @@
               <input
                 type="text"
                 placeholder="Pesquisar por CPF, CNPJ ou Nome..."
-                class="w-full h-10 pl-10 pr-3.5 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden transition"
+                class="w-full h-10 pl-10 pr-3.5 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] focus:border-transparent outline-hidden transition"
               />
             </div>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Filtro em tempo real de tabelas</p>
@@ -302,7 +302,7 @@
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
               Select Padrão com Seta
             </label>
-            <select class="w-full h-10 px-3.5 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden transition">
+            <select class="w-full h-10 px-3.5 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] focus:border-transparent outline-hidden transition">
               <option>Belo Horizonte / MG (IBGE: 3106200)</option>
               <option>São Paulo / SP (IBGE: 3550308)</option>
               <option>Rio de Janeiro / RJ (IBGE: 3304557)</option>
@@ -323,7 +323,7 @@
                 Padrões universais do ERP para seleção de municípios e entrada estrita de datas.
               </p>
             </div>
-            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-900">
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/60 text-[#FC6714] dark:text-orange-400 border border-blue-200 dark:border-blue-900">
               Padrão ERP v2
             </span>
           </div>
@@ -332,7 +332,7 @@
             <!-- 1. CitySearchSelect -->
             <div class="space-y-3">
               <div class="flex items-center justify-between">
-                <span class="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 font-mono">
+                <span class="text-xs font-bold uppercase tracking-wider text-[#FC6714] dark:text-orange-400 font-mono">
                   &lt;CitySearchSelect /&gt;
                 </span>
                 <span class="text-[11px] px-2 py-0.5 rounded-sm bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold">
@@ -348,7 +348,7 @@
                 placeholder="Digite ao menos 3 letras (ex: Bel, Cur, São)..."
               />
               <p class="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
-                ID da Cidade Selecionada: <strong class="text-blue-600 dark:text-blue-400">{{ demoCityId || 'Nenhuma selecionada' }}</strong>
+                ID da Cidade Selecionada: <strong class="text-[#FC6714] dark:text-orange-400">{{ demoCityId || 'Nenhuma selecionada' }}</strong>
               </p>
             </div>
 
@@ -395,7 +395,7 @@
           </div>
 
           <label class="flex items-center gap-2.5 cursor-pointer">
-            <input type="checkbox" checked class="w-4 h-4 rounded-sm border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-blue-500" />
+            <input type="checkbox" checked class="w-4 h-4 rounded-sm border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714]" />
             <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Aceite de notificações automáticas</span>
           </label>
         </div>
@@ -405,8 +405,8 @@
     <!-- SEÇÃO 5: BADGES & PERSONAS DO ERP -->
     <section id="badges" class="space-y-4">
       <div class="flex items-center gap-2.5">
-        <Tag class="w-5 h-5 text-blue-600 dark:text-blue-400" />
-        <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100">5. Badges & Personas do ERP</h2>
+        <Tag class="w-5 h-5 text-[#FC6714] dark:text-orange-400" />
+        <h2 class="text-lg font-heading font-semibold text-[#06064D] dark:text-white">5. Badges & Personas do ERP</h2>
       </div>
       <p class="text-sm text-slate-500 dark:text-slate-400">
         Tamanho ergonômico `text-xs font-semibold` com espaçamento interno generoso (`px-2.5 py-1`). Evita textos colados e ilegíveis.
@@ -458,8 +458,8 @@
     <!-- SEÇÃO 6: ALERTAS & FEEDBACK VISUAL -->
     <section id="alertas" class="space-y-4">
       <div class="flex items-center gap-2.5">
-        <Bell class="w-5 h-5 text-blue-600 dark:text-blue-400" />
-        <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100">6. Banners de Alerta & Notificação</h2>
+        <Bell class="w-5 h-5 text-[#FC6714] dark:text-orange-400" />
+        <h2 class="text-lg font-heading font-semibold text-[#06064D] dark:text-white">6. Banners de Alerta & Notificação</h2>
       </div>
       <p class="text-sm text-slate-500 dark:text-slate-400">
         Comunicação clara de erros, avisos e confirmações operacionais sem sobrecarregar o usuário.
@@ -475,7 +475,7 @@
         </div>
 
         <div class="p-4 rounded-xl border border-blue-200 dark:border-blue-900/80 bg-blue-50 dark:bg-blue-950/40 text-blue-900 dark:text-blue-300 flex items-start gap-3">
-          <Info class="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+          <Info class="w-5 h-5 text-[#FC6714] dark:text-orange-400 shrink-0 mt-0.5" />
           <div class="text-sm">
             <p class="font-semibold">Sincronização em segundo plano</p>
             <p class="text-blue-700 dark:text-blue-400 mt-0.5">A busca relacional é realizada sob demanda utilizando códigos de cidade IBGE.</p>
@@ -495,8 +495,8 @@
     <!-- SEÇÃO 7: TABELAS DE DADOS AREJADAS -->
     <section id="tabelas" class="space-y-4">
       <div class="flex items-center gap-2.5">
-        <Table class="w-5 h-5 text-blue-600 dark:text-blue-400" />
-        <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100">7. Padrão de Tabelas Confortáveis</h2>
+        <Table class="w-5 h-5 text-[#FC6714] dark:text-orange-400" />
+        <h2 class="text-lg font-heading font-semibold text-[#06064D] dark:text-white">7. Padrão de Tabelas Confortáveis</h2>
       </div>
       <p class="text-sm text-slate-500 dark:text-slate-400">
         Linhas com padding generoso (`py-4 px-5`), fontes `text-sm` e contraste nítido entre linhas.
@@ -546,8 +546,8 @@
     <section id="modais" class="space-y-4">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2.5">
-          <Maximize2 class="w-5 h-5 text-blue-600 dark:text-blue-400" />
-          <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100">8. Modais, Diálogos & Formulários em Tela Cheia</h2>
+          <Maximize2 class="w-5 h-5 text-[#FC6714] dark:text-orange-400" />
+          <h2 class="text-lg font-heading font-semibold text-[#06064D] dark:text-white">8. Modais, Diálogos & Formulários em Tela Cheia</h2>
         </div>
         <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
           Biblioteca Canônica
@@ -645,7 +645,7 @@
           <button
             type="button"
             @click="openModalFullscreen = true"
-            class="h-11 px-5 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-500 transition shadow-sm cursor-pointer flex items-center justify-center gap-2"
+            class="h-11 px-5 text-sm font-semibold rounded-lg bg-[#FC6714] text-white hover:bg-[#E0530A] active:bg-[#C94605] transition shadow-sm cursor-pointer flex items-center justify-center gap-2"
           >
             <Maximize2 class="w-4 h-4" />
             <span>Abrir Modal de Tela Cheia (Formulário Complexo)</span>
@@ -755,7 +755,7 @@
         <button
           type="button"
           @click="openModalLg = false"
-          class="h-9 px-4 text-xs font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-500 transition cursor-pointer"
+          class="h-9 px-4 text-xs font-semibold rounded-lg bg-[#FC6714] text-white hover:bg-[#E0530A] active:bg-[#C94605] transition cursor-pointer"
         >
           Salvar Pessoa
         </button>
@@ -827,7 +827,7 @@
             type="button"
             @click="activeFsTab = tab.id"
             :class="activeFsTab === tab.id
-              ? 'border-blue-600 text-blue-600 dark:text-blue-400 font-bold border-b-2'
+              ? 'border-blue-600 text-[#FC6714] dark:text-orange-400 font-bold border-b-2'
               : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 font-medium'"
             class="px-4 py-3 border-b-2 transition whitespace-nowrap cursor-pointer flex items-center gap-2"
           >
@@ -998,7 +998,7 @@
           <button
             type="button"
             @click="openModalFullscreen = false"
-            class="h-10 px-5 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-500 transition shadow-xs cursor-pointer flex items-center gap-2"
+            class="h-10 px-5 text-sm font-semibold rounded-lg bg-[#FC6714] text-white hover:bg-[#E0530A] active:bg-[#C94605] transition shadow-xs cursor-pointer flex items-center gap-2"
           >
             <Check class="w-4 h-4" />
             <span>Emitir Contrato & Ordem de Instalação</span>
@@ -1041,7 +1041,7 @@
         <button
           type="button"
           @click="openModalDrawer = false"
-          class="w-full h-10 text-xs font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-500 transition cursor-pointer"
+          class="w-full h-10 text-xs font-semibold rounded-lg bg-[#FC6714] text-white hover:bg-[#E0530A] active:bg-[#C94605] transition cursor-pointer"
         >
           Concluir Visualização
         </button>

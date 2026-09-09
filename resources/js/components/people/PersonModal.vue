@@ -28,7 +28,7 @@
           type="button"
           @click="activeTab = tab.id"
           :class="activeTab === tab.id
-            ? 'border-blue-600 text-blue-600 dark:text-blue-400 font-bold border-b-2'
+            ? 'border-[#FC6714] text-[#FC6714] font-bold border-b-2'
             : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 font-medium'"
           class="px-4 py-3 border-b-2 transition whitespace-nowrap cursor-pointer flex items-center gap-2"
         >
@@ -50,14 +50,14 @@
             <span class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Natureza do Cadastro:</span>
             <div class="flex items-center gap-4">
               <label class="flex items-center gap-2 cursor-pointer select-none">
-                <input type="radio" value="individual" v-model="form.person_type" class="w-4 h-4 text-blue-600 focus:ring-0 cursor-pointer" />
-                <span :class="form.person_type === 'individual' ? 'font-bold text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 font-medium'">
+                <input type="radio" value="individual" v-model="form.person_type" class="w-4 h-4 text-[#FC6714] accent-[#FC6714] focus:ring-0 cursor-pointer" />
+                <span :class="form.person_type === 'individual' ? 'font-bold text-[#FC6714]' : 'text-slate-600 dark:text-slate-400 font-medium'">
                   Pessoa Física (PF)
                 </span>
               </label>
               <label class="flex items-center gap-2 cursor-pointer select-none">
-                <input type="radio" value="legal" v-model="form.person_type" class="w-4 h-4 text-blue-600 focus:ring-0 cursor-pointer" />
-                <span :class="form.person_type === 'legal' ? 'font-bold text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 font-medium'">
+                <input type="radio" value="legal" v-model="form.person_type" class="w-4 h-4 text-[#FC6714] accent-[#FC6714] focus:ring-0 cursor-pointer" />
+                <span :class="form.person_type === 'legal' ? 'font-bold text-[#FC6714]' : 'text-slate-600 dark:text-slate-400 font-medium'">
                   Pessoa Jurídica (PJ)
                 </span>
               </label>
@@ -101,7 +101,7 @@
               v-model="form.name"
               required
               placeholder="Razão Social ou Nome Completo..."
-              class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden text-sm transition"
+              class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden text-sm transition"
             />
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Nome canônico oficial para emissão de contratos e notas fiscais</p>
           </div>
@@ -118,7 +118,7 @@
               type="text"
               v-model="form.trade_name"
               placeholder="Nome fantasia ou como prefere ser chamado..."
-              class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden text-sm transition"
+              class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden text-sm transition"
             />
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Nome de fachada ou apelido comercial</p>
           </div>
@@ -142,7 +142,7 @@
               list="groupsList"
               v-model="form.group_name"
               placeholder="Geral, VIP, Operacional..."
-              class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden text-sm transition"
+              class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden text-sm transition"
             />
             <datalist id="groupsList">
               <option value="Geral" />
@@ -163,7 +163,7 @@
         <div class="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/40 space-y-4">
           <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
             <div class="flex items-center gap-2.5">
-              <div class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-950/80 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+              <div class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-950/80 text-[#FC6714] flex items-center justify-center">
                 <Tag class="w-4 h-4" />
               </div>
               <div>
@@ -187,11 +187,11 @@
                 : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 hover:border-slate-300 dark:hover:border-slate-700'"
               class="p-3.5 rounded-xl border flex items-start gap-3 cursor-pointer transition select-none shadow-2xs"
             >
-              <input type="checkbox" v-model="form.is_client" class="w-4 h-4 mt-0.5 rounded-sm border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-blue-500 cursor-pointer" />
+              <input type="checkbox" v-model="form.is_client" class="w-4 h-4 mt-0.5 rounded-sm border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-[#FC6714] cursor-pointer" />
               <div class="flex-1 min-w-0">
                 <div class="flex items-center justify-between">
                   <span class="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-                    <Users class="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
+                    <Users class="w-3.5 h-3.5 text-[#FC6714] shrink-0" />
                     Cliente
                   </span>
                   <span class="text-[11px] font-bold px-1.5 py-0.2 rounded" :class="form.is_client ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'">
@@ -358,8 +358,8 @@
         <!-- BLOCO 1: DOCUMENTOS GERAIS E FISCAIS -->
         <div class="p-5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-2xs">
           <div class="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
-            <ShieldCheck class="w-4 h-4 text-blue-600 dark:text-blue-400" />
-            <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+            <ShieldCheck class="w-4 h-4 text-[#FC6714]" />
+            <h3 class="text-sm font-semibold font-heading text-slate-800 dark:text-slate-200 uppercase tracking-wider">
               Documentos Gerais e Registros Fiscais
             </h3>
           </div>
@@ -374,7 +374,7 @@
                 type="text"
                 v-model="form.rg_ie"
                 placeholder="Ex: 12.345.678-9"
-                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden transition"
+                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden transition"
               />
             </div>
 
@@ -387,7 +387,7 @@
                 type="text"
                 v-model="form.rg_issuer"
                 placeholder="Ex: SSP/SP, DETRAN, PC"
-                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden transition"
+                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden transition"
               />
             </div>
 
@@ -411,7 +411,7 @@
                 type="text"
                 v-model="form.state_registration"
                 placeholder="Ex: 123.456.789.110 ou Isento"
-                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden transition"
+                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden transition"
               />
             </div>
 
@@ -424,7 +424,7 @@
                 type="text"
                 v-model="form.municipal_registration"
                 placeholder="Ex: 9876543-2"
-                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden transition"
+                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden transition"
               />
             </div>
 
@@ -437,7 +437,7 @@
                 type="text"
                 v-model="form.cnae"
                 placeholder="Ex: 61.10-8-03"
-                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden transition"
+                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden transition"
               />
             </div>
 
@@ -450,7 +450,7 @@
                 type="text"
                 v-model="form.suframa_registration"
                 placeholder="Número de inscrição na Superintendência da Zona Franca de Manaus"
-                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden transition"
+                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden transition"
               />
             </div>
           </div>
@@ -460,7 +460,7 @@
         <div class="p-5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-2xs">
           <div class="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
             <Users class="w-4 h-4 text-purple-600 dark:text-purple-400" />
-            <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+            <h3 class="text-sm font-semibold font-heading text-slate-800 dark:text-slate-200 uppercase tracking-wider">
               Filiação, Origem e Capital Social
             </h3>
           </div>
@@ -475,7 +475,7 @@
                 type="text"
                 v-model="form.mother_name"
                 placeholder="Nome completo da mãe"
-                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden transition"
+                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden transition"
               />
             </div>
 
@@ -488,7 +488,7 @@
                 type="text"
                 v-model="form.father_name"
                 placeholder="Nome completo do pai"
-                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden transition"
+                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden transition"
               />
             </div>
 
@@ -514,7 +514,7 @@
                   type="text"
                   v-model="form.share_capital"
                   placeholder="0,00"
-                  class="w-full h-10 pl-9 pr-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden font-mono transition"
+                  class="w-full h-10 pl-9 pr-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden font-mono transition"
                 />
               </div>
             </div>
@@ -528,7 +528,7 @@
                 type="text"
                 v-model="form.birth_place"
                 placeholder="Ex: São Paulo / SP, Belo Horizonte / MG"
-                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden transition"
+                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden transition"
               />
             </div>
           </div>
@@ -550,7 +550,7 @@
                 type="email"
                 v-model="form.email"
                 placeholder="nome@dominio.com.br"
-                class="w-full h-10 pl-10 pr-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden text-sm transition"
+                class="w-full h-10 pl-10 pr-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden text-sm transition"
               />
             </div>
             <p class="text-xs text-slate-500 mt-1">Utilizado para faturamento e notificações</p>
@@ -566,7 +566,7 @@
                 type="text"
                 v-model="form.phone"
                 placeholder="(00) 0000-0000"
-                class="w-full h-10 pl-10 pr-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden text-sm transition"
+                class="w-full h-10 pl-10 pr-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden text-sm transition"
               />
             </div>
           </div>
@@ -581,7 +581,7 @@
                 type="text"
                 v-model="form.whatsapp"
                 placeholder="(00) 90000-0000"
-                class="w-full h-10 pl-10 pr-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden text-sm transition"
+                class="w-full h-10 pl-10 pr-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden text-sm transition"
               />
             </div>
           </div>
@@ -595,7 +595,7 @@
             v-model="form.notes"
             rows="3"
             placeholder="Informações adicionais ou particularidades deste cadastro..."
-            class="w-full p-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden text-sm transition"
+            class="w-full p-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden text-sm transition"
           ></textarea>
         </div>
       </div>
@@ -608,7 +608,7 @@
         <div class="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 space-y-5">
           <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
             <div class="flex items-center gap-2.5">
-              <div class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-950/80 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+              <div class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-950/80 text-[#FC6714] flex items-center justify-center">
                 <Home class="w-4 h-4" />
               </div>
               <div>
@@ -628,7 +628,7 @@
             <div>
               <div class="flex items-center justify-between mb-1.5">
                 <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">CEP</label>
-                <span class="text-[10px] font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1">
+                <span class="text-[10px] font-semibold text-[#FC6714] flex items-center gap-1">
                   <Zap class="w-3 h-3" /> ViaCEP Integrado
                 </span>
               </div>
@@ -640,7 +640,7 @@
                   @keyup.enter="handleCepSearch('residential')"
                   placeholder="00000-000"
                   maxlength="9"
-                  class="w-full h-10 pl-3.5 pr-10 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden font-mono text-sm transition"
+                  class="w-full h-10 pl-3.5 pr-10 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden font-mono text-sm transition"
                 />
                 <div class="absolute right-2.5 top-1/2 -translate-y-1/2">
                   <Loader2 v-if="isSearchingResidentialCep" class="w-4 h-4 animate-spin text-blue-600" />
@@ -665,7 +665,7 @@
                 type="text"
                 v-model="form.street"
                 placeholder="Avenida, Rua, Praça..."
-                class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden text-sm transition"
+                class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden text-sm transition"
               />
             </div>
           </div>
@@ -678,7 +678,7 @@
                 type="text"
                 v-model="form.number"
                 placeholder="123 ou S/N"
-                class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden text-sm transition"
+                class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden text-sm transition"
               />
             </div>
 
@@ -688,7 +688,7 @@
                 type="text"
                 v-model="form.complement"
                 placeholder="Apto 42, Bloco B..."
-                class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden text-sm transition"
+                class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden text-sm transition"
               />
             </div>
 
@@ -698,7 +698,7 @@
                 type="text"
                 v-model="form.neighborhood"
                 placeholder="Bairro ou Distrito"
-                class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden text-sm transition"
+                class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden text-sm transition"
               />
             </div>
 
@@ -720,14 +720,14 @@
             <!-- Referência / Instruções de Localização -->
             <div class="lg:col-span-2">
               <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                <Compass class="w-3.5 h-3.5 text-blue-500" />
+                <Compass class="w-3.5 h-3.5 text-[#FC6714]" />
                 Referência / Instruções de Localização
               </label>
               <input
                 type="text"
                 v-model="form.reference"
                 placeholder="Ex: Próximo à padaria central, casa de esquina com portão azul, interfone 102..."
-                class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden text-sm transition"
+                class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden text-sm transition"
               />
               <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Orientações essenciais para equipes técnicas de campo e entregas</p>
             </div>
@@ -757,14 +757,14 @@
                   step="any"
                   v-model.number="form.latitude"
                   placeholder="Latitude (ex: -19.9208)"
-                  class="w-full h-10 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden font-mono text-xs transition"
+                  class="w-full h-10 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden font-mono text-xs transition"
                 />
                 <input
                   type="number"
                   step="any"
                   v-model.number="form.longitude"
                   placeholder="Longitude (ex: -43.9378)"
-                  class="w-full h-10 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden font-mono text-xs transition"
+                  class="w-full h-10 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden font-mono text-xs transition"
                 />
               </div>
               <p v-if="form.latitude && form.longitude" class="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1 flex items-center gap-1">
@@ -781,7 +781,7 @@
             <input
               type="checkbox"
               v-model="form.commercial_same_as_residential"
-              class="w-4 h-4 rounded-sm border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-blue-500 cursor-pointer"
+              class="w-4 h-4 rounded-sm border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-[#FC6714] cursor-pointer"
             />
             <div>
               <span class="text-sm font-bold text-slate-800 dark:text-slate-200">
@@ -838,7 +838,7 @@
                   @keyup.enter="handleCepSearch('commercial')"
                   placeholder="00000-000"
                   maxlength="9"
-                  class="w-full h-10 pl-3.5 pr-10 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden font-mono text-sm transition"
+                  class="w-full h-10 pl-3.5 pr-10 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden font-mono text-sm transition"
                 />
                 <div class="absolute right-2.5 top-1/2 -translate-y-1/2">
                   <Loader2 v-if="isSearchingCommercialCep" class="w-4 h-4 animate-spin text-indigo-600" />
@@ -862,7 +862,7 @@
                 type="text"
                 v-model="form.commercial_street"
                 placeholder="Avenida, Rua, Distrito Empresarial..."
-                class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden text-sm transition"
+                class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden text-sm transition"
               />
             </div>
           </div>
@@ -874,7 +874,7 @@
                 type="text"
                 v-model="form.commercial_number"
                 placeholder="123 ou S/N"
-                class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden text-sm transition"
+                class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden text-sm transition"
               />
             </div>
 
@@ -884,7 +884,7 @@
                 type="text"
                 v-model="form.commercial_complement"
                 placeholder="Galpão 4, Sala 801..."
-                class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden text-sm transition"
+                class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden text-sm transition"
               />
             </div>
 
@@ -894,7 +894,7 @@
                 type="text"
                 v-model="form.commercial_neighborhood"
                 placeholder="Bairro Comercial..."
-                class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden text-sm transition"
+                class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden text-sm transition"
               />
             </div>
 
@@ -922,7 +922,7 @@
                 type="text"
                 v-model="form.commercial_reference"
                 placeholder="Ex: Portão de carga e descarga nos fundos, guarita 2..."
-                class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden text-sm transition"
+                class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden text-sm transition"
               />
             </div>
 
@@ -950,14 +950,14 @@
                   step="any"
                   v-model.number="form.commercial_latitude"
                   placeholder="Latitude"
-                  class="w-full h-10 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden font-mono text-xs transition"
+                  class="w-full h-10 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden font-mono text-xs transition"
                 />
                 <input
                   type="number"
                   step="any"
                   v-model.number="form.commercial_longitude"
                   placeholder="Longitude"
-                  class="w-full h-10 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden font-mono text-xs transition"
+                  class="w-full h-10 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden font-mono text-xs transition"
                 />
               </div>
             </div>
@@ -975,7 +975,7 @@
     <!-- Rodapé Fixo do Modal de Tela Cheia -->
     <template #footer>
       <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-        <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+        <span class="w-2 h-2 rounded-full bg-[#FC6714]"></span>
         <span>Cadastro Canônico de Pessoas • ERP Rede Pronta (Sprint 1)</span>
       </div>
 
@@ -991,7 +991,7 @@
           type="submit"
           form="personForm"
           :disabled="isSubmitting"
-          class="h-10 px-5 rounded-lg text-sm font-semibold bg-blue-600 hover:bg-blue-500 text-white transition disabled:opacity-50 shadow-xs flex items-center gap-2 cursor-pointer"
+          class="h-10 px-5 rounded-lg text-sm font-semibold bg-[#FC6714] hover:bg-[#E0530A] active:bg-[#C94605] text-white transition disabled:opacity-50 shadow-xs flex items-center gap-2 cursor-pointer"
         >
           <Loader2 v-if="isSubmitting" class="w-4 h-4 animate-spin" />
           <Check v-else class="w-4 h-4" />

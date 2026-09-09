@@ -519,3 +519,22 @@ Acesso direto pela barra lateral (ícone de rede / conexão), reunindo o invent�
   - Aba 2 `Documentos & Filiação` no modal de cadastro e edição de pessoas:
     - Documentos e Registros Fiscais: Nº RG, Órgão Emissor, Data Emissão (DD/MM/AAAA), Inscrição Estadual, Inscrição Municipal, CNAE, Num. Inscr. SUFRAMA.
     - Filiação, Origem e Dados Civis: Nome da Mãe, Nome do Pai, Data de Fundação ou Nascimento (DD/MM/AAAA), Capital Social PJ (R$), Naturalidade.
+
+
+### 🎨 Manual de Identidade Visual Oficial (BrandBook)
+
+O sistema segue estritamente as diretrizes corporativas do BrandBook para máxima consistência visual, ergonomia e acessibilidade (WCAG AA):
+
+1. **Tipografia Institucional:**
+   - **Kanit (peso SemiBold 600):** Utilizada exclusivamente para títulos (`h1`, `h2`, etc.), cabeçalhos de seção e chamadas de destaque.
+   - **Montserrat (pesos Medium 500, Bold 700 e Regular 400):** Utilizada para todo o texto corrido, parágrafos, tabelas, rótulos (labels) e campos de formulário.
+   - Carregamento de fontes otimizado via Google Fonts com `preconnect` em `resources/views/welcome.blade.php`.
+
+2. **Cores Institucionais:**
+   - **Laranja Institucional (`#FC6714`):** Cor de ação principal, botões de cadastro/confirmação, elementos em destaque e abas ativas.
+   - **Azul Escuro Institucional (`#06064D`):** Cor estrutural para elementos de contraste (menu lateral / Sidebar, cabeçalhos escuros) e títulos Kanit.
+
+3. **Botões e Estados de Interação:**
+   - **Ação Primária:** Fundo `#FC6714`, texto branco, efeitos suaves de hover (`#E0530A`), active (`#C94605`) e sombra suave.
+   - **Acessibilidade & Focus Ring:** Estados de foco (`:focus-visible` e `input:focus`) padronizados globalmente com anel sutil na cor Laranja (`box-shadow: 0 0 0 2px rgba(252, 103, 20, 0.45); border-color: #FC6714;`).
+   - **Controles Nativos:** Caixas de seleção (checkboxes) e botões de rádio com `accent-color: #FC6714`.

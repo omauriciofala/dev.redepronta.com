@@ -37,7 +37,7 @@
         <button
           type="button"
           @click="setView('people')"
-          class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-500 transition shadow-xs cursor-pointer"
+          class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-[#FC6714] text-white hover:bg-blue-500 transition shadow-xs cursor-pointer"
         >
           <ArrowLeft class="w-4 h-4" />
           <span>Voltar para Pessoas</span>

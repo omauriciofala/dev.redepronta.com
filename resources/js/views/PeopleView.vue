@@ -3,26 +3,27 @@
     <!-- Cabeçalho Confortável Integrado (Sem Top Bar) -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">
+        <h1 class="text-2xl font-semibold font-heading text-[#06064D] dark:text-white tracking-tight">
           Gestão de Pessoas
         </h1>
-        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 font-medium">
           Base canônica centralizada de colaboradores, clientes, fornecedores e solicitantes
         </p>
       </div>
 
+      <!-- Botão de Ação Primária Institucional (Laranja #FC6714) -->
       <button
         @click="openCreateModal"
-        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shadow-sm transition active:scale-98 cursor-pointer"
+        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#FC6714] hover:bg-[#E0530A] active:bg-[#C94605] text-white text-sm font-semibold shadow-sm transition active:scale-98 cursor-pointer focus:ring-2 focus:ring-[#FC6714] focus:ring-offset-2 focus:outline-none"
       >
         <Plus class="w-4 h-4" />
         <span>Nova Pessoa</span>
       </button>
     </div>
 
-    <!-- Barra de Filtros e Busca Principal com Fontes Confortáveis -->
+    <!-- Barra de Filtros e Busca Principal -->
     <div class="space-y-3">
-      <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-4 text-sm shadow-2xs transition-colors duration-200">
+      <div class="p-4 bg-white dark:bg-[#06064D]/50 rounded-xl border border-slate-200 dark:border-[#14147A] flex flex-wrap items-center justify-between gap-4 text-sm shadow-2xs transition-colors duration-200">
         <!-- Busca Textual com Suporte a Atalho (Ctrl+K ou /) e Botão Limpar (X) -->
         <div class="relative flex-1 min-w-[280px]">
           <Search class="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400 pointer-events-none" />
@@ -32,7 +33,7 @@
             v-model="search"
             @input="debounceSearch"
             placeholder="Buscar por nome, CPF/CNPJ, e-mail ou telefone..."
-            class="w-full h-11 pl-10 pr-20 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-blue-500 text-sm transition"
+            class="w-full h-11 pl-10 pr-20 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 text-sm transition"
           />
 
           <!-- Canto Direito da Busca: Botão Limpar (X) e Indicador de Atalho (Ctrl K) -->
@@ -40,7 +41,7 @@
             <button
               v-if="search"
               @click="clearSearch"
-              class="p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition cursor-pointer"
+              class="p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition cursor-pointer focus:ring-2 focus:ring-[#FC6714]"
               title="Limpar pesquisa (Esc)"
             >
               <X class="w-3.5 h-3.5" />
@@ -60,16 +61,16 @@
           type="button"
           @click="isFiltersOpen = !isFiltersOpen"
           :class="activeSecondaryFiltersCount > 0
-            ? 'bg-blue-50 text-blue-700 border-blue-300 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800 font-semibold'
-            : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'"
-          class="inline-flex items-center gap-2 h-11 px-4 rounded-lg border text-sm font-medium transition shadow-2xs cursor-pointer"
+            ? 'bg-[#FC6714]/10 text-[#FC6714] border-[#FC6714] font-semibold'
+            : 'bg-white dark:bg-[#03032E] text-slate-700 dark:text-slate-300 border-slate-200 dark:border-[#14147A] hover:bg-slate-50 dark:hover:bg-white/5'"
+          class="inline-flex items-center gap-2 h-11 px-4 rounded-lg border text-sm font-medium transition shadow-2xs cursor-pointer focus:ring-2 focus:ring-[#FC6714] focus:outline-none"
           title="Abrir/fechar filtros secundários avançados"
         >
-          <SlidersHorizontal class="w-4 h-4 text-slate-500 dark:text-slate-400" />
+          <SlidersHorizontal class="w-4 h-4" :class="activeSecondaryFiltersCount > 0 ? 'text-[#FC6714]' : 'text-slate-500 dark:text-slate-400'" />
           <span>Filtros</span>
           <span
             v-if="activeSecondaryFiltersCount > 0"
-            class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-blue-600 text-white"
+            class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-[#FC6714] text-white"
           >
             {{ activeSecondaryFiltersCount }}
           </span>
@@ -79,21 +80,21 @@
           />
         </button>
 
-        <!-- Filtro por Persona (Tabs com Contadores Numéricos) -->
-        <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-950 p-1 rounded-lg border border-slate-200 dark:border-slate-800 overflow-x-auto max-w-full">
+        <!-- Filtro por Persona (Tabs com Contadores Numéricos e Destaque Laranja Institucional) -->
+        <div class="flex items-center gap-1 bg-slate-100 dark:bg-[#03032E] p-1 rounded-lg border border-slate-200 dark:border-[#14147A] overflow-x-auto max-w-full">
           <button
             v-for="p in personaFilters"
             :key="p.value"
             @click="selectPersona(p.value)"
             :class="selectedPersona === p.value
-              ? 'bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 font-bold shadow-xs'
+              ? 'bg-[#FC6714] text-white font-bold shadow-xs'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 font-medium'"
-            class="px-3 py-1.5 rounded-md text-xs transition whitespace-nowrap cursor-pointer flex items-center gap-1.5"
+            class="px-3 py-1.5 rounded-md text-xs transition whitespace-nowrap cursor-pointer flex items-center gap-1.5 focus:ring-2 focus:ring-[#FC6714] focus:outline-none"
           >
             <span>{{ p.label }}</span>
             <span
               :class="selectedPersona === p.value
-                ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300'
+                ? 'bg-white/25 text-white'
                 : 'bg-slate-200/80 text-slate-600 dark:bg-slate-800 dark:text-slate-400'"
               class="px-1.5 py-0.2 rounded-full text-[10px] font-bold tracking-tight"
             >
@@ -103,15 +104,15 @@
         </div>
       </div>
 
-      <!-- Painel Retrátil de Filtros Secundários Avançados (Sem Poluir a Barra Principal) -->
+      <!-- Painel Retrátil de Filtros Secundários Avançados -->
       <div
         v-if="isFiltersOpen"
-        class="p-4 bg-slate-50 dark:bg-slate-950/70 rounded-xl border border-slate-200 dark:border-slate-800 animate-fadeIn transition-all shadow-xs"
+        class="p-4 bg-slate-50 dark:bg-[#06064D]/30 rounded-xl border border-slate-200 dark:border-[#14147A] animate-fadeIn transition-all shadow-xs"
       >
-        <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-200 dark:border-slate-800">
+        <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-200 dark:border-[#14147A]">
           <div class="flex items-center gap-2">
-            <SlidersHorizontal class="w-4 h-4 text-blue-600 dark:text-blue-400" />
-            <span class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+            <SlidersHorizontal class="w-4 h-4 text-[#FC6714]" />
+            <span class="text-xs font-semibold font-heading uppercase tracking-wider text-slate-800 dark:text-slate-200">
               Filtros Secundários Avançados
             </span>
           </div>
@@ -119,7 +120,7 @@
           <button
             v-if="activeSecondaryFiltersCount > 0"
             @click="clearSecondaryFilters"
-            class="text-xs font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition cursor-pointer flex items-center gap-1"
+            class="text-xs font-semibold text-[#FC6714] hover:text-[#E0530A] transition cursor-pointer flex items-center gap-1 focus:ring-2 focus:ring-[#FC6714]"
           >
             <RotateCcw class="w-3.5 h-3.5" />
             <span>Limpar Filtros</span>
@@ -129,13 +130,13 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
           <!-- Filtro por Status -->
           <div>
-            <label class="block font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+            <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
               Status do Registro
             </label>
             <select
               v-model="filterStatus"
               @change="applySecondaryFilters"
-              class="w-full h-9 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-blue-500 cursor-pointer"
+              class="w-full h-9 px-3 rounded-lg border border-slate-300 dark:border-[#14147A] bg-white dark:bg-[#03032E] text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer"
             >
               <option value="">Todos os Status</option>
               <option value="active">● Apenas Ativos</option>
@@ -145,13 +146,13 @@
 
           <!-- Filtro por Tipo de Pessoa -->
           <div>
-            <label class="block font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+            <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
               Tipo de Pessoa
             </label>
             <select
               v-model="filterPersonType"
               @change="applySecondaryFilters"
-              class="w-full h-9 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-blue-500 cursor-pointer"
+              class="w-full h-9 px-3 rounded-lg border border-slate-300 dark:border-[#14147A] bg-white dark:bg-[#03032E] text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer"
             >
               <option value="">Todos os Tipos</option>
               <option value="individual">Pessoa Física (PF)</option>
@@ -161,13 +162,13 @@
 
           <!-- Filtro por Estado (UF) -->
           <div>
-            <label class="block font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+            <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
               Estado (UF)
             </label>
             <select
               v-model="filterStateId"
               @change="handleStateChange"
-              class="w-full h-9 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-blue-500 cursor-pointer"
+              class="w-full h-9 px-3 rounded-lg border border-slate-300 dark:border-[#14147A] bg-white dark:bg-[#03032E] text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer"
             >
               <option value="">Todos os Estados</option>
               <option v-for="st in statesList" :key="st.id" :value="st.id">
@@ -178,13 +179,13 @@
 
           <!-- Filtro por Cidade -->
           <div>
-            <label class="block font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+            <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
               Cidade
             </label>
             <select
               v-model="filterCityId"
               @change="applySecondaryFilters"
-              class="w-full h-9 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-blue-500 cursor-pointer"
+              class="w-full h-9 px-3 rounded-lg border border-slate-300 dark:border-[#14147A] bg-white dark:bg-[#03032E] text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer"
             >
               <option value="">Todas as Cidades</option>
               <option v-for="ct in citiesList" :key="ct.id" :value="ct.id">
@@ -197,21 +198,21 @@
     </div>
 
     <!-- Tabela Confortável com Linhas Finas e Ordenação Clicável nos Cabeçalhos -->
-    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs transition-colors duration-200">
+    <div class="bg-white dark:bg-[#06064D]/50 rounded-xl border border-slate-200 dark:border-[#14147A] overflow-hidden shadow-xs transition-colors duration-200">
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse text-sm">
           <thead>
-            <tr class="border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/50 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider select-none">
+            <tr class="border-b border-slate-200 dark:border-[#14147A] bg-slate-50/80 dark:bg-[#03032E]/70 text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider select-none">
               <!-- Coluna 1: Nome / Razão Social (Ordenável) -->
               <th
                 @click="toggleSort('name')"
-                class="py-3.5 px-5 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition"
+                class="py-3.5 px-5 cursor-pointer hover:text-[#FC6714] dark:hover:text-[#FC6714] transition"
                 title="Clique para ordenar por Nome / Razão Social"
               >
                 <div class="inline-flex items-center gap-1.5">
                   <span>Nome / Razão Social</span>
-                  <ArrowUp v-if="sortBy === 'name' && sortDirection === 'asc'" class="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                  <ArrowDown v-else-if="sortBy === 'name' && sortDirection === 'desc'" class="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                  <ArrowUp v-if="sortBy === 'name' && sortDirection === 'asc'" class="w-3.5 h-3.5 text-[#FC6714]" />
+                  <ArrowDown v-else-if="sortBy === 'name' && sortDirection === 'desc'" class="w-3.5 h-3.5 text-[#FC6714]" />
                   <ArrowUpDown v-else class="w-3.5 h-3.5 text-slate-400 opacity-60" />
                 </div>
               </th>
@@ -228,13 +229,13 @@
               <!-- Coluna 5: Cidade / UF (Ordenável) -->
               <th
                 @click="toggleSort('city')"
-                class="py-3.5 px-5 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition"
+                class="py-3.5 px-5 cursor-pointer hover:text-[#FC6714] dark:hover:text-[#FC6714] transition"
                 title="Clique para ordenar por Cidade"
               >
                 <div class="inline-flex items-center gap-1.5">
                   <span>Cidade / UF</span>
-                  <ArrowUp v-if="sortBy === 'city' && sortDirection === 'asc'" class="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                  <ArrowDown v-else-if="sortBy === 'city' && sortDirection === 'desc'" class="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                  <ArrowUp v-if="sortBy === 'city' && sortDirection === 'asc'" class="w-3.5 h-3.5 text-[#FC6714]" />
+                  <ArrowDown v-else-if="sortBy === 'city' && sortDirection === 'desc'" class="w-3.5 h-3.5 text-[#FC6714]" />
                   <ArrowUpDown v-else class="w-3.5 h-3.5 text-slate-400 opacity-60" />
                 </div>
               </th>
@@ -242,13 +243,13 @@
               <!-- Coluna 6: Data de Cadastro (Ordenável) -->
               <th
                 @click="toggleSort('date')"
-                class="py-3.5 px-5 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition"
+                class="py-3.5 px-5 cursor-pointer hover:text-[#FC6714] dark:hover:text-[#FC6714] transition"
                 title="Clique para ordenar por Data de Cadastro"
               >
                 <div class="inline-flex items-center gap-1.5">
                   <span>Cadastro</span>
-                  <ArrowUp v-if="sortBy === 'date' && sortDirection === 'asc'" class="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                  <ArrowDown v-else-if="sortBy === 'date' && sortDirection === 'desc'" class="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                  <ArrowUp v-if="sortBy === 'date' && sortDirection === 'asc'" class="w-3.5 h-3.5 text-[#FC6714]" />
+                  <ArrowDown v-else-if="sortBy === 'date' && sortDirection === 'desc'" class="w-3.5 h-3.5 text-[#FC6714]" />
                   <ArrowUpDown v-else class="w-3.5 h-3.5 text-slate-400 opacity-60" />
                 </div>
               </th>
@@ -260,11 +261,11 @@
               <th class="py-3.5 px-5 text-right">Ações</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-slate-100 dark:divide-slate-800/80">
+          <tbody class="divide-y divide-slate-100 dark:divide-[#14147A]/60">
             <!-- Loading -->
             <tr v-if="loading">
               <td colspan="8" class="py-12 text-center text-slate-400 text-sm">
-                <span class="inline-block animate-spin mr-2">⟳</span> Carregando registros...
+                <span class="inline-block animate-spin mr-2 text-[#FC6714]">⟳</span> Carregando registros...
               </td>
             </tr>
 
@@ -280,7 +281,7 @@
               v-else
               v-for="person in people"
               :key="person.id"
-              class="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors"
+              class="hover:bg-slate-50/70 dark:hover:bg-white/5 transition-colors"
             >
               <!-- Nome / Razão Social -->
               <td class="py-4 px-5">
@@ -290,7 +291,7 @@
                 <div v-if="person.trade_name" class="text-xs text-slate-500 dark:text-slate-400 font-medium">
                   {{ person.trade_name }}
                 </div>
-                <div v-if="person.group_name && person.group_name !== 'Geral'" class="text-[11px] font-medium text-blue-600 dark:text-blue-400 mt-0.5">
+                <div v-if="person.group_name && person.group_name !== 'Geral'" class="text-[11px] font-semibold text-[#FC6714] mt-0.5">
                   Grupo: {{ person.group_name }}
                 </div>
               </td>
@@ -315,7 +316,7 @@
                   <button
                     v-if="person.document_number"
                     @click="copyToClipboard(person.document_number, 'doc-' + person.id)"
-                    class="p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition relative group cursor-pointer"
+                    class="p-1 rounded text-slate-400 hover:text-[#FC6714] hover:bg-[#FC6714]/10 transition relative group cursor-pointer focus:ring-2 focus:ring-[#FC6714]"
                     :title="copiedKey === 'doc-' + person.id ? 'Copiado!' : 'Copiar documento'"
                   >
                     <Check v-if="copiedKey === 'doc-' + person.id" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
@@ -324,7 +325,7 @@
                     <!-- Tooltip temporário -->
                     <span
                       v-if="copiedKey === 'doc-' + person.id"
-                      class="absolute -top-7 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-slate-900 text-white text-[10px] font-medium shadow-md whitespace-nowrap z-20 pointer-events-none"
+                      class="absolute -top-7 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-[#06064D] text-white text-[10px] font-medium shadow-md whitespace-nowrap z-20 pointer-events-none"
                     >
                       Copiado!
                     </span>
@@ -352,7 +353,7 @@
                   >
                     <button
                       @click="toggleExpandRoles(person.id)"
-                      class="px-1.5 py-0.5 rounded text-[11px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition flex items-center gap-0.5 shadow-2xs cursor-pointer"
+                      class="px-1.5 py-0.5 rounded text-[11px] font-bold bg-slate-100 dark:bg-[#03032E] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-[#14147A] hover:border-[#FC6714] hover:text-[#FC6714] transition flex items-center gap-0.5 shadow-2xs cursor-pointer focus:ring-2 focus:ring-[#FC6714]"
                       :title="isRolesExpanded(person.id) ? 'Recolher papéis' : 'Ver todos: ' + getHiddenRoles(person).map(r => r.label).join(', ')"
                     >
                       <span>{{ isRolesExpanded(person.id) ? '−' : `+${getHiddenRoles(person).length}` }}</span>
@@ -392,10 +393,10 @@
                     <!-- Link de Discagem Direta (tel:) -->
                     <a
                       :href="'tel:+55' + sanitizePhone(person.contact?.phone || person.contact?.whatsapp)"
-                      class="inline-flex items-center gap-1 text-slate-700 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 font-medium text-xs transition group"
+                      class="inline-flex items-center gap-1 text-slate-700 dark:text-slate-200 hover:text-[#FC6714] font-medium text-xs transition group focus:ring-1 focus:ring-[#FC6714]"
                       title="Ligar pelo discador"
                     >
-                      <Phone class="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-500" />
+                      <Phone class="w-3.5 h-3.5 text-slate-400 group-hover:text-[#FC6714]" />
                       <span>{{ formatPhone(person.contact?.phone || person.contact?.whatsapp) }}</span>
                     </a>
 
@@ -404,7 +405,7 @@
                       :href="'https://wa.me/55' + sanitizePhone(person.contact?.whatsapp || person.contact?.phone)"
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="p-1 rounded text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/60 transition cursor-pointer"
+                      class="p-1 rounded text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/60 transition cursor-pointer focus:ring-1 focus:ring-[#FC6714]"
                       title="Abrir conversa no WhatsApp"
                     >
                       <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
@@ -415,7 +416,7 @@
                     <!-- Botão de Cópia de Telefone -->
                     <button
                       @click="copyToClipboard(person.contact?.phone || person.contact?.whatsapp, 'phone-' + person.id)"
-                      class="p-0.5 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition cursor-pointer"
+                      class="p-0.5 rounded text-slate-400 hover:text-[#FC6714] transition cursor-pointer focus:ring-1 focus:ring-[#FC6714]"
                       title="Copiar telefone"
                     >
                       <Check v-if="copiedKey === 'phone-' + person.id" class="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
@@ -428,17 +429,17 @@
                   <div v-if="person.contact?.email" class="flex items-center gap-1.5">
                     <a
                       :href="'mailto:' + person.contact?.email"
-                      class="inline-flex items-center gap-1 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 text-xs transition truncate max-w-[190px] group"
+                      class="inline-flex items-center gap-1 text-slate-500 dark:text-slate-400 hover:text-[#FC6714] text-xs transition truncate max-w-[190px] group focus:ring-1 focus:ring-[#FC6714]"
                       :title="'Enviar e-mail para ' + person.contact?.email"
                     >
-                      <Mail class="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-500 flex-shrink-0" />
+                      <Mail class="w-3.5 h-3.5 text-slate-400 group-hover:text-[#FC6714] flex-shrink-0" />
                       <span class="truncate">{{ person.contact?.email }}</span>
                     </a>
 
                     <!-- Botão de Cópia de E-mail -->
                     <button
                       @click="copyToClipboard(person.contact?.email, 'email-' + person.id)"
-                      class="p-0.5 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition flex-shrink-0 cursor-pointer"
+                      class="p-0.5 rounded text-slate-400 hover:text-[#FC6714] transition flex-shrink-0 cursor-pointer focus:ring-1 focus:ring-[#FC6714]"
                       title="Copiar e-mail"
                     >
                       <Check v-if="copiedKey === 'email-' + person.id" class="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
@@ -482,14 +483,14 @@
                 <div class="inline-flex items-center gap-1.5">
                   <button
                     @click="openEditModal(person)"
-                    class="p-1.5 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-800 transition cursor-pointer"
+                    class="p-1.5 rounded-lg text-slate-500 hover:text-[#FC6714] hover:bg-[#FC6714]/10 transition cursor-pointer focus:ring-2 focus:ring-[#FC6714]"
                     title="Editar"
                   >
                     <Edit2 class="w-4 h-4" />
                   </button>
                   <button
                     @click="toggleStatus(person)"
-                    class="p-1.5 rounded-lg text-slate-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-slate-800 transition cursor-pointer"
+                    class="p-1.5 rounded-lg text-slate-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-slate-800 transition cursor-pointer focus:ring-2 focus:ring-[#FC6714]"
                     :title="person.status === 'active' ? 'Inativar' : 'Ativar'"
                   >
                     <Power class="w-4 h-4" />
@@ -502,7 +503,7 @@
       </div>
 
       <!-- Paginação Confortável -->
-      <div class="px-5 py-3.5 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs text-slate-600 dark:text-slate-400 bg-slate-50/50 dark:bg-slate-900/50">
+      <div class="px-5 py-3.5 border-t border-slate-200 dark:border-[#14147A] flex items-center justify-between text-xs text-slate-600 dark:text-slate-400 bg-slate-50/50 dark:bg-[#03032E]/50">
         <div>
           Exibindo <strong>{{ people.length }}</strong> de <strong>{{ totalRecords }}</strong> pessoas
         </div>
@@ -510,7 +511,7 @@
           <button
             :disabled="currentPage <= 1"
             @click="changePage(currentPage - 1)"
-            class="px-3 py-1.5 rounded-md border border-slate-200 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-40 font-medium transition cursor-pointer"
+            class="px-3 py-1.5 rounded-md border border-slate-200 dark:border-[#14147A] hover:bg-white dark:hover:bg-[#06064D] hover:border-[#FC6714] hover:text-[#FC6714] disabled:opacity-40 font-medium transition cursor-pointer focus:ring-2 focus:ring-[#FC6714]"
           >
             Anterior
           </button>
@@ -518,7 +519,7 @@
           <button
             :disabled="currentPage >= lastPage"
             @click="changePage(currentPage + 1)"
-            class="px-3 py-1.5 rounded-md border border-slate-200 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-40 font-medium transition cursor-pointer"
+            class="px-3 py-1.5 rounded-md border border-slate-200 dark:border-[#14147A] hover:bg-white dark:hover:bg-[#06064D] hover:border-[#FC6714] hover:text-[#FC6714] disabled:opacity-40 font-medium transition cursor-pointer focus:ring-2 focus:ring-[#FC6714]"
           >
             Próxima
           </button>

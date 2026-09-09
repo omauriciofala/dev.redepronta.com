@@ -157,13 +157,13 @@
                 type="text"
                 v-model="testCnpj"
                 placeholder="Ex: 00.000.000/0001-91 (Banco do Brasil)"
-                class="flex-1 h-9 px-3 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 font-mono text-slate-900 dark:text-slate-100 outline-hidden focus:ring-2 focus:ring-blue-500"
+                class="flex-1 h-9 px-3 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 font-mono text-slate-900 dark:text-slate-100 outline-hidden focus:ring-2 focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714]"
               />
               <button
                 type="button"
                 @click="runCnpjTest"
                 :disabled="loadingCnpjTest"
-                class="h-9 px-3 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white cursor-pointer disabled:opacity-50 transition flex items-center gap-1.5 shadow-xs"
+                class="h-9 px-3 text-xs font-semibold rounded-lg bg-[#FC6714] hover:bg-[#E0530A] active:bg-[#C94605] text-white cursor-pointer disabled:opacity-50 transition flex items-center gap-1.5 shadow-xs"
               >
                 <Loader2 v-if="loadingCnpjTest" class="w-3.5 h-3.5 animate-spin" />
                 <Play v-else class="w-3.5 h-3.5" />
