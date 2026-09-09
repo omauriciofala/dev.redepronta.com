@@ -203,14 +203,14 @@
         <table class="w-full text-left border-collapse text-sm">
           <thead>
             <tr class="border-b border-slate-200 dark:border-[#14147A] bg-slate-50/80 dark:bg-[#03032E]/70 text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider select-none">
-              <!-- Coluna 1: Nome / Razão Social (Ordenável) -->
+              <!-- Coluna 1: Nome (Ordenável) -->
               <th
                 @click="toggleSort('name')"
                 class="py-3.5 px-5 cursor-pointer hover:text-[#FC6714] dark:hover:text-[#FC6714] transition"
-                title="Clique para ordenar por Nome / Razão Social"
+                title="Clique para ordenar por Nome"
               >
                 <div class="inline-flex items-center gap-1.5">
-                  <span>Nome / Razão Social</span>
+                  <span>Nome</span>
                   <ArrowUp v-if="sortBy === 'name' && sortDirection === 'asc'" class="w-3.5 h-3.5 text-[#FC6714]" />
                   <ArrowDown v-else-if="sortBy === 'name' && sortDirection === 'desc'" class="w-3.5 h-3.5 text-[#FC6714]" />
                   <ArrowUpDown v-else class="w-3.5 h-3.5 text-slate-400 opacity-60" />
@@ -220,20 +220,18 @@
               <!-- Coluna 2: Tipo & Documento -->
               <th class="py-3.5 px-5">Tipo & Documento</th>
 
-              <!-- Coluna 3: Papéis (Personas) -->
-              <th class="py-3.5 px-5">Papéis (Personas)</th>
 
               <!-- Coluna 4: Ações Rápidas de Contato -->
               <th class="py-3.5 px-5">Ações Rápidas de Contato</th>
 
-              <!-- Coluna 5: Cidade / UF (Ordenável) -->
+              <!-- Coluna 4: Município (Ordenável) -->
               <th
                 @click="toggleSort('city')"
                 class="py-3.5 px-5 cursor-pointer hover:text-[#FC6714] dark:hover:text-[#FC6714] transition"
-                title="Clique para ordenar por Cidade"
+                title="Clique para ordenar por Município"
               >
                 <div class="inline-flex items-center gap-1.5">
-                  <span>Cidade / UF</span>
+                  <span>Município</span>
                   <ArrowUp v-if="sortBy === 'city' && sortDirection === 'asc'" class="w-3.5 h-3.5 text-[#FC6714]" />
                   <ArrowDown v-else-if="sortBy === 'city' && sortDirection === 'desc'" class="w-3.5 h-3.5 text-[#FC6714]" />
                   <ArrowUpDown v-else class="w-3.5 h-3.5 text-slate-400 opacity-60" />
@@ -258,20 +256,20 @@
               <th class="py-3.5 px-5">Status</th>
 
               <!-- Coluna 8: Ações -->
-              <th class="py-3.5 px-5 text-right">Ações</th>
+              <th class="py-3.5 px-5 text-right">Ação</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100 dark:divide-[#14147A]/60">
             <!-- Loading -->
             <tr v-if="loading">
-              <td colspan="8" class="py-12 text-center text-slate-400 text-sm">
+              <td colspan="7" class="py-12 text-center text-slate-400 text-sm">
                 <span class="inline-block animate-spin mr-2 text-[#FC6714]">⟳</span> Carregando registros...
               </td>
             </tr>
 
             <!-- Vazio -->
             <tr v-else-if="people.length === 0">
-              <td colspan="8" class="py-12 text-center text-slate-400 text-sm">
+              <td colspan="7" class="py-12 text-center text-slate-400 text-sm">
                 Nenhuma pessoa encontrada com os filtros selecionados.
               </td>
             </tr>
@@ -283,7 +281,7 @@
               :key="person.id"
               class="hover:bg-slate-50/70 dark:hover:bg-white/5 transition-colors"
             >
-              <!-- Nome / Razão Social -->
+              <!-- Nome -->
               <td class="py-4 px-5">
                 <div class="font-semibold text-slate-900 dark:text-slate-100 text-sm">
                   {{ person.name }}
@@ -330,58 +328,6 @@
                       Copiado!
                     </span>
                   </button>
-                </div>
-              </td>
-
-              <!-- Badges de Papéis (Personas) com Paleta Semântica e Prevenção de Sobrecarga -->
-              <td class="py-4 px-5">
-                <div class="flex flex-wrap items-center gap-1.5 max-w-[260px]">
-                  <!-- Exibe os 2 primeiros papéis ativos -->
-                  <span
-                    v-for="role in getVisibleRoles(person)"
-                    :key="role.key"
-                    :class="role.badgeClass"
-                    class="px-2 py-0.5 rounded text-[11px] font-semibold border shadow-2xs"
-                  >
-                    {{ role.label }}
-                  </span>
-
-                  <!-- Chip expansível para o 3º papel em diante evitando sobrecarga visual -->
-                  <div
-                    v-if="getHiddenRoles(person).length > 0"
-                    class="relative"
-                  >
-                    <button
-                      @click="toggleExpandRoles(person.id)"
-                      class="px-1.5 py-0.5 rounded text-[11px] font-bold bg-slate-100 dark:bg-[#03032E] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-[#14147A] hover:border-[#FC6714] hover:text-[#FC6714] transition flex items-center gap-0.5 shadow-2xs cursor-pointer focus:ring-2 focus:ring-[#FC6714]"
-                      :title="isRolesExpanded(person.id) ? 'Recolher papéis' : 'Ver todos: ' + getHiddenRoles(person).map(r => r.label).join(', ')"
-                    >
-                      <span>{{ isRolesExpanded(person.id) ? '−' : `+${getHiddenRoles(person).length}` }}</span>
-                    </button>
-
-                    <!-- Papéis extras expandidos inline se clicado -->
-                    <div
-                      v-if="isRolesExpanded(person.id)"
-                      class="flex flex-wrap gap-1.5 mt-1.5"
-                    >
-                      <span
-                        v-for="role in getHiddenRoles(person)"
-                        :key="role.key"
-                        :class="role.badgeClass"
-                        class="px-2 py-0.5 rounded text-[11px] font-semibold border shadow-2xs animate-fadeIn"
-                      >
-                        {{ role.label }}
-                      </span>
-                    </div>
-                  </div>
-
-                  <!-- Fallback caso não possua nenhum papel selecionado -->
-                  <span
-                    v-if="getAllRoles(person).length === 0"
-                    class="text-xs text-slate-400 italic"
-                  >
-                    Sem papéis
-                  </span>
                 </div>
               </td>
 
@@ -449,7 +395,7 @@
                 </div>
               </td>
 
-              <!-- Cidade / UF -->
+              <!-- Município -->
               <td class="py-4 px-5 text-sm font-medium text-slate-700 dark:text-slate-300">
                 <div>{{ person.residential_address?.city_name || person.address?.city_name || person.address?.city?.name || '-' }}</div>
                 <div v-if="person.residential_address?.state_code || person.address?.state_code" class="text-xs text-slate-400">
@@ -478,23 +424,67 @@
                 </span>
               </td>
 
-              <!-- Ações -->
-              <td class="py-4 px-5 text-right">
-                <div class="inline-flex items-center gap-1.5">
+              <!-- Ação (Menu de Reticências) -->
+              <td class="py-4 px-5 text-right relative" @click.stop>
+                <div class="inline-block text-left">
                   <button
-                    @click="openEditModal(person)"
-                    class="p-1.5 rounded-lg text-slate-500 hover:text-[#FC6714] hover:bg-[#FC6714]/10 transition cursor-pointer focus:ring-2 focus:ring-[#FC6714]"
-                    title="Editar"
+                    type="button"
+                    @click="toggleActionsDropdown(person.id)"
+                    class="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:text-[#FC6714] hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 transition cursor-pointer focus:outline-hidden focus:ring-2 focus:ring-[#FC6714]"
+                    :class="{ 'bg-orange-50 dark:bg-[#FC6714]/15 text-[#FC6714] ring-2 ring-[#FC6714]/40': activeDropdownPersonId === person.id }"
+                    title="Opções da pessoa"
+                    aria-label="Opções"
+                    aria-haspopup="true"
+                    :aria-expanded="activeDropdownPersonId === person.id"
                   >
-                    <Edit2 class="w-4 h-4" />
+                    <MoreVertical class="w-4 h-4" />
                   </button>
-                  <button
-                    @click="toggleStatus(person)"
-                    class="p-1.5 rounded-lg text-slate-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-slate-800 transition cursor-pointer focus:ring-2 focus:ring-[#FC6714]"
-                    :title="person.status === 'active' ? 'Inativar' : 'Ativar'"
+
+                  <!-- Dropdown Menu Flutuante -->
+                  <Transition
+                    enter-active-class="transition duration-100 ease-out"
+                    enter-from-class="transform scale-95 opacity-0"
+                    enter-to-class="transform scale-100 opacity-100"
+                    leave-active-class="transition duration-75 ease-in"
+                    leave-from-class="transform scale-100 opacity-100"
+                    leave-to-class="transform scale-95 opacity-0"
                   >
-                    <Power class="w-4 h-4" />
-                  </button>
+                    <div
+                      v-if="activeDropdownPersonId === person.id"
+                      class="absolute right-5 mt-1.5 w-48 rounded-xl bg-white dark:bg-[#06064D] border border-slate-200 dark:border-[#14147A] shadow-xl z-50 py-1 text-xs font-medium divide-y divide-slate-100 dark:divide-[#14147A]/60 focus:outline-hidden"
+                    >
+                      <div class="py-1">
+                        <button
+                          type="button"
+                          @click="handleActionEdit(person)"
+                          class="w-full text-left px-3.5 py-2 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] dark:hover:text-orange-300 transition cursor-pointer"
+                        >
+                          <Edit2 class="w-3.5 h-3.5 text-[#FC6714]" />
+                          <span>Editar pessoa</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          @click="handleActionToggleStatus(person)"
+                          class="w-full text-left px-3.5 py-2 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#14147A]/50 transition cursor-pointer"
+                        >
+                          <Power class="w-3.5 h-3.5" :class="person.status === 'active' ? 'text-amber-500' : 'text-emerald-500'" />
+                          <span>{{ person.status === 'active' ? 'Inativar pessoa' : 'Ativar pessoa' }}</span>
+                        </button>
+                      </div>
+
+                      <div class="py-1">
+                        <button
+                          type="button"
+                          @click="handleActionCopyId(person)"
+                          class="w-full text-left px-3.5 py-2 flex items-center gap-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-[#14147A]/50 hover:text-slate-700 dark:text-slate-300 transition cursor-pointer"
+                        >
+                          <Copy class="w-3.5 h-3.5" />
+                          <span>Copiar ID (#{{ person.id }})</span>
+                        </button>
+                      </div>
+                    </div>
+                  </Transition>
                 </div>
               </td>
             </tr>
@@ -895,14 +885,45 @@ const toggleStatus = async (person: any) => {
   }
 };
 
+
+// Controle do menu de reticências (Ação)
+const activeDropdownPersonId = ref<number | null>(null);
+
+const toggleActionsDropdown = (personId: number) => {
+  activeDropdownPersonId.value = activeDropdownPersonId.value === personId ? null : personId;
+};
+
+const closeActionsDropdown = () => {
+  activeDropdownPersonId.value = null;
+};
+
+const handleActionEdit = (person: any) => {
+  closeActionsDropdown();
+  openEditModal(person);
+};
+
+const handleActionToggleStatus = (person: any) => {
+  closeActionsDropdown();
+  toggleStatus(person);
+};
+
+const handleActionCopyId = (person: any) => {
+  closeActionsDropdown();
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(String(person.id));
+  }
+};
+
 onMounted(() => {
   window.addEventListener('keydown', handleGlobalKeyDown);
+  window.addEventListener('click', closeActionsDropdown);
   loadStates();
   fetchPeople();
 });
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleGlobalKeyDown);
+  window.removeEventListener('click', closeActionsDropdown);
 });
 </script>
 

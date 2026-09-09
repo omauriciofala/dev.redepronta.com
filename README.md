@@ -234,9 +234,21 @@ Para aprofundamento na arquitetura, modelos de dados e execução ágil, consult
   - Contadores numéricos em todas as abas de segmentação (`Todos (N)`, `Clientes (N)`, `Colaboradores (N)`, etc.).
   - Atalhos globais de teclado `Ctrl + K` / `Cmd + K` e `/` com botão de limpeza rápida (`X`) e `Esc`.
   - Painel retrátil de filtros secundários avançados por Status, Tipo de Pessoa (PF/PJ), Estado (UF) e Cidade.
-  - Ordenação interativa por Nome / Razão Social, Cidade / UF e Data de Cadastro com alternância ascendente e descendente.
+  - Ordenação interativa por Nome, Município e Data de Cadastro com alternância ascendente e descendente.
 - **Nova Aba Documentos no Cadastro de Pessoas**:
   - Aba completa com Nº RG, Órgão Emissor, Data Emissão (DD/MM/AAAA), Inscrição Estadual, Inscrição Municipal, CNAE, Num. Inscr. SUFRAMA, Filiação (Nome da Mãe e Pai), Data de Fundação/Nascimento, Capital Social PJ (R$) e Naturalidade.
+
+
+### 📋 Estrutura da Grid de Pessoas
+
+- **Grid Canônica de Pessoas:**
+  - **Nome:** Exibição do nome/razão social em tipografia limpa e link de ordenação.
+  - **Tipo & Documento:** Formatação de CPF/CNPJ com máscara dinâmica e botão discreto de cópia rápida.
+  - **Ações Rápidas de Contato:** Links operacionais diretos para discagem (`tel:`), WhatsApp e e-mail (`mailto:`).
+  - **Município:** Localidade e UF da pessoa com suporte a ordenação alfabética.
+  - **Cadastro:** Data de cadastro formatada no padrão brasileiro `DD/MM/AAAA`.
+  - **Status:** Badge semântica de ativo/inativo.
+  - **Ação com Menu de Reticências:** Botão de reticências (`...`) com menu suspenso (dropdown) flutuante, agrupando opções contextuais: Editar pessoa, Alternar status (Ativar/Inativar) e Copiar identificador (#ID).
 
 
 ### 🎨 Manual de Identidade Visual Oficial (BrandBook)

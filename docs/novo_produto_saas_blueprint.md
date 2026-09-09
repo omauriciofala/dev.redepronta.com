@@ -513,12 +513,24 @@ Acesso direto pela barra lateral (ícone de rede / conexão), reunindo o invent�
     - Cidade: Select de cidades filtradas pelo estado selecionado.
     - Botão "Limpar Filtros" e badge contador de filtros ativos no botão principal.
 - **Ordenação Clicável nas Colunas (Sorting)**:
-  - Cabeçalhos ordenáveis com 1 clique para `Nome / Razão Social` (`name`), `Cidade / UF` (`city`) e `Data de Cadastro` (`date`).
+  - Cabeçalhos ordenáveis com 1 clique para `Nome` (`name`), `Município` (`city`) e `Data de Cadastro` (`date`).
   - Suporte a ordenação ascendente (`asc`) e descendente (`desc`) com ícones dinâmicos `ArrowUp`, `ArrowDown` e `ArrowUpDown`.
 - **Nova Aba "Documentos" no Cadastro de Pessoas**:
   - Aba 2 `Documentos & Filiação` no modal de cadastro e edição de pessoas:
     - Documentos e Registros Fiscais: Nº RG, Órgão Emissor, Data Emissão (DD/MM/AAAA), Inscrição Estadual, Inscrição Municipal, CNAE, Num. Inscr. SUFRAMA.
     - Filiação, Origem e Dados Civis: Nome da Mãe, Nome do Pai, Data de Fundação ou Nascimento (DD/MM/AAAA), Capital Social PJ (R$), Naturalidade.
+
+
+#### 📋 Estrutura Canônica da Grid de Pessoas
+
+- **Grid Canônica de Pessoas:**
+  - **Nome:** Exibição do nome/razão social em tipografia limpa e link de ordenação.
+  - **Tipo & Documento:** Formatação de CPF/CNPJ com máscara dinâmica e botão discreto de cópia rápida.
+  - **Ações Rápidas de Contato:** Links operacionais diretos para discagem (`tel:`), WhatsApp e e-mail (`mailto:`).
+  - **Município:** Localidade e UF da pessoa com suporte a ordenação alfabética.
+  - **Cadastro:** Data de cadastro formatada no padrão brasileiro `DD/MM/AAAA`.
+  - **Status:** Badge semântica de ativo/inativo.
+  - **Ação com Menu de Reticências:** Botão de reticências (`...`) com menu suspenso (dropdown) flutuante, agrupando opções contextuais: Editar pessoa, Alternar status (Ativar/Inativar) e Copiar identificador (#ID).
 
 
 ### 🎨 Manual de Identidade Visual Oficial (BrandBook)
