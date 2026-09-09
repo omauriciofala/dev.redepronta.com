@@ -238,19 +238,6 @@
                 </div>
               </th>
 
-              <!-- Coluna 6: Data de Cadastro (Ordenável) -->
-              <th
-                @click="toggleSort('date')"
-                class="py-3.5 px-5 cursor-pointer hover:text-[#FC6714] dark:hover:text-[#FC6714] transition"
-                title="Clique para ordenar por Data de Cadastro"
-              >
-                <div class="inline-flex items-center gap-1.5">
-                  <span>Cadastro</span>
-                  <ArrowUp v-if="sortBy === 'date' && sortDirection === 'asc'" class="w-3.5 h-3.5 text-[#FC6714]" />
-                  <ArrowDown v-else-if="sortBy === 'date' && sortDirection === 'desc'" class="w-3.5 h-3.5 text-[#FC6714]" />
-                  <ArrowUpDown v-else class="w-3.5 h-3.5 text-slate-400 opacity-60" />
-                </div>
-              </th>
 
               <!-- Coluna 7: Status -->
               <th class="py-3.5 px-5">Status</th>
@@ -262,14 +249,14 @@
           <tbody class="divide-y divide-slate-100 dark:divide-[#14147A]/60">
             <!-- Loading -->
             <tr v-if="loading">
-              <td colspan="7" class="py-12 text-center text-slate-400 text-sm">
+              <td colspan="6" class="py-12 text-center text-slate-400 text-sm">
                 <span class="inline-block animate-spin mr-2 text-[#FC6714]">⟳</span> Carregando registros...
               </td>
             </tr>
 
             <!-- Vazio -->
             <tr v-else-if="people.length === 0">
-              <td colspan="7" class="py-12 text-center text-slate-400 text-sm">
+              <td colspan="6" class="py-12 text-center text-slate-400 text-sm">
                 Nenhuma pessoa encontrada com os filtros selecionados.
               </td>
             </tr>
@@ -403,15 +390,6 @@
                 </div>
               </td>
 
-              <!-- Data de Cadastro -->
-              <td class="py-4 px-5 text-xs text-slate-600 dark:text-slate-400 whitespace-nowrap">
-                <div class="font-medium text-slate-800 dark:text-slate-200">
-                  {{ person.registration_date_formatted || person.created_at?.split(' ')[0] || '-' }}
-                </div>
-                <div class="text-[11px] text-slate-400">
-                  {{ person.created_at?.split(' ')[1] || '' }}
-                </div>
-              </td>
 
               <!-- Status -->
               <td class="py-4 px-5">

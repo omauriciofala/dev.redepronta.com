@@ -541,7 +541,6 @@ O sistema implementa 8 papéis canônicos independentes, permitindo que uma mesm
   - **Tipo & Documento:** Formatação de CPF/CNPJ com máscara dinâmica e botão discreto de cópia rápida.
   - **Ações Rápidas de Contato:** Links operacionais diretos para discagem (`tel:`), WhatsApp e e-mail (`mailto:`).
   - **Município:** Localidade e UF da pessoa com suporte a ordenação alfabética.
-  - **Cadastro:** Data de cadastro formatada no padrão brasileiro `DD/MM/AAAA`.
   - **Status:** Badge semântica de ativo/inativo.
   - **Ação com Menu de Reticências:** Botão de reticências (`...`) com menu suspenso (dropdown) flutuante, agrupando opções contextuais: Editar pessoa, Alternar status (Ativar/Inativar) e Copiar identificador (#ID).
 
