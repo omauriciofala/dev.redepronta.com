@@ -302,12 +302,14 @@
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
               Select Padrão com Seta
             </label>
-            <select class="w-full h-10 px-3.5 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] focus:border-transparent outline-hidden transition">
-              <option>Belo Horizonte / MG (IBGE: 3106200)</option>
-              <option>São Paulo / SP (IBGE: 3550308)</option>
-              <option>Rio de Janeiro / RJ (IBGE: 3304557)</option>
-            </select>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Seleção estática simples</p>
+            <BaseSelect
+              v-model="demoSelect"
+              hint="Seta com recuo ergonômico da borda direita (16px / right-4)"
+            >
+              <option value="3106200">Belo Horizonte / MG (IBGE: 3106200)</option>
+              <option value="3550308">São Paulo / SP (IBGE: 3550308)</option>
+              <option value="3304557">Rio de Janeiro / RJ (IBGE: 3304557)</option>
+            </BaseSelect>
           </div>
         </div>
 
@@ -320,7 +322,7 @@
                 Componentes Canônicos Especializados
               </h3>
               <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Padrões universais do ERP para seleção de municípios e entrada estrita de datas.
+                Padrões universais do ERP para seleção de municípios, entrada estrita de datas e selects ergonômicos.
               </p>
             </div>
             <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/60 text-[#FC6714] dark:text-orange-400 border border-blue-200 dark:border-blue-900">
@@ -328,7 +330,7 @@
             </span>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-5 rounded-2xl bg-slate-50/70 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 p-5 rounded-2xl bg-slate-50/70 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800">
             <!-- 1. CitySearchSelect -->
             <div class="space-y-3">
               <div class="flex items-center justify-between">
@@ -348,7 +350,7 @@
                 placeholder="Digite ao menos 3 letras (ex: Bel, Cur, São)..."
               />
               <p class="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
-                ID da Cidade Selecionada: <strong class="text-[#FC6714] dark:text-orange-400">{{ demoCityId || 'Nenhuma selecionada' }}</strong>
+                ID Selecionado: <strong class="text-[#FC6714] dark:text-orange-400">{{ demoCityId || 'Nenhum' }}</strong>
               </p>
             </div>
 
@@ -359,7 +361,7 @@
                   &lt;DateInput /&gt;
                 </span>
                 <span class="text-[11px] px-2 py-0.5 rounded-sm bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 font-semibold border border-emerald-200 dark:border-emerald-800">
-                  Dia, Mês e Ano (DD/MM/AAAA)
+                  DD/MM/AAAA
                 </span>
               </div>
               <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
@@ -367,10 +369,36 @@
               </p>
               <DateInput
                 v-model="demoDate"
-                label="Data Canônica (Nascimento / Fundação / Ativação)"
+                label="Data Canônica (Nascimento / Fundação)"
               />
               <p class="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
                 Valor Formatado: <strong class="text-emerald-600 dark:text-emerald-400">{{ demoDate || 'Vazio' }}</strong>
+              </p>
+            </div>
+
+            <!-- 3. BaseSelect -->
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 font-mono">
+                  &lt;BaseSelect /&gt;
+                </span>
+                <span class="text-[11px] px-2 py-0.5 rounded-sm bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 font-semibold border border-indigo-200 dark:border-indigo-800">
+                  Seta Recuada 16px
+                </span>
+              </div>
+              <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                Select com <strong>seta estética recuada a 16px da borda</strong> (right-4), acabando com a seta colada na linha da borda e evitando encavalamento de textos.
+              </p>
+              <BaseSelect
+                v-model="demoSelect"
+                label="Select Padrão com Seta Ergonômica"
+              >
+                <option value="3106200">Belo Horizonte / MG (IBGE: 3106200)</option>
+                <option value="3550308">São Paulo / SP (IBGE: 3550308)</option>
+                <option value="3304557">Rio de Janeiro / RJ (IBGE: 3304557)</option>
+              </BaseSelect>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+                Código IBGE Selecionado: <strong class="text-indigo-600 dark:text-indigo-400">{{ demoSelect || 'Nenhum' }}</strong>
               </p>
             </div>
           </div>
@@ -1064,6 +1092,7 @@ import { useNavigation } from '../composables/useNavigation';
 import BaseModal from '../components/common/BaseModal.vue';
 import CitySearchSelect from '../components/common/CitySearchSelect.vue';
 import DateInput from '../components/common/DateInput.vue';
+import BaseSelect from '../components/common/BaseSelect.vue';
 
 const { theme, toggleTheme } = useTheme();
 const { setView } = useNavigation();
@@ -1071,6 +1100,7 @@ const { setView } = useNavigation();
 const demoSwitch = ref(true);
 const demoCityId = ref<number | null>(null);
 const demoDate = ref('25/12/1990');
+const demoSelect = ref('3106200');
 
 // Estados de abertura de modais
 const openModalSm = ref(false);

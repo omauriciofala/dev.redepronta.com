@@ -144,3 +144,37 @@ input[type="radio"] {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(252, 103, 20, 0.5);
 }
+
+/* ==========================================================================
+   4. SELECT PADRÃO CANÔNICO COM SETA ERGONÔMICA (DESIGN SYSTEM)
+   - Remove a seta nativa encostada na borda do navegador.
+   - Posiciona o ícone SVG de seta a 1rem (16px) para dentro da borda direita.
+   - Fornece padding-right generoso para evitar colisão com textos longos.
+   ========================================================================== */
+select:not([multiple]):not(.no-custom-arrow),
+.form-select {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='m6 9 6 6 6-6'/%3e%3c/svg%3e") !important;
+  background-position: right 1rem center !important; /* 16px para dentro do campo */
+  background-repeat: no-repeat !important;
+  background-size: 1rem 1rem !important;
+  padding-right: 2.75rem !important;
+  cursor: pointer;
+}
+
+.dark select:not([multiple]):not(.no-custom-arrow),
+.dark .form-select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='m6 9 6 6 6-6'/%3e%3c/svg%3e") !important;
+}
+
+select:not([multiple]):not(.no-custom-arrow):hover,
+.form-select:hover {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='m6 9 6 6 6-6'/%3e%3c/svg%3e") !important;
+}
+
+.dark select:not([multiple]):not(.no-custom-arrow):hover,
+.dark .form-select:hover {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='m6 9 6 6 6-6'/%3e%3c/svg%3e") !important;
+}

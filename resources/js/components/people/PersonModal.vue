@@ -67,13 +67,16 @@
           <!-- Status do Registro -->
           <div class="flex items-center gap-3">
             <span class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Status:</span>
-            <select
-              v-model="form.status"
-              class="h-9 px-3 text-xs font-semibold rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 cursor-pointer"
-            >
-              <option value="active">● Ativo no Sistema</option>
-              <option value="inactive">○ Inativo / Suspenso</option>
-            </select>
+            <div class="w-48">
+              <BaseSelect
+                v-model="form.status"
+                size="sm"
+                select-class="font-semibold"
+              >
+                <option value="active">● Ativo no Sistema</option>
+                <option value="inactive">○ Inativo / Suspenso</option>
+              </BaseSelect>
+            </div>
           </div>
         </div>
 
@@ -133,25 +136,20 @@
           </div>
 
           <!-- Grupo -->
-          <div>
-            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-              Grupo
-            </label>
-            <select
-              v-model="form.group_id"
-              class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden text-sm transition cursor-pointer"
+          <BaseSelect
+            v-model="form.group_id"
+            label="Grupo"
+            hint="Classificação e segmentação cadastral"
+          >
+            <option :value="null">Selecione o Grupo...</option>
+            <option
+              v-for="grp in personGroupsList"
+              :key="grp.id"
+              :value="grp.id"
             >
-              <option :value="null">Selecione o Grupo...</option>
-              <option
-                v-for="grp in personGroupsList"
-                :key="grp.id"
-                :value="grp.id"
-              >
-                {{ grp.name }}
-              </option>
-            </select>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Classificação e segmentação cadastral</p>
-          </div>
+              {{ grp.name }}
+            </option>
+          </BaseSelect>
         </div>
 
         <!-- BLOCO CENTRAL: PAPÉIS DO CADASTRO (CHECKBOXES) -->
@@ -1108,6 +1106,7 @@ import BaseModal from '../common/BaseModal.vue';
 import CitySearchSelect from '../common/CitySearchSelect.vue';
 import DateInput from '../common/DateInput.vue';
 import CpfCnpjInput from '../common/CpfCnpjInput.vue';
+import BaseSelect from '../common/BaseSelect.vue';
 
 const props = defineProps<{
   isOpen: boolean;
