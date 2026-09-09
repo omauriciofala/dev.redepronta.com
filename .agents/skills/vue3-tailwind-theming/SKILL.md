@@ -128,3 +128,27 @@ Para telas com altíssimo volume de informações (ex: Despacho de Técnicos, Mo
    - **Empty State**: Sempre renderize uma ilustração suave e botão de ação quando a listagem não possuir itens.
    - **Error State**: Banner com botão "Tentar Novamente" e código amigável para suporte.
 3. **Ícones**: Utilize a biblioteca padronizada `@lucide/vue` (ex: `CheckCircleIcon`, `SearchIcon`, `UsersIcon`).
+
+---
+
+## 📐 5. PADRÃO OBRIGATÓRIO DE LAYOUT E MARGENS DE PÁGINAS (PAGE SHELL)
+
+1. **Margem Superior e Inferior Obrigatória (`py-8`)**:
+   - Toda e qualquer view/página renderizada dentro do `<main>` do `AppLayout.vue` **DEVE OBRIGATORIAMENTE** iniciar com o container raiz:
+     ```html
+     <template>
+       <div class="py-8 w-full space-y-6">
+         <!-- Conteúdo da página -->
+       </div>
+     </template>
+     ```
+   - **Regra Inegociável:** É expressamente proibido colar o cabeçalho no topo da viewport (sem `py-8`). O respiro superior de `32px` (`py-8` / `pt-8`) é mandatório em 100% das páginas.
+
+2. **Margens Horizontais e Inferior (Simetria de 60px)**:
+   - A casca principal (`AppLayout.vue`) define `<main class="... px-[60px] pb-12">`.
+   - As views nunca devem redeclarar padding horizontal perimetral que quebre o alinhamento de 60px à esquerda e 60px à direita.
+
+3. **Ritmo Vertical (`space-y-6` ou `space-y-8`)**:
+   - Telas operacionais com grids, tabelas e filtros: `space-y-6` (24px).
+   - Telas editoriais, relatórios e documentação: `space-y-8` (32px).
+

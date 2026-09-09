@@ -26,3 +26,15 @@
 3. **Change-log Vivo por Commit**:
    - Cada commit realizado no repositório reflete diretamente na página **Change-log** (`/#changelog`) do ERP em tempo real.
    - Escreva mensagens autoexplicativas, claras e profissionais, pois elas são consumidas diretamente pelos operadores e gestores do sistema.
+
+---
+
+## 📐 REGRA OBRIGATÓRIA DE LAYOUT DE PÁGINAS (PAGE SHELL & SPACING)
+
+1. **Margem Superior e Inferior Obrigatória (`py-8`)**:
+   - Toda e qualquer view Vue renderizada no `<main>` do `AppLayout.vue` **DEVE OBRIGATORIAMENTE** conter no elemento raiz:
+     `<div class="py-8 w-full space-y-6">` (ou `space-y-8`).
+   - **Proibição Estrita:** O cabeçalho de uma tela NUNCA deve encostar no teto da tela (sem `py-8`). O respiro superior de `32px` (`py-8` / `pt-8`) é mandatório para todas as páginas criadas no sistema.
+2. **Simetria Lateral de 60px**:
+   - A margem horizontal é garantida exclusivamente pelo layout mestre (`px-[60px]` no `AppLayout.vue`).
+

@@ -703,6 +703,104 @@
       </div>
     </section>
 
+    <!-- SEÇÃO 9: ESTRUTURA DE PÁGINAS & MARGENS DE TELA (PAGE SHELL & SPACING) -->
+    <section id="layout-paginas" class="space-y-4">
+      <div class="flex items-center gap-2.5">
+        <LayoutTemplate class="w-5 h-5 text-[#FC6714] dark:text-orange-400" />
+        <h2 class="text-lg font-heading font-semibold text-[#06064D] dark:text-white">9. Estrutura de Páginas & Margens (Page Shell & Spacing) ⭐</h2>
+      </div>
+      <p class="text-sm text-slate-500 dark:text-slate-400">
+        Padrão obrigatório de margens, respiros perimetrais e estrutura de cabeçalho para todas as telas do ERP.
+        <strong>É expressamente proibido colar o cabeçalho no topo da viewport.</strong>
+      </p>
+
+      <!-- Grid com Diretrizes e Demonstração do Page Shell -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Card 1: Margem Superior & Inferior -->
+        <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 space-y-3 shadow-xs">
+          <div class="flex items-center gap-2 text-slate-900 dark:text-slate-100 font-bold text-sm">
+            <span class="w-2.5 h-2.5 rounded-full bg-[#FC6714]"></span>
+            <span>1. Margem Superior (py-8)</span>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+            O container raiz de toda view Vue DEVE conter a classe <code class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[#FC6714] font-mono text-[11px]">py-8 w-full</code> (32px de respiro no topo e na base).
+          </p>
+          <div class="p-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 font-mono text-xs text-slate-600 dark:text-slate-300">
+            &lt;div class="py-8 w-full space-y-6"&gt;
+          </div>
+        </div>
+
+        <!-- Card 2: Simetria Horizontal de 60px -->
+        <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 space-y-3 shadow-xs">
+          <div class="flex items-center gap-2 text-slate-900 dark:text-slate-100 font-bold text-sm">
+            <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+            <span>2. Margem Lateral (px-[60px])</span>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+            A área de conteúdo (<code class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-blue-600 dark:text-blue-400 font-mono text-[11px]">&lt;main&gt;</code>) no <code class="font-mono text-[11px]">AppLayout.vue</code> garante rigorosamente <strong>60px à esquerda e 60px à direita</strong>.
+          </p>
+          <div class="p-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 font-mono text-xs text-slate-600 dark:text-slate-300">
+            &lt;main class="... px-[60px] pb-12"&gt;
+          </div>
+        </div>
+
+        <!-- Card 3: Espaçamento Vertical Entre Blocos -->
+        <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 space-y-3 shadow-xs">
+          <div class="flex items-center gap-2 text-slate-900 dark:text-slate-100 font-bold text-sm">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+            <span>3. Ritmo Vertical (space-y-6 / 8)</span>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+            Utilize <code class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 font-mono text-[11px]">space-y-6</code> (24px) para telas operacionais e <code class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 font-mono text-[11px]">space-y-8</code> (32px) para telas editoriais/relatórios.
+          </p>
+          <div class="p-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 font-mono text-xs text-slate-600 dark:text-slate-300">
+            Cabeçalho ➔ Filtros ➔ Grid ➔ Paginação
+          </div>
+        </div>
+      </div>
+
+      <!-- Diagrama Visual Interativo do Page Shell -->
+      <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 space-y-4 shadow-xs">
+        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
+          <span>Esquema Anatômico do Page Shell</span>
+          <span class="text-xs font-normal text-slate-400">(Visão com réguas de espaçamento padronizadas)</span>
+        </h3>
+
+        <!-- Mockup Visual de Tela -->
+        <div class="p-4 rounded-xl bg-slate-100 dark:bg-slate-950 border border-dashed border-slate-300 dark:border-slate-700 relative overflow-hidden">
+          <!-- Régua Superior (py-8 = 32px) -->
+          <div class="mb-2 py-1.5 px-3 rounded bg-orange-100 dark:bg-[#FC6714]/20 border border-orange-300 dark:border-[#FC6714]/40 text-center text-xs font-mono font-bold text-[#FC6714] flex items-center justify-center gap-2">
+            <span>▲ Margem Superior Obrigatória: py-8 (32px de respiro no topo para não colar o cabeçalho) ▲</span>
+          </div>
+
+          <!-- Conteúdo Simulado da View -->
+          <div class="bg-white dark:bg-slate-900 rounded-lg p-5 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
+            <!-- Cabeçalho Simulado -->
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+              <div class="space-y-1">
+                <div class="h-5 w-48 bg-slate-200 dark:bg-slate-700 rounded"></div>
+                <div class="h-3 w-80 bg-slate-100 dark:bg-slate-800 rounded"></div>
+              </div>
+              <div class="flex items-center gap-2">
+                <div class="h-8 w-28 bg-[#FC6714] rounded-lg"></div>
+                <div class="h-8 w-8 bg-slate-200 dark:bg-slate-700 rounded-lg"></div>
+              </div>
+            </div>
+
+            <!-- Corpo Simulado (Grid/Filtros) -->
+            <div class="h-16 bg-slate-50 dark:bg-slate-800/40 rounded-lg border border-dashed border-slate-200 dark:border-slate-700 flex items-center justify-center text-xs text-slate-400 font-mono">
+              Conteúdo da View (Filtros, Cards, Tabelas, Paginação) • Espaçamento vertical: space-y-6
+            </div>
+          </div>
+
+          <!-- Régua Inferior (pb-12 = 48px) -->
+          <div class="mt-2 py-1.5 px-3 rounded bg-blue-100 dark:bg-blue-950/40 border border-blue-300 dark:border-blue-800 text-center text-xs font-mono font-bold text-blue-600 dark:text-blue-400 flex items-center justify-center gap-2">
+            <span>▼ Margem Inferior: pb-12 (48px no layout principal) + py-8 (32px na view) ▼</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- ========================================================= -->
     <!-- MODAIS REAIS INSTANCIADOS PARA DEMONSTRAÇÃO E TESTE VIVO -->
     <!-- ========================================================= -->
@@ -1085,7 +1183,7 @@ import {
   Sun, Moon, ArrowLeft, Plus, RefreshCw, Check, Trash2, ExternalLink,
   Loader2, Settings, Search, CheckCircle2, Info, AlertTriangle,
   Maximize2, AlertCircle, Layers, Sidebar as SidebarIcon, FileText,
-  DollarSign, Wrench
+  DollarSign, Wrench, LayoutTemplate
 } from 'lucide-vue-next';
 import { useTheme } from '../composables/useTheme';
 import { useNavigation } from '../composables/useNavigation';
@@ -1126,5 +1224,6 @@ const sections = [
   { id: 'alertas', label: '6. Alertas' },
   { id: 'tabelas', label: '7. Tabelas' },
   { id: 'modais', label: '8. Modais & Fullscreen ⭐' },
+  { id: 'layout-paginas', label: '9. Layout & Margens ⭐' },
 ];
 </script>

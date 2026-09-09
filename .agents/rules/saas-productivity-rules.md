@@ -53,3 +53,12 @@ trigger: manual
   - `test(modulo): mensagem descritiva em pt-br`
   - `chore(modulo): mensagem descritiva em pt-br`
 - **Compromisso de Limpeza**: Nunca finalize uma entrega deixando alterações válidas pendentes no `git status`.
+
+---
+
+## 📐 6. PADRÃO OBRIGATÓRIO DE LAYOUT E MARGENS DE PÁGINAS (FRONTEND)
+
+- **Container Raiz Mandatório**: Toda view Vue renderizada no `<main>` do `AppLayout.vue` **DEVE OBRIGATORIAMENTE** iniciar com `<div class="py-8 w-full space-y-6">` (ou `space-y-8` em páginas editoriais).
+- **Proibição de Cabeçalho Colado no Topo**: O cabeçalho de uma view nunca deve encostar no teto da tela (`py-8` / `pt-8` de 32px é obrigatório).
+- **Simetria Lateral de 60px**: A margem horizontal é provida exclusivamente pelo `px-[60px]` do `AppLayout.vue`.
+

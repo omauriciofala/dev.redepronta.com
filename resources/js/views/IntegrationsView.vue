@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-6">
+  <div class="py-8 w-full space-y-6">
     <!-- Cabeçalho da Página -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-slate-200 dark:border-slate-800">
       <div>
