@@ -772,29 +772,18 @@
         </table>
       </div>
 
-      <!-- Paginação Confortável -->
-      <div class="px-5 py-3.5 border-t border-slate-200 dark:border-[#14147A] flex items-center justify-between text-xs text-slate-600 dark:text-slate-400 bg-slate-50/50 dark:bg-[#03032E]/50">
-        <div>
-          Exibindo <strong>{{ people.length }}</strong> de <strong>{{ totalRecords }}</strong> pessoas
-        </div>
-        <div class="flex items-center gap-1.5">
-          <button
-            :disabled="currentPage <= 1"
-            @click="changePage(currentPage - 1)"
-            class="px-3 py-1.5 rounded-md border border-slate-200 dark:border-[#14147A] hover:bg-white dark:hover:bg-[#06064D] hover:border-[#FC6714] hover:text-[#FC6714] disabled:opacity-40 font-medium transition cursor-pointer focus:ring-2 focus:ring-[#FC6714]"
-          >
-            Anterior
-          </button>
-          <span class="px-3 font-semibold text-slate-800 dark:text-slate-200">{{ currentPage }} / {{ lastPage }}</span>
-          <button
-            :disabled="currentPage >= lastPage"
-            @click="changePage(currentPage + 1)"
-            class="px-3 py-1.5 rounded-md border border-slate-200 dark:border-[#14147A] hover:bg-white dark:hover:bg-[#06064D] hover:border-[#FC6714] hover:text-[#FC6714] disabled:opacity-40 font-medium transition cursor-pointer focus:ring-2 focus:ring-[#FC6714]"
-          >
-            Próxima
-          </button>
-        </div>
-      </div>
+      <!-- Rodapé de Paginação Avançado da Grid (3 Blocos Ergonômicos) -->
+      <TablePagination
+        v-model:currentPage="currentPage"
+        v-model:perPage="perPage"
+        :lastPage="lastPage"
+        :totalRecords="totalRecords"
+        :fromRecord="fromRecord"
+        :toRecord="toRecord"
+        :loading="loading"
+        @changePage="changePage"
+        @changePerPage="handlePerPageChange"
+      />
     </div>
 
     <!-- Modal de Cadastro/Edição de Pessoa -->
@@ -944,6 +933,7 @@ import axios from 'axios';
 import BaseModal from '../components/common/BaseModal.vue';
 import PersonModal from '../components/people/PersonModal.vue';
 import PeopleModuleDrawer from '../components/people/PeopleModuleDrawer.vue';
+import TablePagination from '../components/common/TablePagination.vue';
 import CitySearchSelect from '../components/common/CitySearchSelect.vue';
 import StateCrudModal from '../components/people/auxiliary/StateCrudModal.vue';
 import CityCrudModal from '../components/people/auxiliary/CityCrudModal.vue';
@@ -957,6 +947,9 @@ const search = ref('');
 const currentPage = ref(1);
 const lastPage = ref(1);
 const totalRecords = ref(0);
+const perPage = ref(25);
+const fromRecord = ref(0);
+const toRecord = ref(0);
 
 const isModalOpen = ref(false);
 const personEditing = ref<any | null>(null);
@@ -1367,12 +1360,18 @@ const changePage = (page: number) => {
   fetchPeople();
 };
 
+const handlePerPageChange = (newPerPage: number) => {
+  perPage.value = newPerPage;
+  currentPage.value = 1;
+  fetchPeople();
+};
+
 const fetchPeople = async () => {
   loading.value = true;
   try {
     const params: any = {
       page: currentPage.value,
-      per_page: 15,
+      per_page: perPage.value,
       sort_by: sortBy.value,
       sort_direction: sortDirection.value,
     };
@@ -1395,6 +1394,8 @@ const fetchPeople = async () => {
     currentPage.value = res.data.meta.current_page;
     lastPage.value = res.data.meta.last_page;
     totalRecords.value = res.data.meta.total;
+    fromRecord.value = res.data.meta.from ?? (totalRecords.value > 0 ? (currentPage.value - 1) * perPage.value + 1 : 0);
+    toRecord.value = res.data.meta.to ?? Math.min(currentPage.value * perPage.value, totalRecords.value);
 
     // Atualiza contadores numéricos de segmentação
     if (res.data.meta.counts) {
