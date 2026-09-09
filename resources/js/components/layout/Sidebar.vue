@@ -61,6 +61,19 @@
         <span>Change-log</span>
       </button>
 
+      <!-- Item APIs & Integrações -->
+      <button
+        type="button"
+        @click="setView('integrations')"
+        :class="currentView === 'integrations'
+          ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 font-semibold shadow-2xs'
+          : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60'"
+        class="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm rounded-lg transition-colors cursor-pointer text-left"
+      >
+        <Network class="w-5 h-5" :class="currentView === 'integrations' ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'" />
+        <span>APIs & Integrações</span>
+      </button>
+
       <!-- Próximos Módulos -->
       <div class="pt-5 px-3 pb-2 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
         Módulos Futuros
@@ -114,7 +127,7 @@
 </template>
 
 <script setup lang="ts">
-import { Users, Palette, History, Package, CheckSquare, CreditCard, MessageSquare, Sun, Moon } from 'lucide-vue-next';
+import { Users, Palette, History, Network, Package, CheckSquare, CreditCard, MessageSquare, Sun, Moon } from 'lucide-vue-next';
 import { useTheme } from '../../composables/useTheme';
 import { useNavigation } from '../../composables/useNavigation';
 

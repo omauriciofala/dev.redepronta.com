@@ -196,3 +196,31 @@ Para aprofundamento na arquitetura, modelos de dados e execução ágil, consult
 <p align="center">
   Desenvolvido com excelência técnica pela equipe <strong>Rede Pronta</strong>.
 </p>
+
+## 🗺️ Gestão de Pessoas, Endereços e Geolocalização (Atualização Recente)
+
+- **Aba Principal de Pessoas:**
+  - Cadastro simplificado com suporte a CNPJ/CPF, Razão Social, Nome Fantasia, Grupo e Data de Cadastro em formato `DD/MM/AAAA` (`<DateInput />`).
+  - 7 Papéis Operacionais selecionáveis: Cliente, Fornecedor, Funcionário, Terceirizado, Vendedor, Motorista e Transportadora.
+- **Endereços Residencial e Comercial:**
+  - Suporte a múltiplos endereços com opção de espelhamento dinâmico ("Comercial é o mesmo que o Residencial").
+  - **Referência / Instruções de Localização:** Campo dedicado para detalhamento de pontos de referência e orientações logísticas para campo.
+  - **Coordenadas Geográficas (Latitude e Longitude):** Suporte nativo a geolocalização com botão de captura automática por GPS via `navigator.geolocation`.
+- **Integração ViaCEP (`https://viacep.com.br/`):**
+  - Busca automática de endereço por CEP (`/api/v1/cep/{postal_code}`) com associação relacional direta ao código IBGE do município.
+- **Base Nacional de Cidades do IBGE:**
+  - 5.570 cidades catalogadas e selecionáveis através do componente do Design System `<CitySearchSelect />` (busca com 3 caracteres e ícone de lupa `🔍` no canto direito).
+- **Diretriz de Commits:** Todas as mensagens de commit devem ser estritamente em Português do Brasil (`pt-BR`).
+- **Layout Ergômico:** Espaçamento simétrico de 60px à esquerda e à direita da área de conteúdo.
+
+## 📋 Aba Documentos, Filiação & Hub de Integrações (Nova Atualização)
+
+- **Aba Documentos & Filiação em Pessoas:**
+  - **Identificação Civil & Fiscal:** Nº RG, Órgão Emissor, Data de Emissão (`DD/MM/AAAA`), Inscrição Estadual (IE), Inscrição Municipal (IM), CNAE Principal e Inscrição SUFRAMA.
+  - **Filiação & Dados Biográficos/PJ:** Nome da Mãe, Nome do Pai, Data de Fundação/Nascimento (`DD/MM/AAAA`), Capital Social (`R$`) e Naturalidade.
+- **Validação e Máscara Reativa de CPF / CNPJ:**
+  - Componente `<CpfCnpjInput />` com validação matemática de dígitos verificadores e botão "Puxar CNPJá".
+- **Integração CNPJá (`https://cnpja.com/api/open`):**
+  - Autopreenchimento instantâneo de Razão Social, Nome Fantasia, CNAE, Capital Social, Fundação e Endereço completo amarrado ao código IBGE do município.
+- **Menu APIs & Integrações (`/admin/integrations`):**
+  - Painel de controle e testes interativos para ViaCEP, CNPJá, IBGE e GPS.

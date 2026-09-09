@@ -46,6 +46,9 @@ class Person extends Model
         'number',
         'complement',
         'neighborhood',
+        'reference',
+        'latitude',
+        'longitude',
 
         // Endereço Comercial
         'commercial_same_as_residential',
@@ -54,6 +57,9 @@ class Person extends Model
         'commercial_number',
         'commercial_complement',
         'commercial_neighborhood',
+        'commercial_reference',
+        'commercial_latitude',
+        'commercial_longitude',
         'commercial_city_id',
 
         'status',
@@ -72,6 +78,13 @@ class Person extends Model
         'is_carrier' => 'boolean',
         'is_requester' => 'boolean',
         'commercial_same_as_residential' => 'boolean',
+        'latitude' => 'float',
+        'longitude' => 'float',
+        'commercial_latitude' => 'float',
+        'commercial_longitude' => 'float',
+        'rg_issue_date' => 'date',
+        'birth_or_foundation_date' => 'date',
+        'share_capital' => 'decimal:2',
     ];
 
     public function account(): BelongsTo

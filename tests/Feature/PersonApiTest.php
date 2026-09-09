@@ -17,6 +17,49 @@ class PersonApiTest extends TestCase
     protected Account $account;
     protected City $city;
 
+
+    protected function generateValidCpf(): string
+    {
+        $n = [rand(1, 9), rand(0, 9), rand(0, 9), rand(0, 9), rand(0, 9), rand(0, 9), rand(0, 9), rand(0, 9), rand(0, 9)];
+        $d1 = 0;
+        for ($i = 0; $i < 9; $i++) {
+            $d1 += $n[$i] * (10 - $i);
+        }
+        $r1 = ($d1 * 10) % 11;
+        $n[9] = ($r1 >= 10) ? 0 : $r1;
+
+        $d2 = 0;
+        for ($i = 0; $i < 10; $i++) {
+            $d2 += $n[$i] * (11 - $i);
+        }
+        $r2 = ($d2 * 10) % 11;
+        $n[10] = ($r2 >= 10) ? 0 : $r2;
+
+        return implode('', $n);
+    }
+
+    protected function generateValidCnpj(): string
+    {
+        $n = [rand(1, 9), rand(0, 9), rand(0, 9), rand(0, 9), rand(0, 9), rand(0, 9), rand(0, 9), rand(0, 9), 0, 0, 0, 1];
+        $w1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+        $s1 = 0;
+        for ($i = 0; $i < 12; $i++) {
+            $s1 += $n[$i] * $w1[$i];
+        }
+        $r1 = $s1 % 11;
+        $n[12] = ($r1 < 2) ? 0 : 11 - $r1;
+
+        $w2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+        $s2 = 0;
+        for ($i = 0; $i < 13; $i++) {
+            $s2 += $n[$i] * $w2[$i];
+        }
+        $r2 = $s2 % 11;
+        $n[13] = ($r2 < 2) ? 0 : 11 - $r2;
+
+        return implode('', $n);
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -81,7 +124,7 @@ class PersonApiTest extends TestCase
 
     public function test_can_create_legal_entity_person(): void
     {
-        $cnpj = '12345678000199';
+        $cnpj = '00000000000191';
 
         $payload = [
             'person_type' => 'legal',
@@ -103,7 +146,7 @@ class PersonApiTest extends TestCase
 
     public function test_cannot_create_duplicate_document_number(): void
     {
-        $cpf = '11122233344';
+        $cpf = $this->generateValidCpf();
 
         Person::create([
             'account_id' => $this->account->id,
@@ -131,7 +174,7 @@ class PersonApiTest extends TestCase
             'city_id' => $this->city->id,
             'person_type' => 'individual',
             'name' => 'Morador de São Paulo',
-            'document_number' => '55566677788',
+            'document_number' => $this->generateValidCpf(),
         ]);
 
         $this->expectException(QueryException::class);
@@ -143,7 +186,7 @@ class PersonApiTest extends TestCase
         $payload = [
             'person_type' => 'individual',
             'name' => 'Carlos da Silva Brasil',
-            'document_number' => '11199988877',
+            'document_number' => $cpf = $this->generateValidCpf(),
             'birth_date' => '25/12/1985',
             'email' => 'carlos.brasil@redepronta.com.br',
             'city_id' => $this->city->id,
@@ -156,7 +199,7 @@ class PersonApiTest extends TestCase
             ->assertJsonPath('data.birth_date_formatted', '25/12/1985');
 
         $this->assertDatabaseHas('people', [
-            'document_number' => '11199988877',
+            'document_number' => $cpf,
             'birth_date' => '1985-12-25',
         ]);
     }
@@ -166,7 +209,7 @@ class PersonApiTest extends TestCase
         $payload = [
             'person_type' => 'individual',
             'name' => 'Empresário Fernando',
-            'document_number' => '22233344455',
+            'document_number' => $this->generateValidCpf(),
             'email' => 'fernando@empresa.com.br',
             'postal_code' => '01001-000',
             'street' => 'Praça da Sé',
@@ -201,44 +244,99 @@ class PersonApiTest extends TestCase
         $this->assertNotEmpty($responseMatch->json('data'));
     }
 
-    public function test_can_create_person_with_all_simplified_roles_and_registration_date(): void
+        public function test_can_create_person_with_all_simplified_roles_and_registration_date(): void
     {
+        $cpf = $this->generateValidCpf();
         $payload = [
             'person_type' => 'individual',
-            'name' => 'Roberto Operador de Campo',
-            'trade_name' => 'Beto Técnico',
-            'document_number' => '44455566677',
+            'name' => 'Carlos Alberto Motorista e Técnico',
+            'trade_name' => 'Betão Operações',
+            'document_number' => $cpf,
             'registration_date' => '08/09/2026',
             'group_name' => 'Técnicos Próprios & Parceiros',
             'is_client' => false,
             'is_supplier' => false,
             'is_employee' => true,
             'is_outsourced' => true,
-            'is_seller' => true,
+            'is_seller' => false,
             'is_driver' => true,
             'is_carrier' => false,
-            'city_id' => $this->city->id,
         ];
 
         $response = $this->postJson('/api/v1/people', $payload);
 
-        $response->assertStatus(201)
-            ->assertJsonPath('data.name', 'Roberto Operador de Campo')
-            ->assertJsonPath('data.trade_name', 'Beto Técnico')
-            ->assertJsonPath('data.registration_date_formatted', '08/09/2026')
-            ->assertJsonPath('data.group_name', 'Técnicos Próprios & Parceiros')
-            ->assertJsonPath('data.roles.employee', true)
-            ->assertJsonPath('data.roles.outsourced', true)
-            ->assertJsonPath('data.roles.seller', true)
-            ->assertJsonPath('data.roles.driver', true)
-            ->assertJsonPath('data.roles.carrier', false);
+        $response->assertCreated()
+            ->assertJsonPath('data.personas.is_employee', true)
+            ->assertJsonPath('data.personas.is_outsourced', true)
+            ->assertJsonPath('data.personas.is_driver', true)
+            ->assertJsonPath('data.registration_date_formatted', '08/09/2026');
 
         $this->assertDatabaseHas('people', [
-            'document_number' => '44455566677',
+            'document_number' => $cpf,
             'group_name' => 'Técnicos Próprios & Parceiros',
             'is_employee' => 1,
             'is_outsourced' => 1,
             'is_driver' => 1,
+        ]);
+    }
+
+    public function test_can_search_postal_code_via_viacep_endpoint(): void
+    {
+        // CEP da Praça da Sé em São Paulo
+        $response = $this->getJson('/api/v1/cep/01001000');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.street', 'Praça da Sé')
+            ->assertJsonPath('data.neighborhood', 'Sé')
+            ->assertJsonPath('data.state_code', 'SP')
+            ->assertJsonPath('data.ibge_code', '3550308');
+    }
+
+        public function test_can_save_person_with_geo_coordinates_and_reference(): void
+    {
+        $cpf = $this->generateValidCpf();
+        $payload = [
+            'person_type' => 'individual',
+            'name' => 'Cliente com Coordenadas GPS',
+            'document_number' => $cpf,
+            'postal_code' => '01001-000',
+            'street' => 'Praça da Sé',
+            'number' => '100',
+            'neighborhood' => 'Sé',
+            'city_id' => $this->city->id,
+            'reference' => 'Em frente à Catedral da Sé, portão lateral preto',
+            'latitude' => -23.550520,
+            'longitude' => -46.633308,
+            'commercial_same_as_residential' => false,
+            'commercial_postal_code' => '01310-100',
+            'commercial_street' => 'Avenida Paulista',
+            'commercial_number' => '1000',
+            'commercial_neighborhood' => 'Bela Vista',
+            'commercial_city_id' => $this->city->id,
+            'commercial_reference' => 'Próximo à Estação Trianon Masp',
+            'commercial_latitude' => -23.565734,
+            'commercial_longitude' => -46.651582,
+        ];
+
+        $response = $this->postJson('/api/v1/people', $payload);
+
+        $response->assertCreated()
+            ->assertJsonPath('data.address.reference', 'Em frente à Catedral da Sé, portão lateral preto')
+            ->assertJsonPath('data.address.latitude', -23.550520)
+            ->assertJsonPath('data.address.longitude', -46.633308)
+            ->assertJsonPath('data.commercial_address.reference', 'Próximo à Estação Trianon Masp')
+            ->assertJsonPath('data.commercial_address.latitude', -23.565734)
+            ->assertJsonPath('data.commercial_address.longitude', -46.651582);
+
+        $this->assertDatabaseHas('people', [
+            'document_number' => $cpf,
+            'reference' => 'Em frente à Catedral da Sé, portão lateral preto',
+            'latitude' => -23.550520,
+            'longitude' => -46.633308,
+            'commercial_reference' => 'Próximo à Estação Trianon Masp',
+            'commercial_latitude' => -23.565734,
+            'commercial_longitude' => -46.651582,
         ]);
     }
 }

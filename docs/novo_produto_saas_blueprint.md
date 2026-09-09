@@ -337,3 +337,136 @@ CREATE TABLE dispatches (
     FOREIGN KEY (depot_id) REFERENCES depots(id) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
+
+---
+
+## 9. CADASTRO CENTRALIZADO DE PESSOAS, GEOLOCALIZAÇÃO & INTEGRAÇÃO VIACEP
+
+> Implementação do Módulo Canônico de Pessoas (`Person-Centric Architecture`) conforme diretrizes do Design System e requisitos operacionais do ERP.
+
+### 9.1 Estrutura de Abas e Ergonomia do Modal (Tela Cheia)
+O cadastro de pessoas opera em um Modal de Tela Cheia (`fullscreen modal`) com backdrop escurecido e transições suaves, estruturado em abas lógicas:
+1. **Principal:** Identificação civil/jurídica, data de cadastro e seleção de papéis.
+2. **Contatos:** E-mail, telefones (celular/fixo) e redes sociais/contato profissional.
+3. **Endereços:** Gestão de múltiplos endereços (Residencial e Comercial) com geolocalização.
+4. **Financeiro:** Informações fiscais, bancárias e limite de crédito.
+5. **Observações:** Histórico de anotações internas do cliente/colaborador.
+
+### 9.2 Aba Principal: Simplificação e 7 Papéis Operacionais do Cadastro
+Conforme diretriz de ergonomia e simplificação operacional:
+- **CNPJ/CPF:** Campo com validação e formatação automática.
+- **Razão Social / Nome Completo:** Campo obrigatório (`name`).
+- **Nome Fantasia / Nome de Tratamento:** (`trade_name`).
+- **Data de Cadastro:** Formato estrito **Dia, Mês e Ano (`DD/MM/AAAA`)**, utilizando o componente reutilizável do Design System `<DateInput />` com máscara reativa e conversão bidirecional para ISO `YYYY-MM-DD` no backend.
+- **Grupo Empresarial:** Chave estrangeira relacional com tabela `groups`.
+- **Papéis do Cadastro (Flags Booleanas Obrigatórias com Filtros Rápidos na Tabela):**
+  1. `is_customer`: Cliente (S/N)
+  2. `is_supplier`: Fornecedor (S/N)
+  3. `is_employee`: Funcionário (S/N)
+  4. `is_outsourced`: Terceirizado (S/N)
+  5. `is_seller`: Vendedor (S/N)
+  6. `is_driver`: Motorista (S/N)
+  7. `is_carrier`: Transportadora (S/N)
+
+Cada papel possui badge semântico colorido na listagem e filtro rápido dedicado no topo da tabela.
+
+---
+
+### 9.3 Gestão de Endereços, Referência de Localização & Coordenadas Geográficas
+A aba **3. Endereços** contempla a gestão completa de localização física para logística e atendimento de campo:
+- **Endereço Residencial:**
+  - CEP (`postal_code`) com busca automática ViaCEP.
+  - Logradouro (`street`), Número (`number`), Complemento (`complement`), Bairro (`district`).
+  - Cidade canônica (`city_id`) vinculada à base do IBGE.
+  - **Referência / Instruções de Localização (`reference`):** Campo de texto para orientações de acesso, pontos de referência de campo, portarias ou especificidades de entrega.
+  - **Latitude e Longitude (`latitude`, `longitude`):** Coordenadas geográficas em ponto flutuante de alta precisão (DECIMAL 10,8 e 11,8), com botão integrado de **Captura GPS** (`navigator.geolocation`) que obtém as coordenadas do dispositivo em tempo real.
+- **Endereço Comercial & Espelhamento Dinâmico:**
+  - Checkbox **"Comercial é o mesmo que o Residencial" (`commercial_same_as_residential`)**: Ao ser ativado, copia e espelha automaticamente em tempo real todos os dados do endereço residencial (incluindo CEP, rua, número, complemento, bairro, cidade, referência e coordenadas) para os campos comerciais, desabilitando a edição manual para evitar divergências e agilizar o cadastro.
+  - Campos comerciais independentes: `commercial_postal_code`, `commercial_street`, `commercial_number`, `commercial_complement`, `commercial_district`, `commercial_city_id`, `commercial_reference`, `commercial_latitude`, `commercial_longitude`.
+
+---
+
+### 9.4 Integração Nativa com a API ViaCEP (`https://viacep.com.br/`)
+O ERP conta com integração backend e frontend com a API pública ViaCEP:
+- **Rota Backend:** `GET /api/v1/cep/{postal_code}` (`GeoController@cep`).
+- **Fluxo de Integração:**
+  1. O usuário digita o CEP de 8 dígitos no campo residencial ou comercial.
+  2. O frontend dispara requisição assíncrona com indicador visual de carregamento (`spinner`).
+  3. O backend sanitiza o CEP e consome `https://viacep.com.br/ws/{cep}/json/` com timeout e tratamento de erros.
+  4. **Vinculação Canônica com o IBGE:** Como o ViaCEP retorna o código IBGE do município (`ibge`), o backend realiza a busca exata no banco de dados local através de `City::where('ibge_code', $data['ibge'])->first()`. Isso garante que a chave estrangeira `city_id` seja amarrada com 100% de integridade relacional, eliminando erros de digitação de nomes de municípios.
+  5. Os campos Logradouro, Bairro, Complemento e Cidade são preenchidos automaticamente na interface.
+
+---
+
+### 9.5 Base Canônica Nacional de Cidades (5.570 Municípios do IBGE) & Componente `<CitySearchSelect />`
+- O sistema possui todos os 5.570 municípios do Brasil e seus 27 estados/DF devidamente cadastrados na tabela `cities`, com seus respectivos códigos oficiais do IBGE.
+- **Componente Blade/Vue Universal `<CitySearchSelect />`:**
+  - Ativado a partir da digitação de 3 caracteres.
+  - **Ícone de Lupa (`🔍`) no canto direito** do campo (conforme diretriz obrigatória de UI/UX, substituindo a seta tradicional de dropdown `▼`).
+  - Suporte completo a tema escuro e tema claro com destaque de cidade, estado e código IBGE.
+  - Disponibilizado e documentado no Catálogo do Design System (`/admin/design-system`).
+
+---
+
+### 9.6 Diretrizes Gerais de Interface, Change-Log & Commits
+1. **Espaçamento Horizontal Simétrico de 60px:**
+   - O layout possui espaçamento horizontal de exatamente **60px entre o sidebar e a área de conteúdo**, bem como **60px de respiro no lado direito**, garantindo ergonomia e harmonia visual em telas desktop.
+2. **Página de Change-Log Integrada (`/admin/changelog`):**
+   - Página que analisa os commits Git do repositório em tempo real, agrupando por data e categoria convencional (feat, fix, docs, refactor, chore).
+3. **Regra de Ouro para Commits em Português do Brasil:**
+   - **TODO e QUALQUER commit no repositório DEVE ter sua mensagem escrita obrigatoriamente em Português do Brasil (pt-BR)** seguindo a convenção semântica.
+
+---
+
+## 10. MÓDULO DE DOCUMENTOS, FILIAÇÃO & HUB CENTRAL DE APIS / INTEGRAÇÕES
+
+> Especificação funcional e relacional dos campos de identificação civil, dados fiscais, filiação e catálogo de integrações.
+
+### 10.1 Aba 2. Documentos & Filiação no Cadastro de Pessoas
+A aba **Documentos** foi estruturada para centralizar todos os identificadores oficiais do cidadão ou da pessoa jurídica:
+
+#### Bloco 1: Documentos de Identificação Civil & Fiscal
+1. **Nº RG:** Número da Carteira de Identidade Civil (`rg_ie`).
+2. **Órgão Emissor:** Sigla do órgão expedidor e UF (ex: `SSP/SP`, `DETRAN/RJ`) (`rg_issuer`).
+3. **Data de Emissão:** Formato oficial estrito **Dia, Mês e Ano (`DD/MM/AAAA`)** com máscara automática `<DateInput />` (`rg_issue_date`).
+4. **Inscrição Estadual (IE):** Registro de contribuinte ICMS da Unidade da Federação ou "Isento" (`state_registration`).
+5. **Inscrição Municipal (IM):** Registro de prestador de serviços na Prefeitura (`municipal_registration`).
+6. **CNAE Principal:** Código e descrição da Classificação Nacional de Atividades Econômicas (`cnae`). Preenchido automaticamente via integração CNPJá.
+7. **Nº Inscrição SUFRAMA:** Cadastro de incentivos da Superintendência da Zona Franca de Manaus (`suframa_registration`).
+
+#### Bloco 2: Filiação & Dados Biográficos / Corporativos
+1. **Nome da Mãe:** Nome completo da genitora (`mother_name`).
+2. **Nome do Pai:** Nome completo do genitor (`father_name`).
+3. **Data de Fundação ou Nascimento:** Campo versátil que assume semântica de Fundação para Pessoa Jurídica e Nascimento para Pessoa Física, no padrão `DD/MM/AAAA` (`birth_or_foundation_date`).
+4. **Capital Social (PJ):** Valor monetário integralizado da empresa (`share_capital`), formatado em moeda brasileira e preenchido pela CNPJá.
+5. **Naturalidade:** Cidade e Unidade da Federação de origem do cadastrado (`birth_place`).
+
+---
+
+### 10.2 Validação Matemática e Máscara Dinâmica de CPF / CNPJ (`<CpfCnpjInput />`)
+- **Componente Oficial do Design System:** `<CpfCnpjInput />`
+- **Máscara Reativa:**
+  - Até 11 dígitos numéricos: formata como CPF (`000.000.000-00`).
+  - De 12 a 14 dígitos numéricos: formata dinamicamente como CNPJ (`00.000.000/0000-00`).
+- **Validação Algorítmica Oficial da Receita Federal:**
+  - Validação de dígitos verificadores (Módulo 11) com rejeição de sequências falsas (`111.111.111-11`, etc.).
+  - Borda e badge visual: verde com ícone de check (`CPF` ou `CNPJ`) quando válido; vermelho (`Inválido`) quando inválido.
+- **Botão Integrado "Puxar CNPJá":**
+  - Ao detectar 14 dígitos válidos de CNPJ, exibe botão de ação com ícone de prédio e spinner de busca.
+
+---
+
+### 10.3 Hub de APIs & Menu "APIs / Integrações" (`/admin/integrations`)
+Acesso direto pela barra lateral (ícone de rede / conexão), reunindo o inventário de todas as APIs integradas:
+1. **CNPJá Open API (`https://cnpja.com/api/open`):**
+   - Consulta pública de CNPJs na Receita Federal do Brasil.
+   - Puxa Razão Social, Fantasia, CNAE, Capital Social, Data de Fundação, SUFRAMA e Endereço com amarração ao código IBGE.
+   - Teste interativo com campo de consulta ao vivo na página `/admin/integrations`.
+2. **ViaCEP WebService (`https://viacep.com.br/`):**
+   - Geocodificação reversa de CEP nacional para preenchimento de endereços residenciais e comerciais.
+   - Teste interativo ao vivo com busca de logradouro e município.
+3. **Catálogo Canônico IBGE (5.570 Cidades):**
+   - Base territorial local estrita para integridade de dados.
+4. **GPS & Georreferenciamento W3C:**
+   - Captura de coordenadas geográficas via hardware/satélite.
+5. **Roadmap de Expansão:** Gateways de pagamento (PIX/Boleto), mensageria (WhatsApp/SMS) e TR-069 ACS.

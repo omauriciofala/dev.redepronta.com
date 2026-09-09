@@ -3,7 +3,7 @@
     :model-value="isOpen"
     size="fullscreen"
     :title="isEditing ? 'Editar Cadastro de Pessoa' : 'Novo Cadastro de Pessoa'"
-    description="Cadastro simplificado de identificação, papéis operacionais, contatos e endereços"
+    description="Cadastro simplificado de identificação, papéis operacionais, contatos e endereços com geolocalização"
     @close="close"
   >
     <!-- Badge de Destaque no Cabeçalho -->
@@ -79,18 +79,16 @@
 
         <!-- Linha 1: CNPJ/CPF e Razão Social/Nome (obrigatório) -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <!-- CNPJ / CPF -->
+          <!-- CNPJ / CPF com Validação e Máscara Dinâmica -->
           <div>
             <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
               CNPJ / CPF
             </label>
-            <input
-              type="text"
+            <CpfCnpjInput
               v-model="form.document_number"
-              :placeholder="form.person_type === 'individual' ? '000.000.000-00' : '00.000.000/0000-00'"
-              class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden font-mono text-sm transition"
+              @change-doc-type="handleDocTypeChange"
+              @cnpja-data="handleCnpjaData"
             />
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Identificador fiscal único</p>
           </div>
 
           <!-- Razão Social / Nome (obrigatório) -->
@@ -419,7 +417,7 @@
       </div>
 
       <!-- ========================================== -->
-      <!-- ABA 3: ENDEREÇOS (RESIDENCIAL E COMERCIAL) -->
+      <!-- ABA 3: ENDEREÇOS (COM VIACEP E GEO)        -->
       <!-- ========================================== -->
       <div v-show="activeTab === 'endereco'" class="space-y-8">
         <!-- BLOCO 1: ENDEREÇO RESIDENCIAL / PRINCIPAL -->
@@ -433,7 +431,7 @@
                 <h4 class="text-sm font-bold text-slate-900 dark:text-slate-100">
                   {{ form.person_type === 'individual' ? 'Endereço Residencial' : 'Endereço da Sede / Principal' }}
                 </h4>
-                <p class="text-xs text-slate-500 dark:text-slate-400">Localização principal para correspondência e cadastro fiscal</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Localização principal para correspondência, cadastro fiscal e ordem de serviço</p>
               </div>
             </div>
             <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200 dark:border-blue-900">
@@ -441,15 +439,40 @@
             </span>
           </div>
 
+          <!-- Linha 1: CEP (com ViaCEP) e Logradouro -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
             <div>
-              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">CEP</label>
-              <input
-                type="text"
-                v-model="form.postal_code"
-                placeholder="00000-000"
-                class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden font-mono text-sm transition"
-              />
+              <div class="flex items-center justify-between mb-1.5">
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">CEP</label>
+                <span class="text-[10px] font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1">
+                  <Zap class="w-3 h-3" /> ViaCEP Integrado
+                </span>
+              </div>
+              <div class="relative flex items-center">
+                <input
+                  type="text"
+                  v-model="form.postal_code"
+                  @blur="handleCepSearch('residential')"
+                  @keyup.enter="handleCepSearch('residential')"
+                  placeholder="00000-000"
+                  maxlength="9"
+                  class="w-full h-10 pl-3.5 pr-10 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden font-mono text-sm transition"
+                />
+                <div class="absolute right-2.5 top-1/2 -translate-y-1/2">
+                  <Loader2 v-if="isSearchingResidentialCep" class="w-4 h-4 animate-spin text-blue-600" />
+                  <button
+                    v-else
+                    type="button"
+                    @click="handleCepSearch('residential')"
+                    class="p-1 text-slate-400 hover:text-blue-600 transition cursor-pointer"
+                    title="Buscar endereço pelo ViaCEP"
+                  >
+                    <Search class="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+              <p v-if="cepErrorResidential" class="text-[11px] text-red-500 mt-1">{{ cepErrorResidential }}</p>
+              <p v-else class="text-xs text-slate-400 mt-1">Digite o CEP e pressione Enter ou saia do campo</p>
             </div>
 
             <div class="md:col-span-2">
@@ -463,6 +486,7 @@
             </div>
           </div>
 
+          <!-- Linha 2: Número, Complemento, Bairro e Cidade -->
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
             <div>
               <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">Número</label>
@@ -504,6 +528,65 @@
                 label="Cidade Canônica (IBGE)"
                 placeholder="Digite 3 letras da cidade..."
               />
+            </div>
+          </div>
+
+          <!-- Linha 3: Referência / Instruções de Localização e Coordenadas (Latitude / Longitude) -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 pt-3 border-t border-slate-200/80 dark:border-slate-800/80">
+            <!-- Referência / Instruções de Localização -->
+            <div class="lg:col-span-2">
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                <Compass class="w-3.5 h-3.5 text-blue-500" />
+                Referência / Instruções de Localização
+              </label>
+              <input
+                type="text"
+                v-model="form.reference"
+                placeholder="Ex: Próximo à padaria central, casa de esquina com portão azul, interfone 102..."
+                class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden text-sm transition"
+              />
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Orientações essenciais para equipes técnicas de campo e entregas</p>
+            </div>
+
+            <!-- Latitude & Longitude com botão de localização atual -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1">
+                  <MapPin class="w-3.5 h-3.5 text-emerald-500" />
+                  Latitude / Longitude
+                </label>
+                <button
+                  type="button"
+                  @click="getCurrentCoordinates('residential')"
+                  :disabled="isGettingLocation"
+                  class="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                  title="Capturar coordenadas geográficas do dispositivo"
+                >
+                  <Navigation class="w-3 h-3" />
+                  <span>{{ isGettingLocation ? 'Localizando...' : 'GPS Atual' }}</span>
+                </button>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <input
+                  type="number"
+                  step="any"
+                  v-model.number="form.latitude"
+                  placeholder="Latitude (ex: -19.9208)"
+                  class="w-full h-10 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden font-mono text-xs transition"
+                />
+                <input
+                  type="number"
+                  step="any"
+                  v-model.number="form.longitude"
+                  placeholder="Longitude (ex: -43.9378)"
+                  class="w-full h-10 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden font-mono text-xs transition"
+                />
+              </div>
+              <p v-if="form.latitude && form.longitude" class="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1 flex items-center gap-1">
+                <Check class="w-3 h-3" /> Coordenadas georreferenciadas
+              </p>
+              <p v-else class="text-xs text-slate-400 mt-1">Geolocalização para roteirização e FSM</p>
             </div>
           </div>
         </div>
@@ -557,13 +640,36 @@
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
             <div>
-              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">CEP Comercial</label>
-              <input
-                type="text"
-                v-model="form.commercial_postal_code"
-                placeholder="00000-000"
-                class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden font-mono text-sm transition"
-              />
+              <div class="flex items-center justify-between mb-1.5">
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">CEP Comercial</label>
+                <span class="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
+                  <Zap class="w-3 h-3" /> ViaCEP
+                </span>
+              </div>
+              <div class="relative flex items-center">
+                <input
+                  type="text"
+                  v-model="form.commercial_postal_code"
+                  @blur="handleCepSearch('commercial')"
+                  @keyup.enter="handleCepSearch('commercial')"
+                  placeholder="00000-000"
+                  maxlength="9"
+                  class="w-full h-10 pl-3.5 pr-10 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden font-mono text-sm transition"
+                />
+                <div class="absolute right-2.5 top-1/2 -translate-y-1/2">
+                  <Loader2 v-if="isSearchingCommercialCep" class="w-4 h-4 animate-spin text-indigo-600" />
+                  <button
+                    v-else
+                    type="button"
+                    @click="handleCepSearch('commercial')"
+                    class="p-1 text-slate-400 hover:text-indigo-600 transition cursor-pointer"
+                    title="Buscar endereço comercial pelo ViaCEP"
+                  >
+                    <Search class="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+              <p v-if="cepErrorCommercial" class="text-[11px] text-red-500 mt-1">{{ cepErrorCommercial }}</p>
             </div>
 
             <div class="md:col-span-2">
@@ -620,6 +726,58 @@
               />
             </div>
           </div>
+
+          <!-- Linha de Referência Comercial e Coordenadas -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 pt-3 border-t border-indigo-100 dark:border-indigo-900/60">
+            <div class="lg:col-span-2">
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                <Compass class="w-3.5 h-3.5 text-indigo-500" />
+                Referência / Instruções de Localização Comercial
+              </label>
+              <input
+                type="text"
+                v-model="form.commercial_reference"
+                placeholder="Ex: Portão de carga e descarga nos fundos, guarita 2..."
+                class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden text-sm transition"
+              />
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1">
+                  <MapPin class="w-3.5 h-3.5 text-indigo-500" />
+                  Latitude / Longitude Comercial
+                </label>
+                <button
+                  type="button"
+                  @click="getCurrentCoordinates('commercial')"
+                  :disabled="isGettingLocation"
+                  class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                  title="Capturar GPS comercial"
+                >
+                  <Navigation class="w-3 h-3" />
+                  <span>{{ isGettingLocation ? 'Localizando...' : 'GPS Atual' }}</span>
+                </button>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <input
+                  type="number"
+                  step="any"
+                  v-model.number="form.commercial_latitude"
+                  placeholder="Latitude"
+                  class="w-full h-10 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden font-mono text-xs transition"
+                />
+                <input
+                  type="number"
+                  step="any"
+                  v-model.number="form.commercial_longitude"
+                  placeholder="Longitude"
+                  class="w-full h-10 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-hidden font-mono text-xs transition"
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -665,12 +823,13 @@ import { ref, reactive, watch } from 'vue';
 import {
   FileText, Mail, MapPin, Tag, Users, Truck, Briefcase, Wrench,
   BadgePercent, Car, Package, Phone, MessageSquare, AlertCircle,
-  Loader2, Check, Home, Building2
+  Loader2, Check, Home, Building2, Search, Compass, Navigation, Zap
 } from 'lucide-vue-next';
 import axios from 'axios';
 import BaseModal from '../common/BaseModal.vue';
 import CitySearchSelect from '../common/CitySearchSelect.vue';
 import DateInput from '../common/DateInput.vue';
+import CpfCnpjInput from '../common/CpfCnpjInput.vue';
 
 const props = defineProps<{
   isOpen: boolean;
@@ -682,6 +841,15 @@ const emit = defineEmits(['close', 'saved']);
 const isEditing = ref(false);
 const isSubmitting = ref(false);
 const errorMessage = ref('');
+
+// Estados de busca de CEP ViaCEP
+const isSearchingResidentialCep = ref(false);
+const isSearchingCommercialCep = ref(false);
+const cepErrorResidential = ref('');
+const cepErrorCommercial = ref('');
+
+// Estado de busca de coordenadas do dispositivo
+const isGettingLocation = ref(false);
 
 // Informações iniciais de cidades para exibição prévia
 const residentialCityInfo = reactive({
@@ -718,6 +886,17 @@ const defaultForm = () => ({
   trade_name: '',
   document_number: '',
   rg_ie: '',
+  rg_issuer: '',
+  rg_issue_date: '',
+  state_registration: '',
+  municipal_registration: '',
+  cnae: '',
+  suframa_registration: '',
+  mother_name: '',
+  father_name: '',
+  birth_or_foundation_date: '',
+  share_capital: '',
+  birth_place: '',
   birth_date: '',
   registration_date: getTodayFormatted(),
   group_name: 'Geral',
@@ -739,6 +918,9 @@ const defaultForm = () => ({
   number: '',
   complement: '',
   neighborhood: '',
+  reference: '',
+  latitude: null as number | null,
+  longitude: null as number | null,
 
   // Endereço Comercial
   commercial_same_as_residential: true,
@@ -748,6 +930,9 @@ const defaultForm = () => ({
   commercial_number: '',
   commercial_complement: '',
   commercial_neighborhood: '',
+  commercial_reference: '',
+  commercial_latitude: null as number | null,
+  commercial_longitude: null as number | null,
 
   // Contatos
   email: '',
@@ -759,10 +944,99 @@ const defaultForm = () => ({
 
 const form = reactive(defaultForm());
 
+// Integração com ViaCEP
+const handleCepSearch = async (type: 'residential' | 'commercial') => {
+  const rawCep = type === 'residential' ? form.postal_code : form.commercial_postal_code;
+  const clean = (rawCep || '').replace(/\D/g, '');
+
+  if (clean.length !== 8) {
+    if (type === 'residential') cepErrorResidential.value = 'Informe um CEP válido de 8 dígitos.';
+    else cepErrorCommercial.value = 'Informe um CEP válido de 8 dígitos.';
+    return;
+  }
+
+  const isRes = type === 'residential';
+  if (isRes) {
+    isSearchingResidentialCep.value = true;
+    cepErrorResidential.value = '';
+  } else {
+    isSearchingCommercialCep.value = true;
+    cepErrorCommercial.value = '';
+  }
+
+  try {
+    const res = await axios.get(`/api/v1/cep/${clean}`);
+    if (res.data.success && res.data.data) {
+      const d = res.data.data;
+      if (isRes) {
+        form.postal_code = d.postal_code || form.postal_code;
+        form.street = d.street || form.street;
+        form.neighborhood = d.neighborhood || form.neighborhood;
+        if (d.complement && !form.complement) form.complement = d.complement;
+        if (d.city_id) {
+          form.city_id = d.city_id;
+          residentialCityInfo.name = d.city_name;
+          residentialCityInfo.state_code = d.state_code;
+          residentialCityInfo.ibge_code = d.ibge_code;
+        }
+      } else {
+        form.commercial_postal_code = d.postal_code || form.commercial_postal_code;
+        form.commercial_street = d.street || form.commercial_street;
+        form.commercial_neighborhood = d.neighborhood || form.commercial_neighborhood;
+        if (d.complement && !form.commercial_complement) form.commercial_complement = d.complement;
+        if (d.city_id) {
+          form.commercial_city_id = d.city_id;
+          commercialCityInfo.name = d.city_name;
+          commercialCityInfo.state_code = d.state_code;
+          commercialCityInfo.ibge_code = d.ibge_code;
+        }
+      }
+    }
+  } catch (err: any) {
+    const msg = err.response?.data?.message || 'CEP não localizado na base ViaCEP.';
+    if (isRes) cepErrorResidential.value = msg;
+    else cepErrorCommercial.value = msg;
+  } finally {
+    if (isRes) isSearchingResidentialCep.value = false;
+    else isSearchingCommercialCep.value = false;
+  }
+};
+
+// Obtenção de Coordenadas GPS via Navegador
+const getCurrentCoordinates = (type: 'residential' | 'commercial') => {
+  if (!navigator.geolocation) {
+    alert('Geolocalização não suportada por este dispositivo/navegador.');
+    return;
+  }
+  isGettingLocation.value = true;
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const lat = Number(pos.coords.latitude.toFixed(6));
+      const lng = Number(pos.coords.longitude.toFixed(6));
+      if (type === 'residential') {
+        form.latitude = lat;
+        form.longitude = lng;
+      } else {
+        form.commercial_latitude = lat;
+        form.commercial_longitude = lng;
+      }
+      isGettingLocation.value = false;
+    },
+    (err) => {
+      console.warn('Não foi possível obter geolocalização:', err);
+      isGettingLocation.value = false;
+      alert('Não foi possível obter as coordenadas automaticamente. Verifique as permissões de localização do navegador.');
+    },
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
+};
+
 watch(() => props.isOpen, (open) => {
   if (open) {
     activeTab.value = 'principal';
     errorMessage.value = '';
+    cepErrorResidential.value = '';
+    cepErrorCommercial.value = '';
 
     if (props.personToEdit) {
       isEditing.value = true;
@@ -804,6 +1078,9 @@ watch(() => props.isOpen, (open) => {
         number: resAddr.number || '',
         complement: resAddr.complement || '',
         neighborhood: resAddr.neighborhood || '',
+        reference: resAddr.reference || '',
+        latitude: resAddr.latitude !== null && resAddr.latitude !== undefined ? Number(resAddr.latitude) : null,
+        longitude: resAddr.longitude !== null && resAddr.longitude !== undefined ? Number(resAddr.longitude) : null,
 
         // Comercial
         commercial_same_as_residential: commAddr.same_as_residential ?? true,
@@ -813,6 +1090,9 @@ watch(() => props.isOpen, (open) => {
         commercial_number: commAddr.number || '',
         commercial_complement: commAddr.complement || '',
         commercial_neighborhood: commAddr.neighborhood || '',
+        commercial_reference: commAddr.reference || '',
+        commercial_latitude: commAddr.latitude !== null && commAddr.latitude !== undefined ? Number(commAddr.latitude) : null,
+        commercial_longitude: commAddr.longitude !== null && commAddr.longitude !== undefined ? Number(commAddr.longitude) : null,
 
         // Contato
         email: p.contact?.email || p.email || '',
@@ -833,6 +1113,63 @@ watch(() => props.isOpen, (open) => {
   }
 });
 
+
+// Handlers para CpfCnpjInput e integração CNPJá
+const cnpjaSuccessFeedback = ref('');
+
+const handleDocTypeChange = (type: 'individual' | 'legal') => {
+  form.person_type = type;
+};
+
+const handleCnpjaData = (d: any) => {
+  if (!d) return;
+
+  if (d.name) form.name = d.name;
+  if (d.trade_name) form.trade_name = d.trade_name;
+  form.person_type = 'legal';
+
+  // Documentos fiscais e dados PJ extraídos da CNPJá
+  if (d.cnae) form.cnae = d.cnae;
+  else if (d.main_activity) form.cnae = d.main_activity;
+
+  if (d.share_capital !== undefined && d.share_capital !== null) {
+    form.share_capital = Number(d.share_capital).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+  }
+
+  if (d.founded) {
+    // Converte YYYY-MM-DD para DD/MM/AAAA
+    const parts = d.founded.split('-');
+    if (parts.length === 3) {
+      form.birth_or_foundation_date = `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+  }
+
+  if (d.suframa) form.suframa_registration = d.suframa;
+
+  if (d.phone) form.phone = d.phone;
+  if (d.email) form.email = d.email;
+
+  if (d.address) {
+    if (d.address.postal_code) form.postal_code = d.address.postal_code;
+    if (d.address.street) form.street = d.address.street;
+    if (d.address.number) form.number = d.address.number;
+    if (d.address.complement) form.complement = d.address.complement;
+    if (d.address.neighborhood) form.neighborhood = d.address.neighborhood;
+
+    if (d.address.city_id) {
+      form.city_id = d.address.city_id;
+      residentialCityInfo.name = d.address.city_name || '';
+      residentialCityInfo.state_code = d.address.state_code || '';
+      residentialCityInfo.ibge_code = d.address.ibge_code || '';
+    }
+  }
+
+  cnpjaSuccessFeedback.value = `Dados da empresa "${d.name}" carregados com sucesso via CNPJá!`;
+  setTimeout(() => {
+    cnpjaSuccessFeedback.value = '';
+  }, 6000);
+};
+
 const close = () => {
   emit('close');
 };
@@ -844,7 +1181,7 @@ const submit = async () => {
   try {
     const payload = { ...form };
 
-    // Se comercial for o mesmo que residencial, espelha os campos
+    // Se comercial for o mesmo que residencial, espelha todos os campos de localização e georreferenciamento
     if (payload.commercial_same_as_residential) {
       payload.commercial_postal_code = payload.postal_code;
       payload.commercial_street = payload.street;
@@ -852,6 +1189,9 @@ const submit = async () => {
       payload.commercial_complement = payload.complement;
       payload.commercial_neighborhood = payload.neighborhood;
       payload.commercial_city_id = payload.city_id;
+      payload.commercial_reference = payload.reference;
+      payload.commercial_latitude = payload.latitude;
+      payload.commercial_longitude = payload.longitude;
     }
 
     if (isEditing.value && props.personToEdit) {

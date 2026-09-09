@@ -56,4 +56,62 @@ class GeoController extends Controller
         $genders = Gender::orderBy('name')->get(['id', 'code', 'name']);
         return response()->json(['data' => $genders]);
     }
+    public function cep(string $postalCode): JsonResponse
+    {
+        $cleanCep = preg_replace('/\D/', '', $postalCode);
+
+        if (strlen($cleanCep) !== 8) {
+            return response()->json([
+                'success' => false,
+                'message' => 'CEP inválido. Forneça 8 dígitos numéricos.',
+            ], 422);
+        }
+
+        try {
+            $response = \Illuminate\Support\Facades\Http::timeout(5)->get("https://viacep.com.br/ws/{$cleanCep}/json/");
+
+            if (!$response->successful() || isset($response->json()['erro'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'CEP não encontrado na base do ViaCEP.',
+                ], 404);
+            }
+
+            $data = $response->json();
+
+            // Localiza a cidade canônica pelo código IBGE oficial
+            $city = null;
+            if (!empty($data['ibge'])) {
+                $city = City::with('state:id,code,name')->where('ibge_code', $data['ibge'])->first();
+            }
+
+            // Fallback por nome da localidade e UF
+            if (!$city && !empty($data['localidade']) && !empty($data['uf'])) {
+                $city = City::with('state:id,code,name')
+                    ->where('name', 'like', $data['localidade'])
+                    ->whereHas('state', fn ($q) => $q->where('code', $data['uf']))
+                    ->first();
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'postal_code' => $data['cep'] ?? $postalCode,
+                    'street' => $data['logradouro'] ?? '',
+                    'complement' => $data['complemento'] ?? '',
+                    'neighborhood' => $data['bairro'] ?? '',
+                    'city_id' => $city?->id,
+                    'city_name' => $city?->name ?? $data['localidade'] ?? '',
+                    'state_code' => $city?->state?->code ?? $data['uf'] ?? '',
+                    'ibge_code' => $city?->ibge_code ?? $data['ibge'] ?? '',
+                    'city' => $city,
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Falha de comunicação com o serviço ViaCEP: ' . $e->getMessage(),
+            ], 502);
+        }
+    }
 }
