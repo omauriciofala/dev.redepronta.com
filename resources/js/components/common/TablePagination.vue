@@ -35,12 +35,40 @@
           <span>‹ Anterior</span>
         </button>
 
-        <!-- Indicador Numérico da Página Atual -->
-        <div
-          class="min-w-8 h-8 px-2.5 flex items-center justify-center rounded-lg font-bold text-xs bg-orange-50 dark:bg-[#FC6714]/20 text-[#FC6714] border border-orange-200 dark:border-[#FC6714]/40 shadow-2xs select-none"
-          title="Página Atual"
-        >
-          {{ currentPage }}
+        <!-- Lista de Badges / Botões Numéricos de Páginas -->
+        <div class="flex items-center gap-1">
+          <template v-for="(item, index) in visiblePages" :key="index">
+            <!-- Reticências (...) -->
+            <span
+              v-if="item === '...'"
+              class="w-6 h-8 flex items-center justify-center text-xs font-bold text-slate-400 select-none"
+            >
+              …
+            </span>
+
+            <!-- Página Atual (Destaque Ativo) -->
+            <button
+              v-else-if="item === currentPage"
+              type="button"
+              disabled
+              class="min-w-8 h-8 px-2.5 flex items-center justify-center rounded-lg font-bold text-xs bg-[#FC6714] text-white border border-[#FC6714] shadow-2xs select-none cursor-default"
+              :title="`Página ${item} (Atual)`"
+            >
+              {{ item }}
+            </button>
+
+            <!-- Outras Páginas Clicáveis -->
+            <button
+              v-else
+              type="button"
+              :disabled="loading"
+              @click="changePage(Number(item))"
+              class="min-w-8 h-8 px-2 flex items-center justify-center rounded-lg font-semibold text-xs border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 hover:bg-orange-50/50 dark:hover:bg-[#FC6714]/10 hover:border-[#FC6714] hover:text-[#FC6714] dark:hover:text-orange-400 disabled:opacity-50 transition cursor-pointer shadow-2xs select-none focus:outline-none focus:ring-2 focus:ring-[#FC6714]/30"
+              :title="`Ir para página ${item}`"
+            >
+              {{ item }}
+            </button>
+          </template>
         </div>
 
         <!-- Botão Próximo › -->
@@ -152,6 +180,32 @@ const isTargetPageValid = computed(() => {
   if (!targetPageInput.value) return false;
   const val = Number(targetPageInput.value);
   return Number.isInteger(val) && val >= 1 && val <= props.lastPage;
+});
+
+type PageItem = number | '...';
+
+const visiblePages = computed<PageItem[]>(() => {
+  const total = props.lastPage;
+  const current = props.currentPage;
+
+  if (total <= 1) {
+    return [1];
+  }
+
+  if (total <= 7) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+
+  // Mais de 7 páginas: janela com elipses
+  if (current <= 4) {
+    return [1, 2, 3, 4, 5, '...', total];
+  }
+
+  if (current >= total - 3) {
+    return [1, '...', total - 4, total - 3, total - 2, total - 1, total];
+  }
+
+  return [1, '...', current - 1, current, current + 1, '...', total];
 });
 
 const changePage = (page: number) => {
