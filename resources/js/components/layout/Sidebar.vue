@@ -35,6 +35,19 @@
         Desenvolvimento
       </div>
 
+      <!-- Item Desenvolvedor -->
+      <button
+        type="button"
+        @click="setView('developer')"
+        :class="currentView === 'developer'
+          ? 'bg-[#FC6714] text-white font-bold shadow-xs'
+          : 'text-slate-300 hover:text-white hover:bg-white/10 font-medium'"
+        class="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm rounded-lg transition-colors cursor-pointer text-left focus:ring-2 focus:ring-[#FC6714] focus:outline-none"
+      >
+        <Terminal class="w-5 h-5" :class="currentView === 'developer' ? 'text-white' : 'text-slate-300'" />
+        <span>Desenvolvedor</span>
+      </button>
+
       <!-- Item Design System -->
       <button
         type="button"
@@ -127,7 +140,7 @@
 </template>
 
 <script setup lang="ts">
-import { Users, Palette, History, Network, Package, CheckSquare, CreditCard, MessageSquare, Sun, Moon } from 'lucide-vue-next';
+import { Users, Terminal, Palette, History, Network, Package, CheckSquare, CreditCard, MessageSquare, Sun, Moon } from 'lucide-vue-next';
 import { useTheme } from '../../composables/useTheme';
 import { useNavigation } from '../../composables/useNavigation';
 

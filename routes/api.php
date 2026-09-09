@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\ChangelogController;
 use App\Http\Controllers\Api\V1\PersonGroupController;
 use App\Http\Controllers\Api\V1\CnaeController;
 use App\Http\Controllers\Api\V1\NeighborhoodController;
+use App\Http\Controllers\Api\V1\DeveloperController;
 
 Route::prefix('v1')->group(function () {
     // APIs e Integrações (CNPJá, ViaCEP, Catálogo de Serviços)
@@ -38,4 +39,11 @@ Route::prefix('v1')->group(function () {
 
     // Change-log Vivo
     Route::get('changelog', [ChangelogController::class, 'index']);
+
+    // Ferramentas de Desenvolvedor / Sandbox
+    Route::prefix('dev')->group(function () {
+        Route::get('stats', [DeveloperController::class, 'stats']);
+        Route::post('reset', [DeveloperController::class, 'reset']);
+        Route::post('populate-people', [DeveloperController::class, 'populatePeople']);
+    });
 });

@@ -1,6 +1,6 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 
-export type ActiveView = 'people' | 'design-system' | 'changelog' | 'integrations';
+export type ActiveView = 'people' | 'design-system' | 'changelog' | 'integrations' | 'developer';
 
 const currentView = ref<ActiveView>('people');
 
@@ -12,7 +12,7 @@ export function useNavigation() {
 
   const syncHash = () => {
     const hash = window.location.hash.replace('#', '');
-    if (hash === 'design-system' || hash === 'people' || hash === 'changelog' || hash === 'integrations') {
+    if (hash === 'design-system' || hash === 'people' || hash === 'changelog' || hash === 'integrations' || hash === 'developer') {
       currentView.value = hash as ActiveView;
     }
   };

@@ -35,13 +35,29 @@ class DummyPeopleSeeder extends Seeder
         // Carregar cidades com estados associados para filtros ricos
         $cities = City::with('state')->inRandomOrder()->limit(300)->get();
         if ($cities->isEmpty()) {
-            $this->call(CanonicalGeographicSeeder::class);
+            (new CanonicalGeographicSeeder())->run();
             $cities = City::with('state')->inRandomOrder()->limit(300)->get();
+        }
+
+        if ($cities->isEmpty()) {
+            $fallbackState = \App\Models\State::firstOrCreate(['code' => 'SP'], ['code' => 'SP', 'name' => 'São Paulo']);
+            $fallbackCity = City::firstOrCreate(
+                ['ibge_code' => '3550308'],
+                ['state_id' => $fallbackState->id, 'name' => 'São Paulo', 'ibge_code' => '3550308']
+            );
+            $cities = collect([$fallbackCity->load('state')]);
         }
 
         // Carregar grupos e gêneros
         $groups = PersonGroup::where('account_id', $account->id)->get();
         $genders = Gender::all();
+        if ($genders->isEmpty()) {
+            (new GenderSeeder())->run();
+            $genders = Gender::all();
+        }
+        $maleGender = $genders->firstWhere('code', 'M') ?? $genders->first();
+        $femaleGender = $genders->firstWhere('code', 'F') ?? $genders->last();
+
         $cnaes = Cnae::pluck('code')->toArray();
         if (empty($cnaes)) {
             $cnaes = [
@@ -194,7 +210,7 @@ class DummyPeopleSeeder extends Seeder
                 $sur2 = $lastNames[array_rand($lastNames)];
                 $fullName = "{$firstName} {$sur1} {$sur2}";
 
-                $genderId = $isMale ? 1 : 2;
+                $genderId = $isMale ? ($maleGender?->id) : ($femaleGender?->id);
 
                 $birthDate = Carbon::now()->subYears(mt_rand(20, 65))->subDays(mt_rand(0, 365))->format('Y-m-d');
                 $rg = sprintf('%02d.%03d.%03d-%01d', mt_rand(10, 99), mt_rand(100, 999), mt_rand(100, 999), mt_rand(0, 9));
