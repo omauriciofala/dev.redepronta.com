@@ -41,7 +41,13 @@ class PersonResource extends JsonResource
             'birth_date_formatted' => $this->birth_date?->format('d/m/Y'),
             'registration_date' => $this->registration_date?->format('Y-m-d'),
             'registration_date_formatted' => $this->registration_date ? $this->registration_date->format('d/m/Y') : $this->created_at?->format('d/m/Y'),
-            'group_name' => $this->group_name,
+            'group_id' => $this->group_id,
+            'group_name' => $this->group?->name ?? $this->group_name ?? 'Geral',
+            'group' => $this->group ? [
+                'id' => $this->group->id,
+                'name' => $this->group->name,
+                'color' => $this->group->color,
+            ] : null,
             'gender_id' => $this->gender_id,
             'gender_name' => $this->gender?->name,
 

@@ -141,6 +141,12 @@ class PersonService
             if (empty($data['account_id'])) {
                 $data['account_id'] = session('active_account_id') ?? \App\Models\Account::first()?->id ?? 1;
             }
+            if (!empty($data['group_id'])) {
+                $grp = \App\Models\PersonGroup::find($data['group_id']);
+                if ($grp) {
+                    $data['group_name'] = $grp->name;
+                }
+            }
             return Person::create($data);
         });
     }
@@ -148,8 +154,17 @@ class PersonService
     public function update(Person $person, array $data): Person
     {
         return DB::transaction(function () use ($person, $data) {
+            if (!empty($data['group_id'])) {
+                $grp = \App\Models\PersonGroup::find($data['group_id']);
+                if ($grp) {
+                    $data['group_name'] = $grp->name;
+                }
+            } elseif (array_key_exists('group_id', $data) && is_null($data['group_id'])) {
+                $data['group_name'] = null;
+            }
+
             $person->update($data);
-            return $person->fresh(['city.state', 'gender']);
+            return $person->fresh(['city.state', 'gender', 'group']);
         });
     }
 

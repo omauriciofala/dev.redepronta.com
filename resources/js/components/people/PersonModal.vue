@@ -137,24 +137,19 @@
             <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
               Grupo
             </label>
-            <input
-              type="text"
-              list="groupsList"
-              v-model="form.group_name"
-              placeholder="Geral, VIP, Operacional..."
-              class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden text-sm transition"
-            />
-            <datalist id="groupsList">
-              <option value="Geral" />
-              <option value="Clientes Fibra Óptica" />
-              <option value="Clientes Corporativos" />
-              <option value="Fornecedores de Link & Trânsito" />
-              <option value="Fornecedores de Equipamentos & Cabos" />
-              <option value="Equipe Técnica FSM" />
-              <option value="Parceiros Terceirizados" />
-              <option value="Revenda & Representantes" />
-              <option value="Logística & Frotas" />
-            </datalist>
+            <select
+              v-model="form.group_id"
+              class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-[#FC6714] focus:border-transparent outline-hidden text-sm transition cursor-pointer"
+            >
+              <option :value="null">Selecione o Grupo...</option>
+              <option
+                v-for="grp in personGroupsList"
+                :key="grp.id"
+                :value="grp.id"
+              >
+                {{ grp.name }}
+              </option>
+            </select>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Classificação e segmentação cadastral</p>
           </div>
         </div>
@@ -1156,6 +1151,28 @@ const tabs = [
   { id: 'endereco', label: 'Endereços', icon: MapPin },
 ];
 
+// Grupos de Pessoas do Cadastro Básico
+interface PersonGroupOption {
+  id: number;
+  name: string;
+  color?: string;
+  is_active?: boolean;
+}
+const personGroupsList = ref<PersonGroupOption[]>([]);
+const isLoadingGroups = ref(false);
+
+const loadPersonGroups = async () => {
+  try {
+    isLoadingGroups.value = true;
+    const res = await axios.get('/api/v1/person-groups');
+    personGroupsList.value = res.data?.data || [];
+  } catch (err) {
+    console.error('Erro ao carregar lista de grupos de pessoas:', err);
+  } finally {
+    isLoadingGroups.value = false;
+  }
+};
+
 const getTodayFormatted = () => {
   const now = new Date();
   const d = String(now.getDate()).padStart(2, '0');
@@ -1183,6 +1200,7 @@ const defaultForm = () => ({
   birth_place: '',
   birth_date: '',
   registration_date: getTodayFormatted(),
+  group_id: null as number | null,
   group_name: 'Geral',
 
   // Papéis do Cadastro (S/N)
@@ -1315,12 +1333,14 @@ const getCurrentCoordinates = (type: 'residential' | 'commercial') => {
   );
 };
 
-watch(() => props.isOpen, (open) => {
+watch(() => props.isOpen, async (open) => {
   if (open) {
     activeTab.value = 'principal';
     errorMessage.value = '';
     cepErrorResidential.value = '';
     cepErrorCommercial.value = '';
+
+    await loadPersonGroups();
 
     if (props.personToEdit) {
       isEditing.value = true;
@@ -1340,10 +1360,19 @@ watch(() => props.isOpen, (open) => {
       const personas = p.personas || {};
       const roles = p.roles || {};
 
+      // Mapeamento do grupo de pessoas
+      let targetGroupId = p.group_id ?? p.group?.id ?? null;
+      if (!targetGroupId && (p.group_name || p.group?.name) && personGroupsList.value.length > 0) {
+        const rawName = (p.group_name || p.group?.name || '').trim().toLowerCase();
+        const found = personGroupsList.value.find((g) => g.name.trim().toLowerCase() === rawName);
+        if (found) targetGroupId = found.id;
+      }
+
       Object.assign(form, {
         ...p,
         registration_date: p.registration_date_formatted || p.registration_date || getTodayFormatted(),
-        group_name: p.group_name || 'Geral',
+        group_id: targetGroupId,
+        group_name: p.group_name || p.group?.name || (targetGroupId ? (personGroupsList.value.find(g => g.id === targetGroupId)?.name || '') : ''),
 
         // Papéis do Cadastro
         is_client: Boolean(roles.client ?? personas.is_client),
@@ -1409,6 +1438,15 @@ watch(() => props.isOpen, (open) => {
       commercialCityInfo.state_code = '';
       commercialCityInfo.ibge_code = '';
       Object.assign(form, defaultForm());
+
+      // Pré-seleciona o grupo "Geral" para novo cadastro caso exista
+      if (personGroupsList.value.length > 0) {
+        const geralGroup = personGroupsList.value.find(g => g.name.trim().toLowerCase() === 'geral');
+        if (geralGroup) {
+          form.group_id = geralGroup.id;
+          form.group_name = geralGroup.name;
+        }
+      }
     }
   }
 });
@@ -1504,6 +1542,16 @@ const submit = async () => {
       payload.commercial_reference = payload.reference;
       payload.commercial_latitude = payload.latitude;
       payload.commercial_longitude = payload.longitude;
+    }
+
+    // Sincronização de Grupo de Pessoas
+    if (form.group_id) {
+      const selectedGroup = personGroupsList.value.find((g) => g.id === Number(form.group_id));
+      payload.group_id = Number(form.group_id);
+      payload.group_name = selectedGroup ? selectedGroup.name : (form.group_name || null);
+    } else {
+      payload.group_id = null;
+      payload.group_name = null;
     }
 
     if (isEditing.value && props.personToEdit) {
