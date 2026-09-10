@@ -70,8 +70,8 @@
         />
       </div>
 
-      <!-- Linha 3: Categoria, Unidade e Estoque Mínimo -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <!-- Linha 3: Categoria e Unidade -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
             Categoria
@@ -107,19 +107,6 @@
               {{ u.code }} — {{ u.name }}
             </option>
           </select>
-        </div>
-
-        <div>
-          <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-            Estoque Mínimo
-          </label>
-          <input
-            type="number"
-            step="1"
-            min="0"
-            v-model="form.min_stock"
-            class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-slate-900 dark:text-slate-100 font-mono text-xs focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none"
-          />
         </div>
       </div>
 
@@ -233,7 +220,7 @@ const form = ref({
   category: 'Geral',
   unit_id: '',
   unit_cost: 0,
-  min_stock: 5,
+  min_stock: 0,
   has_serial: false,
   track_batch: false,
 });
@@ -249,7 +236,7 @@ watch(
         category: val.category || 'Geral',
         unit_id: val.unit_id ? String(val.unit_id) : (val.unit?.id ? String(val.unit.id) : ''),
         unit_cost: Number(val.unit_cost) || 0,
-        min_stock: Number(val.min_stock) || 5,
+        min_stock: Number(val.min_stock) || 0,
         has_serial: Boolean(val.has_serial),
         track_batch: Boolean(val.track_batch),
       };
@@ -261,7 +248,7 @@ watch(
         category: 'Geral',
         unit_id: props.unitsList[0]?.id ? String(props.unitsList[0].id) : '',
         unit_cost: 0,
-        min_stock: 5,
+        min_stock: 0,
         has_serial: false,
         track_batch: false,
       };

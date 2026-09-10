@@ -405,9 +405,6 @@
                   </div>
                 </th>
 
-                <!-- Estoque Mínimo -->
-                <th class="py-3.5 px-5 text-right">Estoque Mín.</th>
-
                 <!-- Saldo na Região -->
                 <th
                   @click="toggleSortRegional('total_virtual_quantity')"
@@ -428,7 +425,7 @@
             </thead>
             <tbody class="divide-y divide-slate-100 dark:divide-[#14147A]/60">
               <tr v-if="filteredRegionalMaterials.length === 0">
-                <td colspan="6" class="py-12 text-center text-slate-400 text-sm">
+                <td colspan="5" class="py-12 text-center text-slate-400 text-sm">
                   <div class="max-w-sm mx-auto space-y-2">
                     <Boxes class="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto" />
                     <p class="font-medium text-slate-700 dark:text-slate-300">Nenhum material encontrado nesta posição regional</p>
@@ -495,13 +492,6 @@
                   <!-- Custo Médio -->
                   <td class="py-4 px-5 text-right font-mono text-sm text-slate-700 dark:text-slate-300">
                     R$ {{ formatNumber(m.unit_cost) }}
-                  </td>
-
-                  <!-- Estoque Mínimo -->
-                  <td class="py-4 px-5 text-right font-mono text-sm text-slate-700 dark:text-slate-300">
-                    <span :class="{ 'text-rose-600 dark:text-rose-400 font-bold': m.is_low_stock }">
-                      {{ formatNumber(m.min_stock) }}
-                    </span>
                   </td>
 
                   <!-- Saldo na Região (Destacado) -->
@@ -706,16 +696,13 @@
                 <!-- Rastreabilidade -->
                 <th class="py-3.5 px-5 text-center">Rastreabilidade</th>
 
-                <!-- Estoque Mínimo -->
-                <th class="py-3.5 px-5 text-right">Estoque Mín.</th>
-
                 <!-- Ações -->
                 <th class="py-3.5 px-5 text-right">Ações</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 dark:divide-[#14147A]/60">
               <tr v-if="filteredMaterials.length === 0">
-                <td colspan="7" class="py-12 text-center text-slate-400 text-sm">
+                <td colspan="6" class="py-12 text-center text-slate-400 text-sm">
                   <div class="max-w-sm mx-auto space-y-2">
                     <Boxes class="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto" />
                     <p class="font-medium text-slate-700 dark:text-slate-300">Nenhum material encontrado</p>
@@ -784,11 +771,6 @@
                   >
                     A Granel / Lote
                   </span>
-                </td>
-
-                <!-- Estoque Mínimo -->
-                <td class="py-4 px-5 text-right font-mono font-medium text-slate-700 dark:text-slate-300">
-                  {{ formatNumber(m.min_stock) }}
                 </td>
 
                 <!-- Ações (Menu de Reticências Verticais) -->
