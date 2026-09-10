@@ -37,334 +37,444 @@
       </div>
 
       <!-- ========================================================================= -->
-      <!-- SEÇÃO 1: CABEÇALHO DA MOVIMENTAÇÃO (TIPO, DEPÓSITOS E DOCUMENTAÇÃO) -->
+      <!-- BARRA DE NAVEGAÇÃO POR ABAS DO MODAL FULLSCREEN -->
       <!-- ========================================================================= -->
-      <div class="p-5 bg-slate-50/80 dark:bg-slate-800/40 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4">
-        <!-- 4 Tipos Obrigatórios de Movimentação -->
-        <div>
-          <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
-            Tipo de Movimentação de Estoque *
-          </label>
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <!-- Entrada -->
-            <button
-              type="button"
-              @click="setMovementType('ENTRY')"
-              class="flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl border text-xs font-bold transition cursor-pointer"
-              :class="form.movement_type === 'ENTRY'
-                ? 'bg-emerald-600 text-white border-emerald-600 shadow-md ring-2 ring-emerald-500/30'
-                : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/60'"
-            >
-              <ArrowDownToLine class="w-4 h-4" />
-              <span>Entrada</span>
-            </button>
-
-            <!-- Saída -->
-            <button
-              type="button"
-              @click="setMovementType('EXIT')"
-              class="flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl border text-xs font-bold transition cursor-pointer"
-              :class="form.movement_type === 'EXIT'
-                ? 'bg-rose-600 text-white border-rose-600 shadow-md ring-2 ring-rose-500/30'
-                : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/60'"
-            >
-              <ArrowUpFromLine class="w-4 h-4" />
-              <span>Saída</span>
-            </button>
-
-            <!-- Devolução -->
-            <button
-              type="button"
-              @click="setMovementType('RETURN')"
-              class="flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl border text-xs font-bold transition cursor-pointer"
-              :class="form.movement_type === 'RETURN'
-                ? 'bg-indigo-600 text-white border-indigo-600 shadow-md ring-2 ring-indigo-500/30'
-                : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/60'"
-            >
-              <RotateCcw class="w-4 h-4" />
-              <span>Devolução</span>
-            </button>
-
-            <!-- Transferência -->
-            <button
-              type="button"
-              @click="setMovementType('TRANSFER')"
-              class="flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl border text-xs font-bold transition cursor-pointer"
-              :class="form.movement_type === 'TRANSFER'
-                ? 'bg-[#FC6714] text-white border-[#FC6714] shadow-md ring-2 ring-[#FC6714]/30'
-                : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/60'"
-            >
-              <ArrowRightLeft class="w-4 h-4" />
-              <span>Transferência</span>
-            </button>
-          </div>
-          <p class="mt-2 text-xs font-medium" :class="typeDescriptionColor">
-            {{ typeDescriptionText }}
-          </p>
-        </div>
-
-        <!-- Depósitos de Origem e Destino -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3 border-t border-slate-200/80 dark:border-slate-700/60">
-          <!-- ORIGEM -->
-          <div>
-            <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-              Depósito de Origem {{ isSourceRequired ? '*' : '(Opcional / Externo)' }}
-            </label>
-
-            <template v-if="form.movement_type === 'ENTRY'">
-              <div class="h-10 px-3.5 rounded-lg border border-dashed border-slate-300 dark:border-slate-700 bg-white/60 dark:bg-slate-800/40 text-slate-400 dark:text-slate-500 text-xs flex items-center select-none">
-                Fornecedor / Compra / Inventário Inicial
-              </div>
-            </template>
-
-            <template v-else-if="form.movement_type === 'RETURN'">
-              <select
-                v-model="form.source_depot_id"
-                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none cursor-pointer"
-              >
-                <option value="">Origem Externa (Cliente / Técnico em Campo)</option>
-                <option v-for="d in depots" :key="d.id" :value="String(d.id)">
-                  {{ d.name }} ({{ formatDepotType(d.type) }})
-                </option>
-              </select>
-            </template>
-
-            <template v-else>
-              <select
-                v-model="form.source_depot_id"
-                :required="isSourceRequired"
-                @change="onHeaderSourceChange"
-                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none cursor-pointer"
-              >
-                <option value="" disabled>Selecione o local de saída...</option>
-                <option v-for="d in depots" :key="d.id" :value="String(d.id)">
-                  {{ d.name }} ({{ formatDepotType(d.type) }})
-                </option>
-              </select>
-            </template>
-          </div>
-
-          <!-- DESTINO -->
-          <div>
-            <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-              Depósito de Destino {{ isDestRequired ? '*' : '(Opcional / Externo)' }}
-            </label>
-
-            <template v-if="form.movement_type === 'EXIT'">
-              <div class="h-10 px-3.5 rounded-lg border border-dashed border-slate-300 dark:border-slate-700 bg-white/60 dark:bg-slate-800/40 text-slate-400 dark:text-slate-500 text-xs flex items-center select-none">
-                Aplicação Operacional / Técnico / Cliente
-              </div>
-            </template>
-
-            <template v-else>
-              <select
-                v-model="form.destination_depot_id"
-                :required="isDestRequired"
-                class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none cursor-pointer"
-              >
-                <option value="" disabled>Selecione o local de entrada...</option>
-                <option v-for="d in destinationOptions" :key="d.id" :value="String(d.id)">
-                  {{ d.name }} ({{ formatDepotType(d.type) }})
-                </option>
-              </select>
-            </template>
-          </div>
-        </div>
-
-        <!-- Documento e Datas (3 Colunas) -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-3 border-t border-slate-200/80 dark:border-slate-700/60">
-          <!-- Número do Documento -->
-          <div>
-            <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-              Número do Documento
-            </label>
-            <input
-              type="text"
-              v-model="form.document_number"
-              :placeholder="docRefPlaceholder"
-              class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none"
-            />
-          </div>
-
-          <!-- Data do Documento -->
-          <div>
-            <DateInput
-              v-model="form.document_date"
-              label="Data do Documento"
-            />
-          </div>
-
-          <!-- Data da Movimentação -->
-          <div>
-            <DateInput
-              v-model="form.movement_date"
-              label="Data da Movimentação"
-              required
-            />
-          </div>
-        </div>
-
-        <!-- Pessoas: Recebedor e Motorista (2 Colunas com Campo de Pesquisa) -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3 border-t border-slate-200/80 dark:border-slate-700/60">
-          <!-- Recebedor -->
-          <div>
-            <PersonSearchSelect
-              v-model="form.receiver_person_id"
-              label="Recebedor (Pessoa / Colaborador)"
-              placeholder="Digite ao menos 2 letras para buscar o recebedor..."
-            />
-          </div>
-
-          <!-- Motorista -->
-          <div>
-            <PersonSearchSelect
-              v-model="form.driver_person_id"
-              label="Motorista / Transportador"
-              placeholder="Digite ao menos 2 letras para buscar o motorista..."
-            />
-          </div>
-        </div>
-      </div>
-
-      <!-- ========================================================================= -->
-      <!-- SEÇÃO 2: LINHA DE INSERÇÃO DE MATERIAL NA GRID (CONFORME SOLICITADO) -->
-      <!-- ========================================================================= -->
-      <div class="p-5 bg-white dark:bg-[#06064D]/50 rounded-2xl border border-slate-200 dark:border-[#14147A] shadow-xs space-y-4">
-        <div class="flex items-center justify-between gap-4">
-          <div class="flex items-center gap-2">
-            <Layers class="w-4 h-4 text-[#FC6714]" />
-            <h4 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">
-              Adicionar Material à Movimentação
-            </h4>
-          </div>
-          <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">
-            Insira os materiais um a um para compor a grid
-          </span>
-        </div>
-
-        <!-- Linha: Campo Novo Material + Campo Quantidade + Botão Adicionar -->
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
-          <!-- Campo 1: Material (8 colunas) -->
-          <div class="md:col-span-8">
-            <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-              Novo Material *
-            </label>
-            <select
-              v-model="newItem.material_id"
-              @change="onNewItemMaterialChange"
-              class="w-full h-11 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-xs font-medium focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none cursor-pointer"
-            >
-              <option value="" disabled>Selecione um material do catálogo para adicionar...</option>
-              <option v-for="m in materials" :key="m.id" :value="m.id">
-                {{ m.code }} — {{ m.name }} [{{ m.unit?.code || 'UND' }}] {{ m.has_serial ? '• [Serial Obrigatório]' : '• [Convencional]' }}
-              </option>
-            </select>
-          </div>
-
-          <!-- Campo 2: Quantidade (2 colunas) -->
-          <div class="md:col-span-2">
-            <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-              Quantidade *
-            </label>
-            <input
-              type="number"
-              :step="selectedNewItemMaterial?.has_serial ? '1' : '0.01'"
-              min="1"
-              v-model.number="newItem.quantity"
-              placeholder="Qtd"
-              class="w-full h-11 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 font-mono text-xs font-bold focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none"
-            />
-          </div>
-
-          <!-- Botão 3: Adicionar Material (2 colunas) -->
-          <div class="md:col-span-2">
-            <button
-              type="button"
-              @click="addMaterialToGrid"
-              :disabled="!newItem.material_id || newItem.quantity <= 0"
-              class="w-full h-11 px-4 rounded-lg bg-[#FC6714] hover:bg-[#E0530A] active:bg-[#C94605] disabled:opacity-50 text-white text-xs font-bold shadow-xs transition active:scale-98 cursor-pointer flex items-center justify-center gap-2"
-            >
-              <Plus class="w-4 h-4" />
-              <span>Adicionar à Grid</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Alerta Contextual quando material tem Rastreamento Serial Obrigatório -->
-        <div
-          v-if="selectedNewItemMaterial?.has_serial"
-          class="p-3.5 rounded-xl border border-purple-200 dark:border-purple-800/60 bg-purple-50/60 dark:bg-purple-950/25 flex items-center justify-between gap-3 text-xs"
+      <div class="flex border-b border-slate-200 dark:border-slate-800 gap-2 sm:gap-6 overflow-x-auto select-none bg-slate-50/70 dark:bg-slate-900/40 px-3 pt-2 rounded-t-xl">
+        <!-- Aba 1: Dados -->
+        <button
+          type="button"
+          @click="currentTab = 'data'"
+          :class="currentTab === 'data'
+            ? 'border-[#FC6714] text-[#FC6714] font-bold'
+            : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium'"
+          class="pb-3 border-b-2 text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer shrink-0"
         >
-          <div class="flex items-center gap-2 text-purple-900 dark:text-purple-300 font-medium">
-            <QrCode class="w-4 h-4 text-purple-600 shrink-0" />
-            <span>
-              <strong>Rastreamento Serial Obrigatório:</strong> A quantidade informada define que devem ser informados e bipados exatamente <strong>{{ newItem.quantity || 1 }}</strong> seriais deste item.
-            </span>
-          </div>
-          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-200/70 dark:bg-purple-900 text-purple-800 dark:text-purple-200 shrink-0">
-            Conferência Obrigatória
+          <SlidersHorizontal class="w-4 h-4" />
+          <span>Dados</span>
+        </button>
+
+        <!-- Aba 2: Materiais (com a Grid) -->
+        <button
+          type="button"
+          @click="currentTab = 'materials'"
+          :class="currentTab === 'materials'
+            ? 'border-[#FC6714] text-[#FC6714] font-bold'
+            : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium'"
+          class="pb-3 border-b-2 text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer shrink-0"
+        >
+          <Layers class="w-4 h-4" />
+          <span>Materiais (Grid)</span>
+          <span
+            v-if="gridItems.length > 0"
+            class="px-2 py-0.5 rounded-full text-[11px] font-bold"
+            :class="currentTab === 'materials'
+              ? 'bg-[#FC6714]/15 text-[#FC6714]'
+              : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300'"
+          >
+            {{ gridItems.length }}
           </span>
+        </button>
+
+        <!-- Aba 3: Serializados -->
+        <button
+          type="button"
+          @click="currentTab = 'serials'"
+          :class="currentTab === 'serials'
+            ? 'border-[#FC6714] text-[#FC6714] font-bold'
+            : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium'"
+          class="pb-3 border-b-2 text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer shrink-0"
+        >
+          <QrCode class="w-4 h-4" />
+          <span>Serializado</span>
+          <span
+            v-if="serializedGridItems.length > 0"
+            class="px-2 py-0.5 rounded-full text-[11px] font-bold flex items-center gap-1"
+            :class="hasPendingSerials
+              ? 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-800 animate-pulse'
+              : 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'"
+          >
+            <component :is="hasPendingSerials ? AlertCircle : CheckCircle2" class="w-3 h-3" />
+            <span>{{ totalBipedSerialsCount }}/{{ totalRequiredSerialsCount }}</span>
+          </span>
+        </button>
+
+        <!-- Aba 4: Anexos -->
+        <button
+          type="button"
+          @click="currentTab = 'attachments'"
+          :class="currentTab === 'attachments'
+            ? 'border-[#FC6714] text-[#FC6714] font-bold'
+            : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium'"
+          class="pb-3 border-b-2 text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer shrink-0"
+        >
+          <Paperclip class="w-4 h-4" />
+          <span>Anexos</span>
+          <span
+            v-if="form.attachments.length > 0"
+            class="px-2 py-0.5 rounded-full text-[11px] font-bold"
+            :class="currentTab === 'attachments'
+              ? 'bg-[#FC6714]/15 text-[#FC6714]'
+              : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300'"
+          >
+            {{ form.attachments.length }}
+          </span>
+        </button>
+      </div>
+
+      <!-- ========================================================================= -->
+      <!-- ABA 1: DADOS DA MOVIMENTAÇÃO -->
+      <!-- ========================================================================= -->
+      <div v-show="currentTab === 'data'" class="space-y-6">
+        <div class="p-5 bg-slate-50/80 dark:bg-slate-800/40 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-5">
+          <!-- 4 Tipos Obrigatórios de Movimentação -->
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
+              Tipo de Movimentação de Estoque *
+            </label>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <!-- Entrada -->
+              <button
+                type="button"
+                @click="setMovementType('ENTRY')"
+                class="flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl border text-xs font-bold transition cursor-pointer"
+                :class="form.movement_type === 'ENTRY'
+                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-md ring-2 ring-emerald-500/30'
+                  : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/60'"
+              >
+                <ArrowDownToLine class="w-4 h-4" />
+                <span>Entrada</span>
+              </button>
+
+              <!-- Saída -->
+              <button
+                type="button"
+                @click="setMovementType('EXIT')"
+                class="flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl border text-xs font-bold transition cursor-pointer"
+                :class="form.movement_type === 'EXIT'
+                  ? 'bg-rose-600 text-white border-rose-600 shadow-md ring-2 ring-rose-500/30'
+                  : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/60'"
+              >
+                <ArrowUpFromLine class="w-4 h-4" />
+                <span>Saída</span>
+              </button>
+
+              <!-- Devolução -->
+              <button
+                type="button"
+                @click="setMovementType('RETURN')"
+                class="flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl border text-xs font-bold transition cursor-pointer"
+                :class="form.movement_type === 'RETURN'
+                  ? 'bg-indigo-600 text-white border-indigo-600 shadow-md ring-2 ring-indigo-500/30'
+                  : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/60'"
+              >
+                <RotateCcw class="w-4 h-4" />
+                <span>Devolução</span>
+              </button>
+
+              <!-- Transferência -->
+              <button
+                type="button"
+                @click="setMovementType('TRANSFER')"
+                class="flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl border text-xs font-bold transition cursor-pointer"
+                :class="form.movement_type === 'TRANSFER'
+                  ? 'bg-[#FC6714] text-white border-[#FC6714] shadow-md ring-2 ring-[#FC6714]/30'
+                  : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/60'"
+              >
+                <ArrowRightLeft class="w-4 h-4" />
+                <span>Transferência</span>
+              </button>
+            </div>
+            <p class="mt-2 text-xs font-medium" :class="typeDescriptionColor">
+              {{ typeDescriptionText }}
+            </p>
+          </div>
+
+          <!-- Depósitos de Origem e Destino -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3 border-t border-slate-200/80 dark:border-slate-700/60">
+            <!-- ORIGEM -->
+            <div>
+              <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                Depósito de Origem {{ isSourceRequired ? '*' : '(Opcional / Externo)' }}
+              </label>
+
+              <template v-if="form.movement_type === 'ENTRY'">
+                <div class="h-10 px-3.5 rounded-lg border border-dashed border-slate-300 dark:border-slate-700 bg-white/60 dark:bg-slate-800/40 text-slate-400 dark:text-slate-500 text-xs flex items-center select-none">
+                  Fornecedor / Compra / Inventário Inicial
+                </div>
+              </template>
+
+              <template v-else-if="form.movement_type === 'RETURN'">
+                <select
+                  v-model="form.source_depot_id"
+                  class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none cursor-pointer"
+                >
+                  <option value="">Origem Externa (Cliente / Técnico em Campo)</option>
+                  <option v-for="d in depots" :key="d.id" :value="String(d.id)">
+                    {{ d.name }} ({{ formatDepotType(d.type) }})
+                  </option>
+                </select>
+              </template>
+
+              <template v-else>
+                <select
+                  v-model="form.source_depot_id"
+                  :required="isSourceRequired"
+                  @change="onHeaderSourceChange"
+                  class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none cursor-pointer"
+                >
+                  <option value="" disabled>Selecione o local de saída...</option>
+                  <option v-for="d in depots" :key="d.id" :value="String(d.id)">
+                    {{ d.name }} ({{ formatDepotType(d.type) }})
+                  </option>
+                </select>
+              </template>
+            </div>
+
+            <!-- DESTINO -->
+            <div>
+              <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                Depósito de Destino {{ isDestRequired ? '*' : '(Opcional / Externo)' }}
+              </label>
+
+              <template v-if="form.movement_type === 'EXIT'">
+                <div class="h-10 px-3.5 rounded-lg border border-dashed border-slate-300 dark:border-slate-700 bg-white/60 dark:bg-slate-800/40 text-slate-400 dark:text-slate-500 text-xs flex items-center select-none">
+                  Aplicação Operacional / Técnico / Cliente
+                </div>
+              </template>
+
+              <template v-else>
+                <select
+                  v-model="form.destination_depot_id"
+                  :required="isDestRequired"
+                  class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none cursor-pointer"
+                >
+                  <option value="" disabled>Selecione o local de entrada...</option>
+                  <option v-for="d in destinationOptions" :key="d.id" :value="String(d.id)">
+                    {{ d.name }} ({{ formatDepotType(d.type) }})
+                  </option>
+                </select>
+              </template>
+            </div>
+          </div>
+
+          <!-- Documento e Datas (3 Colunas) -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-3 border-t border-slate-200/80 dark:border-slate-700/60">
+            <!-- Número do Documento -->
+            <div>
+              <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                Número do Documento
+              </label>
+              <input
+                type="text"
+                v-model="form.document_number"
+                :placeholder="docRefPlaceholder"
+                class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none"
+              />
+            </div>
+
+            <!-- Data do Documento -->
+            <div>
+              <DateInput
+                v-model="form.document_date"
+                label="Data do Documento"
+              />
+            </div>
+
+            <!-- Data da Movimentação -->
+            <div>
+              <DateInput
+                v-model="form.movement_date"
+                label="Data da Movimentação"
+                required
+              />
+            </div>
+          </div>
+
+          <!-- Pessoas: Recebedor e Motorista (2 Colunas com Campo de Pesquisa) -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3 border-t border-slate-200/80 dark:border-slate-700/60">
+            <!-- Recebedor -->
+            <div>
+              <PersonSearchSelect
+                v-model="form.receiver_person_id"
+                label="Recebedor (Pessoa / Colaborador)"
+                placeholder="Digite ao menos 2 letras para buscar o recebedor..."
+              />
+            </div>
+
+            <!-- Motorista -->
+            <div>
+              <PersonSearchSelect
+                v-model="form.driver_person_id"
+                label="Motorista / Transportador"
+                placeholder="Digite ao menos 2 letras para buscar o motorista..."
+              />
+            </div>
+          </div>
+
+          <!-- Anotações da Movimentação -->
+          <div class="pt-3 border-t border-slate-200/80 dark:border-slate-700/60">
+            <div class="flex items-center gap-2 mb-1.5">
+              <FileText class="w-4 h-4 text-[#FC6714]" />
+              <label class="font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider text-xs">
+                Anotações Operacionais da Movimentação
+              </label>
+            </div>
+            <textarea
+              v-model="form.notes"
+              rows="3"
+              :placeholder="notesPlaceholder"
+              class="w-full p-3.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none resize-none leading-relaxed"
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Botão de Avanço de Aba -->
+        <div class="flex justify-end">
+          <button
+            type="button"
+            @click="currentTab = 'materials'"
+            class="h-10 px-5 rounded-xl bg-[#FC6714] hover:bg-[#E0530A] active:bg-[#C94605] text-white text-xs font-bold shadow-xs transition flex items-center gap-2 cursor-pointer"
+          >
+            <span>Avançar para Materiais (Grid)</span>
+            <ArrowRight class="w-4 h-4" />
+          </button>
         </div>
       </div>
 
       <!-- ========================================================================= -->
-      <!-- SEÇÃO 3: GRID DE MATERIAIS DA MOVIMENTAÇÃO -->
+      <!-- ABA 2: MATERIAIS (GRID DE MOVIMENTAÇÃO) -->
       <!-- ========================================================================= -->
-      <div class="rounded-2xl border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D]/50 shadow-xs overflow-hidden">
-        <div class="p-4 border-b border-slate-200 dark:border-[#14147A] bg-slate-50/60 dark:bg-[#03032E]/70 flex items-center justify-between gap-4">
-          <div class="flex items-center gap-3">
-            <h4 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-              Materiais da Movimentação (Grid de Conferência)
-            </h4>
-            <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
-              {{ gridItems.length }} item(ns)
+      <div v-show="currentTab === 'materials'" class="space-y-6">
+        <!-- Linha de Inserção de Material -->
+        <div class="p-5 bg-white dark:bg-[#06064D]/50 rounded-2xl border border-slate-200 dark:border-[#14147A] shadow-xs space-y-4">
+          <div class="flex items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+              <Layers class="w-4 h-4 text-[#FC6714]" />
+              <h4 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+                Adicionar Material à Movimentação
+              </h4>
+            </div>
+            <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">
+              Insira os materiais um a um para compor a grid
             </span>
           </div>
 
-          <div v-if="hasPendingSerials" class="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400 font-bold animate-pulse">
-            <AlertCircle class="w-4 h-4" />
-            <span>Existem seriais pendentes de bipagem</span>
+          <!-- Linha: Campo Novo Material + Campo Quantidade + Botão Adicionar -->
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+            <!-- Campo 1: Material (8 colunas) -->
+            <div class="md:col-span-8">
+              <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                Novo Material *
+              </label>
+              <select
+                v-model="newItem.material_id"
+                @change="onNewItemMaterialChange"
+                class="w-full h-11 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-xs font-medium focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none cursor-pointer"
+              >
+                <option value="" disabled>Selecione um material do catálogo para adicionar...</option>
+                <option v-for="m in materials" :key="m.id" :value="m.id">
+                  {{ m.code }} — {{ m.name }} [{{ m.unit?.code || 'UND' }}] {{ m.has_serial ? '• [Serial Obrigatório]' : '• [Convencional]' }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Campo 2: Quantidade (2 colunas) -->
+            <div class="md:col-span-2">
+              <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                Quantidade *
+              </label>
+              <input
+                type="number"
+                :step="selectedNewItemMaterial?.has_serial ? '1' : '0.01'"
+                min="1"
+                v-model.number="newItem.quantity"
+                placeholder="Qtd"
+                class="w-full h-11 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 font-mono text-xs font-bold focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none"
+              />
+            </div>
+
+            <!-- Botão 3: Adicionar Material (2 colunas) -->
+            <div class="md:col-span-2">
+              <button
+                type="button"
+                @click="addMaterialToGrid"
+                :disabled="!newItem.material_id || newItem.quantity <= 0"
+                class="w-full h-11 px-4 rounded-lg bg-[#FC6714] hover:bg-[#E0530A] active:bg-[#C94605] disabled:opacity-50 text-white text-xs font-bold shadow-xs transition active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+              >
+                <Plus class="w-4 h-4" />
+                <span>Adicionar à Grid</span>
+              </button>
+            </div>
           </div>
-          <div v-else-if="gridItems.length > 0" class="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-bold">
-            <CheckCircle2 class="w-4 h-4" />
-            <span>Todos os itens validados para movimentação</span>
+
+          <!-- Alerta Contextual quando material tem Rastreamento Serial Obrigatório -->
+          <div
+            v-if="selectedNewItemMaterial?.has_serial"
+            class="p-3.5 rounded-xl border border-purple-200 dark:border-purple-800/60 bg-purple-50/60 dark:bg-purple-950/25 flex items-center justify-between gap-3 text-xs"
+          >
+            <div class="flex items-center gap-2 text-purple-900 dark:text-purple-300 font-medium">
+              <QrCode class="w-4 h-4 text-purple-600 shrink-0" />
+              <span>
+                <strong>Rastreamento Serial Obrigatório:</strong> A quantidade informada define que devem ser informados e bipados exatamente <strong>{{ newItem.quantity || 1 }}</strong> seriais deste item na aba <strong>Serializado</strong>.
+              </span>
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-200/70 dark:bg-purple-900 text-purple-800 dark:text-purple-200 shrink-0">
+              Conferência Obrigatória
+            </span>
           </div>
         </div>
 
-        <!-- Se Grid Vazia -->
-        <div v-if="gridItems.length === 0" class="py-12 text-center text-slate-400 dark:text-slate-500 space-y-2">
-          <Layers class="w-10 h-10 mx-auto opacity-40 text-[#FC6714]" />
-          <p class="text-sm font-semibold">Nenhum material adicionado à movimentação ainda.</p>
-          <p class="text-xs">Selecione o material e a quantidade na linha acima e clique em "Adicionar à Grid".</p>
-        </div>
+        <!-- Grid de Conferência de Materiais -->
+        <div class="rounded-2xl border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D]/50 shadow-xs overflow-hidden">
+          <div class="p-4 border-b border-slate-200 dark:border-[#14147A] bg-slate-50/60 dark:bg-[#03032E]/70 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <h4 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                Materiais da Movimentação (Grid de Conferência)
+              </h4>
+              <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+                {{ gridItems.length }} item(ns)
+              </span>
+            </div>
 
-        <!-- Tabela de Itens da Grid -->
-        <div v-else class="overflow-x-auto">
-          <table class="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr class="border-b border-slate-200 dark:border-[#14147A] bg-slate-100/50 dark:bg-[#03032E]/40 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider select-none">
-                <th class="py-3 px-4 w-12 text-center">#</th>
-                <th class="py-3 px-4">Material / SKU</th>
-                <th class="py-3 px-4 w-36">Tipo de Rastreio</th>
-                <th class="py-3 px-4 w-28 text-right">Qtd</th>
-                <th class="py-3 px-4">Conferência Serial / Bipagem</th>
-                <th class="py-3 px-4 w-16 text-center">Ações</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100 dark:divide-slate-800/60">
-              <template v-for="(item, idx) in gridItems" :key="item.uid">
+            <div v-if="hasPendingSerials" class="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400 font-bold">
+              <AlertCircle class="w-4 h-4 animate-pulse" />
+              <span>{{ pendingSerialsCount }} serial(is) pendente(s) na aba Serializado</span>
+            </div>
+            <div v-else-if="gridItems.length > 0" class="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-bold">
+              <CheckCircle2 class="w-4 h-4" />
+              <span>Todos os materiais validados</span>
+            </div>
+          </div>
+
+          <!-- Se Grid Vazia -->
+          <div v-if="gridItems.length === 0" class="py-12 text-center text-slate-400 dark:text-slate-500 space-y-2">
+            <Layers class="w-10 h-10 mx-auto opacity-40 text-[#FC6714]" />
+            <p class="text-sm font-semibold">Nenhum material adicionado à movimentação ainda.</p>
+            <p class="text-xs">Selecione o material e a quantidade na linha acima e clique em "Adicionar à Grid".</p>
+          </div>
+
+          <!-- Tabela de Itens da Grid -->
+          <div v-else class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="border-b border-slate-200 dark:border-[#14147A] bg-slate-100/50 dark:bg-[#03032E]/40 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider select-none">
+                  <th class="py-3 px-4 w-12 text-center">#</th>
+                  <th class="py-3 px-4">Material / SKU</th>
+                  <th class="py-3 px-4 w-36">Tipo de Rastreio</th>
+                  <th class="py-3 px-4 w-28 text-right">Qtd</th>
+                  <th class="py-3 px-4 w-60">Conferência Serial</th>
+                  <th class="py-3 px-4 w-16 text-center">Ações</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 dark:divide-slate-800/60">
                 <tr
-                  class="transition-colors duration-150"
-                  :class="item.material.has_serial && item.serials.length < item.quantity
-                    ? 'bg-amber-50/40 dark:bg-amber-950/15'
-                    : 'hover:bg-slate-50 dark:hover:bg-white/5'"
+                  v-for="(item, idx) in gridItems"
+                  :key="item.uid"
+                  class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors duration-150"
                 >
-                  <!-- Índice -->
                   <td class="py-3.5 px-4 text-center font-bold text-slate-400">
                     {{ idx + 1 }}
                   </td>
-
-                  <!-- Material / SKU -->
                   <td class="py-3.5 px-4">
                     <div class="font-bold text-slate-900 dark:text-slate-100">
                       {{ item.material.name }}
@@ -373,8 +483,6 @@
                       SKU: {{ item.material.code }} • {{ item.material.unit?.code || 'UND' }}
                     </div>
                   </td>
-
-                  <!-- Tipo de Rastreio -->
                   <td class="py-3.5 px-4">
                     <span
                       v-if="item.material.has_serial"
@@ -390,173 +498,318 @@
                       Convencional
                     </span>
                   </td>
-
-                  <!-- Quantidade -->
                   <td class="py-3.5 px-4 text-right font-mono font-bold text-slate-900 dark:text-slate-100 text-sm">
                     {{ item.quantity }}
                   </td>
-
-                  <!-- Conferência Serial / Bipagem -->
                   <td class="py-3.5 px-4">
-                    <!-- Caso Convencional -->
-                    <span v-if="!item.material.has_serial" class="text-slate-400 italic">
-                      Não aplicável (sem controle serial)
+                    <span v-if="!item.material.has_serial" class="text-slate-400 italic text-[11px]">
+                      Não aplicável (sem serial)
                     </span>
-
-                    <!-- Caso Serializado -->
-                    <div v-else class="space-y-2">
-                      <div class="flex items-center justify-between gap-2">
-                        <!-- Badge de Status -->
-                        <span
-                          class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold"
-                          :class="item.serials.length === item.quantity
-                            ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'
-                            : 'bg-amber-100 text-amber-800 dark:bg-amber-950/70 dark:text-amber-300 border border-amber-300 dark:border-amber-800'"
-                        >
-                          <component
-                            :is="item.serials.length === item.quantity ? CheckCircle2 : AlertCircle"
-                            class="w-3.5 h-3.5"
-                          />
-                          <span>
-                            {{ item.serials.length }} de {{ item.quantity }} serial(is) bipado(s)
-                          </span>
-                        </span>
-
-                        <button
-                          type="button"
-                          @click="toggleItemScanner(item)"
-                          class="text-xs font-semibold text-[#FC6714] hover:underline cursor-pointer inline-flex items-center gap-1"
-                        >
-                          <ScanBarcode class="w-3.5 h-3.5" />
-                          <span>{{ item.showScanner ? 'Recolher leitor' : 'Bipar seriais' }}</span>
-                        </button>
-                      </div>
-
-                      <!-- Área de Bipagem Rápida / Leitor Óptico Integrado -->
-                      <div
-                        v-if="item.showScanner || item.serials.length < item.quantity"
-                        class="p-3 bg-white dark:bg-slate-900 rounded-xl border border-purple-200 dark:border-purple-800 space-y-2"
+                    <div v-else class="flex items-center gap-2">
+                      <button
+                        type="button"
+                        @click="currentTab = 'serials'"
+                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer"
+                        :class="item.serials.length === item.quantity
+                          ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'
+                          : 'bg-amber-100 text-amber-800 dark:bg-amber-950/70 dark:text-amber-300 border border-amber-300 dark:border-amber-800 hover:bg-amber-200'"
+                        title="Ir para a aba Serializado para bipar este material"
                       >
-                        <!-- Input de Bipagem -->
-                        <div class="flex items-center gap-2">
-                          <div class="relative flex-1">
-                            <ScanBarcode class="w-4 h-4 absolute left-3 top-2.5 text-purple-500 pointer-events-none" />
-                            <input
-                              type="text"
-                              v-model="item.scannerInput"
-                              @keydown.enter.prevent="onScanBarcodeEnter(item)"
-                              :placeholder="item.serials.length < item.quantity ? `Bipe o serial ${item.serials.length + 1} de ${item.quantity} e tecle Enter...` : 'Todos os seriais já foram bipados'"
-                              :disabled="item.serials.length >= item.quantity"
-                              class="w-full h-9 pl-9 pr-3 rounded-lg border border-purple-300 dark:border-purple-700 bg-purple-50/40 dark:bg-purple-950/30 text-xs font-mono focus:ring-2 focus:ring-purple-400 outline-none"
-                            />
-                          </div>
-                          <button
-                            type="button"
-                            @click="onScanBarcodeEnter(item)"
-                            :disabled="!item.scannerInput?.trim() || item.serials.length >= item.quantity"
-                            class="h-9 px-3 rounded-lg bg-purple-600 hover:bg-purple-700 disabled:opacity-40 text-white text-xs font-bold transition cursor-pointer"
-                          >
-                            Bipar
-                          </button>
-                        </div>
-
-                        <!-- Erro específico de bipagem na linha -->
-                        <div v-if="item.scanError" class="text-[11px] font-bold text-rose-600 flex items-center gap-1">
-                          <AlertCircle class="w-3.5 h-3.5" />
-                          <span>{{ item.scanError }}</span>
-                        </div>
-
-                        <!-- Chips com seriais bipados -->
-                        <div v-if="item.serials.length > 0" class="flex flex-wrap gap-1.5 pt-1">
-                          <span
-                            v-for="(s, sIdx) in item.serials"
-                            :key="sIdx"
-                            class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-purple-100 dark:bg-purple-900/60 text-purple-900 dark:text-purple-200 font-mono text-[11px] border border-purple-200 dark:border-purple-800"
-                          >
-                            <span>{{ s.serial_number || s }}</span>
-                            <button
-                              type="button"
-                              @click="removeSerialFromItem(item, sIdx)"
-                              class="text-purple-400 hover:text-rose-600 transition cursor-pointer"
-                              title="Remover este serial"
-                            >
-                              ✕
-                            </button>
-                          </span>
-                        </div>
-                      </div>
+                        <component :is="item.serials.length === item.quantity ? CheckCircle2 : AlertCircle" class="w-3.5 h-3.5" />
+                        <span>{{ item.serials.length }} de {{ item.quantity }} bipado(s)</span>
+                        <ArrowRight class="w-3 h-3 opacity-70" />
+                      </button>
                     </div>
                   </td>
-
-                  <!-- Ações -->
                   <td class="py-3.5 px-4 text-center">
                     <button
                       type="button"
                       @click="removeGridItem(idx)"
                       class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
-                      title="Remover material da movimentação"
+                      title="Remover material da grid"
                     >
                       <Trash2 class="w-4 h-4" />
                     </button>
                   </td>
                 </tr>
-              </template>
-            </tbody>
-          </table>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Rodapé Interno da Grid com Totais -->
+          <div v-if="gridItems.length > 0" class="p-4 bg-slate-50/70 dark:bg-[#03032E]/60 border-t border-slate-200 dark:border-[#14147A] flex flex-wrap items-center justify-between gap-4 text-xs font-semibold">
+            <div class="flex items-center gap-4 text-slate-600 dark:text-slate-400">
+              <span>Total de Materiais: <strong>{{ gridItems.length }}</strong></span>
+              <span>Total de Peças: <strong>{{ totalPiecesCount }}</strong></span>
+              <span>Itens Serializados: <strong>{{ totalSerializedCount }}</strong></span>
+            </div>
+
+            <div v-if="hasPendingSerials" class="text-rose-600 dark:text-rose-400 font-bold flex items-center gap-1.5">
+              <AlertCircle class="w-4 h-4" />
+              <span>Existem seriais a serem bipados na aba Serializado</span>
+            </div>
+            <div v-else class="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1.5">
+              <CheckCircle2 class="w-4 h-4" />
+              <span>Grid pronta para submissão</span>
+            </div>
+          </div>
         </div>
 
-        <!-- Rodapé Interno da Grid com Totais -->
-        <div v-if="gridItems.length > 0" class="p-4 bg-slate-50/70 dark:bg-[#03032E]/60 border-t border-slate-200 dark:border-[#14147A] flex flex-wrap items-center justify-between gap-4 text-xs font-semibold">
-          <div class="flex items-center gap-4 text-slate-600 dark:text-slate-400">
-            <span>Total de Materiais: <strong>{{ gridItems.length }}</strong></span>
-            <span>Total de Peças: <strong>{{ totalPiecesCount }}</strong></span>
-            <span>Itens Serializados: <strong>{{ totalSerializedCount }}</strong></span>
-          </div>
+        <!-- Botões de Navegação -->
+        <div class="flex items-center justify-between pt-2">
+          <button
+            type="button"
+            @click="currentTab = 'data'"
+            class="h-10 px-4 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-semibold transition hover:bg-slate-50 cursor-pointer flex items-center gap-2"
+          >
+            <ArrowLeft class="w-4 h-4" />
+            <span>Voltar para Dados</span>
+          </button>
 
-          <div v-if="hasPendingSerials" class="text-rose-600 dark:text-rose-400 font-bold flex items-center gap-1.5">
-            <AlertCircle class="w-4 h-4" />
-            <span>Faltam seriais a serem bipados antes de confirmar</span>
-          </div>
-          <div v-else class="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1.5">
-            <CheckCircle2 class="w-4 h-4" />
-            <span>Grid pronta para submissão</span>
-          </div>
+          <button
+            type="button"
+            @click="currentTab = serializedGridItems.length > 0 ? 'serials' : 'attachments'"
+            class="h-10 px-5 rounded-xl bg-[#FC6714] hover:bg-[#E0530A] active:bg-[#C94605] text-white text-xs font-bold shadow-xs transition flex items-center gap-2 cursor-pointer"
+          >
+            <span>{{ serializedGridItems.length > 0 ? 'Avançar para Serializado' : 'Avançar para Anexos' }}</span>
+            <ArrowRight class="w-4 h-4" />
+          </button>
         </div>
       </div>
 
       <!-- ========================================================================= -->
-      <!-- SEÇÃO 4: ANOTAÇÕES E ANEXOS (DOCUMENTOS E FOTOS) -->
+      <!-- ABA 3: SERIALIZADOS (CONFERÊNCIA E BIPAGEM DE SERIAIS) -->
       <!-- ========================================================================= -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        <!-- Bloco de Anotações (5 Colunas) -->
-        <div class="lg:col-span-5 p-4 bg-white dark:bg-[#06064D]/50 rounded-2xl border border-slate-200 dark:border-[#14147A] shadow-xs flex flex-col justify-between">
-          <div class="space-y-1.5 mb-3">
-            <div class="flex items-center gap-2">
-              <FileText class="w-4 h-4 text-[#FC6714]" />
-              <label class="font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider text-xs">
-                Anotações da Movimentação
-              </label>
-            </div>
-            <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-              Registre observações pertinentes, detalhes da carga, motivo da devolução/saída ou instruções operacionais.
+      <div v-show="currentTab === 'serials'" class="space-y-6">
+        <!-- Se não houver itens serializados na grid -->
+        <div
+          v-if="serializedGridItems.length === 0"
+          class="p-12 bg-white dark:bg-[#06064D]/50 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 text-center space-y-4"
+        >
+          <div class="w-16 h-16 rounded-2xl bg-purple-50 dark:bg-purple-950/50 text-purple-600 flex items-center justify-center mx-auto">
+            <QrCode class="w-8 h-8" />
+          </div>
+          <div class="space-y-1">
+            <h4 class="text-base font-bold text-slate-900 dark:text-white">
+              Nenhum material com rastreamento serial na grid
+            </h4>
+            <p class="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+              Os materiais adicionados até o momento não exigem controle serial individual. Caso precise movimentar ONUs, roteadores ou outros itens com serial obrigatório, adicione-os na aba Materiais.
             </p>
           </div>
-          <textarea
-            v-model="form.notes"
-            rows="5"
-            :placeholder="notesPlaceholder"
-            class="w-full p-3.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none resize-none leading-relaxed"
-          ></textarea>
+          <div>
+            <button
+              type="button"
+              @click="currentTab = 'materials'"
+              class="h-10 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-xs transition cursor-pointer inline-flex items-center gap-2"
+            >
+              <Plus class="w-4 h-4" />
+              <span>Ir para a Aba de Materiais</span>
+            </button>
+          </div>
         </div>
 
-        <!-- Bloco de Anexos: Documentos e Fotos (7 Colunas) -->
-        <div class="lg:col-span-7 p-4 bg-white dark:bg-[#06064D]/50 rounded-2xl border border-slate-200 dark:border-[#14147A] shadow-xs space-y-3">
+        <!-- Se HOUVER itens serializados na grid -->
+        <div v-else class="space-y-5">
+          <!-- Cabeçalho de Status Geral de Bipagem -->
+          <div class="p-4 bg-gradient-to-r from-purple-900/10 via-purple-800/5 to-transparent rounded-2xl border border-purple-200 dark:border-purple-800/80 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center shadow-xs">
+                <ScanBarcode class="w-5 h-5" />
+              </div>
+              <div>
+                <h4 class="text-sm font-bold text-purple-950 dark:text-purple-200 uppercase tracking-wider">
+                  Conferência e Bipagem de Seriais
+                </h4>
+                <p class="text-xs text-slate-500 dark:text-slate-400">
+                  {{ hasPendingSerials ? `Faltam ${pendingSerialsCount} número(s) de série a serem bipados para liberar a movimentação.` : 'Todos os seriais obrigatórios foram bipados e validados com sucesso!' }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Progresso Geral -->
+            <div class="flex items-center gap-3">
+              <div class="text-right">
+                <span class="block text-xs font-mono font-bold" :class="hasPendingSerials ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'">
+                  {{ totalBipedSerialsCount }} / {{ totalRequiredSerialsCount }} seriais
+                </span>
+                <span class="text-[11px] text-slate-400">
+                  {{ serialsProgressPercent }}% conferido
+                </span>
+              </div>
+              <div class="w-24 h-2.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+                <div
+                  class="h-full transition-all duration-300"
+                  :class="hasPendingSerials ? 'bg-amber-500' : 'bg-emerald-500'"
+                  :style="{ width: `${serialsProgressPercent}%` }"
+                ></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cards Individuais de Cada Item Serializado -->
+          <div class="space-y-4">
+            <div
+              v-for="item in serializedGridItems"
+              :key="item.uid"
+              class="p-5 bg-white dark:bg-[#06064D]/50 rounded-2xl border transition-all duration-150 shadow-xs space-y-4"
+              :class="item.serials.length === item.quantity
+                ? 'border-emerald-300 dark:border-emerald-800/80 bg-emerald-50/20 dark:bg-emerald-950/10'
+                : 'border-purple-200 dark:border-purple-800/70'"
+            >
+              <!-- Cabeçalho do Card do Item -->
+              <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 flex items-center justify-center font-bold text-xs">
+                    <QrCode class="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h5 class="text-sm font-bold text-slate-900 dark:text-white">
+                      {{ item.material.name }}
+                    </h5>
+                    <div class="text-[11px] text-slate-400 font-mono">
+                      SKU: {{ item.material.code }} • Exigidos: <strong>{{ item.quantity }} {{ item.material.unit?.code || 'UND' }}</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Badge de Status do Item -->
+                <div class="flex items-center gap-2">
+                  <span
+                    class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold"
+                    :class="item.serials.length === item.quantity
+                      ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'
+                      : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-300 dark:border-amber-800'"
+                  >
+                    <component :is="item.serials.length === item.quantity ? CheckCircle2 : AlertCircle" class="w-3.5 h-3.5" />
+                    <span>{{ item.serials.length }} de {{ item.quantity }} bipado(s)</span>
+                  </span>
+
+                  <button
+                    v-if="item.serials.length > 0"
+                    type="button"
+                    @click="clearItemSerials(item)"
+                    class="p-1.5 text-xs text-rose-500 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition cursor-pointer"
+                    title="Limpar todos os seriais bipados deste item"
+                  >
+                    Limpar
+                  </button>
+                </div>
+              </div>
+
+              <!-- Linha de Entrada de Bipagem Rápida / Leitor Óptico -->
+              <div class="space-y-2">
+                <div class="flex items-center gap-2">
+                  <div class="relative flex-1">
+                    <ScanBarcode class="w-4 h-4 absolute left-3.5 top-3 text-purple-500 pointer-events-none" />
+                    <input
+                      type="text"
+                      v-model="item.scannerInput"
+                      @keydown.enter.prevent="onScanBarcodeEnter(item)"
+                      :placeholder="item.serials.length < item.quantity ? `Bipe o serial ${item.serials.length + 1} de ${item.quantity} ou digite e tecle Enter...` : 'Todos os seriais deste material já foram conferidos'"
+                      :disabled="item.serials.length >= item.quantity"
+                      class="w-full h-10 pl-10 pr-3 rounded-xl border border-purple-300 dark:border-purple-700 bg-purple-50/40 dark:bg-[#03032E] text-xs font-mono font-medium focus:ring-2 focus:ring-purple-400 outline-none"
+                    />
+                  </div>
+
+                  <button
+                    type="button"
+                    @click="onScanBarcodeEnter(item)"
+                    :disabled="!item.scannerInput?.trim() || item.serials.length >= item.quantity"
+                    class="h-10 px-5 rounded-xl bg-purple-600 hover:bg-purple-700 active:bg-purple-800 disabled:opacity-40 text-white text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shrink-0"
+                  >
+                    <Plus class="w-4 h-4" />
+                    <span>Bipar</span>
+                  </button>
+                </div>
+
+                <!-- Mensagem de Erro de Bipagem -->
+                <div v-if="item.scanError" class="p-2.5 rounded-lg bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900 text-[11px] font-bold text-rose-600 dark:text-rose-300 flex items-center gap-2">
+                  <AlertCircle class="w-4 h-4 shrink-0 text-rose-500" />
+                  <span>{{ item.scanError }}</span>
+                </div>
+              </div>
+
+              <!-- Lista de Seriais Já Bipados -->
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                    Seriais Registrados ({{ item.serials.length }} de {{ item.quantity }}):
+                  </span>
+                  <span v-if="item.serials.length < item.quantity" class="text-[11px] text-amber-600 dark:text-amber-400 font-semibold">
+                    Restam {{ item.quantity - item.serials.length }} serial(is)
+                  </span>
+                  <span v-else class="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                    <CheckCircle2 class="w-3.5 h-3.5" />
+                    <span>Conferência 100% completa</span>
+                  </span>
+                </div>
+
+                <div v-if="item.serials.length === 0" class="p-4 rounded-xl border border-dashed border-slate-200 dark:border-slate-800 text-center text-slate-400 text-xs">
+                  Nenhum serial bipado ainda para este material. Utilize o campo acima com seu leitor óptico.
+                </div>
+
+                <div v-else class="flex flex-wrap gap-2">
+                  <div
+                    v-for="(s, sIdx) in item.serials"
+                    :key="sIdx"
+                    class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-purple-50 dark:bg-purple-950/70 border border-purple-200 dark:border-purple-800 text-purple-900 dark:text-purple-200 text-xs font-mono font-medium shadow-2xs"
+                  >
+                    <span class="w-4 h-4 rounded-full bg-purple-200 dark:bg-purple-900 text-purple-800 dark:text-purple-200 flex items-center justify-center text-[10px] font-bold">
+                      {{ sIdx + 1 }}
+                    </span>
+                    <span class="font-bold">{{ s.serial_number || s }}</span>
+                    <span v-if="s.mac_address" class="text-[10px] text-purple-500 dark:text-purple-400">
+                      [{{ s.mac_address }}]
+                    </span>
+                    <button
+                      type="button"
+                      @click="removeSerialFromItem(item, sIdx)"
+                      class="text-purple-400 hover:text-rose-600 dark:hover:text-rose-400 p-0.5 rounded transition cursor-pointer"
+                      title="Remover este serial"
+                    >
+                      <X class="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botões de Navegação -->
+        <div class="flex items-center justify-between pt-2">
+          <button
+            type="button"
+            @click="currentTab = 'materials'"
+            class="h-10 px-4 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-semibold transition hover:bg-slate-50 cursor-pointer flex items-center gap-2"
+          >
+            <ArrowLeft class="w-4 h-4" />
+            <span>Voltar para Materiais</span>
+          </button>
+
+          <button
+            type="button"
+            @click="currentTab = 'attachments'"
+            class="h-10 px-5 rounded-xl bg-[#FC6714] hover:bg-[#E0530A] active:bg-[#C94605] text-white text-xs font-bold shadow-xs transition flex items-center gap-2 cursor-pointer"
+          >
+            <span>Avançar para Anexos</span>
+            <ArrowRight class="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      <!-- ========================================================================= -->
+      <!-- ABA 4: ANEXOS (DOCUMENTOS E FOTOS) -->
+      <!-- ========================================================================= -->
+      <div v-show="currentTab === 'attachments'" class="space-y-6">
+        <div class="p-5 bg-white dark:bg-[#06064D]/50 rounded-2xl border border-slate-200 dark:border-[#14147A] shadow-xs space-y-4">
           <div class="flex items-center justify-between gap-2">
             <div class="flex items-center gap-2">
               <Paperclip class="w-4 h-4 text-[#FC6714]" />
-              <label class="font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider text-xs">
-                Anexos (Documentos e Fotos)
-              </label>
+              <h4 class="font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider text-xs">
+                Anexos da Movimentação (Documentos e Fotos)
+              </h4>
             </div>
             <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
               {{ form.attachments.length }} anexo(s)
@@ -569,7 +822,7 @@
             @dragleave.prevent="isDragging = false"
             @drop.prevent="onDropFiles"
             @click="triggerFileInput"
-            class="p-4 rounded-xl border-2 border-dashed transition cursor-pointer flex flex-col items-center justify-center text-center gap-1.5"
+            class="p-8 rounded-2xl border-2 border-dashed transition cursor-pointer flex flex-col items-center justify-center text-center gap-2"
             :class="isDragging
               ? 'border-[#FC6714] bg-[#FC6714]/10 dark:bg-[#FC6714]/15'
               : 'border-slate-300 dark:border-slate-700 bg-slate-50/60 dark:bg-[#03032E]/70 hover:border-[#FC6714]/60 hover:bg-slate-100/50 dark:hover:bg-slate-800/40'"
@@ -582,87 +835,128 @@
               @change="onFileChange"
               class="hidden"
             />
-            <div class="w-9 h-9 rounded-full bg-orange-100 dark:bg-[#FC6714]/20 text-[#FC6714] flex items-center justify-center">
-              <UploadCloud class="w-5 h-5" />
+            <div class="w-12 h-12 rounded-full bg-orange-100 dark:bg-[#FC6714]/20 text-[#FC6714] flex items-center justify-center">
+              <UploadCloud class="w-6 h-6" />
             </div>
-            <div>
-              <p class="text-xs font-bold text-slate-700 dark:text-slate-200">
+            <div class="space-y-1">
+              <p class="text-sm font-bold text-slate-800 dark:text-slate-200">
                 Clique para selecionar ou arraste arquivos aqui
               </p>
-              <p class="text-[11px] text-slate-400 dark:text-slate-500">
-                PDF, XML (NF-e), Fotos (JPG, PNG, WEBP), Word, Excel (Máx. 20MB cada)
+              <p class="text-xs text-slate-400 dark:text-slate-500">
+                Notas Fiscais (PDF / XML), Fotos da carga (JPG, PNG, WEBP), Guias, Planilhas (Máx. 20MB cada)
               </p>
             </div>
           </div>
 
           <!-- Spinner durante upload de arquivos -->
-          <div v-if="isUploadingAttachment" class="flex items-center gap-2 p-2.5 rounded-xl bg-orange-50 dark:bg-[#FC6714]/10 text-[#FC6714] text-xs font-semibold">
+          <div v-if="isUploadingAttachment" class="flex items-center gap-2 p-3 rounded-xl bg-orange-50 dark:bg-[#FC6714]/10 text-[#FC6714] text-xs font-semibold">
             <Loader2 class="w-4 h-4 animate-spin" />
             <span>Fazendo upload de anexo(s) para o servidor...</span>
           </div>
 
           <!-- Lista de Arquivos Anexados -->
-          <div v-if="form.attachments.length > 0" class="max-h-44 overflow-y-auto space-y-2 pr-1">
-            <div
-              v-for="(att, idx) in form.attachments"
-              :key="att.tempId || att.id || idx"
-              class="flex items-center justify-between p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-[#03032E] hover:border-slate-300 transition gap-3"
-            >
-              <div class="flex items-center gap-3 min-w-0">
-                <!-- Preview se for imagem -->
-                <div v-if="isImageAttachment(att)" class="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0 bg-slate-100 dark:bg-slate-800">
-                  <img :src="att.url" :alt="att.file_name" class="w-full h-full object-cover" />
-                </div>
-                <!-- Ícone se for documento -->
-                <div v-else class="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 text-slate-500 dark:text-slate-400">
-                  <component :is="getFileIcon(att.file_name)" class="w-5 h-5 text-[#FC6714]" />
-                </div>
+          <div v-if="form.attachments.length > 0" class="space-y-2 pt-2">
+            <h5 class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+              Arquivos Anexados ({{ form.attachments.length }})
+            </h5>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div
+                v-for="(att, idx) in form.attachments"
+                :key="att.tempId || att.id || idx"
+                class="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-[#03032E] hover:border-slate-300 transition gap-3"
+              >
+                <div class="flex items-center gap-3 min-w-0">
+                  <!-- Preview se for imagem -->
+                  <div v-if="isImageAttachment(att)" class="w-12 h-12 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0 bg-slate-100 dark:bg-slate-800">
+                    <img :src="att.url" :alt="att.file_name" class="w-full h-full object-cover" />
+                  </div>
+                  <!-- Ícone se for documento -->
+                  <div v-else class="w-12 h-12 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 text-slate-500 dark:text-slate-400">
+                    <component :is="getFileIcon(att.file_name)" class="w-6 h-6 text-[#FC6714]" />
+                  </div>
 
-                <div class="min-w-0">
-                  <p class="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate" :title="att.file_name">
-                    {{ att.file_name }}
-                  </p>
-                  <div class="flex items-center gap-2 text-[11px] text-slate-400 dark:text-slate-500">
-                    <span v-if="att.file_size">{{ formatFileSize(att.file_size) }}</span>
-                    <span v-if="att.is_uploading" class="text-amber-500 font-medium">Enviando...</span>
-                    <span v-else class="text-emerald-600 dark:text-emerald-400 font-medium">Pronto</span>
+                  <div class="min-w-0">
+                    <p class="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate" :title="att.file_name">
+                      {{ att.file_name }}
+                    </p>
+                    <div class="flex items-center gap-2 text-[11px] text-slate-400 dark:text-slate-500">
+                      <span v-if="att.file_size">{{ formatFileSize(att.file_size) }}</span>
+                      <span v-if="att.is_uploading" class="text-amber-500 font-medium">Enviando...</span>
+                      <span v-else class="text-emerald-600 dark:text-emerald-400 font-medium">Pronto</span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <!-- Ações do Anexo -->
-              <div class="flex items-center gap-1 shrink-0">
-                <a
-                  v-if="att.url && !att.is_uploading"
-                  :href="att.url"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition cursor-pointer"
-                  title="Visualizar ou baixar anexo"
-                >
-                  <ExternalLink class="w-4 h-4" />
-                </a>
-                <button
-                  type="button"
-                  @click="removeAttachment(idx)"
-                  class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
-                  title="Remover anexo"
-                >
-                  <Trash2 class="w-4 h-4" />
-                </button>
+                <!-- Ações do Anexo -->
+                <div class="flex items-center gap-1 shrink-0">
+                  <a
+                    v-if="att.url && !att.is_uploading"
+                    :href="att.url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition cursor-pointer"
+                    title="Visualizar ou baixar anexo"
+                  >
+                    <ExternalLink class="w-4 h-4" />
+                  </a>
+                  <button
+                    type="button"
+                    @click="removeAttachment(idx)"
+                    class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
+                    title="Remover anexo"
+                  >
+                    <Trash2 class="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
+        </div>
+
+        <!-- Botões de Navegação -->
+        <div class="flex items-center justify-between pt-2">
+          <button
+            type="button"
+            @click="currentTab = serializedGridItems.length > 0 ? 'serials' : 'materials'"
+            class="h-10 px-4 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-semibold transition hover:bg-slate-50 cursor-pointer flex items-center gap-2"
+          >
+            <ArrowLeft class="w-4 h-4" />
+            <span>{{ serializedGridItems.length > 0 ? 'Voltar para Serializado' : 'Voltar para Materiais' }}</span>
+          </button>
         </div>
       </div>
     </div>
 
     <!-- RODAPÉ DO MODAL FULLSCREEN -->
     <template #footer>
-      <div class="w-full flex items-center justify-between gap-4">
-        <div class="text-xs text-slate-500 dark:text-slate-400 font-medium flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span>Transação atômica única no banco de dados para todos os materiais da grid</span>
+      <div class="w-full flex flex-wrap items-center justify-between gap-4">
+        <div class="text-xs text-slate-500 dark:text-slate-400 font-medium flex flex-wrap items-center gap-4">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>Transação atômica única</span>
+          </div>
+
+          <div class="flex items-center gap-2.5 text-[11px] font-semibold">
+            <span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+              {{ gridItems.length }} material(is)
+            </span>
+            <span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+              {{ totalPiecesCount }} peça(s)
+            </span>
+            <span
+              v-if="serializedGridItems.length > 0"
+              class="px-2 py-0.5 rounded-md font-bold flex items-center gap-1"
+              :class="hasPendingSerials
+                ? 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-800'
+                : 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'"
+            >
+              <component :is="hasPendingSerials ? AlertCircle : CheckCircle2" class="w-3 h-3" />
+              <span>Seriais: {{ totalBipedSerialsCount }}/{{ totalRequiredSerialsCount }}</span>
+            </span>
+            <span v-if="form.attachments.length > 0" class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+              {{ form.attachments.length }} anexo(s)
+            </span>
+          </div>
         </div>
 
         <div class="flex items-center gap-3">
@@ -677,7 +971,7 @@
           <button
             type="button"
             @click="submitAllMovements"
-            :disabled="submitting || gridItems.length === 0 || hasPendingSerials"
+            :disabled="submitting || gridItems.length === 0 || hasPendingSerials || isUploadingAttachment"
             class="h-11 px-6 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-98 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
             :class="submitButtonColorClass"
           >
@@ -714,12 +1008,18 @@ import {
   FileSpreadsheet,
   File as FileIcon,
   Loader2,
+  SlidersHorizontal,
+  ArrowRight,
+  ArrowLeft,
 } from 'lucide-vue-next';
 import BaseModal from '@/components/common/BaseModal.vue';
 import PersonSearchSelect from '@/components/common/PersonSearchSelect.vue';
 import DateInput from '@/components/common/DateInput.vue';
 
 type MovementType = 'ENTRY' | 'EXIT' | 'RETURN' | 'TRANSFER';
+type ModalTab = 'data' | 'materials' | 'serials' | 'attachments';
+
+const currentTab = ref<ModalTab>('data');
 
 interface AttachmentItem {
   tempId?: string;
@@ -920,11 +1220,30 @@ const notesPlaceholder = computed(() => {
   }
 });
 
-// Verifica se há itens serializados na grid com bipagem pendente
+// Computeds para Itens Serializados e Bipagem
+const serializedGridItems = computed(() => {
+  return gridItems.value.filter(item => item.material?.has_serial);
+});
+
+const totalRequiredSerialsCount = computed(() => {
+  return serializedGridItems.value.reduce((acc, item) => acc + Number(item.quantity || 0), 0);
+});
+
+const totalBipedSerialsCount = computed(() => {
+  return serializedGridItems.value.reduce((acc, item) => acc + (item.serials?.length || 0), 0);
+});
+
+const pendingSerialsCount = computed(() => {
+  return Math.max(0, totalRequiredSerialsCount.value - totalBipedSerialsCount.value);
+});
+
+const serialsProgressPercent = computed(() => {
+  if (totalRequiredSerialsCount.value === 0) return 100;
+  return Math.round((totalBipedSerialsCount.value / totalRequiredSerialsCount.value) * 100);
+});
+
 const hasPendingSerials = computed(() => {
-  return gridItems.value.some(item => {
-    return item.material.has_serial && item.serials.length < item.quantity;
-  });
+  return pendingSerialsCount.value > 0;
 });
 
 const totalPiecesCount = computed(() => {
@@ -932,8 +1251,13 @@ const totalPiecesCount = computed(() => {
 });
 
 const totalSerializedCount = computed(() => {
-  return gridItems.value.filter(item => item.material.has_serial).length;
+  return serializedGridItems.value.length;
 });
+
+function clearItemSerials(item: GridItem) {
+  item.serials = [];
+  item.scanError = '';
+}
 
 function setMovementType(type: MovementType) {
   form.value.movement_type = type;
@@ -1203,6 +1527,7 @@ watch(
   (val) => {
     if (val) {
       errorMessage.value = '';
+      currentTab.value = 'data';
       const initialType = props.initialType || 'TRANSFER';
 
       const defaultSource = props.initialDepot?.id
