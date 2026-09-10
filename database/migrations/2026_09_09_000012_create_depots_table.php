@@ -17,7 +17,7 @@ return new class extends Migration
                 $table->foreignId('city_id')->nullable()->constrained('cities')->onDelete('restrict');
                 $table->string('name', 150)->comment('Nome do Depósito ex: Almoxarifado Central, Base Campinas, Depósito Avançado');
                 $table->string('code', 50)->comment('Código único ou identificador interno');
-                $table->enum('type', ['CENTRAL', 'REGIONAL_BASE', 'LAB_REPAIR'])->default('REGIONAL_BASE');
+                $table->string('type', 50)->default('REGIONAL_BASE');
                 $table->text('description')->nullable();
                 $table->boolean('is_active')->default(true);
                 $table->timestamps();

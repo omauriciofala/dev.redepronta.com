@@ -49,6 +49,29 @@ class StockWmsModuleTest extends TestCase
         $this->unitUnd = Unit::firstOrCreate(['code' => 'UND'], ['name' => 'Unidade']);
         $this->unitMt = Unit::firstOrCreate(['code' => 'MT'], ['name' => 'Metro']);
 
+        // Tipos de Depósito Padrão
+        \App\Models\DepotType::create([
+            'account_id' => $this->account->id,
+            'code' => 'CENTRAL',
+            'name' => 'Almoxarifado Central',
+            'description' => 'Depósito principal',
+            'is_active' => true,
+        ]);
+        \App\Models\DepotType::create([
+            'account_id' => $this->account->id,
+            'code' => 'REGIONAL_BASE',
+            'name' => 'Base Regional',
+            'description' => 'Base operacional regional',
+            'is_active' => true,
+        ]);
+        \App\Models\DepotType::create([
+            'account_id' => $this->account->id,
+            'code' => 'LAB_REPAIR',
+            'name' => 'Laboratório de Reparo',
+            'description' => 'Laboratório de manutenção',
+            'is_active' => true,
+        ]);
+
         // 1. Posição Regional
         $this->cluster = DepotCluster::create([
             'account_id' => $this->account->id,
@@ -460,4 +483,100 @@ class StockWmsModuleTest extends TestCase
         $response->assertStatus(422);
         $this->assertDatabaseHas('depots', ['id' => $this->secondaryDepot->id]);
     }
+
+    /**
+     * Testa listagem de tipos de depósito.
+     */
+    public function test_can_list_depot_types(): void
+    {
+        $response = $this->getJson('/api/v1/depot-types');
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'data' => [
+                '*' => ['id', 'name', 'code', 'description', 'is_active', 'depots_count'],
+            ],
+        ]);
+    }
+
+    /**
+     * Testa criação de um novo tipo de depósito.
+     */
+    public function test_can_create_depot_type(): void
+    {
+        $payload = [
+            'name' => 'Depósito de Transbordo',
+            'code' => 'TRANSBORDO',
+            'description' => 'Área de transbordo temporário de cargas',
+            'is_active' => true,
+        ];
+
+        $response = $this->postJson('/api/v1/depot-types', $payload);
+
+        $response->assertStatus(201);
+        $response->assertJsonPath('data.code', 'TRANSBORDO');
+        $response->assertJsonPath('data.name', 'Depósito de Transbordo');
+
+        $this->assertDatabaseHas('depot_types', [
+            'code' => 'TRANSBORDO',
+            'name' => 'Depósito de Transbordo',
+        ]);
+    }
+
+    /**
+     * Testa exclusão de tipo de depósito em uso deve ser bloqueada.
+     */
+    public function test_cannot_delete_depot_type_in_use(): void
+    {
+        $type = \App\Models\DepotType::where('code', 'CENTRAL')->first();
+
+        $response = $this->deleteJson("/api/v1/depot-types/{$type->id}");
+
+        $response->assertStatus(422);
+        $this->assertDatabaseHas('depot_types', ['id' => $type->id]);
+    }
+
+    /**
+     * Testa criação de depósito com tipo personalizado e pessoa responsável.
+     */
+    public function test_can_create_depot_with_custom_type_and_responsible_person(): void
+    {
+        $person = \App\Models\Person::create([
+            'account_id' => $this->account->id,
+            'name' => 'Carlos Gestor Almoxarifado',
+            'document_number' => '111.222.333-44',
+            'status' => 'active',
+            'role' => 'Gestor WMS',
+        ]);
+
+        $customType = \App\Models\DepotType::create([
+            'account_id' => $this->account->id,
+            'name' => 'Depósito de Quarentena',
+            'code' => 'QUARENTENA',
+            'is_active' => true,
+        ]);
+
+        $payload = [
+            'cluster_id' => $this->cluster->id,
+            'name' => 'Galpão de Quarentena RMC',
+            'code' => 'GALPAO-QUAR-01',
+            'type' => 'QUARENTENA',
+            'responsible_person_id' => $person->id,
+            'is_active' => true,
+        ];
+
+        $response = $this->postJson('/api/v1/depots', $payload);
+
+        $response->assertStatus(201);
+        $response->assertJsonPath('data.type', 'QUARENTENA');
+        $response->assertJsonPath('data.responsible_person_id', $person->id);
+        $response->assertJsonPath('data.responsible_person.name', 'Carlos Gestor Almoxarifado');
+
+        $this->assertDatabaseHas('depots', [
+            'code' => 'GALPAO-QUAR-01',
+            'type' => 'QUARENTENA',
+            'responsible_person_id' => $person->id,
+        ]);
+    }
 }
+

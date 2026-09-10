@@ -26,7 +26,7 @@ class StoreDepotRequest extends FormRequest
             'cluster_id' => ['required', 'integer', 'exists:depot_clusters,id'],
             'name' => ['required', 'string', 'max:150'],
             'code' => ['required', 'string', 'max:50'],
-            'type' => ['required', 'string', 'in:CENTRAL,REGIONAL_BASE,LAB_REPAIR'],
+            'type' => ['required', 'string', 'max:50'],
             'responsible_person_id' => ['nullable', 'integer', 'exists:people,id'],
             'city_id' => ['nullable', 'integer', 'exists:cities,id'],
             'description' => ['nullable', 'string'],

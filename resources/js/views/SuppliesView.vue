@@ -88,6 +88,15 @@
 
                 <button
                   type="button"
+                  @click="openDepotTypeCrudModal"
+                  class="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] dark:hover:text-orange-300 transition cursor-pointer"
+                >
+                  <Tags class="w-4 h-4 text-slate-400" />
+                  <span>Tipos de Depósito</span>
+                </button>
+
+                <button
+                  type="button"
                   @click="openCreateDepotModal"
                   class="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] dark:hover:text-orange-300 transition cursor-pointer"
                 >
@@ -814,15 +823,15 @@
         </div>
 
         <div class="flex items-center gap-3">
-          <!-- Filtro de Tipo de Depósito -->
+          <!-- Filtro de Tipo de Depósito Dinâmico -->
           <select
             v-model="depotFilterType"
             class="h-11 px-3 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-xs font-semibold focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer"
           >
             <option value="all">Todos os Tipos de Depósito</option>
-            <option value="CENTRAL">Almoxarifados Centrais</option>
-            <option value="REGIONAL_BASE">Bases Regionais</option>
-            <option value="LAB_REPAIR">Laboratórios de Reparo</option>
+            <option v-for="t in depotTypesList" :key="t.code" :value="t.code">
+              {{ t.name }}
+            </option>
           </select>
 
           <span class="text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
@@ -1235,6 +1244,13 @@
       @updated="onClustersUpdated"
     />
 
+    <!-- Modal 3.1: Gestão Completa de Tipos de Depósito -->
+    <DepotTypeCrudModal
+      :is-open="isDepotTypeModalOpen"
+      @close="isDepotTypeModalOpen = false"
+      @updated="onDepotTypesUpdated"
+    />
+
     <!-- Modal 4: Cadastro / Edição de Depósito -->
     <DepotModal
       :is-open="isDepotModalOpen"
@@ -1286,12 +1302,13 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import {
   Package, ArrowRightLeft, Plus, Layers, Boxes, Warehouse, QrCode, RefreshCw,
   ChevronDown, X, Search, ArrowUp, ArrowDown, ArrowUpDown, Copy, Check,
-  AlertCircle, CheckCircle2, Menu, MapPin, Edit2
+  AlertCircle, CheckCircle2, Menu, MapPin, Edit2, Tags
 } from 'lucide-vue-next';
 import TablePagination from '@/components/common/TablePagination.vue';
 import TransferModal from '@/components/supplies/TransferModal.vue';
 import MaterialModal from '@/components/supplies/MaterialModal.vue';
 import ClusterCrudModal from '@/components/supplies/auxiliary/ClusterCrudModal.vue';
+import DepotTypeCrudModal from '@/components/supplies/auxiliary/DepotTypeCrudModal.vue';
 import DepotModal from '@/components/supplies/DepotModal.vue';
 import SuppliesModuleDrawer from '@/components/supplies/SuppliesModuleDrawer.vue';
 
@@ -1350,6 +1367,8 @@ const isHeaderMenuOpen = ref(false);
 const headerMenuContainerRef = ref<HTMLElement | null>(null);
 const isModuleDrawerOpen = ref(false);
 const isClusterModalOpen = ref(false);
+const isDepotTypeModalOpen = ref(false);
+const depotTypesList = ref<any[]>([]);
 const isMaterialModalOpen = ref(false);
 const selectedMaterialForEdit = ref<any>(null);
 const isDepotModalOpen = ref(false);
@@ -1382,12 +1401,14 @@ function formatNumber(val: any): string {
 }
 
 function formatDepotType(type: string): string {
+  const found = depotTypesList.value.find(t => t.code === type);
+  if (found) return found.name;
   const map: Record<string, string> = {
     CENTRAL: 'Almoxarifado Central',
     REGIONAL_BASE: 'Base Regional',
     LAB_REPAIR: 'Laboratório de Reparo',
   };
-  return map[type] || 'Depósito';
+  return map[type] || type || 'Depósito';
 }
 
 function formatSerialStatusLabel(status: string): string {
@@ -1426,6 +1447,11 @@ function handleDocumentClick(event: MouseEvent) {
 function openClusterCrudModal() {
   isHeaderMenuOpen.value = false;
   isClusterModalOpen.value = true;
+}
+
+function openDepotTypeCrudModal() {
+  isHeaderMenuOpen.value = false;
+  isDepotTypeModalOpen.value = true;
 }
 
 function navigateToTab(tab: 'regional' | 'materials' | 'depots' | 'serials') {
@@ -1856,6 +1882,25 @@ async function onClustersUpdated() {
   await loadRegionalStock();
 }
 
+// ─── AÇÕES DE MODAL: TIPOS DE DEPÓSITO ───────────────────────────────────────
+async function loadDepotTypes() {
+  try {
+    const res = await fetch('/api/v1/depot-types?active_only=true');
+    const json = await res.json();
+    depotTypesList.value = json.data || [];
+  } catch (err) {
+    console.error('Erro ao carregar tipos de depósito:', err);
+  }
+}
+
+async function onDepotTypesUpdated() {
+  showToast('Tipos de depósito sincronizados com sucesso!');
+  await Promise.all([
+    loadDepotTypes(),
+    loadDepots(),
+  ]);
+}
+
 // ─── AÇÕES DE MODAL: DEPÓSITOS ───────────────────────────────────────────────
 function openCreateDepotModal() {
   isHeaderMenuOpen.value = false;
@@ -1873,6 +1918,7 @@ async function onDepotSaved() {
   await Promise.all([
     loadDepots(),
     loadClusters(),
+    loadDepotTypes(),
   ]);
   await loadRegionalStock();
 }
@@ -1883,6 +1929,7 @@ async function refreshCurrentTab() {
   try {
     await Promise.all([
       loadClusters(),
+      loadDepotTypes(),
       loadMaterials(),
       loadUnits(),
       loadDepots(),
@@ -1900,6 +1947,7 @@ onMounted(async () => {
   document.addEventListener('click', handleDocumentClick);
   await Promise.all([
     loadClusters(),
+    loadDepotTypes(),
     loadMaterials(),
     loadUnits(),
     loadDepots(),

@@ -84,28 +84,22 @@
             required
             class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none cursor-pointer"
           >
-            <option value="REGIONAL_BASE">Base Regional</option>
-            <option value="CENTRAL">Almoxarifado Central</option>
-            <option value="LAB_REPAIR">Laboratório de Reparo</option>
+            <option v-for="t in availableDepotTypes" :key="t.code" :value="t.code">
+              {{ t.name }}
+            </option>
           </select>
         </div>
       </div>
 
-      <!-- Linha 3: Responsável e Cidade -->
+      <!-- Linha 3: Responsável e Município -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-            Responsável pelo Depósito
-          </label>
-          <select
+          <PersonSearchSelect
             v-model="form.responsible_person_id"
-            class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none cursor-pointer"
-          >
-            <option value="">Sem responsável vinculado</option>
-            <option v-for="p in peopleList" :key="p.id" :value="p.id">
-              {{ p.name }} {{ p.role ? `(${p.role})` : '' }}
-            </option>
-          </select>
+            :initial-person-name="selectedPersonInfo.name"
+            label="Responsável pelo Depósito"
+            placeholder="Digite o nome ou CPF da pessoa..."
+          />
         </div>
 
         <div>
@@ -197,6 +191,7 @@ import { ref, computed, watch, onMounted } from 'vue';
 import { Plus, Edit2, AlertCircle, Trash2 } from 'lucide-vue-next';
 import BaseModal from '@/components/common/BaseModal.vue';
 import CitySearchSelect from '@/components/common/CitySearchSelect.vue';
+import PersonSearchSelect from '@/components/common/PersonSearchSelect.vue';
 
 const props = defineProps<{
   isOpen: boolean;
@@ -212,7 +207,10 @@ const emit = defineEmits<{
 const isEditing = computed(() => Boolean(props.depotData && props.depotData.id));
 const submitting = ref(false);
 const errorMessage = ref('');
-const peopleList = ref<any[]>([]);
+
+const selectedPersonInfo = ref({
+  name: '',
+});
 
 const selectedCityInfo = ref({
   name: '',
@@ -220,24 +218,32 @@ const selectedCityInfo = ref({
   ibge_code: '',
 });
 
+const availableDepotTypes = ref<any[]>([
+  { code: 'REGIONAL_BASE', name: 'Base Regional' },
+  { code: 'CENTRAL', name: 'Almoxarifado Central' },
+  { code: 'LAB_REPAIR', name: 'Laboratório de Reparo' },
+]);
+
 const form = ref({
   name: '',
   code: '',
   cluster_id: '' as string | number,
   type: 'REGIONAL_BASE',
-  responsible_person_id: '' as string | number,
+  responsible_person_id: null as number | null,
   city_id: null as number | null,
   description: '',
   is_active: true,
 });
 
-async function loadPeople() {
+async function loadDepotTypes() {
   try {
-    const res = await fetch('/api/v1/people?per_page=100&status=active');
+    const res = await fetch('/api/v1/depot-types?active_only=true');
     const json = await res.json();
-    peopleList.value = json.data || [];
+    if (json.data && json.data.length > 0) {
+      availableDepotTypes.value = json.data;
+    }
   } catch (err) {
-    console.error('Erro ao carregar lista de responsáveis:', err);
+    console.error('Erro ao carregar tipos de depósito:', err);
   }
 }
 
@@ -245,9 +251,13 @@ watch(
   () => props.isOpen,
   (val) => {
     if (val) {
-      if (peopleList.value.length === 0) loadPeople();
+      loadDepotTypes();
 
       if (props.depotData) {
+        selectedPersonInfo.value = {
+          name: props.depotData.responsible_person?.name || '',
+        };
+
         selectedCityInfo.value = {
           name: props.depotData.city?.name || '',
           state_code: props.depotData.city?.state?.code || props.depotData.city?.state_code || '',
@@ -258,13 +268,17 @@ watch(
           name: props.depotData.name || '',
           code: props.depotData.code || '',
           cluster_id: props.depotData.cluster_id || (props.depotData.cluster?.id ?? (props.clustersList[0]?.id || '')),
-          type: props.depotData.type || 'REGIONAL_BASE',
-          responsible_person_id: props.depotData.responsible_person_id || (props.depotData.responsible_person?.id ?? ''),
+          type: props.depotData.type || (availableDepotTypes.value[0]?.code || 'REGIONAL_BASE'),
+          responsible_person_id: props.depotData.responsible_person_id || (props.depotData.responsible_person?.id ?? null),
           city_id: props.depotData.city_id || (props.depotData.city?.id ?? null),
           description: props.depotData.description || '',
           is_active: props.depotData.is_active !== undefined ? Boolean(props.depotData.is_active) : true,
         };
       } else {
+        selectedPersonInfo.value = {
+          name: '',
+        };
+
         selectedCityInfo.value = {
           name: '',
           state_code: '',
@@ -275,8 +289,8 @@ watch(
           name: '',
           code: '',
           cluster_id: props.clustersList[0]?.id || '',
-          type: 'REGIONAL_BASE',
-          responsible_person_id: '',
+          type: availableDepotTypes.value[0]?.code || 'REGIONAL_BASE',
+          responsible_person_id: null,
           city_id: null,
           description: '',
           is_active: true,
