@@ -24,6 +24,48 @@
       </span>
     </template>
 
+    <!-- Banner Global de Feedback / Alertas (Visível em ambas as telas: Preview ou Catálogo) -->
+    <Transition
+      enter-active-class="transition duration-200 ease-out"
+      enter-from-class="opacity-0 -translate-y-2"
+      enter-to-class="opacity-100 translate-y-0"
+      leave-active-class="transition duration-150 ease-in"
+      leave-from-class="opacity-100 translate-y-0"
+      leave-to-class="opacity-0 -translate-y-2"
+    >
+      <div
+        v-if="alertMessage"
+        ref="alertBannerRef"
+        class="mb-4 p-4 rounded-xl text-xs flex items-start justify-between gap-3 shadow-xs border transition-all"
+        :class="alertSuccess 
+          ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-100 border-emerald-300 dark:border-emerald-800' 
+          : 'bg-rose-50 dark:bg-rose-950/60 text-rose-900 dark:text-rose-100 border-rose-300 dark:border-rose-800'"
+      >
+        <div class="flex items-start gap-3">
+          <div
+            class="p-2 rounded-lg shrink-0 mt-0.5"
+            :class="alertSuccess ? 'bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300' : 'bg-rose-100 dark:bg-rose-900 text-rose-700 dark:text-rose-300'"
+          >
+            <component :is="alertSuccess ? CheckCircle2 : AlertCircle" class="w-5 h-5" />
+          </div>
+          <div>
+            <strong class="font-bold block text-sm">
+              {{ alertSuccess ? 'Importação Concluída com Sucesso!' : 'Atenção / Ocorreu um Erro' }}
+            </strong>
+            <span class="text-xs opacity-90 mt-1 block leading-relaxed">{{ alertMessage }}</span>
+          </div>
+        </div>
+        <button
+          type="button"
+          @click="alertMessage = ''"
+          class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer shrink-0"
+          title="Fechar aviso"
+        >
+          <X class="w-4 h-4" />
+        </button>
+      </div>
+    </Transition>
+
     <!-- ========================================================================= -->
     <!-- TELA 1: PRÉ-VISUALIZAÇÃO DA IMPORTAÇÃO (PREVIEW ANTES DE GRAVAR)          -->
     <!-- ========================================================================= -->
@@ -260,17 +302,6 @@
             <span>Vincular Material</span>
           </button>
         </div>
-      </div>
-
-      <!-- Feedback de Importação / Ações -->
-      <div v-if="alertMessage" class="p-3 rounded-lg text-xs flex items-center justify-between gap-2" :class="alertSuccess ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800' : 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800'">
-        <div class="flex items-center gap-2">
-          <component :is="alertSuccess ? CheckCircle2 : AlertCircle" class="w-4 h-4 shrink-0" />
-          <span>{{ alertMessage }}</span>
-        </div>
-        <button type="button" @click="alertMessage = ''" class="p-0.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer">
-          <X class="w-3.5 h-3.5" />
-        </button>
       </div>
 
       <!-- Formulário de Cadastro / Edição -->
@@ -524,15 +555,21 @@
         <button
           type="button"
           @click="cancelPreview"
-          class="h-10 px-4 text-xs font-semibold rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/80 transition cursor-pointer"
+          :disabled="isImporting"
+          class="h-10 px-4 text-xs font-semibold rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/80 disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer"
         >
           Descartar / Cancelar Prévia
         </button>
 
         <div class="flex items-center gap-4">
-          <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">
+          <span v-if="!isImporting" class="text-xs text-slate-500 dark:text-slate-400 font-medium">
             Pronto para gravar: <strong class="text-emerald-600 dark:text-emerald-400 font-bold">{{ validRowsCount }} linha(s) válida(s)</strong>
           </span>
+          <span v-else class="text-xs text-[#FC6714] font-semibold flex items-center gap-2">
+            <Loader2 class="w-4 h-4 animate-spin" />
+            <span>Gravando materiais e vínculos no catálogo...</span>
+          </span>
+
           <button
             type="button"
             @click="confirmImport"
@@ -541,7 +578,7 @@
           >
             <Loader2 v-if="isImporting" class="w-4 h-4 animate-spin" />
             <Check v-else class="w-4 h-4 stroke-[2.5]" />
-            <span>Confirmar e Importar ({{ validRowsCount }} linhas válidas)</span>
+            <span>{{ isImporting ? 'Gravando Materiais...' : `Confirmar e Importar (${validRowsCount} linhas válidas)` }}</span>
           </button>
         </div>
       </div>
@@ -631,6 +668,15 @@ const editingMaterialSku = ref('');
 const formError = ref('');
 const alertMessage = ref('');
 const alertSuccess = ref(true);
+const alertBannerRef = ref<HTMLElement | null>(null);
+
+function scrollToAlert() {
+  setTimeout(() => {
+    if (alertBannerRef.value) {
+      alertBannerRef.value.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, 60);
+}
 
 // Estado de Preview da Importação
 const isPreviewMode = ref(false);
@@ -790,6 +836,7 @@ async function saveItem() {
     closeForm();
     await loadItems();
     emit('updated');
+    scrollToAlert();
   } catch (err: any) {
     formError.value = err.response?.data?.message || 'Erro ao salvar material no catálogo.';
   } finally {
@@ -807,9 +854,11 @@ async function deleteItem(item: OwnerMaterialItem) {
     alertSuccess.value = true;
     await loadItems();
     emit('updated');
+    scrollToAlert();
   } catch (err: any) {
     alertMessage.value = err.response?.data?.message || 'Erro ao remover item do catálogo.';
     alertSuccess.value = false;
+    scrollToAlert();
   }
 }
 
@@ -851,6 +900,7 @@ async function handleFileUploadForPreview(event: Event) {
   } catch (err: any) {
     alertMessage.value = err.response?.data?.message || 'Falha ao analisar arquivo para prévia.';
     alertSuccess.value = false;
+    scrollToAlert();
   } finally {
     isPreviewLoading.value = false;
     target.value = '';
@@ -876,14 +926,18 @@ async function confirmImport() {
       rows: previewRows.value,
     });
 
-    alertMessage.value = res.data.message || 'Importação realizada com sucesso!';
-    alertSuccess.value = true;
+    const successMsg = res.data.message || 'Importação realizada com sucesso!';
     cancelPreview();
     await loadItems();
     emit('updated');
+
+    alertMessage.value = successMsg;
+    alertSuccess.value = true;
+    scrollToAlert();
   } catch (err: any) {
-    alertMessage.value = err.response?.data?.message || 'Erro ao efetivar a importação dos materiais.';
+    alertMessage.value = err.response?.data?.message || err.message || 'Erro ao efetivar a importação dos materiais.';
     alertSuccess.value = false;
+    scrollToAlert();
   } finally {
     isImporting.value = false;
   }

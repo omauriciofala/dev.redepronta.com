@@ -10,6 +10,7 @@ use App\Services\Stock\MaterialImportService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 class OwnerMaterialController extends Controller
@@ -503,20 +504,18 @@ class OwnerMaterialController extends Controller
             return response()->json(['message' => 'Nenhuma linha válida encontrada para importar.'], 422);
         }
 
-        // Unidade de medida padrão para materiais recém-criados
-        $defaultUnit = \App\Models\Unit::where('account_id', $accountId)->whereIn('code', ['UND', 'UN'])->first()
-            ?? \App\Models\Unit::whereIn('code', ['UND', 'UN'])->first()
-            ?? \App\Models\Unit::where('is_active', true)->first()
-            ?? \App\Models\Unit::create(['account_id' => $accountId, 'code' => 'UND', 'name' => 'Unidade', 'is_active' => true]);
-
-        $createdMaterials = 0;
-        $createdLinks = 0;
-        $updatedLinks = 0;
-        $failedRows = 0;
-        $errors = [];
-
         DB::beginTransaction();
         try {
+            // Unidade de medida padrão para materiais recém-criados
+            $defaultUnit = \App\Models\Unit::whereIn('code', ['UND', 'UN'])->first()
+                ?? \App\Models\Unit::where('is_active', true)->first()
+                ?? \App\Models\Unit::create(['code' => 'UND', 'name' => 'Unidade', 'is_active' => true]);
+
+            $createdMaterials = 0;
+            $createdLinks = 0;
+            $updatedLinks = 0;
+            $failedRows = 0;
+            $errors = [];
             foreach ($rowsToProcess as $row) {
                 if (($row['status'] ?? 'valid') === 'error') {
                     $failedRows++;
@@ -634,6 +633,10 @@ class OwnerMaterialController extends Controller
             ]);
         } catch (\Throwable $e) {
             DB::rollBack();
+            Log::error('Erro ao importar materiais do proprietário: ' . $e->getMessage(), [
+                'exception' => $e,
+                'owner_id' => $materialOwner->id,
+            ]);
             return response()->json([
                 'message' => 'Falha ao processar importação: ' . $e->getMessage(),
             ], 422);
