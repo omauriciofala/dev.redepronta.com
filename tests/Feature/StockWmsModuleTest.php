@@ -72,6 +72,22 @@ class StockWmsModuleTest extends TestCase
             'is_active' => true,
         ]);
 
+        // Categorias de Material Padrão
+        \App\Models\MaterialCategory::create([
+            'account_id' => $this->account->id,
+            'name' => 'Ativos de Rede',
+            'code' => 'ATIVOS',
+            'color' => '#3B82F6',
+            'is_active' => true,
+        ]);
+        \App\Models\MaterialCategory::create([
+            'account_id' => $this->account->id,
+            'name' => 'Cabos & Fibras',
+            'code' => 'CABOS',
+            'color' => '#FC6714',
+            'is_active' => true,
+        ]);
+
         // 1. Posição Regional
         $this->cluster = DepotCluster::create([
             'account_id' => $this->account->id,
@@ -578,5 +594,110 @@ class StockWmsModuleTest extends TestCase
             'responsible_person_id' => $person->id,
         ]);
     }
+
+    /**
+     * Testa listagem de unidades de medida.
+     */
+    public function test_can_list_units(): void
+    {
+        $response = $this->getJson('/api/v1/units');
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'data' => [
+                '*' => ['id', 'code', 'name', 'is_active', 'materials_count'],
+            ],
+        ]);
+    }
+
+    /**
+     * Testa criação de nova unidade de medida.
+     */
+    public function test_can_create_unit(): void
+    {
+        $payload = [
+            'code' => 'KG',
+            'name' => 'Quilograma',
+            'is_active' => true,
+        ];
+
+        $response = $this->postJson('/api/v1/units', $payload);
+
+        $response->assertStatus(201);
+        $response->assertJsonPath('data.code', 'KG');
+        $response->assertJsonPath('data.name', 'Quilograma');
+
+        $this->assertDatabaseHas('units', [
+            'code' => 'KG',
+            'name' => 'Quilograma',
+        ]);
+    }
+
+    /**
+     * Testa bloqueio de exclusão de unidade vinculada a material.
+     */
+    public function test_cannot_delete_unit_in_use(): void
+    {
+        // $this->unitUnd está vinculada ao $this->materialOnu
+        $response = $this->deleteJson("/api/v1/units/{$this->unitUnd->id}");
+
+        $response->assertStatus(422);
+        $this->assertDatabaseHas('units', ['id' => $this->unitUnd->id]);
+    }
+
+    /**
+     * Testa listagem de categorias de material.
+     */
+    public function test_can_list_material_categories(): void
+    {
+        $response = $this->getJson('/api/v1/material-categories');
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'data' => [
+                '*' => ['id', 'name', 'code', 'description', 'color', 'is_active', 'materials_count'],
+            ],
+        ]);
+    }
+
+    /**
+     * Testa criação de nova categoria de material.
+     */
+    public function test_can_create_material_category(): void
+    {
+        $payload = [
+            'name' => 'Ferramentas de Fusão Óptica',
+            'code' => 'FERRAMENTAS_FUSAO',
+            'description' => 'Máquinas de fusão e clivadores de alta precisão',
+            'color' => '#8B5CF6',
+            'is_active' => true,
+        ];
+
+        $response = $this->postJson('/api/v1/material-categories', $payload);
+
+        $response->assertStatus(201);
+        $response->assertJsonPath('data.name', 'Ferramentas de Fusão Óptica');
+        $response->assertJsonPath('data.code', 'FERRAMENTAS_FUSAO');
+
+        $this->assertDatabaseHas('material_categories', [
+            'name' => 'Ferramentas de Fusão Óptica',
+            'code' => 'FERRAMENTAS_FUSAO',
+        ]);
+    }
+
+    /**
+     * Testa bloqueio de exclusão de categoria com materiais vinculados.
+     */
+    public function test_cannot_delete_material_category_in_use(): void
+    {
+        // $this->materialOnu tem category = 'Ativos de Rede'
+        $category = \App\Models\MaterialCategory::where('name', 'Ativos de Rede')->first();
+
+        $response = $this->deleteJson("/api/v1/material-categories/{$category->id}");
+
+        $response->assertStatus(422);
+        $this->assertDatabaseHas('material_categories', ['id' => $category->id]);
+    }
 }
+
 

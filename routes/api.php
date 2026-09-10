@@ -12,6 +12,8 @@ use App\Http\Controllers\Api\V1\DeveloperController;
 use App\Http\Controllers\Api\V1\ClusterController;
 use App\Http\Controllers\Api\V1\DepotTypeController;
 use App\Http\Controllers\Api\V1\DepotController;
+use App\Http\Controllers\Api\V1\MaterialCategoryController;
+use App\Http\Controllers\Api\V1\UnitController;
 use App\Http\Controllers\Api\V1\MaterialController;
 use App\Http\Controllers\Api\V1\StockController;
 
@@ -46,6 +48,8 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('clusters', ClusterController::class);
     Route::apiResource('depot-types', DepotTypeController::class);
     Route::apiResource('depots', DepotController::class);
+    Route::apiResource('units', UnitController::class);
+    Route::apiResource('material-categories', MaterialCategoryController::class);
     Route::get('materials/units', [MaterialController::class, 'units']);
     Route::apiResource('materials', MaterialController::class);
 

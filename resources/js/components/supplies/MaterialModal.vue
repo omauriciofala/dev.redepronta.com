@@ -80,11 +80,17 @@
             v-model="form.category"
             class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none cursor-pointer"
           >
-            <option value="Equipamentos">Equipamentos</option>
-            <option value="Cabos & Fibras">Cabos & Fibras Ópticas</option>
-            <option value="Conectores & Passivos">Conectores & Passivos</option>
-            <option value="Ferramentas">Ferramentas & EPIs</option>
-            <option value="Geral">Geral / Diversos</option>
+            <option value="">Selecione...</option>
+            <option v-for="cat in availableCategories" :key="cat.id" :value="cat.name">
+              {{ cat.name }}
+            </option>
+            <!-- Fallback para preservar categoria existente se não estiver na lista -->
+            <option
+              v-if="form.category && !availableCategories.some(c => c.name === form.category)"
+              :value="form.category"
+            >
+              {{ form.category }} (Atual)
+            </option>
           </select>
         </div>
 
@@ -195,6 +201,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
+import axios from 'axios';
 import { AlertCircle } from 'lucide-vue-next';
 import BaseModal from '@/components/common/BaseModal.vue';
 
@@ -202,6 +209,7 @@ const props = defineProps<{
   isOpen: boolean;
   materialData?: any;
   unitsList: Array<{ id: number; code: string; name: string }>;
+  categoriesList?: Array<{ id: number; name: string; color?: string; code?: string }>;
 }>();
 
 const emit = defineEmits<{
@@ -211,6 +219,23 @@ const emit = defineEmits<{
 
 const submitting = ref(false);
 const errorMessage = ref('');
+const internalCategories = ref<Array<{ id: number; name: string; color?: string; code?: string }>>([]);
+
+const availableCategories = computed(() => {
+  if (props.categoriesList && props.categoriesList.length > 0) {
+    return props.categoriesList;
+  }
+  return internalCategories.value;
+});
+
+async function fetchCategories() {
+  try {
+    const res = await axios.get('/api/v1/material-categories?active_only=1');
+    internalCategories.value = res.data.data || [];
+  } catch (err) {
+    console.error('Erro ao carregar categorias para o modal de material:', err);
+  }
+}
 
 const isEditing = computed(() => !!props.materialData?.id);
 
@@ -295,4 +320,14 @@ async function submitForm() {
     submitting.value = false;
   }
 }
+
+watch(
+  () => props.isOpen,
+  (open) => {
+    if (open) {
+      fetchCategories();
+    }
+  },
+  { immediate: true }
+);
 </script>

@@ -106,6 +106,24 @@
 
                 <button
                   type="button"
+                  @click="openMaterialCategoryCrudModal"
+                  class="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] dark:hover:text-orange-300 transition cursor-pointer"
+                >
+                  <FolderTree class="w-4 h-4 text-slate-400" />
+                  <span>Categorias de Material</span>
+                </button>
+
+                <button
+                  type="button"
+                  @click="openUnitCrudModal"
+                  class="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] dark:hover:text-orange-300 transition cursor-pointer"
+                >
+                  <Scale class="w-4 h-4 text-slate-400" />
+                  <span>Unidades de Medida</span>
+                </button>
+
+                <button
+                  type="button"
                   @click="openCreateMaterialModal"
                   class="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] dark:hover:text-orange-300 transition cursor-pointer"
                 >
@@ -591,6 +609,17 @@
         </div>
 
         <div class="flex items-center gap-3">
+          <!-- Filtro por Categoria -->
+          <select
+            v-model="materialFilterCategory"
+            class="h-11 px-3 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-xs font-semibold focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer"
+          >
+            <option value="all">Todas as Categorias</option>
+            <option v-for="c in materialCategoriesList" :key="c.id" :value="c.name">
+              {{ c.name }}
+            </option>
+          </select>
+
           <!-- Filtro de Tipo de Rastreio -->
           <select
             v-model="materialFilterType"
@@ -1233,6 +1262,7 @@
       :is-open="isMaterialModalOpen"
       :material-data="selectedMaterialForEdit"
       :units-list="unitsList"
+      :categories-list="materialCategoriesList"
       @close="isMaterialModalOpen = false"
       @saved="onMaterialSaved"
     />
@@ -1249,6 +1279,20 @@
       :is-open="isDepotTypeModalOpen"
       @close="isDepotTypeModalOpen = false"
       @updated="onDepotTypesUpdated"
+    />
+
+    <!-- Modal 3.2: Gestão Completa de Categorias de Material -->
+    <MaterialCategoryCrudModal
+      :is-open="isMaterialCategoryModalOpen"
+      @close="isMaterialCategoryModalOpen = false"
+      @updated="onMaterialCategoriesUpdated"
+    />
+
+    <!-- Modal 3.3: Gestão Completa de Unidades de Medida -->
+    <UnitCrudModal
+      :is-open="isUnitModalOpen"
+      @close="isUnitModalOpen = false"
+      @updated="onUnitsUpdated"
     />
 
     <!-- Modal 4: Cadastro / Edição de Depósito -->
@@ -1302,13 +1346,15 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import {
   Package, ArrowRightLeft, Plus, Layers, Boxes, Warehouse, QrCode, RefreshCw,
   ChevronDown, X, Search, ArrowUp, ArrowDown, ArrowUpDown, Copy, Check,
-  AlertCircle, CheckCircle2, Menu, MapPin, Edit2, Tags
+  AlertCircle, CheckCircle2, Menu, MapPin, Edit2, Tags, FolderTree, Scale
 } from 'lucide-vue-next';
 import TablePagination from '@/components/common/TablePagination.vue';
 import TransferModal from '@/components/supplies/TransferModal.vue';
 import MaterialModal from '@/components/supplies/MaterialModal.vue';
 import ClusterCrudModal from '@/components/supplies/auxiliary/ClusterCrudModal.vue';
 import DepotTypeCrudModal from '@/components/supplies/auxiliary/DepotTypeCrudModal.vue';
+import MaterialCategoryCrudModal from '@/components/supplies/auxiliary/MaterialCategoryCrudModal.vue';
+import UnitCrudModal from '@/components/supplies/auxiliary/UnitCrudModal.vue';
 import DepotModal from '@/components/supplies/DepotModal.vue';
 import SuppliesModuleDrawer from '@/components/supplies/SuppliesModuleDrawer.vue';
 
@@ -1369,8 +1415,12 @@ const isModuleDrawerOpen = ref(false);
 const isClusterModalOpen = ref(false);
 const isDepotTypeModalOpen = ref(false);
 const depotTypesList = ref<any[]>([]);
+const isMaterialCategoryModalOpen = ref(false);
+const materialCategoriesList = ref<any[]>([]);
+const isUnitModalOpen = ref(false);
 const isMaterialModalOpen = ref(false);
 const selectedMaterialForEdit = ref<any>(null);
+const materialFilterCategory = ref('all');
 const isDepotModalOpen = ref(false);
 const selectedDepotForEdit = ref<any>(null);
 const isTransferModalOpen = ref(false);
@@ -1602,6 +1652,10 @@ const filteredMaterials = computed(() => {
     list = list.filter(m => !m.has_serial);
   }
 
+  if (materialFilterCategory.value !== 'all') {
+    list = list.filter(m => m.category === materialFilterCategory.value);
+  }
+
   if (materialSearch.value.trim()) {
     const q = materialSearch.value.toLowerCase();
     list = list.filter(m =>
@@ -1654,7 +1708,7 @@ async function loadMaterials() {
 
 async function loadUnits() {
   try {
-    const res = await fetch('/api/v1/materials/units');
+    const res = await fetch('/api/v1/units?active_only=true');
     const json = await res.json();
     unitsList.value = json.data || [];
   } catch (err) {
@@ -1901,6 +1955,44 @@ async function onDepotTypesUpdated() {
   ]);
 }
 
+// ─── AÇÕES DE MODAL: CATEGORIAS DE MATERIAL ──────────────────────────────────
+function openMaterialCategoryCrudModal() {
+  isHeaderMenuOpen.value = false;
+  isMaterialCategoryModalOpen.value = true;
+}
+
+async function loadMaterialCategories() {
+  try {
+    const res = await fetch('/api/v1/material-categories?active_only=true');
+    const json = await res.json();
+    materialCategoriesList.value = json.data || [];
+  } catch (err) {
+    console.error('Erro ao carregar categorias de material:', err);
+  }
+}
+
+async function onMaterialCategoriesUpdated() {
+  showToast('Categorias de material sincronizadas com sucesso!');
+  await Promise.all([
+    loadMaterialCategories(),
+    loadMaterials(),
+  ]);
+}
+
+// ─── AÇÕES DE MODAL: UNIDADES DE MEDIDA ──────────────────────────────────────
+function openUnitCrudModal() {
+  isHeaderMenuOpen.value = false;
+  isUnitModalOpen.value = true;
+}
+
+async function onUnitsUpdated() {
+  showToast('Unidades de medida sincronizadas com sucesso!');
+  await Promise.all([
+    loadUnits(),
+    loadMaterials(),
+  ]);
+}
+
 // ─── AÇÕES DE MODAL: DEPÓSITOS ───────────────────────────────────────────────
 function openCreateDepotModal() {
   isHeaderMenuOpen.value = false;
@@ -1930,6 +2022,7 @@ async function refreshCurrentTab() {
     await Promise.all([
       loadClusters(),
       loadDepotTypes(),
+      loadMaterialCategories(),
       loadMaterials(),
       loadUnits(),
       loadDepots(),
@@ -1948,6 +2041,7 @@ onMounted(async () => {
   await Promise.all([
     loadClusters(),
     loadDepotTypes(),
+    loadMaterialCategories(),
     loadMaterials(),
     loadUnits(),
     loadDepots(),
