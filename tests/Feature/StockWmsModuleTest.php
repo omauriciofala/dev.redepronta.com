@@ -904,6 +904,149 @@ class StockWmsModuleTest extends TestCase
             'owner_id' => $novoOwner->id,
         ]);
     }
+
+    /**
+     * Testa validação do tipo de movimentação no endpoint unificado.
+     */
+    public function test_movement_endpoint_validates_type(): void
+    {
+        $response = $this->postJson('/api/v1/stock/movement', [
+            'movement_type' => 'INVALIDO',
+            'material_id' => $this->materialCable->id,
+            'quantity' => 10,
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['movement_type']);
+    }
+
+    /**
+     * Testa movimentação do tipo Entrada (ENTRY).
+     */
+    public function test_can_execute_entry_movement(): void
+    {
+        $initialBalance = StockBalance::where('account_id', $this->account->id)
+            ->where('depot_id', $this->centralDepot->id)
+            ->where('material_id', $this->materialCable->id)
+            ->value('quantity') ?? 0;
+
+        $response = $this->postJson('/api/v1/stock/movement', [
+            'movement_type' => 'ENTRY',
+            'destination_depot_id' => $this->centralDepot->id,
+            'material_id' => $this->materialCable->id,
+            'quantity' => 500.0,
+            'document_ref' => 'NF-10293',
+            'notes' => 'Entrada de compra de cabos de fibra',
+        ]);
+
+        $response->assertStatus(201);
+        $response->assertJsonPath('data.movement_type', 'ENTRY');
+        $response->assertJsonPath('data.destination_depot_id', $this->centralDepot->id);
+
+        $newBalance = StockBalance::where('account_id', $this->account->id)
+            ->where('depot_id', $this->centralDepot->id)
+            ->where('material_id', $this->materialCable->id)
+            ->value('quantity');
+
+        $this->assertEquals($initialBalance + 500.0, (float)$newBalance);
+    }
+
+    /**
+     * Testa movimentação do tipo Saída (EXIT).
+     */
+    public function test_can_execute_exit_movement(): void
+    {
+        // Garante saldo no depósito central
+        $balance = StockBalance::firstOrCreate(
+            ['account_id' => $this->account->id, 'depot_id' => $this->centralDepot->id, 'material_id' => $this->materialCable->id],
+            ['quantity' => 0, 'reserved_quantity' => 0]
+        );
+        $balance->update(['quantity' => 300.0]);
+
+        $response = $this->postJson('/api/v1/stock/movement', [
+            'movement_type' => 'EXIT',
+            'source_depot_id' => $this->centralDepot->id,
+            'material_id' => $this->materialCable->id,
+            'quantity' => 100.0,
+            'document_ref' => 'OS-5542',
+            'notes' => 'Saída para atendimento de rede externa',
+        ]);
+
+        $response->assertStatus(201);
+        $response->assertJsonPath('data.movement_type', 'EXIT');
+        $response->assertJsonPath('data.source_depot_id', $this->centralDepot->id);
+
+        $balance->refresh();
+        $this->assertEquals(200.0, (float)$balance->quantity);
+    }
+
+    /**
+     * Testa movimentação do tipo Devolução (RETURN).
+     */
+    public function test_can_execute_return_movement(): void
+    {
+        $initialBalance = StockBalance::where('account_id', $this->account->id)
+            ->where('depot_id', $this->centralDepot->id)
+            ->where('material_id', $this->materialCable->id)
+            ->value('quantity') ?? 0;
+
+        $response = $this->postJson('/api/v1/stock/movement', [
+            'movement_type' => 'RETURN',
+            'destination_depot_id' => $this->centralDepot->id,
+            'material_id' => $this->materialCable->id,
+            'quantity' => 50.0,
+            'document_ref' => 'RET-001',
+            'notes' => 'Devolução de sobra de cabo da instalação',
+        ]);
+
+        $response->assertStatus(201);
+        $response->assertJsonPath('data.movement_type', 'RETURN');
+
+        $newBalance = StockBalance::where('account_id', $this->account->id)
+            ->where('depot_id', $this->centralDepot->id)
+            ->where('material_id', $this->materialCable->id)
+            ->value('quantity');
+
+        $this->assertEquals($initialBalance + 50.0, (float)$newBalance);
+    }
+
+    /**
+     * Testa movimentação do tipo Transferência (TRANSFER) via endpoint unificado.
+     */
+    public function test_can_execute_transfer_movement_via_unified_endpoint(): void
+    {
+        $sourceBal = StockBalance::firstOrCreate(
+            ['account_id' => $this->account->id, 'depot_id' => $this->centralDepot->id, 'material_id' => $this->materialCable->id],
+            ['quantity' => 0, 'reserved_quantity' => 0]
+        );
+        $sourceBal->update(['quantity' => 200.0]);
+
+        $destBal = StockBalance::firstOrCreate(
+            ['account_id' => $this->account->id, 'depot_id' => $this->baseDepot->id, 'material_id' => $this->materialCable->id],
+            ['quantity' => 0, 'reserved_quantity' => 0]
+        );
+        $destBal->update(['quantity' => 0.0]);
+
+        $response = $this->postJson('/api/v1/stock/movement', [
+            'movement_type' => 'TRANSFER',
+            'source_depot_id' => $this->centralDepot->id,
+            'destination_depot_id' => $this->baseDepot->id,
+            'material_id' => $this->materialCable->id,
+            'quantity' => 80.0,
+            'document_ref' => 'TRF-098',
+            'notes' => 'Transferência entre depósitos',
+        ]);
+
+        $response->assertStatus(201);
+        $response->assertJsonPath('data.movement_type', 'TRANSFER');
+        $response->assertJsonPath('data.source_depot_id', $this->centralDepot->id);
+        $response->assertJsonPath('data.destination_depot_id', $this->baseDepot->id);
+
+        $sourceBal->refresh();
+        $destBal->refresh();
+        $this->assertEquals(120.0, (float)$sourceBal->quantity);
+        $this->assertEquals(80.0, (float)$destBal->quantity);
+    }
 }
 
 

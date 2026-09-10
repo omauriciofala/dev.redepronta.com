@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Stock\StoreStockMovementRequest;
 use App\Http\Requests\Stock\TransferStockRequest;
 use App\Models\StockBalance;
 use App\Models\StockMovement;
@@ -102,6 +103,30 @@ class StockController extends Controller
         return response()->json($serials);
     }
 
+    /**
+     * Executa movimentação centralizada de materiais (Entrada, Saída, Devolução, Transferência).
+     */
+     public function movement(StoreStockMovementRequest $request): JsonResponse
+     {
+         $accountId = $this->getAccountId();
+         $userId = auth()->id();
+ 
+         $movement = $this->stockService->processMovement($request->validated(), $accountId, $userId);
+ 
+         $labels = [
+             'ENTRY' => 'Entrada',
+             'EXIT' => 'Saída',
+             'RETURN' => 'Devolução',
+             'TRANSFER' => 'Transferência',
+         ];
+         $label = $labels[$movement->movement_type] ?? 'Movimentação';
+ 
+         return response()->json([
+             'message' => "{$label} de estoque realizada com sucesso.",
+             'data' => $movement,
+         ], 201);
+     }
+ 
     /**
      * Executa a Transferência de Materiais entre Depósitos com Atomicidade Estrita.
      */

@@ -294,21 +294,27 @@ class ClusterStockService
             );
             $balance->increment('quantity', $quantity);
 
-            // Cria os seriais
+            // Cria ou atualiza os seriais para status IN_STOCK
             $createdSerials = [];
             if ($material->has_serial) {
                 foreach ($serialsData as $item) {
                     $sn = is_array($item) ? ($item['serial_number'] ?? '') : (string)$item;
                     $mac = is_array($item) ? ($item['mac_address'] ?? null) : null;
+                    $sn = trim($sn);
+                    if (empty($sn)) continue;
 
-                    $serial = StockSerial::create([
-                        'account_id' => $accountId,
-                        'material_id' => $materialId,
-                        'current_depot_id' => $depotId,
-                        'serial_number' => trim($sn),
-                        'mac_address' => $mac ? trim($mac) : null,
-                        'status' => 'IN_STOCK',
-                    ]);
+                    $serial = StockSerial::updateOrCreate(
+                        [
+                            'account_id' => $accountId,
+                            'serial_number' => $sn,
+                        ],
+                        [
+                            'material_id' => $materialId,
+                            'current_depot_id' => $depotId,
+                            'mac_address' => $mac ? trim($mac) : null,
+                            'status' => 'IN_STOCK',
+                        ]
+                    );
                     $createdSerials[] = $serial->id;
                 }
             }
@@ -332,6 +338,235 @@ class ClusterStockService
 
             return $movement->load(['material.unit', 'destinationDepot', 'serials']);
         });
+    }
+
+    /**
+     * Realiza saída direta de estoque (baixa operacional, técnicos ou aplicação externa).
+     */
+    public function exit(array $data, int $accountId, ?int $userId = null): StockMovement
+    {
+        $sourceDepotId = (int)$data['source_depot_id'];
+        $materialId = (int)$data['material_id'];
+        $quantity = (float)$data['quantity'];
+        $serialIds = $data['serial_ids'] ?? [];
+
+        if ($quantity <= 0) {
+            throw ValidationException::withMessages([
+                'quantity' => ['A quantidade a retirar deve ser maior que zero.'],
+            ]);
+        }
+
+        return DB::transaction(function () use ($accountId, $sourceDepotId, $materialId, $quantity, $serialIds, $userId, $data) {
+            $sourceDepot = Depot::where('account_id', $accountId)->findOrFail($sourceDepotId);
+            $material = Material::where('account_id', $accountId)->findOrFail($materialId);
+
+            $sourceBalance = StockBalance::where('account_id', $accountId)
+                ->where('depot_id', $sourceDepotId)
+                ->where('material_id', $materialId)
+                ->lockForUpdate()
+                ->first();
+
+            $availableQty = $sourceBalance ? (float)$sourceBalance->quantity - (float)$sourceBalance->reserved_quantity : 0;
+
+            if ($availableQty < $quantity) {
+                throw ValidationException::withMessages([
+                    'quantity' => [
+                        "Saldo insuficiente no depósito '{$sourceDepot->name}'. Disponível: {$availableQty}, Solicitado: {$quantity}."
+                    ],
+                ]);
+            }
+
+            $validSerials = [];
+            if ($material->has_serial) {
+                if (count($serialIds) !== (int)$quantity) {
+                    throw ValidationException::withMessages([
+                        'serial_ids' => [
+                            "Para itens serializados, selecione exatamente {$quantity} número(s) de série (selecionados: " . count($serialIds) . ")."
+                        ],
+                    ]);
+                }
+
+                $validSerials = StockSerial::where('account_id', $accountId)
+                    ->where('material_id', $materialId)
+                    ->where('current_depot_id', $sourceDepotId)
+                    ->where('status', 'IN_STOCK')
+                    ->whereIn('id', $serialIds)
+                    ->lockForUpdate()
+                    ->get();
+
+                if ($validSerials->count() !== count($serialIds)) {
+                    throw ValidationException::withMessages([
+                        'serial_ids' => [
+                            'Um ou mais números de série selecionados não estão disponíveis no depósito de origem com status EM ESTOQUE.'
+                        ],
+                    ]);
+                }
+            }
+
+            $sourceBalance->decrement('quantity', $quantity);
+
+            if (!empty($validSerials)) {
+                foreach ($validSerials as $serial) {
+                    $serial->update([
+                        'status' => 'INSTALLED_CUSTOMER',
+                    ]);
+                }
+            }
+
+            $movement = StockMovement::create([
+                'account_id' => $accountId,
+                'material_id' => $materialId,
+                'source_depot_id' => $sourceDepotId,
+                'destination_depot_id' => null,
+                'user_id' => $userId,
+                'movement_type' => 'EXIT',
+                'quantity' => $quantity,
+                'document_ref' => $data['document_ref'] ?? null,
+                'notes' => $data['notes'] ?? 'Saída de estoque',
+                'created_at' => now(),
+            ]);
+
+            if (!empty($validSerials)) {
+                $movement->serials()->attach($validSerials->pluck('id'));
+            }
+
+            return $movement->load(['material.unit', 'sourceDepot', 'serials']);
+        });
+    }
+
+    /**
+     * Realiza devolução de estoque (retorno de clientes, técnicos ou garantias).
+     */
+    public function returnStock(array $data, int $accountId, ?int $userId = null): StockMovement
+    {
+        $destDepotId = (int)$data['destination_depot_id'];
+        $sourceDepotId = !empty($data['source_depot_id']) ? (int)$data['source_depot_id'] : null;
+        $materialId = (int)$data['material_id'];
+        $quantity = (float)$data['quantity'];
+        $serialIds = $data['serial_ids'] ?? [];
+        $serialsData = $data['serials'] ?? [];
+
+        if ($quantity <= 0) {
+            throw ValidationException::withMessages([
+                'quantity' => ['A quantidade a devolver deve ser maior que zero.'],
+            ]);
+        }
+
+        return DB::transaction(function () use ($accountId, $destDepotId, $sourceDepotId, $materialId, $quantity, $serialIds, $serialsData, $userId, $data) {
+            $destDepot = Depot::where('account_id', $accountId)->findOrFail($destDepotId);
+            $material = Material::where('account_id', $accountId)->findOrFail($materialId);
+
+            if ($sourceDepotId) {
+                Depot::where('account_id', $accountId)->findOrFail($sourceDepotId);
+            }
+
+            $affectedSerialIds = [];
+
+            if ($material->has_serial) {
+                if (!empty($serialIds)) {
+                    if (count($serialIds) !== (int)$quantity) {
+                        throw ValidationException::withMessages([
+                            'serial_ids' => ["Para devolução de itens serializados, selecione exatamente {$quantity} seriais."],
+                        ]);
+                    }
+
+                    $existingSerials = StockSerial::where('account_id', $accountId)
+                        ->where('material_id', $materialId)
+                        ->whereIn('id', $serialIds)
+                        ->lockForUpdate()
+                        ->get();
+
+                    foreach ($existingSerials as $serial) {
+                        $serial->update([
+                            'current_depot_id' => $destDepotId,
+                            'status' => 'IN_STOCK',
+                        ]);
+                        $affectedSerialIds[] = $serial->id;
+                    }
+                } elseif (!empty($serialsData)) {
+                    if (count($serialsData) !== (int)$quantity) {
+                        throw ValidationException::withMessages([
+                            'serials' => ["Para devolução de itens serializados, informe {$quantity} seriais."],
+                        ]);
+                    }
+
+                    foreach ($serialsData as $item) {
+                        $sn = is_array($item) ? ($item['serial_number'] ?? '') : (string)$item;
+                        $sn = trim($sn);
+                        if (empty($sn)) continue;
+
+                        $serial = StockSerial::where('account_id', $accountId)
+                            ->where('serial_number', $sn)
+                            ->first();
+
+                        if ($serial) {
+                            $serial->update([
+                                'material_id' => $materialId,
+                                'current_depot_id' => $destDepotId,
+                                'status' => 'IN_STOCK',
+                            ]);
+                        } else {
+                            $serial = StockSerial::create([
+                                'account_id' => $accountId,
+                                'material_id' => $materialId,
+                                'current_depot_id' => $destDepotId,
+                                'serial_number' => $sn,
+                                'status' => 'IN_STOCK',
+                            ]);
+                        }
+                        $affectedSerialIds[] = $serial->id;
+                    }
+                } else {
+                    throw ValidationException::withMessages([
+                        'serial_ids' => ['Informe ou selecione os números de série para a devolução.'],
+                    ]);
+                }
+            }
+
+            // Incrementa saldo no depósito de destino
+            $destBalance = StockBalance::firstOrCreate(
+                ['account_id' => $accountId, 'depot_id' => $destDepotId, 'material_id' => $materialId],
+                ['quantity' => 0, 'reserved_quantity' => 0]
+            );
+            $destBalance->increment('quantity', $quantity);
+
+            $movement = StockMovement::create([
+                'account_id' => $accountId,
+                'material_id' => $materialId,
+                'source_depot_id' => $sourceDepotId,
+                'destination_depot_id' => $destDepotId,
+                'user_id' => $userId,
+                'movement_type' => 'RETURN',
+                'quantity' => $quantity,
+                'document_ref' => $data['document_ref'] ?? null,
+                'notes' => $data['notes'] ?? 'Devolução para estoque',
+                'created_at' => now(),
+            ]);
+
+            if (!empty($affectedSerialIds)) {
+                $movement->serials()->attach($affectedSerialIds);
+            }
+
+            return $movement->load(['material.unit', 'destinationDepot', 'serials']);
+        });
+    }
+
+    /**
+     * Processador central de movimentações (Entrada, Saída, Devolução, Transferência).
+     */
+    public function processMovement(array $data, int $accountId, ?int $userId = null): StockMovement
+    {
+        $type = strtoupper($data['movement_type'] ?? 'TRANSFER');
+
+        return match ($type) {
+            'TRANSFER' => $this->transfer($data, $accountId, $userId),
+            'ENTRY' => $this->entry($data, $accountId, $userId),
+            'EXIT' => $this->exit($data, $accountId, $userId),
+            'RETURN' => $this->returnStock($data, $accountId, $userId),
+            default => throw ValidationException::withMessages([
+                'movement_type' => ['Tipo de movimentação inválido. Permite apenas Entrada, Saída, Devolução ou Transferência.'],
+            ]),
+        };
     }
 
     /**

@@ -124,11 +124,11 @@
           >
             <div class="flex items-center gap-3">
               <div class="w-8 h-8 rounded-lg bg-[#FC6714] text-white flex items-center justify-center shrink-0 shadow-xs">
-                <ArrowRightLeft class="w-4 h-4" />
+                <ArrowUpDown class="w-4 h-4" />
               </div>
               <div>
-                <div class="font-bold text-slate-900 dark:text-slate-100">Nova Transferência Atômica</div>
-                <div class="text-[11px] text-slate-500 dark:text-slate-400">Movimentar materiais entre depósitos</div>
+                <div class="font-bold text-slate-900 dark:text-slate-100">Nova Movimentação de Estoque</div>
+                <div class="text-[11px] text-slate-500 dark:text-slate-400">Entrada, saída, devolução e transferência</div>
               </div>
             </div>
             <ArrowUpRight class="w-4 h-4 text-[#FC6714] opacity-70 group-hover:opacity-100 transition" />

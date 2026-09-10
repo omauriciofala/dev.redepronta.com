@@ -23,21 +23,11 @@
         <!-- Botão Primário Laranja (#FC6714) -->
         <button
           type="button"
-          @click="openTransferModal()"
+          @click="openMovementModal()"
           class="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-[#FC6714] hover:bg-[#E0530A] active:bg-[#C94605] text-white text-sm font-semibold shadow-sm transition active:scale-98 cursor-pointer focus:ring-2 focus:ring-[#FC6714] focus:ring-offset-2 focus:outline-none"
         >
-          <ArrowRightLeft class="w-4 h-4" />
-          <span>Nova Transferência</span>
-        </button>
-
-        <!-- Botão Secundário de Contorno -->
-        <button
-          type="button"
-          @click="openCreateMaterialModal()"
-          class="inline-flex items-center gap-2 h-10 px-3.5 rounded-lg border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 text-sm font-medium shadow-2xs transition cursor-pointer"
-        >
-          <Plus class="w-4 h-4 text-[#FC6714]" />
-          <span>Novo Material</span>
+          <ArrowUpDown class="w-4 h-4" />
+          <span>Nova Movimentação</span>
         </button>
 
         <!-- Menu de Cadastros Base / Tabelas de Apoio (Três Pontos Verticais ⋮) -->
@@ -512,15 +502,15 @@
                     </span>
                   </td>
 
-                  <!-- Ação de Transferir -->
+                  <!-- Ação de Movimentar -->
                   <td class="py-4 px-5 text-right">
                     <button
                       type="button"
-                      @click="openTransferModal(m)"
+                      @click="openMovementModal(m)"
                       class="h-8 px-3 text-xs font-medium rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-orange-50 hover:text-[#FC6714] hover:border-[#FC6714] dark:hover:bg-[#FC6714]/10 dark:hover:text-[#FC6714] transition cursor-pointer inline-flex items-center gap-1.5"
                     >
-                      <ArrowRightLeft class="w-3.5 h-3.5" />
-                      <span>Transferir</span>
+                      <ArrowUpDown class="w-3.5 h-3.5" />
+                      <span>Movimentar</span>
                     </button>
                   </td>
                 </tr>
@@ -815,12 +805,12 @@
 
                     <button
                       type="button"
-                      @click="openTransferModal(m)"
+                      @click="openMovementModal(m)"
                       class="h-8 px-2.5 text-xs font-medium rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-orange-50 hover:text-[#FC6714] hover:border-[#FC6714] dark:hover:bg-[#FC6714]/10 dark:hover:text-[#FC6714] transition cursor-pointer inline-flex items-center gap-1"
-                      title="Transferir material entre depósitos"
+                      title="Movimentar estoque do material"
                     >
-                      <ArrowRightLeft class="w-3.5 h-3.5" />
-                      <span>Transferir</span>
+                      <ArrowUpDown class="w-3.5 h-3.5" />
+                      <span>Movimentar</span>
                     </button>
                   </div>
                 </td>
@@ -1263,15 +1253,17 @@
     <!-- COMPONENTES MODAIS INTEGRADOS (BASE MODAL CANÔNICO) -->
     <!-- ============================================================================= -->
 
-    <!-- Modal 1: Transferência Atômica de Materiais -->
-    <TransferModal
-      :is-open="isTransferModalOpen"
+    <!-- Modal 1: Movimentação de Estoque (Entrada, Saída, Devolução, Transferência) -->
+    <MovementModal
+      :is-open="isMovementModalOpen"
       :depots="depots"
       :materials="materials"
-      :initial-material="selectedMaterialForTransfer"
-      :initial-depot="selectedDepotForTransfer"
-      @close="isTransferModalOpen = false"
-      @transferred="onTransferSuccess"
+      :initial-material="selectedMaterialForMovement"
+      :initial-depot="selectedDepotForMovement"
+      :initial-type="selectedMovementType"
+      @close="isMovementModalOpen = false"
+      @saved="onMovementSuccess"
+      @transferred="onMovementSuccess"
     />
 
     <!-- Modal 2: Cadastro / Edição de Material de Estoque -->
@@ -1373,7 +1365,7 @@ import {
   AlertCircle, CheckCircle2, Menu, MapPin, Edit2, Tags, FolderTree, Scale, UserCheck
 } from 'lucide-vue-next';
 import TablePagination from '@/components/common/TablePagination.vue';
-import TransferModal from '@/components/supplies/TransferModal.vue';
+import MovementModal from '@/components/supplies/MovementModal.vue';
 import MaterialModal from '@/components/supplies/MaterialModal.vue';
 import ClusterCrudModal from '@/components/supplies/auxiliary/ClusterCrudModal.vue';
 import DepotTypeCrudModal from '@/components/supplies/auxiliary/DepotTypeCrudModal.vue';
@@ -1459,9 +1451,10 @@ const selectedMaterialForEdit = ref<any>(null);
 const materialFilterCategory = ref('all');
 const isDepotModalOpen = ref(false);
 const selectedDepotForEdit = ref<any>(null);
-const isTransferModalOpen = ref(false);
-const selectedMaterialForTransfer = ref<any>(null);
-const selectedDepotForTransfer = ref<any>(null);
+const isMovementModalOpen = ref(false);
+const selectedMaterialForMovement = ref<any>(null);
+const selectedDepotForMovement = ref<any>(null);
+const selectedMovementType = ref<'ENTRY' | 'EXIT' | 'RETURN' | 'TRANSFER'>('TRANSFER');
 
 function showToast(msg: string, type: 'success' | 'error' = 'success') {
   toastMessage.value = msg;
@@ -1909,34 +1902,44 @@ async function loadSerials() {
   }
 }
 
-// ─── AÇÕES DE MODAL: TRANSFERÊNCIA ───────────────────────────────────────────
+// ─── AÇÕES DE MODAL: MOVIMENTAÇÃO DE ESTOQUE ────────────────────────────────
+function openMovementModal(
+  material?: any,
+  depot?: any,
+  type: 'ENTRY' | 'EXIT' | 'RETURN' | 'TRANSFER' = 'TRANSFER'
+) {
+  selectedMaterialForMovement.value = material || null;
+  selectedDepotForMovement.value = depot || null;
+  selectedMovementType.value = type;
+  isMovementModalOpen.value = true;
+}
+
 function openTransferModal(material?: any) {
-  selectedMaterialForTransfer.value = material || null;
-  selectedDepotForTransfer.value = null;
-  isTransferModalOpen.value = true;
+  openMovementModal(material, null, 'TRANSFER');
 }
 
 function openTransferFromDepot(depot: Depot) {
-  selectedDepotForTransfer.value = depot;
-  selectedMaterialForTransfer.value = null;
-  isTransferModalOpen.value = true;
+  openMovementModal(null, depot, 'TRANSFER');
 }
 
 function openTransferFromBreakdown(breakdownItem: any, material: any) {
   const originDepot = depots.value.find(d => d.id === breakdownItem.depot_id || d.name === breakdownItem.depot_name) || null;
-  selectedDepotForTransfer.value = originDepot;
-  selectedMaterialForTransfer.value = material;
-  isTransferModalOpen.value = true;
+  openMovementModal(material, originDepot, 'TRANSFER');
 }
 
 function openTransferFromSerial(serial: any) {
-  selectedMaterialForTransfer.value = serial.material || null;
-  selectedDepotForTransfer.value = serial.current_depot || null;
-  isTransferModalOpen.value = true;
+  openMovementModal(serial.material || null, serial.current_depot || null, 'TRANSFER');
 }
 
-async function onTransferSuccess() {
-  showToast('Transferência executada com sucesso!');
+async function onMovementSuccess(movement?: any) {
+  const typeLabels: Record<string, string> = {
+    ENTRY: 'Entrada',
+    EXIT: 'Saída',
+    RETURN: 'Devolução',
+    TRANSFER: 'Transferência',
+  };
+  const label = movement?.movement_type ? (typeLabels[movement.movement_type] || 'Movimentação') : 'Movimentação';
+  showToast(`${label} de estoque realizada com sucesso!`);
   await Promise.all([
     loadRegionalStock(),
     loadMaterials(),

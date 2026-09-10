@@ -60,6 +60,7 @@ Route::prefix('v1')->group(function () {
         Route::get('regional-position', [StockController::class, 'regionalPosition']);
         Route::get('balances', [StockController::class, 'balances']);
         Route::get('serials', [StockController::class, 'serials']);
+        Route::post('movement', [StockController::class, 'movement']);
         Route::post('transfer', [StockController::class, 'transfer']);
         Route::post('entry', [StockController::class, 'entry']);
         Route::get('movements', [StockController::class, 'movements']);
