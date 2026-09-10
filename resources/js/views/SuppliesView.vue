@@ -1527,7 +1527,58 @@ interface Unit {
 }
 
 // ─── ESTADOS GERAIS DO MÓDULO ────────────────────────────────────────────────
-const activeTab = ref<'regional' | 'materials' | 'depots' | 'serials'>('regional');
+type TabKey = 'regional' | 'materials' | 'depots' | 'serials';
+const VALID_TABS: TabKey[] = ['regional', 'materials', 'depots', 'serials'];
+
+function getInitialTab(): TabKey {
+  try {
+    const hash = window.location.hash;
+    if (hash) {
+      if (hash.includes('?')) {
+        const queryPart = hash.split('?')[1];
+        const params = new URLSearchParams(queryPart);
+        const tab = params.get('tab') as TabKey;
+        if (VALID_TABS.includes(tab)) {
+          return tab;
+        }
+      }
+      const slashParts = hash.replace(/^#\/?/, '').split('?')[0].split('/');
+      if (slashParts.length > 1 && VALID_TABS.includes(slashParts[1] as TabKey)) {
+        return slashParts[1] as TabKey;
+      }
+    }
+
+    const saved = localStorage.getItem('rp_supplies_active_tab') as TabKey;
+    if (saved && VALID_TABS.includes(saved)) {
+      return saved;
+    }
+  } catch (e) {
+    // Fallback silencioso
+  }
+
+  return 'regional';
+}
+
+const activeTab = ref<TabKey>(getInitialTab());
+
+function updateTabInUrlAndStorage(tab: TabKey) {
+  try {
+    localStorage.setItem('rp_supplies_active_tab', tab);
+
+    const currentHash = window.location.hash.replace(/^#\/?/, '').split('?')[0].split('/')[0] || 'supplies';
+    const newHash = `${currentHash}?tab=${tab}`;
+    if (window.location.hash !== `#${newHash}`) {
+      history.replaceState(null, '', `#${newHash}`);
+    }
+  } catch (e) {
+    // Fallback silencioso
+  }
+}
+
+watch(activeTab, (newTab) => {
+  updateTabInUrlAndStorage(newTab);
+});
+
 const loading = ref(false);
 const toastMessage = ref('');
 const toastType = ref<'success' | 'error'>('success');
@@ -2255,7 +2306,16 @@ async function refreshCurrentTab() {
 }
 
 // ─── CICLO DE VIDA ────────────────────────────────────────────────────────────
+function handleHashChangeForTabs() {
+  const currentTabInHash = getInitialTab();
+  if (currentTabInHash && currentTabInHash !== activeTab.value) {
+    activeTab.value = currentTabInHash;
+  }
+}
+
 onMounted(async () => {
+  window.addEventListener('hashchange', handleHashChangeForTabs);
+  updateTabInUrlAndStorage(activeTab.value);
   document.addEventListener('click', handleDocumentClick);
   await Promise.all([
     loadClusters(),
@@ -2271,6 +2331,7 @@ onMounted(async () => {
 });
 
 onBeforeUnmount(() => {
+  window.removeEventListener('hashchange', handleHashChangeForTabs);
   document.removeEventListener('click', handleDocumentClick);
 });
 </script>

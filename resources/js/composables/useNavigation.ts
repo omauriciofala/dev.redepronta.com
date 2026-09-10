@@ -7,13 +7,26 @@ const currentView = ref<ActiveView>('people');
 export function useNavigation() {
   const setView = (view: ActiveView) => {
     currentView.value = view;
+    if (view === 'supplies') {
+      try {
+        const savedTab = localStorage.getItem('rp_supplies_active_tab');
+        if (savedTab && ['regional', 'materials', 'depots', 'serials'].includes(savedTab)) {
+          window.location.hash = `${view}?tab=${savedTab}`;
+          return;
+        }
+      } catch (e) {
+        // Fallback para hash limpo
+      }
+    }
     window.location.hash = view;
   };
 
   const syncHash = () => {
-    const hash = window.location.hash.replace('#', '');
-    if (hash === 'design-system' || hash === 'people' || hash === 'supplies' || hash === 'changelog' || hash === 'integrations' || hash === 'developer') {
-      currentView.value = hash as ActiveView;
+    const raw = window.location.hash.replace(/^#\/?/, '');
+    const cleanView = raw.split('?')[0].split('/')[0].trim();
+    const validViews: ActiveView[] = ['design-system', 'people', 'supplies', 'changelog', 'integrations', 'developer'];
+    if (validViews.includes(cleanView as ActiveView)) {
+      currentView.value = cleanView as ActiveView;
     }
   };
 
