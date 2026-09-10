@@ -18,13 +18,19 @@ class ClusterController extends Controller
     public function index(Request $request): JsonResponse
     {
         $accountId = $this->getAccountId();
-        $query = DepotCluster::where('account_id', $accountId)->withCount('depots');
+        $query = DepotCluster::where('account_id', $accountId)
+            ->withCount('depots')
+            ->with('owner.person');
 
         if ($request->filled('search')) {
             $s = $request->query('search');
             $query->where(function ($q) use ($s) {
                 $q->where('name', 'like', "%{$s}%")
-                  ->orWhere('code', 'like', "%{$s}%");
+                  ->orWhere('code', 'like', "%{$s}%")
+                  ->orWhereHas('owner', function ($oq) use ($s) {
+                      $oq->where('name', 'like', "%{$s}%")
+                         ->orWhere('code', 'like', "%{$s}%");
+                  });
             });
         }
 
@@ -45,6 +51,7 @@ class ClusterController extends Controller
         $data['account_id'] = $this->getAccountId();
 
         $cluster = DepotCluster::create($data);
+        $cluster->load(['owner.person']);
 
         return response()->json([
             'message' => 'Posição regional criada com sucesso.',
@@ -54,13 +61,15 @@ class ClusterController extends Controller
 
     public function show(DepotCluster $cluster): JsonResponse
     {
-        $cluster->load(['depots.responsiblePerson']);
+        $cluster->load(['owner.person', 'depots.responsiblePerson']);
         return response()->json(['data' => $cluster]);
     }
 
     public function update(StoreClusterRequest $request, DepotCluster $cluster): JsonResponse
     {
         $cluster->update($request->validated());
+        $cluster->load(['owner.person']);
+
         return response()->json([
             'message' => 'Posição regional atualizada com sucesso.',
             'data' => $cluster,

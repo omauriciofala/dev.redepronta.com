@@ -14,6 +14,7 @@ class StoreClusterRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'owner_id' => ['required', 'integer', 'exists:material_owners,id'],
             'name' => ['required', 'string', 'max:150'],
             'code' => ['required', 'string', 'max:50'],
             'description' => ['nullable', 'string'],
@@ -25,6 +26,8 @@ class StoreClusterRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'owner_id.required' => 'O vínculo com um Proprietário é obrigatório para a Posição Regional.',
+            'owner_id.exists' => 'O proprietário selecionado não foi encontrado.',
             'name.required' => 'O nome da posição regional é obrigatório.',
             'code.required' => 'A sigla/código da posição regional é obrigatória.',
         ];

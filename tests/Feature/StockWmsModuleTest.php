@@ -6,6 +6,8 @@ use App\Models\Account;
 use App\Models\Depot;
 use App\Models\DepotCluster;
 use App\Models\Material;
+use App\Models\MaterialOwner;
+use App\Models\Person;
 use App\Models\StockBalance;
 use App\Models\StockSerial;
 use App\Models\Unit;
@@ -21,6 +23,8 @@ class StockWmsModuleTest extends TestCase
     use RefreshDatabase;
 
     protected Account $account;
+    protected Person $requesterPerson;
+    protected MaterialOwner $owner;
     protected Unit $unitUnd;
     protected Unit $unitMt;
     protected DepotCluster $cluster;
@@ -88,9 +92,27 @@ class StockWmsModuleTest extends TestCase
             'is_active' => true,
         ]);
 
+        // Proprietário Padrão Regional (vínculo obrigatório da Posição Regional)
+        $this->requesterPerson = Person::create([
+            'account_id' => $this->account->id,
+            'name' => 'Operadora Parceira Telecom',
+            'document_number' => '11.222.333/0001-44',
+            'status' => 'active',
+            'is_requester' => true,
+        ]);
+
+        $this->owner = MaterialOwner::create([
+            'account_id' => $this->account->id,
+            'person_id' => $this->requesterPerson->id,
+            'code' => 'PROP-PADRAO',
+            'name' => 'Proprietário Padrão Regional',
+            'is_active' => true,
+        ]);
+
         // 1. Posição Regional
         $this->cluster = DepotCluster::create([
             'account_id' => $this->account->id,
+            'owner_id' => $this->owner->id,
             'code' => 'REG-CAMPINAS',
             'name' => 'Posição Regional Campinas',
             'description' => 'Região Metropolitana de Campinas e RMC',
@@ -778,6 +800,109 @@ class StockWmsModuleTest extends TestCase
 
         $response->assertStatus(200);
         $this->assertSoftDeleted('material_owners', ['id' => $owner->id]);
+    }
+
+    /**
+     * Testa que a criação de posição regional falha quando o proprietário não é informado.
+     */
+    public function test_cluster_creation_fails_without_owner_id(): void
+    {
+        $payload = [
+            'name' => 'Posição Regional Sem Dono',
+            'code' => 'REG-NO-OWNER',
+            'description' => 'Teste sem vínculo de proprietário',
+            'is_active' => true,
+        ];
+
+        $response = $this->postJson('/api/v1/clusters', $payload);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['owner_id']);
+    }
+
+    /**
+     * Testa criação de posição regional com proprietário obrigatório com sucesso.
+     */
+    public function test_can_create_cluster_with_owner_id(): void
+    {
+        $payload = [
+            'owner_id' => $this->owner->id,
+            'name' => 'Posição Regional Ribeirão Preto',
+            'code' => 'REG-RIBEIRAO',
+            'description' => 'Região de Ribeirão e cidades vizinhas',
+            'color' => '#10B981',
+            'is_active' => true,
+        ];
+
+        $response = $this->postJson('/api/v1/clusters', $payload);
+
+        $response->assertStatus(201);
+        $response->assertJsonPath('data.name', 'Posição Regional Ribeirão Preto');
+        $response->assertJsonPath('data.owner_id', $this->owner->id);
+        $response->assertJsonPath('data.owner.code', $this->owner->code);
+
+        $this->assertDatabaseHas('depot_clusters', [
+            'code' => 'REG-RIBEIRAO',
+            'owner_id' => $this->owner->id,
+        ]);
+    }
+
+    /**
+     * Testa que não é permitido criar posição regional com proprietário inexistente.
+     */
+    public function test_cluster_cannot_be_created_with_invalid_owner_id(): void
+    {
+        $payload = [
+            'owner_id' => 999999,
+            'name' => 'Posição Regional Dono Invalido',
+            'code' => 'REG-INVALID',
+            'is_active' => true,
+        ];
+
+        $response = $this->postJson('/api/v1/clusters', $payload);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['owner_id']);
+    }
+
+    /**
+     * Testa atualização do proprietário de uma posição regional.
+     */
+    public function test_can_update_cluster_owner(): void
+    {
+        $personNovo = Person::create([
+            'account_id' => $this->account->id,
+            'name' => 'Novo Solicitante TIM',
+            'document_number' => '99.888.777/0001-66',
+            'status' => 'active',
+            'is_requester' => true,
+        ]);
+
+        $novoOwner = MaterialOwner::create([
+            'account_id' => $this->account->id,
+            'person_id' => $personNovo->id,
+            'code' => 'PROP-TIM',
+            'name' => 'TIM Brasil S.A.',
+            'is_active' => true,
+        ]);
+
+        $payload = [
+            'owner_id' => $novoOwner->id,
+            'name' => $this->cluster->name,
+            'code' => $this->cluster->code,
+            'is_active' => true,
+        ];
+
+        $response = $this->putJson("/api/v1/clusters/{$this->cluster->id}", $payload);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.owner_id', $novoOwner->id);
+        $response->assertJsonPath('data.owner.code', 'PROP-TIM');
+
+        $this->assertDatabaseHas('depot_clusters', [
+            'id' => $this->cluster->id,
+            'owner_id' => $novoOwner->id,
+        ]);
     }
 }
 

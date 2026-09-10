@@ -273,6 +273,14 @@
             >
               <span class="w-2.5 h-2.5 rounded-full" :style="{ backgroundColor: c.color || '#FC6714' }"></span>
               <span>{{ c.name }}</span>
+              <span
+                v-if="c.owner"
+                class="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold tracking-wide"
+                :class="selectedClusterId === c.id ? 'bg-white/25 text-white' : 'bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-300'"
+                :title="`Proprietário: ${c.owner.code} - ${c.owner.name}`"
+              >
+                {{ c.owner.code }}
+              </span>
             </button>
           </div>
         </div>
@@ -1382,6 +1390,16 @@ interface Cluster {
   code: string;
   color?: string;
   description?: string;
+  owner_id?: number;
+  owner?: {
+    id: number;
+    code: string;
+    name: string;
+    person?: {
+      id: number;
+      name: string;
+    };
+  };
 }
 
 interface Depot {

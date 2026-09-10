@@ -63,6 +63,25 @@
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <div class="sm:col-span-3">
+              <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+                Proprietário Vinculado *
+              </label>
+              <select
+                v-model="form.owner_id"
+                required
+                class="w-full h-9 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714] outline-none cursor-pointer"
+              >
+                <option value="">Selecione o proprietário obrigatório...</option>
+                <option v-for="o in availableOwners" :key="o.id" :value="o.id">
+                  {{ o.code }} — {{ o.name }} (Solicitante: {{ o.person ? o.person.name : 'N/A' }})
+                </option>
+              </select>
+              <span class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">
+                A posição regional é vinculada obrigatoriamente a um proprietário com perfil de solicitante.
+              </span>
+            </div>
+
             <div>
               <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
                 Código / Sigla *
@@ -146,21 +165,22 @@
           <table class="w-full text-left border-collapse text-xs">
             <thead class="sticky top-0 bg-slate-100/90 dark:bg-[#03032E]/90 backdrop-blur-xs border-b border-slate-200 dark:border-[#14147A] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-bold z-10">
               <tr>
-                <th class="py-3 px-4 w-36">Código</th>
+                <th class="py-3 px-4 w-32">Código</th>
                 <th class="py-3 px-4">Posição Regional</th>
+                <th class="py-3 px-4 w-44">Proprietário</th>
                 <th class="py-3 px-4">Abrangência</th>
-                <th class="py-3 px-4 w-28 text-center">Depósitos</th>
-                <th class="py-3 px-4 text-right w-28">Ações</th>
+                <th class="py-3 px-4 w-24 text-center">Depósitos</th>
+                <th class="py-3 px-4 text-right w-24">Ações</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 dark:divide-[#14147A]/60">
               <tr v-if="loading">
-                <td colspan="5" class="py-8 text-center text-slate-400">
+                <td colspan="6" class="py-8 text-center text-slate-400">
                   <span class="inline-block animate-spin mr-1.5 text-[#FC6714]">⟳</span> Carregando posições regionais...
                 </td>
               </tr>
               <tr v-else-if="filteredClusters.length === 0">
-                <td colspan="5" class="py-8 text-center text-slate-400">
+                <td colspan="6" class="py-8 text-center text-slate-400">
                   Nenhuma posição regional encontrada.
                 </td>
               </tr>
@@ -183,6 +203,24 @@
                 <!-- Nome -->
                 <td class="py-3 px-4 font-semibold text-slate-900 dark:text-slate-100">
                   {{ c.name }}
+                </td>
+
+                <!-- Proprietário -->
+                <td class="py-3 px-4">
+                  <div v-if="c.owner" class="space-y-0.5">
+                    <div class="flex items-center gap-1.5">
+                      <span class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-mono text-[10px] font-bold">
+                        {{ c.owner.code }}
+                      </span>
+                      <span class="font-medium text-slate-800 dark:text-slate-200 truncate max-w-[130px]" :title="c.owner.name">
+                        {{ c.owner.name }}
+                      </span>
+                    </div>
+                    <span v-if="c.owner.person" class="text-[10px] text-slate-400 block truncate max-w-[150px]">
+                      Solicitante: {{ c.owner.person.name }}
+                    </span>
+                  </div>
+                  <span v-else class="text-slate-400 italic">Não vinculado</span>
                 </td>
 
                 <!-- Descrição -->
@@ -231,7 +269,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { Search, Plus, Edit2, X, AlertCircle } from 'lucide-vue-next';
 import BaseModal from '@/components/common/BaseModal.vue';
 
@@ -245,6 +283,7 @@ const emit = defineEmits<{
 }>();
 
 const clustersList = ref<any[]>([]);
+const availableOwners = ref<any[]>([]);
 const loading = ref(false);
 const searchTerm = ref('');
 const isFormOpen = ref(false);
@@ -253,6 +292,7 @@ const formError = ref('');
 const editingId = ref<number | null>(null);
 
 const form = ref({
+  owner_id: '' as number | string,
   code: '',
   name: '',
   color: '#FC6714',
@@ -265,9 +305,20 @@ const filteredClusters = computed(() => {
   return clustersList.value.filter(c =>
     c.name.toLowerCase().includes(q) ||
     c.code.toLowerCase().includes(q) ||
-    (c.description && c.description.toLowerCase().includes(q))
+    (c.description && c.description.toLowerCase().includes(q)) ||
+    (c.owner && (c.owner.name.toLowerCase().includes(q) || c.owner.code.toLowerCase().includes(q)))
   );
 });
+
+async function loadOwners() {
+  try {
+    const res = await fetch('/api/v1/material-owners?active_only=true');
+    const json = await res.json();
+    availableOwners.value = json.data || [];
+  } catch (err) {
+    console.error('Erro ao carregar proprietários:', err);
+  }
+}
 
 async function loadClusters() {
   loading.value = true;
@@ -286,6 +337,7 @@ function openCreateForm() {
   editingId.value = null;
   formError.value = '';
   form.value = {
+    owner_id: availableOwners.value.length > 0 ? availableOwners.value[0].id : '',
     code: '',
     name: '',
     color: '#FC6714',
@@ -298,6 +350,7 @@ function editCluster(cluster: any) {
   editingId.value = cluster.id;
   formError.value = '';
   form.value = {
+    owner_id: cluster.owner_id ? cluster.owner_id : (cluster.owner?.id ? cluster.owner.id : ''),
     code: cluster.code,
     name: cluster.name,
     color: cluster.color || '#FC6714',
@@ -314,6 +367,10 @@ function closeForm() {
 
 async function saveCluster() {
   formError.value = '';
+  if (!form.value.owner_id) {
+    formError.value = 'O vínculo com um Proprietário é obrigatório para a Posição Regional.';
+    return;
+  }
   if (!form.value.name.trim()) {
     formError.value = 'O nome da posição regional é obrigatório.';
     return;
@@ -334,7 +391,10 @@ async function saveCluster() {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
-      body: JSON.stringify(form.value),
+      body: JSON.stringify({
+        ...form.value,
+        owner_id: Number(form.value.owner_id),
+      }),
     });
 
     const json = await res.json();
@@ -353,7 +413,19 @@ async function saveCluster() {
   }
 }
 
+watch(
+  () => props.isOpen,
+  (open) => {
+    if (open) {
+      closeForm();
+      loadOwners();
+      loadClusters();
+    }
+  }
+);
+
 onMounted(() => {
+  loadOwners();
   loadClusters();
 });
 </script>

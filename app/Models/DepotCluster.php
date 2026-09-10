@@ -11,6 +11,7 @@ class DepotCluster extends Model
 
     protected $fillable = [
         'account_id',
+        'owner_id',
         'name',
         'code',
         'description',
@@ -25,6 +26,11 @@ class DepotCluster extends Model
     public function account()
     {
         return $this->belongsTo(Account::class);
+    }
+
+    public function owner()
+    {
+        return $this->belongsTo(MaterialOwner::class, 'owner_id');
     }
 
     public function depots()
