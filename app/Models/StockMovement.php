@@ -17,14 +17,30 @@ class StockMovement extends Model
         'movement_type',
         'quantity',
         'document_ref',
+        'document_number',
+        'document_date',
+        'movement_date',
+        'receiver_person_id',
+        'driver_person_id',
         'notes',
         'created_at',
     ];
 
     protected $casts = [
         'quantity' => 'decimal:2',
+        'document_date' => 'date',
+        'movement_date' => 'datetime',
         'created_at' => 'datetime',
     ];
+
+    protected $appends = [
+        'type',
+    ];
+
+    public function getTypeAttribute(): ?string
+    {
+        return $this->attributes['movement_type'] ?? null;
+    }
 
     public function account()
     {
@@ -49,6 +65,21 @@ class StockMovement extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function receiver()
+    {
+        return $this->belongsTo(Person::class, 'receiver_person_id');
+    }
+
+    public function driver()
+    {
+        return $this->belongsTo(Person::class, 'driver_person_id');
+    }
+
+    public function attachments()
+    {
+        return $this->hasMany(StockMovementAttachment::class, 'stock_movement_id');
     }
 
     public function serials()

@@ -7,8 +7,11 @@ use App\Models\DepotCluster;
 use App\Models\Material;
 use App\Models\StockBalance;
 use App\Models\StockMovement;
+use App\Models\StockMovementAttachment;
 use App\Models\StockSerial;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 class ClusterStockService
@@ -244,24 +247,22 @@ class ClusterStockService
             }
 
             // 7. Registro da movimentação para rastreabilidade e auditoria
-            $movement = StockMovement::create([
-                'account_id' => $accountId,
-                'material_id' => $materialId,
-                'source_depot_id' => $sourceDepotId,
-                'destination_depot_id' => $destDepotId,
-                'user_id' => $userId,
-                'movement_type' => 'TRANSFER',
-                'quantity' => $quantity,
-                'document_ref' => $data['document_ref'] ?? null,
-                'notes' => $data['notes'] ?? null,
-                'created_at' => now(),
-            ]);
+            $movement = $this->createMovementRecord(
+                $accountId,
+                $materialId,
+                $sourceDepotId,
+                $destDepotId,
+                $userId,
+                'TRANSFER',
+                $quantity,
+                $data
+            );
 
             if (!empty($validSerials)) {
                 $movement->serials()->attach($validSerials->pluck('id'));
             }
 
-            return $movement->load(['material.unit', 'sourceDepot', 'destinationDepot', 'serials']);
+            return $movement->load(['material.unit', 'sourceDepot', 'destinationDepot', 'receiver', 'driver', 'attachments', 'serials']);
         });
     }
 
@@ -319,24 +320,22 @@ class ClusterStockService
                 }
             }
 
-            $movement = StockMovement::create([
-                'account_id' => $accountId,
-                'material_id' => $materialId,
-                'source_depot_id' => null,
-                'destination_depot_id' => $depotId,
-                'user_id' => $userId,
-                'movement_type' => 'ENTRY',
-                'quantity' => $quantity,
-                'document_ref' => $data['document_ref'] ?? null,
-                'notes' => $data['notes'] ?? 'Entrada direta de estoque',
-                'created_at' => now(),
-            ]);
+            $movement = $this->createMovementRecord(
+                $accountId,
+                $materialId,
+                null,
+                $depotId,
+                $userId,
+                'ENTRY',
+                $quantity,
+                $data
+            );
 
             if (!empty($createdSerials)) {
                 $movement->serials()->attach($createdSerials);
             }
 
-            return $movement->load(['material.unit', 'destinationDepot', 'serials']);
+            return $movement->load(['material.unit', 'destinationDepot', 'receiver', 'driver', 'attachments', 'serials']);
         });
     }
 
@@ -413,24 +412,22 @@ class ClusterStockService
                 }
             }
 
-            $movement = StockMovement::create([
-                'account_id' => $accountId,
-                'material_id' => $materialId,
-                'source_depot_id' => $sourceDepotId,
-                'destination_depot_id' => null,
-                'user_id' => $userId,
-                'movement_type' => 'EXIT',
-                'quantity' => $quantity,
-                'document_ref' => $data['document_ref'] ?? null,
-                'notes' => $data['notes'] ?? 'Saída de estoque',
-                'created_at' => now(),
-            ]);
+            $movement = $this->createMovementRecord(
+                $accountId,
+                $materialId,
+                $sourceDepotId,
+                null,
+                $userId,
+                'EXIT',
+                $quantity,
+                $data
+            );
 
             if (!empty($validSerials)) {
                 $movement->serials()->attach($validSerials->pluck('id'));
             }
 
-            return $movement->load(['material.unit', 'sourceDepot', 'serials']);
+            return $movement->load(['material.unit', 'sourceDepot', 'receiver', 'driver', 'attachments', 'serials']);
         });
     }
 
@@ -530,24 +527,22 @@ class ClusterStockService
             );
             $destBalance->increment('quantity', $quantity);
 
-            $movement = StockMovement::create([
-                'account_id' => $accountId,
-                'material_id' => $materialId,
-                'source_depot_id' => $sourceDepotId,
-                'destination_depot_id' => $destDepotId,
-                'user_id' => $userId,
-                'movement_type' => 'RETURN',
-                'quantity' => $quantity,
-                'document_ref' => $data['document_ref'] ?? null,
-                'notes' => $data['notes'] ?? 'Devolução para estoque',
-                'created_at' => now(),
-            ]);
+            $movement = $this->createMovementRecord(
+                $accountId,
+                $materialId,
+                $sourceDepotId,
+                $destDepotId,
+                $userId,
+                'RETURN',
+                $quantity,
+                $data
+            );
 
             if (!empty($affectedSerialIds)) {
                 $movement->serials()->attach($affectedSerialIds);
             }
 
-            return $movement->load(['material.unit', 'destinationDepot', 'serials']);
+            return $movement->load(['material.unit', 'destinationDepot', 'receiver', 'driver', 'attachments', 'serials']);
         });
     }
 
@@ -614,5 +609,99 @@ class ClusterStockService
         }
 
         return $result;
+    }
+
+    /**
+     * Cria o registro de movimentação de estoque com os metadados estendidos.
+     */
+    protected function createMovementRecord(
+        int $accountId,
+        int $materialId,
+        ?int $sourceDepotId,
+        ?int $destinationDepotId,
+        ?int $userId,
+        string $type,
+        float $quantity,
+        array $data
+    ): StockMovement {
+        $movementDate = !empty($data['movement_date'])
+            ? Carbon::parse($data['movement_date'])->toDateString()
+            : now()->toDateString();
+
+        $documentDate = !empty($data['document_date'])
+            ? Carbon::parse($data['document_date'])->toDateString()
+            : null;
+
+        $movement = StockMovement::create([
+            'account_id' => $accountId,
+            'material_id' => $materialId,
+            'source_depot_id' => $sourceDepotId,
+            'destination_depot_id' => $destinationDepotId,
+            'user_id' => $userId,
+            'movement_type' => $type,
+            'quantity' => $quantity,
+            'document_ref' => $data['document_ref'] ?? $data['document_number'] ?? null,
+            'document_number' => $data['document_number'] ?? $data['document_ref'] ?? null,
+            'document_date' => $documentDate,
+            'movement_date' => $movementDate,
+            'receiver_person_id' => $data['receiver_person_id'] ?? null,
+            'driver_person_id' => $data['driver_person_id'] ?? null,
+            'notes' => $data['notes'] ?? null,
+        ]);
+
+        if (!empty($data['attachments']) && is_array($data['attachments'])) {
+            $this->saveAttachments($movement, $data['attachments'], $accountId);
+        }
+
+        return $movement;
+    }
+
+    /**
+     * Vincula ou grava anexos na movimentação de estoque.
+     */
+    public function saveAttachments(StockMovement $movement, array $attachments, int $accountId): void
+    {
+        foreach ($attachments as $att) {
+            if ($att instanceof \Illuminate\Http\UploadedFile) {
+                $path = $att->store("stock_attachments/{$accountId}", 'public');
+                StockMovementAttachment::create([
+                    'account_id' => $accountId,
+                    'stock_movement_id' => $movement->id,
+                    'file_name' => $att->getClientOriginalName(),
+                    'file_path' => $path,
+                    'file_type' => $att->getClientMimeType() ?? $att->getClientOriginalExtension(),
+                    'file_size' => $att->getSize(),
+                    'description' => null,
+                ]);
+            } elseif (is_array($att)) {
+                if (!empty($att['file_path'])) {
+                    StockMovementAttachment::create([
+                        'account_id' => $accountId,
+                        'stock_movement_id' => $movement->id,
+                        'file_name' => $att['file_name'] ?? basename($att['file_path']),
+                        'file_path' => $att['file_path'],
+                        'file_type' => $att['file_type'] ?? null,
+                        'file_size' => $att['file_size'] ?? null,
+                        'description' => $att['description'] ?? null,
+                    ]);
+                }
+            }
+        }
+    }
+
+    /**
+     * Realiza o upload isolado de um anexo para retorno de metadados na interface.
+     */
+    public function uploadAttachment(\Illuminate\Http\UploadedFile $file, int $accountId, ?string $description = null): array
+    {
+        $path = $file->store("stock_attachments/{$accountId}", 'public');
+        return [
+            'file_name' => $file->getClientOriginalName(),
+            'file_path' => $path,
+            'file_type' => $file->getClientMimeType() ?? $file->getClientOriginalExtension(),
+            'file_size' => $file->getSize(),
+            'url' => Storage::disk('public')->url($path),
+            'description' => $description,
+        ];
     }
 }

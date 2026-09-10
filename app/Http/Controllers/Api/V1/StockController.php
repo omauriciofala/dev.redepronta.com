@@ -170,13 +170,45 @@ class StockController extends Controller
     }
 
     /**
+     * Upload de Anexo para Movimentação de Estoque (Documentos e Fotos).
+     */
+    public function uploadAttachment(Request $request): JsonResponse
+    {
+        $request->validate([
+            'file' => ['required', 'file', 'max:20480'], // max 20MB
+            'description' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $accountId = $this->getAccountId();
+        $attachment = $this->stockService->uploadAttachment(
+            $request->file('file'),
+            $accountId,
+            $request->input('description')
+        );
+
+        return response()->json([
+            'message' => 'Anexo enviado com sucesso.',
+            'data' => $attachment,
+        ], 201);
+    }
+
+    /**
      * Histórico de Movimentações para Auditoria.
      */
     public function movements(Request $request): JsonResponse
     {
         $accountId = $this->getAccountId();
         $query = StockMovement::where('account_id', $accountId)
-            ->with(['material.unit', 'sourceDepot', 'destinationDepot', 'user', 'serials']);
+            ->with([
+                'material.unit',
+                'sourceDepot',
+                'destinationDepot',
+                'user',
+                'serials',
+                'receiver',
+                'driver',
+                'attachments',
+            ]);
 
         if ($request->filled('material_id')) {
             $query->where('material_id', $request->query('material_id'));

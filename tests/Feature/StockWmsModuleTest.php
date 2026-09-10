@@ -9,12 +9,15 @@ use App\Models\Material;
 use App\Models\MaterialOwner;
 use App\Models\Person;
 use App\Models\StockBalance;
+use App\Models\StockMovement;
 use App\Models\StockSerial;
 use App\Models\Unit;
 use App\Services\Stock\ClusterStockService;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
@@ -1127,6 +1130,137 @@ class StockWmsModuleTest extends TestCase
         $this->assertDatabaseMissing('stock_serials', [
             'serial_number' => 'GPON-ONLY-ONE',
         ]);
+    }
+
+    /**
+     * Testa que é possível fazer upload de anexos (documentos ou fotos) para movimentação de estoque.
+     */
+    public function test_can_upload_attachment_for_stock_movement(): void
+    {
+        Storage::fake('public');
+
+        $file = UploadedFile::fake()->create('nota_fiscal_eletronica.pdf', 500, 'application/pdf');
+
+        $response = $this->postJson('/api/v1/stock/attachments', [
+            'file' => $file,
+            'description' => 'Comprovante Fiscal',
+        ]);
+
+        $response->assertStatus(201)
+            ->assertJsonStructure([
+                'message',
+                'data' => [
+                    'file_name',
+                    'file_path',
+                    'file_type',
+                    'file_size',
+                    'url',
+                ],
+            ]);
+
+        $path = $response->json('data.file_path');
+        $this->assertNotEmpty($path);
+        Storage::disk('public')->assertExists($path);
+    }
+
+    /**
+     * Testa que a movimentação de estoque persiste com precisão número do documento, datas,
+     * recebedor, motorista, anotações e anexos (fotos/documentos).
+     */
+    public function test_stock_movement_persists_extended_fields_receiver_driver_and_attachments(): void
+    {
+        Storage::fake('public');
+
+        // Cria recebedor e motorista
+        $receiver = Person::create([
+            'account_id' => $this->account->id,
+            'name' => 'Carlos Recebedor da Silva',
+            'document_number' => '11122233344',
+            'role' => 'Almoxarife',
+            'status' => 'active',
+        ]);
+
+        $driver = Person::create([
+            'account_id' => $this->account->id,
+            'name' => 'Marcos Motorista Transportador',
+            'document_number' => '55566677788',
+            'role' => 'Motorista',
+            'status' => 'active',
+        ]);
+
+        $payload = [
+            'movement_type' => 'ENTRY',
+            'destination_depot_id' => $this->centralDepot->id,
+            'document_number' => 'NF-998877',
+            'document_date' => '2026-09-08',
+            'movement_date' => '2026-09-10',
+            'receiver_person_id' => $receiver->id,
+            'driver_person_id' => $driver->id,
+            'notes' => 'Carga conferida com lacre intacto pelo motorista e recebedor.',
+            'attachments' => [
+                [
+                    'file_name' => 'danfe_998877.pdf',
+                    'file_path' => "stock_attachments/{$this->account->id}/danfe.pdf",
+                    'file_type' => 'application/pdf',
+                    'file_size' => 1024,
+                    'description' => 'Documento Fiscal DANFE',
+                ],
+                [
+                    'file_name' => 'foto_carga_caminhao.jpg',
+                    'file_path' => "stock_attachments/{$this->account->id}/foto.jpg",
+                    'file_type' => 'image/jpeg',
+                    'file_size' => 2048,
+                    'description' => 'Foto da carga conferida',
+                ],
+            ],
+            'items' => [
+                [
+                    'material_id' => $this->materialCable->id,
+                    'quantity' => 300,
+                ],
+            ],
+        ];
+
+        $response = $this->postJson('/api/v1/stock/movement', $payload);
+
+        $response->assertStatus(201);
+
+        // Valida no banco de dados na tabela stock_movements
+        $this->assertDatabaseHas('stock_movements', [
+            'account_id' => $this->account->id,
+            'movement_type' => 'ENTRY',
+            'destination_depot_id' => $this->centralDepot->id,
+            'document_number' => 'NF-998877',
+            'document_date' => '2026-09-08 00:00:00',
+            'receiver_person_id' => $receiver->id,
+            'driver_person_id' => $driver->id,
+            'notes' => 'Carga conferida com lacre intacto pelo motorista e recebedor.',
+        ]);
+
+        // Valida anexos gravados na tabela stock_movement_attachments
+        $this->assertDatabaseHas('stock_movement_attachments', [
+            'account_id' => $this->account->id,
+            'file_name' => 'danfe_998877.pdf',
+            'file_path' => "stock_attachments/{$this->account->id}/danfe.pdf",
+        ]);
+
+        $this->assertDatabaseHas('stock_movement_attachments', [
+            'account_id' => $this->account->id,
+            'file_name' => 'foto_carga_caminhao.jpg',
+            'file_path' => "stock_attachments/{$this->account->id}/foto.jpg",
+        ]);
+
+        // Valida que o endpoint de listagem retorna os relacionamentos
+        $listResponse = $this->getJson('/api/v1/stock/movements');
+        $listResponse->assertStatus(200);
+
+        $firstMovement = $listResponse->json('data.0');
+        $this->assertEquals('NF-998877', $firstMovement['document_number']);
+        $this->assertEquals($receiver->id, $firstMovement['receiver']['id']);
+        $this->assertEquals('Carlos Recebedor da Silva', $firstMovement['receiver']['name']);
+        $this->assertEquals($driver->id, $firstMovement['driver']['id']);
+        $this->assertEquals('Marcos Motorista Transportador', $firstMovement['driver']['name']);
+        $this->assertCount(2, $firstMovement['attachments']);
     }
 }
 

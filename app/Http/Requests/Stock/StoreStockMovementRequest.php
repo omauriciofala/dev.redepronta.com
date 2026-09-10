@@ -18,7 +18,13 @@ class StoreStockMovementRequest extends FormRequest
         $rules = [
             'movement_type' => ['required', 'string', 'in:ENTRY,EXIT,RETURN,TRANSFER'],
             'document_ref' => ['nullable', 'string', 'max:100'],
-            'notes' => ['nullable', 'string', 'max:500'],
+            'document_number' => ['nullable', 'string', 'max:100'],
+            'document_date' => ['nullable', 'date'],
+            'movement_date' => ['nullable'],
+            'receiver_person_id' => ['nullable', 'integer', 'exists:people,id'],
+            'driver_person_id' => ['nullable', 'integer', 'exists:people,id'],
+            'notes' => ['nullable', 'string', 'max:1000'],
+            'attachments' => ['nullable', 'array'],
 
             // Suporte a item único (retrocompatibilidade)
             'material_id' => ['required_without:items', 'nullable', 'integer', 'exists:materials,id'],
@@ -68,6 +74,8 @@ class StoreStockMovementRequest extends FormRequest
             'destination_depot_id.required' => 'O depósito de destino é obrigatório.',
             'destination_depot_id.exists' => 'O depósito de destino selecionado não existe.',
             'destination_depot_id.different' => 'O depósito de destino deve ser diferente do depósito de origem.',
+            'receiver_person_id.exists' => 'A pessoa selecionada como recebedor não existe.',
+            'driver_person_id.exists' => 'A pessoa selecionada como motorista não existe.',
             'items.min' => 'Adicione ao menos um material na grid para efetuar a movimentação.',
             'items.*.material_id.required' => 'O material de cada item é obrigatório.',
             'items.*.material_id.exists' => 'Um dos materiais informados não existe no catálogo.',

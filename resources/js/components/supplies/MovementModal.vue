@@ -103,8 +103,8 @@
           </p>
         </div>
 
-        <!-- Parâmetros de Origem, Destino e Documento -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 border-t border-slate-200/80 dark:border-slate-700/60">
+        <!-- Depósitos de Origem e Destino -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3 border-t border-slate-200/80 dark:border-slate-700/60">
           <!-- ORIGEM -->
           <div>
             <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
@@ -169,17 +169,58 @@
               </select>
             </template>
           </div>
+        </div>
 
-          <!-- DOCUMENTO DE REFERÊNCIA -->
+        <!-- Documento e Datas (3 Colunas) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-3 border-t border-slate-200/80 dark:border-slate-700/60">
+          <!-- Número do Documento -->
           <div>
             <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-              Documento / OS / NF-e
+              Número do Documento
             </label>
             <input
               type="text"
-              v-model="form.document_ref"
+              v-model="form.document_number"
               :placeholder="docRefPlaceholder"
-              class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none"
+              class="w-full h-10 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none"
+            />
+          </div>
+
+          <!-- Data do Documento -->
+          <div>
+            <DateInput
+              v-model="form.document_date"
+              label="Data do Documento"
+            />
+          </div>
+
+          <!-- Data da Movimentação -->
+          <div>
+            <DateInput
+              v-model="form.movement_date"
+              label="Data da Movimentação"
+              required
+            />
+          </div>
+        </div>
+
+        <!-- Pessoas: Recebedor e Motorista (2 Colunas com Campo de Pesquisa) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3 border-t border-slate-200/80 dark:border-slate-700/60">
+          <!-- Recebedor -->
+          <div>
+            <PersonSearchSelect
+              v-model="form.receiver_person_id"
+              label="Recebedor (Pessoa / Colaborador)"
+              placeholder="Digite ao menos 2 letras para buscar o recebedor..."
+            />
+          </div>
+
+          <!-- Motorista -->
+          <div>
+            <PersonSearchSelect
+              v-model="form.driver_person_id"
+              label="Motorista / Transportador"
+              placeholder="Digite ao menos 2 letras para buscar o motorista..."
             />
           </div>
         </div>
@@ -483,17 +524,136 @@
         </div>
       </div>
 
-      <!-- Observações Operacionais da Movimentação -->
-      <div>
-        <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-          Observações Operacionais Gerais
-        </label>
-        <textarea
-          v-model="form.notes"
-          rows="2"
-          :placeholder="notesPlaceholder"
-          class="w-full p-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none"
-        ></textarea>
+      <!-- ========================================================================= -->
+      <!-- SEÇÃO 4: ANOTAÇÕES E ANEXOS (DOCUMENTOS E FOTOS) -->
+      <!-- ========================================================================= -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <!-- Bloco de Anotações (5 Colunas) -->
+        <div class="lg:col-span-5 p-4 bg-white dark:bg-[#06064D]/50 rounded-2xl border border-slate-200 dark:border-[#14147A] shadow-xs flex flex-col justify-between">
+          <div class="space-y-1.5 mb-3">
+            <div class="flex items-center gap-2">
+              <FileText class="w-4 h-4 text-[#FC6714]" />
+              <label class="font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider text-xs">
+                Anotações da Movimentação
+              </label>
+            </div>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+              Registre observações pertinentes, detalhes da carga, motivo da devolução/saída ou instruções operacionais.
+            </p>
+          </div>
+          <textarea
+            v-model="form.notes"
+            rows="5"
+            :placeholder="notesPlaceholder"
+            class="w-full p-3.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none resize-none leading-relaxed"
+          ></textarea>
+        </div>
+
+        <!-- Bloco de Anexos: Documentos e Fotos (7 Colunas) -->
+        <div class="lg:col-span-7 p-4 bg-white dark:bg-[#06064D]/50 rounded-2xl border border-slate-200 dark:border-[#14147A] shadow-xs space-y-3">
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <Paperclip class="w-4 h-4 text-[#FC6714]" />
+              <label class="font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider text-xs">
+                Anexos (Documentos e Fotos)
+              </label>
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+              {{ form.attachments.length }} anexo(s)
+            </span>
+          </div>
+
+          <!-- Dropzone e Seletor de Arquivos -->
+          <div
+            @dragover.prevent="isDragging = true"
+            @dragleave.prevent="isDragging = false"
+            @drop.prevent="onDropFiles"
+            @click="triggerFileInput"
+            class="p-4 rounded-xl border-2 border-dashed transition cursor-pointer flex flex-col items-center justify-center text-center gap-1.5"
+            :class="isDragging
+              ? 'border-[#FC6714] bg-[#FC6714]/10 dark:bg-[#FC6714]/15'
+              : 'border-slate-300 dark:border-slate-700 bg-slate-50/60 dark:bg-[#03032E]/70 hover:border-[#FC6714]/60 hover:bg-slate-100/50 dark:hover:bg-slate-800/40'"
+          >
+            <input
+              ref="fileInputRef"
+              type="file"
+              multiple
+              accept="image/*,.pdf,.xml,.doc,.docx,.xls,.xlsx"
+              @change="onFileChange"
+              class="hidden"
+            />
+            <div class="w-9 h-9 rounded-full bg-orange-100 dark:bg-[#FC6714]/20 text-[#FC6714] flex items-center justify-center">
+              <UploadCloud class="w-5 h-5" />
+            </div>
+            <div>
+              <p class="text-xs font-bold text-slate-700 dark:text-slate-200">
+                Clique para selecionar ou arraste arquivos aqui
+              </p>
+              <p class="text-[11px] text-slate-400 dark:text-slate-500">
+                PDF, XML (NF-e), Fotos (JPG, PNG, WEBP), Word, Excel (Máx. 20MB cada)
+              </p>
+            </div>
+          </div>
+
+          <!-- Spinner durante upload de arquivos -->
+          <div v-if="isUploadingAttachment" class="flex items-center gap-2 p-2.5 rounded-xl bg-orange-50 dark:bg-[#FC6714]/10 text-[#FC6714] text-xs font-semibold">
+            <Loader2 class="w-4 h-4 animate-spin" />
+            <span>Fazendo upload de anexo(s) para o servidor...</span>
+          </div>
+
+          <!-- Lista de Arquivos Anexados -->
+          <div v-if="form.attachments.length > 0" class="max-h-44 overflow-y-auto space-y-2 pr-1">
+            <div
+              v-for="(att, idx) in form.attachments"
+              :key="att.tempId || att.id || idx"
+              class="flex items-center justify-between p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-[#03032E] hover:border-slate-300 transition gap-3"
+            >
+              <div class="flex items-center gap-3 min-w-0">
+                <!-- Preview se for imagem -->
+                <div v-if="isImageAttachment(att)" class="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0 bg-slate-100 dark:bg-slate-800">
+                  <img :src="att.url" :alt="att.file_name" class="w-full h-full object-cover" />
+                </div>
+                <!-- Ícone se for documento -->
+                <div v-else class="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 text-slate-500 dark:text-slate-400">
+                  <component :is="getFileIcon(att.file_name)" class="w-5 h-5 text-[#FC6714]" />
+                </div>
+
+                <div class="min-w-0">
+                  <p class="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate" :title="att.file_name">
+                    {{ att.file_name }}
+                  </p>
+                  <div class="flex items-center gap-2 text-[11px] text-slate-400 dark:text-slate-500">
+                    <span v-if="att.file_size">{{ formatFileSize(att.file_size) }}</span>
+                    <span v-if="att.is_uploading" class="text-amber-500 font-medium">Enviando...</span>
+                    <span v-else class="text-emerald-600 dark:text-emerald-400 font-medium">Pronto</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Ações do Anexo -->
+              <div class="flex items-center gap-1 shrink-0">
+                <a
+                  v-if="att.url && !att.is_uploading"
+                  :href="att.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition cursor-pointer"
+                  title="Visualizar ou baixar anexo"
+                >
+                  <ExternalLink class="w-4 h-4" />
+                </a>
+                <button
+                  type="button"
+                  @click="removeAttachment(idx)"
+                  class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
+                  title="Remover anexo"
+                >
+                  <Trash2 class="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -532,6 +692,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
+import axios from 'axios';
 import {
   AlertCircle,
   QrCode,
@@ -545,10 +706,32 @@ import {
   ScanBarcode,
   Layers,
   X,
+  FileText,
+  Paperclip,
+  UploadCloud,
+  ExternalLink,
+  FileCode,
+  FileSpreadsheet,
+  File as FileIcon,
+  Loader2,
 } from 'lucide-vue-next';
 import BaseModal from '@/components/common/BaseModal.vue';
+import PersonSearchSelect from '@/components/common/PersonSearchSelect.vue';
+import DateInput from '@/components/common/DateInput.vue';
 
 type MovementType = 'ENTRY' | 'EXIT' | 'RETURN' | 'TRANSFER';
+
+interface AttachmentItem {
+  tempId?: string;
+  id?: number;
+  file_name: string;
+  file_path: string;
+  file_type?: string;
+  file_size?: number;
+  url?: string;
+  description?: string;
+  is_uploading?: boolean;
+}
 
 interface GridItem {
   uid: string;
@@ -585,8 +768,19 @@ const form = ref({
   source_depot_id: '',
   destination_depot_id: '',
   document_ref: '',
+  document_number: '',
+  document_date: '',
+  movement_date: '',
+  receiver_person_id: null as number | null,
+  driver_person_id: null as number | null,
   notes: '',
+  attachments: [] as AttachmentItem[],
 });
+
+// Anexos e upload
+const fileInputRef = ref<HTMLInputElement | null>(null);
+const isDragging = ref(false);
+const isUploadingAttachment = ref(false);
 
 // Grid de materiais da movimentação
 const gridItems = ref<GridItem[]>([]);
@@ -892,6 +1086,118 @@ function removeSerialFromItem(item: GridItem, serialIndex: number) {
   item.scanError = '';
 }
 
+// Manipulação e upload de anexos (documentos e fotos)
+function triggerFileInput() {
+  fileInputRef.value?.click();
+}
+
+function onFileChange(e: Event) {
+  const target = e.target as HTMLInputElement;
+  if (target.files && target.files.length > 0) {
+    uploadFiles(target.files);
+    target.value = '';
+  }
+}
+
+function onDropFiles(e: DragEvent) {
+  isDragging.value = false;
+  if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
+    uploadFiles(e.dataTransfer.files);
+  }
+}
+
+async function uploadFiles(fileList: FileList | File[]) {
+  const files = Array.from(fileList);
+  if (files.length === 0) return;
+
+  isUploadingAttachment.value = true;
+  errorMessage.value = '';
+
+  for (const file of files) {
+    const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    const isImg = file.type.startsWith('image/');
+    const localUrl = isImg ? URL.createObjectURL(file) : '';
+
+    const newItem: AttachmentItem = {
+      tempId,
+      file_name: file.name,
+      file_path: '',
+      file_type: file.type,
+      file_size: file.size,
+      url: localUrl,
+      is_uploading: true,
+    };
+
+    form.value.attachments.push(newItem);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await axios.post('/api/v1/stock/attachments', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      if (response.data?.data) {
+        newItem.file_path = response.data.data.file_path;
+        newItem.url = response.data.data.url;
+        newItem.file_name = response.data.data.file_name;
+        newItem.file_size = response.data.data.file_size;
+        newItem.file_type = response.data.data.file_type;
+        newItem.is_uploading = false;
+      }
+    } catch (err: any) {
+      console.error('Erro ao enviar anexo:', err);
+      form.value.attachments = form.value.attachments.filter(a => a.tempId !== tempId);
+      errorMessage.value = `Falha ao anexar '${file.name}': ` + (err.response?.data?.message || err.message);
+    }
+  }
+
+  isUploadingAttachment.value = false;
+}
+
+function removeAttachment(index: number) {
+  form.value.attachments.splice(index, 1);
+}
+
+function formatFileSize(bytes?: number): string {
+  if (!bytes) return '';
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function isImageAttachment(att: AttachmentItem): boolean {
+  if (att.file_type && att.file_type.startsWith('image/')) return true;
+  const name = (att.file_name || '').toLowerCase();
+  return (
+    name.endsWith('.jpg') ||
+    name.endsWith('.jpeg') ||
+    name.endsWith('.png') ||
+    name.endsWith('.webp') ||
+    name.endsWith('.gif')
+  );
+}
+
+function getFileIcon(fileName: string) {
+  const name = (fileName || '').toLowerCase();
+  if (name.endsWith('.pdf')) return FileText;
+  if (name.endsWith('.xml') || name.endsWith('.json')) return FileCode;
+  if (name.endsWith('.xls') || name.endsWith('.xlsx') || name.endsWith('.csv')) return FileSpreadsheet;
+  return FileIcon;
+}
+
+function parseDateToIso(dateStr: string | null | undefined): string | null {
+  if (!dateStr) return null;
+  const clean = dateStr.trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(clean)) return clean;
+  const parts = clean.split('/');
+  if (parts.length === 3 && parts[2].length === 4) {
+    return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+  }
+  return null;
+}
+
 watch(
   () => props.isOpen,
   (val) => {
@@ -906,12 +1212,24 @@ watch(
       const otherDepot = props.depots.find(d => String(d.id) !== defaultSource);
       const defaultDest = otherDepot?.id ? String(otherDepot.id) : (props.depots[1]?.id ? String(props.depots[1].id) : '');
 
+      const today = new Date();
+      const day = String(today.getDate()).padStart(2, '0');
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const year = today.getFullYear();
+      const todayFormatted = `${day}/${month}/${year}`;
+
       form.value = {
         movement_type: initialType,
         source_depot_id: initialType === 'ENTRY' ? '' : defaultSource,
         destination_depot_id: initialType === 'EXIT' ? '' : defaultDest,
         document_ref: '',
+        document_number: '',
+        document_date: '',
+        movement_date: todayFormatted,
+        receiver_person_id: null,
+        driver_person_id: null,
         notes: '',
+        attachments: [],
       };
 
       gridItems.value = [];
@@ -989,15 +1307,36 @@ async function submitAllMovements() {
     }
   }
 
+  if (form.value.attachments.some(a => a.is_uploading)) {
+    errorMessage.value = 'Aguarde a conclusão do upload de todos os anexos antes de salvar.';
+    return;
+  }
+
   submitting.value = true;
   try {
+    const docNumber = form.value.document_number || form.value.document_ref || null;
+
     // Monta o payload em lote (items)
     const payload: any = {
       movement_type: form.value.movement_type,
       source_depot_id: form.value.source_depot_id ? Number(form.value.source_depot_id) : null,
       destination_depot_id: form.value.destination_depot_id ? Number(form.value.destination_depot_id) : null,
-      document_ref: form.value.document_ref || null,
+      document_ref: docNumber,
+      document_number: docNumber,
+      document_date: parseDateToIso(form.value.document_date),
+      movement_date: parseDateToIso(form.value.movement_date),
+      receiver_person_id: form.value.receiver_person_id || null,
+      driver_person_id: form.value.driver_person_id || null,
       notes: form.value.notes || null,
+      attachments: form.value.attachments
+        .filter(a => !a.is_uploading && a.file_path)
+        .map(a => ({
+          file_name: a.file_name,
+          file_path: a.file_path,
+          file_type: a.file_type,
+          file_size: a.file_size,
+          description: a.description || null,
+        })),
       items: gridItems.value.map(item => {
         const itemObj: any = {
           material_id: item.material_id,

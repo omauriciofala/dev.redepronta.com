@@ -63,6 +63,7 @@ Route::prefix('v1')->group(function () {
         Route::post('movement', [StockController::class, 'movement']);
         Route::post('transfer', [StockController::class, 'transfer']);
         Route::post('entry', [StockController::class, 'entry']);
+        Route::post('attachments', [StockController::class, 'uploadAttachment']);
         Route::get('movements', [StockController::class, 'movements']);
     });
 
