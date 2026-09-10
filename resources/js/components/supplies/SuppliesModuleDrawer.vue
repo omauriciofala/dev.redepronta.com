@@ -2,7 +2,7 @@
   <BaseModal
     v-model="isOpenModel"
     size="drawer"
-    title="Menu do Módulo de Suprimentos & WMS"
+    title="Suprimentos & WMS"
     description="Atalhos rápidos, posições de estoque, alertas de reposição e ferramentas de gestão"
     @close="close"
   >

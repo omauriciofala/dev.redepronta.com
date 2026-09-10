@@ -35,7 +35,7 @@
         Operações & WMS
       </div>
 
-      <!-- Item Suprimentos (WMS) -->
+      <!-- Item Suprimentos & WMS -->
       <button
         type="button"
         @click="setView('supplies')"
@@ -45,7 +45,7 @@
         class="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm rounded-lg transition-colors cursor-pointer text-left focus:ring-2 focus:ring-[#FC6714] focus:outline-none"
       >
         <Package class="w-5 h-5" :class="currentView === 'supplies' ? 'text-white' : 'text-slate-300'" />
-        <span>Suprimentos (WMS)</span>
+        <span>Suprimentos & WMS</span>
       </button>
 
       <!-- Desenvolvimento & Governança -->
