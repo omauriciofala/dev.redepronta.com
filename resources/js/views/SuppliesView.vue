@@ -628,8 +628,8 @@
             title="Filtrar por Proprietário para visualizar códigos e nomes do catálogo dele"
           >
             <option value="">Todos os Proprietários (SKU Canônico)</option>
-            <option v-for="o in materialOwnersList" :key="o.id" :value="o.id">
-              {{ o.code }} — {{ o.name }}
+            <option v-for="o in materialOwnersList" :key="o.id" :value="o.id" :title="o.name">
+              {{ o.code }}
             </option>
           </select>
 
