@@ -189,7 +189,7 @@ class DummyPeopleSeeder extends Seeder
                     $roles['is_client'] = true;
                 } elseif ($randRole <= 60) {
                     $roles['is_employee'] = true;
-                    $roles['is_requester'] = (mt_rand(1, 100) <= 50);
+                    $roles['is_requester'] = false;
                 } elseif ($randRole <= 75) {
                     $roles['is_seller'] = true;
                 } elseif ($randRole <= 85) {
