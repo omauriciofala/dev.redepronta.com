@@ -47,7 +47,7 @@ class ClusterController extends Controller
         $cluster = DepotCluster::create($data);
 
         return response()->json([
-            'message' => 'Cluster regional criado com sucesso.',
+            'message' => 'Posição regional criada com sucesso.',
             'data' => $cluster,
         ], 201);
     }
@@ -62,7 +62,7 @@ class ClusterController extends Controller
     {
         $cluster->update($request->validated());
         return response()->json([
-            'message' => 'Cluster regional atualizado com sucesso.',
+            'message' => 'Posição regional atualizada com sucesso.',
             'data' => $cluster,
         ]);
     }
@@ -72,13 +72,13 @@ class ClusterController extends Controller
         // Se houver depósitos vinculados, a foreign key RESTRICT no banco ou a validação impede a exclusão
         if ($cluster->depots()->exists()) {
             return response()->json([
-                'message' => 'Não é possível excluir este cluster pois existem depósitos vinculados a ele. Inative o cluster ou mova os depósitos.',
+                'message' => 'Não é possível excluir esta posição regional pois existem depósitos vinculados a ela. Inative a posição regional ou mova os depósitos.',
             ], 422);
         }
 
         $cluster->delete();
         return response()->json([
-            'message' => 'Cluster regional excluído com sucesso.',
+            'message' => 'Posição regional excluída com sucesso.',
         ]);
     }
 }

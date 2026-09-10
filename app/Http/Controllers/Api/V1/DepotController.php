@@ -24,8 +24,7 @@ class DepotController extends Controller
             $s = $request->query('search');
             $query->where(function ($q) use ($s) {
                 $q->where('name', 'like', "%{$s}%")
-                  ->orWhere('code', 'like', "%{$s}%")
-                  ->orWhere('vehicle_plate', 'like', "%{$s}%");
+                  ->orWhere('code', 'like', "%{$s}%");
             });
         }
 

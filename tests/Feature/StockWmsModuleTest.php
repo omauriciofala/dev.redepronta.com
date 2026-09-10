@@ -26,7 +26,7 @@ class StockWmsModuleTest extends TestCase
     protected DepotCluster $cluster;
     protected Depot $centralDepot;
     protected Depot $baseDepot;
-    protected Depot $vehicleDepot;
+    protected Depot $secondaryDepot;
     protected Material $materialOnu;
     protected Material $materialCable;
 
@@ -49,17 +49,17 @@ class StockWmsModuleTest extends TestCase
         $this->unitUnd = Unit::firstOrCreate(['code' => 'UND'], ['name' => 'Unidade']);
         $this->unitMt = Unit::firstOrCreate(['code' => 'MT'], ['name' => 'Metro']);
 
-        // 1. Cluster Regional
+        // 1. Posição Regional
         $this->cluster = DepotCluster::create([
             'account_id' => $this->account->id,
-            'code' => 'CL-CAMPINAS',
-            'name' => 'Cluster Regional Campinas',
+            'code' => 'REG-CAMPINAS',
+            'name' => 'Posição Regional Campinas',
             'description' => 'Região Metropolitana de Campinas e RMC',
             'color' => '#FC6714',
             'is_active' => true,
         ]);
 
-        // 2. Depósitos: Central, Base Regional e Veículo Técnico
+        // 2. Depósitos físicos: Central, Base Regional e Depósito Avançado
         $this->centralDepot = Depot::create([
             'account_id' => $this->account->id,
             'cluster_id' => $this->cluster->id,
@@ -78,13 +78,12 @@ class StockWmsModuleTest extends TestCase
             'is_active' => true,
         ]);
 
-        $this->vehicleDepot = Depot::create([
+        $this->secondaryDepot = Depot::create([
             'account_id' => $this->account->id,
             'cluster_id' => $this->cluster->id,
-            'code' => 'VEIC-01',
-            'name' => 'Fiorino 01 - Técnico Carlos',
-            'type' => 'VEHICLE',
-            'vehicle_plate' => 'BRA2E19',
+            'code' => 'DEP-SUMARE',
+            'name' => 'Depósito Avançado Sumaré',
+            'type' => 'REGIONAL_BASE',
             'is_active' => true,
         ]);
 
@@ -115,9 +114,9 @@ class StockWmsModuleTest extends TestCase
     }
 
     /**
-     * Testa o cálculo em tempo real do Saldo Virtual Aglutinado no Cluster Regional.
+     * Testa o cálculo em tempo real do Saldo da Posição Regional.
      */
-    public function test_cluster_stock_service_calculates_virtual_aggregated_balance(): void
+    public function test_cluster_stock_service_calculates_regional_position_balance(): void
     {
         $service = app(ClusterStockService::class);
 
@@ -130,16 +129,16 @@ class StockWmsModuleTest extends TestCase
             'reserved_quantity' => 100,
         ]);
 
-        // Insere 300 metros de cabo no Veículo
+        // Insere 300 metros de cabo no Depósito Avançado
         StockBalance::create([
             'account_id' => $this->account->id,
-            'depot_id' => $this->vehicleDepot->id,
+            'depot_id' => $this->secondaryDepot->id,
             'material_id' => $this->materialCable->id,
             'quantity' => 300,
             'reserved_quantity' => 0,
         ]);
 
-        // Insere ONUs e seriais na Base
+        // Insere itens serializados na Base
         StockBalance::create([
             'account_id' => $this->account->id,
             'depot_id' => $this->baseDepot->id,
@@ -163,10 +162,10 @@ class StockWmsModuleTest extends TestCase
             'status' => 'IN_STOCK',
         ]);
 
-        // Insere ONUs no Veículo
+        // Insere itens serializados no Depósito Avançado
         StockBalance::create([
             'account_id' => $this->account->id,
-            'depot_id' => $this->vehicleDepot->id,
+            'depot_id' => $this->secondaryDepot->id,
             'material_id' => $this->materialOnu->id,
             'quantity' => 2,
             'reserved_quantity' => 0,
@@ -174,31 +173,28 @@ class StockWmsModuleTest extends TestCase
         StockSerial::create([
             'account_id' => $this->account->id,
             'material_id' => $this->materialOnu->id,
-            'current_depot_id' => $this->vehicleDepot->id,
+            'current_depot_id' => $this->secondaryDepot->id,
             'serial_number' => 'ALCLB003',
             'status' => 'IN_STOCK',
         ]);
 
         $result = $service->calculateClusterStock($this->cluster->id, $this->account->id);
 
-        $this->assertEquals('Cluster Regional Campinas', $result['cluster']['name']);
+        $this->assertEquals('Posição Regional Campinas', $result['cluster']['name']);
         $this->assertEquals(2, $result['summary']['total_materials']);
+        $this->assertEquals(3, $result['summary']['depots_count']);
 
         // Encontra o cabo
         $cableData = collect($result['materials'])->firstWhere('material_id', $this->materialCable->id);
         $this->assertNotNull($cableData);
-        $this->assertEquals(2000, $cableData['base_quantity']);
-        $this->assertEquals(300, $cableData['vehicles_quantity']);
-        $this->assertEquals(2300, $cableData['total_virtual_quantity']);
-        $this->assertEquals(2200, $cableData['available_virtual_quantity']); // 2300 - 100 reservado
+        $this->assertEquals(2300, $cableData['total_quantity']);
+        $this->assertEquals(2200, $cableData['available_quantity']); // 2300 - 100 reservado
 
-        // Encontra a ONU
+        // Encontra o equipamento serializado
         $onuData = collect($result['materials'])->firstWhere('material_id', $this->materialOnu->id);
         $this->assertNotNull($onuData);
-        $this->assertEquals(5, $onuData['base_quantity']);
-        $this->assertEquals(2, $onuData['vehicles_quantity']);
-        $this->assertEquals(7, $onuData['total_virtual_quantity']);
-        $this->assertEquals(3, $onuData['serials_in_stock']); // 2 na base + 1 no veículo
+        $this->assertEquals(7, $onuData['total_quantity']);
+        $this->assertEquals(3, $onuData['serials_in_stock']); // 2 na base + 1 no depósito avançado
     }
 
     /**
@@ -275,13 +271,13 @@ class StockWmsModuleTest extends TestCase
     }
 
     /**
-     * Testa transferência de materiais serializados (Central -> Veículo) atualizando a localização dos números de série.
+     * Testa transferência de materiais serializados (Central -> Depósito Avançado) atualizando a localização dos números de série.
      */
     public function test_transfer_serialized_materials_updates_serial_location(): void
     {
         $service = app(ClusterStockService::class);
 
-        // Saldo inicial de 3 ONUs na Central
+        // Saldo inicial de 3 itens serializados na Central
         StockBalance::create([
             'account_id' => $this->account->id,
             'depot_id' => $this->centralDepot->id,
@@ -291,7 +287,7 @@ class StockWmsModuleTest extends TestCase
         ]);
         StockBalance::create([
             'account_id' => $this->account->id,
-            'depot_id' => $this->vehicleDepot->id,
+            'depot_id' => $this->secondaryDepot->id,
             'material_id' => $this->materialOnu->id,
             'quantity' => 0,
             'reserved_quantity' => 0,
@@ -312,27 +308,27 @@ class StockWmsModuleTest extends TestCase
             'status' => 'IN_STOCK',
         ]);
 
-        // Transfere 2 ONUs para o Veículo do técnico
+        // Transfere 2 itens serializados para o Depósito Avançado
         $movement = $service->transfer([
             'source_depot_id' => $this->centralDepot->id,
-            'destination_depot_id' => $this->vehicleDepot->id,
+            'destination_depot_id' => $this->secondaryDepot->id,
             'material_id' => $this->materialOnu->id,
             'quantity' => 2,
             'serial_ids' => [$s1->id, $s2->id],
-            'notes' => 'Carga diária da Fiorino',
+            'notes' => 'Transferência para base avançada',
         ], $this->account->id);
 
         $this->assertEquals(2, $movement->serials->count());
 
-        // Verifica seriais agora apontando para o veículo
+        // Verifica seriais agora apontando para o depósito de destino
         $s1->refresh();
         $s2->refresh();
-        $this->assertEquals($this->vehicleDepot->id, $s1->current_depot_id);
-        $this->assertEquals($this->vehicleDepot->id, $s2->current_depot_id);
+        $this->assertEquals($this->secondaryDepot->id, $s1->current_depot_id);
+        $this->assertEquals($this->secondaryDepot->id, $s2->current_depot_id);
 
         // Verifica saldos
         $sourceBal = StockBalance::where('depot_id', $this->centralDepot->id)->where('material_id', $this->materialOnu->id)->first();
-        $destBal = StockBalance::where('depot_id', $this->vehicleDepot->id)->where('material_id', $this->materialOnu->id)->first();
+        $destBal = StockBalance::where('depot_id', $this->secondaryDepot->id)->where('material_id', $this->materialOnu->id)->first();
         $this->assertEquals(1, $sourceBal->quantity);
         $this->assertEquals(2, $destBal->quantity);
     }

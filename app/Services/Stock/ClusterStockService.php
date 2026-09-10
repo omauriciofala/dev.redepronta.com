@@ -14,8 +14,8 @@ use Illuminate\Validation\ValidationException;
 class ClusterStockService
 {
     /**
-     * Calcula o Saldo Virtual Aglutinado em tempo real para um Cluster Regional.
-     * Consolida a Base Física Regional e todos os depósitos móveis (veículos dos técnicos).
+     * Calcula o Saldo Consolidado em tempo real para uma Posição Regional.
+     * Consolida todos os depósitos da respectiva posição regional.
      */
     public function calculateClusterStock(int $clusterId, int $accountId): array
     {
@@ -34,19 +34,18 @@ class ClusterStockService
                     'total_items_count' => 0,
                     'total_serials_in_stock' => 0,
                     'depots_count' => 0,
-                    'vehicles_count' => 0,
                 ],
                 'materials' => [],
             ];
         }
 
-        // Saldos físicos em todos os depósitos deste cluster
+        // Saldos físicos em todos os depósitos deste cluster / posição regional
         $balances = StockBalance::where('account_id', $accountId)
             ->whereIn('depot_id', $depotIds)
             ->with(['material.unit', 'depot.responsiblePerson'])
             ->get();
 
-        // Contagem de seriais disponíveis no cluster por material
+        // Contagem de seriais disponíveis na posição regional por material
         $serialsCount = StockSerial::where('account_id', $accountId)
             ->whereIn('current_depot_id', $depotIds)
             ->where('status', 'IN_STOCK')
@@ -64,8 +63,7 @@ class ClusterStockService
             $material = $matBalances->first()->material;
             if (!$material) continue;
 
-            $baseQty = 0;
-            $vehiclesQty = 0;
+            $regionalQty = 0;
             $reservedQty = 0;
             $breakdown = [];
 
@@ -74,19 +72,13 @@ class ClusterStockService
                 $qty = (float)$bal->quantity;
                 $res = (float)$bal->reserved_quantity;
                 $reservedQty += $res;
-
-                if ($depot && $depot->type === 'VEHICLE') {
-                    $vehiclesQty += $qty;
-                } else {
-                    $baseQty += $qty;
-                }
+                $regionalQty += $qty;
 
                 $breakdown[] = [
                     'depot_id' => $depot?->id,
                     'depot_name' => $depot?->name,
                     'depot_code' => $depot?->code,
                     'depot_type' => $depot?->type,
-                    'vehicle_plate' => $depot?->vehicle_plate,
                     'responsible_name' => $depot?->responsiblePerson?->name,
                     'quantity' => $qty,
                     'reserved_quantity' => $res,
@@ -94,8 +86,7 @@ class ClusterStockService
                 ];
             }
 
-            $totalVirtual = $baseQty + $vehiclesQty;
-            $totalItemsCount += $totalVirtual;
+            $totalItemsCount += $regionalQty;
 
             $materialsList[] = [
                 'material_id' => $material->id,
@@ -106,13 +97,13 @@ class ClusterStockService
                 'has_serial' => (bool)$material->has_serial,
                 'unit_cost' => (float)$material->unit_cost,
                 'min_stock' => (float)$material->min_stock,
-                'base_quantity' => $baseQty,
-                'vehicles_quantity' => $vehiclesQty,
-                'total_virtual_quantity' => $totalVirtual,
+                'total_quantity' => $regionalQty,
+                'total_virtual_quantity' => $regionalQty,
                 'total_reserved_quantity' => $reservedQty,
-                'available_virtual_quantity' => max(0, $totalVirtual - $reservedQty),
+                'available_quantity' => max(0, $regionalQty - $reservedQty),
+                'available_virtual_quantity' => max(0, $regionalQty - $reservedQty),
                 'serials_in_stock' => $serialsCount[$material->id] ?? 0,
-                'is_low_stock' => ($material->min_stock > 0 && $totalVirtual <= $material->min_stock),
+                'is_low_stock' => ($material->min_stock > 0 && $regionalQty <= $material->min_stock),
                 'breakdown' => $breakdown,
             ];
         }
@@ -120,7 +111,6 @@ class ClusterStockService
         // Ordena por nome do material
         usort($materialsList, fn($a, $b) => strcmp($a['name'], $b['name']));
 
-        $vehiclesCount = $depots->where('type', 'VEHICLE')->count();
         $totalSerialsInStock = array_sum($serialsCount);
 
         return [
@@ -131,14 +121,12 @@ class ClusterStockService
                 'color' => $cluster->color,
                 'description' => $cluster->description,
                 'depots_count' => $depots->count(),
-                'vehicles_count' => $vehiclesCount,
             ],
             'summary' => [
                 'total_materials' => count($materialsList),
                 'total_items_count' => $totalItemsCount,
                 'total_serials_in_stock' => $totalSerialsInStock,
                 'depots_count' => $depots->count(),
-                'vehicles_count' => $vehiclesCount,
             ],
             'materials' => $materialsList,
         ];
@@ -146,7 +134,7 @@ class ClusterStockService
 
     /**
      * Realiza a transferência de materiais entre depósitos com atomicidade garantida (DB::transaction).
-     * Suporta materiais convencionais e serializados (ONUs, Roteadores).
+     * Suporta materiais convencionais e serializados.
      */
     public function transfer(array $data, int $accountId, ?int $userId = null): StockMovement
     {
@@ -347,7 +335,7 @@ class ClusterStockService
     }
 
     /**
-     * Retorna a visão consolidada de todos os clusters da conta.
+     * Retorna a visão consolidada de todas as posições regionais da conta.
      */
     public function getRegionalPosition(int $accountId, ?int $clusterId = null): array
     {

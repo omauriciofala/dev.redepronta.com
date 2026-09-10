@@ -38,10 +38,9 @@ No centro de todas as operações está a entidade **Pessoa (`people`)**. Uma Pe
 3. **Clientes (`Customers / Subscribers`):** Assinantes residenciais, corporativos (B2B) ou operadoras que contratam a infraestrutura.
 4. **Solicitantes (`Requesters`):** Entidades ou pessoas autorizadas a demandar chamados em nome de um cliente ou operadora parceira.
 
-### AXIOMA 2: Suprimentos Gira em Torno de DEPÓSITOS FÍSICOS & CLUSTERS REGIONAIS
-- **Depósitos Físicos (`depots`):** Todo local físico onde materiais estão fisicamente guardados (Almoxarifado Central, Bases Regionais, Carros dos Técnicos e Laboratórios).
-- **Clusters de Depósito / Posição Regional (`depot_clusters`):** Agrupamento geográfico de depósitos sob a mesma cobertura.
-- **Saldo Virtual Aglutinado (`Aggregated Virtual Balance`):** O gestor enxerga o saldo consolidado de toda a região em tempo real (soma da base regional + todos os carros dos técnicos do cluster).
+### AXIOMA 2: Suprimentos Gira em Torno de DEPÓSITOS FÍSICOS & POSIÇÕES REGIONAIS
+- **Depósitos Físicos (`depots`):** Todo local físico onde materiais estão guardados (Almoxarifado Central, Bases Regionais e Laboratórios). Não utilizamos veículos como depósitos, existem apenas os Depósitos.
+- **Posição Regional (`depot_clusters`):** Agrupamento geográfico de depósitos sob a mesma cobertura regional, consolidando em tempo real os saldos dos depósitos daquela região.
 
 ---
 
@@ -236,7 +235,7 @@ CREATE TABLE depots (
     organization_id CHAR(36) NOT NULL,
     cluster_id CHAR(36) NOT NULL,
     name VARCHAR(255) NOT NULL,
-    type ENUM('CENTRAL', 'REGIONAL_BASE', 'VEHICLE', 'LAB_REPAIR') NOT NULL,
+    type ENUM('CENTRAL', 'REGIONAL_BASE', 'LAB_REPAIR') NOT NULL,
     worker_id CHAR(36) NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

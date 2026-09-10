@@ -57,10 +57,10 @@ No ERP Rede Pronta, pessoas são o núcleo relacional universal. Em vez de tabel
 ```
 
 ### 2. Suprimentos em Torno de Depósitos e Posições Regionais (`stock_clusters`)
-O controle de estoque físico e virtual reflete com precisão a geografia das operadoras:
-- **Depósitos Físicos**: Almoxarifado Central, Bases Operacionais Avançadas e Carros/Viaturas das equipes técnicas.
-- **Posição Regional (Cluster de Depósitos)**: Agrupamento geográfico de depósitos que calcula em tempo real o **Saldo Virtual Aglutinado** da região, permitindo alocação estratégica de materiais sem necessidade de transferências físicas imediatas.
-- **Rastreabilidade Serial Ponta a Ponta**: Acompanhamento unitário de ONUs, roteadores, bobinas de fibra e rádios por Número de Série, MAC Address e histórico de movimentações.
+O controle de estoque físico reflete com precisão a geografia das operações:
+- **Depósitos Físicos**: Almoxarifado Central, Bases Operacionais e Depósitos Avançados (não são utilizados veículos como depósitos, existem apenas os Depósitos).
+- **Posição Regional**: Agrupamento geográfico de depósitos que calcula em tempo real o saldo consolidado da região, permitindo alocação estratégica de materiais sem necessidade de transferências físicas imediatas.
+- **Rastreabilidade de Itens Serializados**: Acompanhamento unitário de equipamentos por Número de Série, MAC Address e histórico de movimentações.
 
 ---
 
@@ -101,7 +101,7 @@ Toda demanda no ERP Rede Pronta percorre um ciclo de vida estruturado, evitando 
 | :--- | :--- |
 | **CRM Omnichannel** | Chat unificado ao vivo (WhatsApp multi-número, Telegram, Webchat e Chat Interno) e Cliente de E-mail (Webmail) integrado com conversão de mensagens em tarefas/chamados com 1 clique. |
 | **FSM & Despacho** | Mobilização de equipes, roteirização geográfica, controle de deslocamento (KM/Horários), fotos de evidência de campo e assinatura digital de OS. |
-| **WMS & Suprimentos** | Gestão de Depósitos e Clusters Regionais, saldo virtual aglutinado, rastreabilidade por número de série/MAC, cautelas de ferramental e inventário dinâmico. |
+| **WMS & Suprimentos** | Gestão de Depósitos e Posições Regionais, saldo consolidado regional, rastreabilidade por número de série/MAC, cautelas de ferramental e inventário dinâmico. |
 | **ERP Financeiro** | Contas a Pagar (LPU de técnicos, aluguéis de POPs e compras), Contas a Receber, Fluxo de Caixa Realizado vs Previsto, DRE Gerencial e **Conciliação Bancária Automática (OFX/CNAB 240 e 400)**. |
 | **Contratos & Cobrança** | Gestão de assinaturas telecom, réguas de cobrança automatizadas via WhatsApp/E-mail, geração de boletos registrados e PIX dinâmico. |
 | **Portais & Intranet** | Camada de comunicação e autoatendimento segmentada para Colaboradores, Fornecedores, Clientes e Solicitantes. |

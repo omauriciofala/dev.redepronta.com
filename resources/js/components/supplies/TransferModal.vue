@@ -303,7 +303,7 @@ async function submitTransfer() {
   errorMessage.value = '';
 
   if (selectedMaterial.value?.has_serial && form.value.serial_ids.length === 0) {
-    errorMessage.value = 'Selecione ao menos um número de série (ONU) para transferir.';
+    errorMessage.value = 'Selecione ao menos um número de série para transferir.';
     return;
   }
 

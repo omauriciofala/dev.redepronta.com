@@ -17,7 +17,6 @@ class Depot extends Model
         'name',
         'code',
         'type',
-        'vehicle_plate',
         'description',
         'is_active',
     ];

@@ -38,7 +38,7 @@
             type="text"
             v-model="form.code"
             required
-            placeholder="Ex: ONU-GPON-01"
+            placeholder="Ex: MAT-001"
             class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-slate-900 dark:text-slate-100 font-mono text-xs uppercase focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none"
           />
         </div>
@@ -51,7 +51,7 @@
             type="text"
             v-model="form.name"
             required
-            placeholder="Ex: ONU GPON Wi-Fi 6 Gigabit 4 Portas"
+            placeholder="Ex: Roteador Wi-Fi 6 Gigabit"
             class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none"
           />
         </div>
@@ -80,7 +80,7 @@
             v-model="form.category"
             class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none cursor-pointer"
           >
-            <option value="Equipamentos">Equipamentos (ONUs/OLTs)</option>
+            <option value="Equipamentos">Equipamentos</option>
             <option value="Cabos & Fibras">Cabos & Fibras Ópticas</option>
             <option value="Conectores & Passivos">Conectores & Passivos</option>
             <option value="Ferramentas">Ferramentas & EPIs</option>
@@ -145,7 +145,7 @@
             />
             <div>
               <span class="font-bold text-slate-900 dark:text-slate-100 block">Rastreamento Serial Obrigatório</span>
-              <span class="text-[11px] text-slate-500 dark:text-slate-400">Exige GPON SN / MAC individual (ex: ONUs, Roteadores)</span>
+              <span class="text-[11px] text-slate-500 dark:text-slate-400">Exige número de série individual (Serializado)</span>
             </div>
           </label>
 

@@ -25,8 +25,8 @@ class StoreClusterRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'O nome do cluster regional é obrigatório.',
-            'code.required' => 'A sigla/código do cluster é obrigatória.',
+            'name.required' => 'O nome da posição regional é obrigatório.',
+            'code.required' => 'A sigla/código da posição regional é obrigatória.',
         ];
     }
 }

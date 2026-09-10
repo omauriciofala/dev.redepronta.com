@@ -15,10 +15,9 @@ return new class extends Migration
                 $table->foreignId('cluster_id')->constrained('depot_clusters')->onDelete('restrict');
                 $table->foreignId('responsible_person_id')->nullable()->constrained('people')->onDelete('restrict');
                 $table->foreignId('city_id')->nullable()->constrained('cities')->onDelete('restrict');
-                $table->string('name', 150)->comment('Nome do Depósito ex: Almoxarifado Central, Base Campinas, Fiorino ABC-1234');
+                $table->string('name', 150)->comment('Nome do Depósito ex: Almoxarifado Central, Base Campinas, Depósito Avançado');
                 $table->string('code', 50)->comment('Código único ou identificador interno');
-                $table->enum('type', ['CENTRAL', 'REGIONAL_BASE', 'VEHICLE', 'LAB_REPAIR'])->default('REGIONAL_BASE');
-                $table->string('vehicle_plate', 20)->nullable()->comment('Placa do veículo se type = VEHICLE');
+                $table->enum('type', ['CENTRAL', 'REGIONAL_BASE', 'LAB_REPAIR'])->default('REGIONAL_BASE');
                 $table->text('description')->nullable();
                 $table->boolean('is_active')->default(true);
                 $table->timestamps();

@@ -23,7 +23,7 @@ class StockController extends Controller
     }
 
     /**
-     * Retorna a Posição Regional e Saldo Virtual Aglutinado por Cluster Regional.
+     * Retorna o saldo consolidado de materiais por Posição Regional.
      */
     public function regionalPosition(Request $request): JsonResponse
     {
@@ -68,7 +68,7 @@ class StockController extends Controller
     }
 
     /**
-     * Consulta e Rastreabilidade Individual de Números de Série (ONUs, Roteadores).
+     * Consulta e Rastreabilidade Individual de Materiais Serializados.
      */
     public function serials(Request $request): JsonResponse
     {

@@ -9,8 +9,8 @@
 
 1. **MÓDULO 0: Cadastros Básicos Canônicos, Core SaaS & Pessoas (Person-Centric)**
    - Estados, Cidades (IBGE), Unidades, Departamentos, Categorias/Motivos de chamados, Pessoas unificadas (`people`), Tenants (`accounts`), Unidades (`organizations`), RBAC e Theming Engine (Dark/Light/White-label).
-2. **MÓDULO 1: Suprimentos, Depósitos Físicos & Clusters Regionais (WMS)**
-   - Depósitos físicos (Centrais, Bases, Veículos), Clusters de Depósito (Posição Regional), Saldo Virtual Aglutinado e Rastreabilidade Serial (ONUs/Roteadores).
+2. **MÓDULO 1: Suprimentos, Depósitos Físicos & Posição Regional (WMS)**
+   - Depósitos físicos (Centrais, Bases, Depósitos Operacionais), Posições Regionais (sem redundância de clusters), Saldo Consolidado e Rastreabilidade Serial (Serializado).
 3. **MÓDULO 2: O Funil Operacional (Tarefas -> Chamados -> Acionamentos)**
    - **Tarefas:** Ponto de entrada universal (APIs, IA, rotinas).
    - **Chamados:** Demandas formais de clientes/solicitantes com controle de SLA.
@@ -59,22 +59,22 @@ Todas as Foreign Keys de entidades de negócio utilizam **`ON DELETE RESTRICT`**
 
 ---
 
-### 🔹 SPRINT 2: Suprimentos, Depósitos Físicos & Clusters Regionais (WMS)
-**Objetivo:** Mapear depósitos físicos (centrais, bases e veículos), agrupá-los em Clusters Regionais e calcular o Saldo Virtual Aglutinado com controle de seriais e restrição de integridade.
+### 🔹 SPRINT 2: Suprimentos, Depósitos Físicos & Posição Regional (WMS)
+**Objetivo:** Mapear depósitos físicos (centrais, bases e depósitos operacionais), agrupá-los em Posições Regionais e calcular o Saldo da Posição Regional com controle de seriais e restrição de integridade.
 
 #### Checklist de Tarefas:
-- [x] Migrations `depot_clusters`, `depots` (Central, Base, Veículo) e `materials` com `ON DELETE RESTRICT`.
-- [x] Tabelas `stock_balances` e `stock_serials` (rastreabilidade individual de ONUs).
-- [x] `ClusterStockService` que calcula em tempo real o Saldo Virtual Aglutinado da região.
-- [x] Endpoints e rotinas de transferência de materiais (Central -> Veículo).
-- [x] Componente Vue 3 para visualização da Posição Regional.
+- [x] Migrations `depot_clusters`, `depots` (Central, Base, Laboratório) e `materials` com `ON DELETE RESTRICT`.
+- [x] Tabelas `stock_balances` e `stock_serials` (rastreabilidade individual de itens serializados).
+- [x] `ClusterStockService` que calcula em tempo real o Saldo Consolidado da Posição Regional.
+- [x] Endpoints e rotinas de transferência de materiais entre depósitos.
+- [x] Componente Vue 3 para visualização da Posição Regional e Gestão WMS.
 
 > #### 💬 Prompt Curto para a IA (Sprint 2):
 > ```text
 > Execute o Sprint 2 do SaaS: implemente a camada de suprimentos no Laravel 13.x + MariaDB com integridade ON DELETE RESTRICT.
-> 1. Crie as tabelas `depot_clusters`, `depots` (CENTRAL, REGIONAL_BASE, VEHICLE), `materials`, `stock_balances` e `stock_serials`.
-> 2. Implemente o `ClusterStockService` que calcula em tempo real o Saldo Virtual Aglutinado da região (somando a base regional e todos os veículos dos técnicos daquele cluster).
-> 3. Crie os endpoints de transferência de materiais e o componente Vue 3 RegionalClusterStockView.vue.
+> 1. Crie as tabelas `depot_clusters`, `depots` (CENTRAL, REGIONAL_BASE, LAB_REPAIR), `materials`, `stock_balances` e `stock_serials`.
+> 2. Implemente o `ClusterStockService` que calcula em tempo real o Saldo da Posição Regional (somando todos os depósitos da respectiva posição regional).
+> 3. Crie os endpoints de transferência de materiais e o componente Vue 3 SuppliesView.vue.
 > ```
 
 ---
