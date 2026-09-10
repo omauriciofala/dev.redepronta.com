@@ -4,6 +4,7 @@
     <DesignSystemView v-else-if="currentView === 'design-system'" />
     <ChangelogView v-else-if="currentView === 'changelog'" />
     <IntegrationsView v-else-if="currentView === 'integrations'" />
+    <SuppliesView v-else-if="currentView === 'supplies'" />
     <PeopleView v-else />
   </AppLayout>
 </template>
@@ -11,6 +12,7 @@
 <script setup lang="ts">
 import AppLayout from './components/layout/AppLayout.vue';
 import PeopleView from './views/PeopleView.vue';
+import SuppliesView from './views/SuppliesView.vue';
 import DeveloperView from './views/DeveloperView.vue';
 import DesignSystemView from './views/DesignSystemView.vue';
 import ChangelogView from './views/ChangelogView.vue';

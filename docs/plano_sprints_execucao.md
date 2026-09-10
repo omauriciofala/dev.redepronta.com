@@ -63,11 +63,11 @@ Todas as Foreign Keys de entidades de negócio utilizam **`ON DELETE RESTRICT`**
 **Objetivo:** Mapear depósitos físicos (centrais, bases e veículos), agrupá-los em Clusters Regionais e calcular o Saldo Virtual Aglutinado com controle de seriais e restrição de integridade.
 
 #### Checklist de Tarefas:
-- [ ] Migrations `depot_clusters`, `depots` (Central, Base, Veículo) e `materials` com `ON DELETE RESTRICT`.
-- [ ] Tabelas `stock_balances` e `stock_serials` (rastreabilidade individual de ONUs).
-- [ ] `ClusterStockService` que calcula em tempo real o Saldo Virtual Aglutinado da região.
-- [ ] Endpoints e rotinas de transferência de materiais (Central -> Veículo).
-- [ ] Componente Vue 3 para visualização da Posição Regional.
+- [x] Migrations `depot_clusters`, `depots` (Central, Base, Veículo) e `materials` com `ON DELETE RESTRICT`.
+- [x] Tabelas `stock_balances` e `stock_serials` (rastreabilidade individual de ONUs).
+- [x] `ClusterStockService` que calcula em tempo real o Saldo Virtual Aglutinado da região.
+- [x] Endpoints e rotinas de transferência de materiais (Central -> Veículo).
+- [x] Componente Vue 3 para visualização da Posição Regional.
 
 > #### 💬 Prompt Curto para a IA (Sprint 2):
 > ```text
