@@ -88,7 +88,7 @@
 
                 <button
                   type="button"
-                  @click="navigateToTab('depots')"
+                  @click="openCreateDepotModal"
                   class="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] dark:hover:text-orange-300 transition cursor-pointer"
                 >
                   <Warehouse class="w-4 h-4 text-slate-400" />
@@ -97,20 +97,11 @@
 
                 <button
                   type="button"
-                  @click="openCreateDepotModal(); isHeaderMenuOpen = false"
-                  class="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] dark:hover:text-orange-300 transition cursor-pointer"
-                >
-                  <Plus class="w-4 h-4 text-slate-400" />
-                  <span>Novo Depósito</span>
-                </button>
-
-                <button
-                  type="button"
-                  @click="navigateToTab('materials')"
+                  @click="openCreateMaterialModal"
                   class="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] dark:hover:text-orange-300 transition cursor-pointer"
                 >
                   <Boxes class="w-4 h-4 text-slate-400" />
-                  <span>Catálogo de Materiais</span>
+                  <span>Materiais</span>
                 </button>
               </div>
             </div>
@@ -1831,6 +1822,7 @@ async function onTransferSuccess() {
 
 // ─── AÇÕES DE MODAL: MATERIAIS ───────────────────────────────────────────────
 function openCreateMaterialModal() {
+  isHeaderMenuOpen.value = false;
   selectedMaterialForEdit.value = null;
   isMaterialModalOpen.value = true;
 }
@@ -1857,6 +1849,7 @@ async function onClustersUpdated() {
 
 // ─── AÇÕES DE MODAL: DEPÓSITOS ───────────────────────────────────────────────
 function openCreateDepotModal() {
+  isHeaderMenuOpen.value = false;
   selectedDepotForEdit.value = null;
   isDepotModalOpen.value = true;
 }
