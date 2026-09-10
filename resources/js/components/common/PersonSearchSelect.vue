@@ -126,6 +126,7 @@ const props = withDefaults(defineProps<{
   placeholder?: string;
   disabled?: boolean;
   required?: boolean;
+  role?: string;
 }>(), {
   modelValue: null,
   initialPersonName: '',
@@ -133,6 +134,7 @@ const props = withDefaults(defineProps<{
   placeholder: 'Digite ao menos 2 letras do nome ou documento...',
   disabled: false,
   required: false,
+  role: '',
 });
 
 const emit = defineEmits<{
@@ -179,13 +181,16 @@ const searchPeople = async (searchTerm: string) => {
   hasSearched.value = true;
 
   try {
-    const response = await axios.get('/api/v1/people', {
-      params: {
-        search: searchTerm,
-        status: 'active',
-        per_page: 15,
-      },
-    });
+    const params: any = {
+      search: searchTerm,
+      status: 'active',
+      per_page: 15,
+    };
+    if (props.role) {
+      params.role = props.role;
+    }
+
+    const response = await axios.get('/api/v1/people', { params });
     results.value = response.data.data || [];
     highlightedIndex.value = results.value.length > 0 ? 0 : -1;
   } catch (error) {

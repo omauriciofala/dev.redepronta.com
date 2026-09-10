@@ -698,6 +698,88 @@ class StockWmsModuleTest extends TestCase
         $response->assertStatus(422);
         $this->assertDatabaseHas('material_categories', ['id' => $category->id]);
     }
+
+    /**
+     * Testa listagem de proprietários de materiais.
+     */
+    public function test_can_list_material_owners(): void
+    {
+        $response = $this->getJson('/api/v1/material-owners');
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'data' => [],
+        ]);
+    }
+
+    /**
+     * Testa criação de proprietário e garantia de que a pessoa vinculada receba o papel de solicitante.
+     */
+    public function test_can_create_material_owner_and_ensures_person_is_requester(): void
+    {
+        $person = \App\Models\Person::create([
+            'account_id' => $this->account->id,
+            'name' => 'Operadora Parceira Telecom',
+            'document_number' => '44.555.666/0001-77',
+            'status' => 'active',
+            'is_requester' => false,
+        ]);
+
+        $this->assertFalse($person->is_requester);
+
+        $payload = [
+            'person_id' => $person->id,
+            'code' => 'PROP-VIVO',
+            'name' => 'Telefônica Brasil S.A. / Vivo',
+            'description' => 'Equipamentos de comodato de fibra óptica',
+            'is_active' => true,
+        ];
+
+        $response = $this->postJson('/api/v1/material-owners', $payload);
+
+        $response->assertStatus(201);
+        $response->assertJsonPath('data.code', 'PROP-VIVO');
+        $response->assertJsonPath('data.name', 'Telefônica Brasil S.A. / Vivo');
+        $response->assertJsonPath('data.person_id', $person->id);
+        $response->assertJsonPath('data.person.is_requester', true);
+
+        // Verifica que a pessoa agora é solicitante no banco
+        $person->refresh();
+        $this->assertTrue($person->is_requester);
+
+        $this->assertDatabaseHas('material_owners', [
+            'code' => 'PROP-VIVO',
+            'person_id' => $person->id,
+        ]);
+    }
+
+    /**
+     * Testa exclusão de proprietário de materiais.
+     */
+    public function test_can_delete_material_owner(): void
+    {
+        $person = \App\Models\Person::create([
+            'account_id' => $this->account->id,
+            'name' => 'Claro Solicitante Provedor',
+            'document_number' => '55.666.777/0001-88',
+            'status' => 'active',
+            'is_requester' => true,
+        ]);
+
+        $owner = \App\Models\MaterialOwner::create([
+            'account_id' => $this->account->id,
+            'person_id' => $person->id,
+            'code' => 'PROP-CLARO',
+            'name' => 'Claro Telecom Participações',
+            'is_active' => true,
+        ]);
+
+        $response = $this->deleteJson("/api/v1/material-owners/{$owner->id}");
+
+        $response->assertStatus(200);
+        $this->assertSoftDeleted('material_owners', ['id' => $owner->id]);
+    }
 }
+
 
 

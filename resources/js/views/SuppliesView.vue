@@ -124,6 +124,15 @@
 
                 <button
                   type="button"
+                  @click="openMaterialOwnerCrudModal"
+                  class="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] dark:hover:text-orange-300 transition cursor-pointer"
+                >
+                  <UserCheck class="w-4 h-4 text-slate-400" />
+                  <span>Proprietários</span>
+                </button>
+
+                <button
+                  type="button"
                   @click="openCreateMaterialModal"
                   class="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] dark:hover:text-orange-300 transition cursor-pointer"
                 >
@@ -1295,6 +1304,13 @@
       @updated="onUnitsUpdated"
     />
 
+    <!-- Modal 3.4: Gestão Completa de Proprietários -->
+    <MaterialOwnerCrudModal
+      :is-open="isMaterialOwnerModalOpen"
+      @close="isMaterialOwnerModalOpen = false"
+      @updated="onMaterialOwnersUpdated"
+    />
+
     <!-- Modal 4: Cadastro / Edição de Depósito -->
     <DepotModal
       :is-open="isDepotModalOpen"
@@ -1346,7 +1362,7 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import {
   Package, ArrowRightLeft, Plus, Layers, Boxes, Warehouse, QrCode, RefreshCw,
   ChevronDown, X, Search, ArrowUp, ArrowDown, ArrowUpDown, Copy, Check,
-  AlertCircle, CheckCircle2, Menu, MapPin, Edit2, Tags, FolderTree, Scale
+  AlertCircle, CheckCircle2, Menu, MapPin, Edit2, Tags, FolderTree, Scale, UserCheck
 } from 'lucide-vue-next';
 import TablePagination from '@/components/common/TablePagination.vue';
 import TransferModal from '@/components/supplies/TransferModal.vue';
@@ -1355,6 +1371,7 @@ import ClusterCrudModal from '@/components/supplies/auxiliary/ClusterCrudModal.v
 import DepotTypeCrudModal from '@/components/supplies/auxiliary/DepotTypeCrudModal.vue';
 import MaterialCategoryCrudModal from '@/components/supplies/auxiliary/MaterialCategoryCrudModal.vue';
 import UnitCrudModal from '@/components/supplies/auxiliary/UnitCrudModal.vue';
+import MaterialOwnerCrudModal from '@/components/supplies/auxiliary/MaterialOwnerCrudModal.vue';
 import DepotModal from '@/components/supplies/DepotModal.vue';
 import SuppliesModuleDrawer from '@/components/supplies/SuppliesModuleDrawer.vue';
 
@@ -1418,6 +1435,7 @@ const depotTypesList = ref<any[]>([]);
 const isMaterialCategoryModalOpen = ref(false);
 const materialCategoriesList = ref<any[]>([]);
 const isUnitModalOpen = ref(false);
+const isMaterialOwnerModalOpen = ref(false);
 const isMaterialModalOpen = ref(false);
 const selectedMaterialForEdit = ref<any>(null);
 const materialFilterCategory = ref('all');
@@ -1991,6 +2009,16 @@ async function onUnitsUpdated() {
     loadUnits(),
     loadMaterials(),
   ]);
+}
+
+// ─── AÇÕES DE MODAL: PROPRIETÁRIOS ───────────────────────────────────────────
+function openMaterialOwnerCrudModal() {
+  isHeaderMenuOpen.value = false;
+  isMaterialOwnerModalOpen.value = true;
+}
+
+function onMaterialOwnersUpdated() {
+  showToast('Proprietários sincronizados com sucesso!');
 }
 
 // ─── AÇÕES DE MODAL: DEPÓSITOS ───────────────────────────────────────────────
