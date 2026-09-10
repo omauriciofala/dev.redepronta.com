@@ -109,18 +109,14 @@
         </div>
 
         <div>
-          <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-            Cidade / Localidade
-          </label>
-          <select
+          <CitySearchSelect
             v-model="form.city_id"
-            class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none cursor-pointer"
-          >
-            <option value="">Selecione a cidade...</option>
-            <option v-for="c in citiesList" :key="c.id" :value="c.id">
-              {{ c.name }} - {{ c.state?.code || c.state_code || '' }}
-            </option>
-          </select>
+            :initial-city-name="selectedCityInfo.name"
+            :initial-state-code="selectedCityInfo.state_code"
+            :initial-ibge-code="selectedCityInfo.ibge_code"
+            label="Município"
+            placeholder="Digite 3 letras do município..."
+          />
         </div>
       </div>
 
@@ -200,6 +196,7 @@
 import { ref, computed, watch, onMounted } from 'vue';
 import { Plus, Edit2, AlertCircle, Trash2 } from 'lucide-vue-next';
 import BaseModal from '@/components/common/BaseModal.vue';
+import CitySearchSelect from '@/components/common/CitySearchSelect.vue';
 
 const props = defineProps<{
   isOpen: boolean;
@@ -216,7 +213,12 @@ const isEditing = computed(() => Boolean(props.depotData && props.depotData.id))
 const submitting = ref(false);
 const errorMessage = ref('');
 const peopleList = ref<any[]>([]);
-const citiesList = ref<any[]>([]);
+
+const selectedCityInfo = ref({
+  name: '',
+  state_code: '',
+  ibge_code: '',
+});
 
 const form = ref({
   name: '',
@@ -224,7 +226,7 @@ const form = ref({
   cluster_id: '' as string | number,
   type: 'REGIONAL_BASE',
   responsible_person_id: '' as string | number,
-  city_id: '' as string | number,
+  city_id: null as number | null,
   description: '',
   is_active: true,
 });
@@ -239,42 +241,43 @@ async function loadPeople() {
   }
 }
 
-async function loadCities() {
-  try {
-    const res = await fetch('/api/v1/cities?per_page=100');
-    const json = await res.json();
-    citiesList.value = json.data || [];
-  } catch (err) {
-    console.error('Erro ao carregar lista de cidades:', err);
-  }
-}
-
 watch(
   () => props.isOpen,
   (val) => {
     if (val) {
       if (peopleList.value.length === 0) loadPeople();
-      if (citiesList.value.length === 0) loadCities();
 
       if (props.depotData) {
+        selectedCityInfo.value = {
+          name: props.depotData.city?.name || '',
+          state_code: props.depotData.city?.state?.code || props.depotData.city?.state_code || '',
+          ibge_code: props.depotData.city?.ibge_code || '',
+        };
+
         form.value = {
           name: props.depotData.name || '',
           code: props.depotData.code || '',
           cluster_id: props.depotData.cluster_id || (props.depotData.cluster?.id ?? (props.clustersList[0]?.id || '')),
           type: props.depotData.type || 'REGIONAL_BASE',
           responsible_person_id: props.depotData.responsible_person_id || (props.depotData.responsible_person?.id ?? ''),
-          city_id: props.depotData.city_id || (props.depotData.city?.id ?? ''),
+          city_id: props.depotData.city_id || (props.depotData.city?.id ?? null),
           description: props.depotData.description || '',
           is_active: props.depotData.is_active !== undefined ? Boolean(props.depotData.is_active) : true,
         };
       } else {
+        selectedCityInfo.value = {
+          name: '',
+          state_code: '',
+          ibge_code: '',
+        };
+
         form.value = {
           name: '',
           code: '',
           cluster_id: props.clustersList[0]?.id || '',
           type: 'REGIONAL_BASE',
           responsible_person_id: '',
-          city_id: '',
+          city_id: null,
           description: '',
           is_active: true,
         };

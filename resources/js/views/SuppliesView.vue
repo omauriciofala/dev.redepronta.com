@@ -909,8 +909,11 @@
                       <div class="font-semibold text-slate-900 dark:text-slate-100 text-sm">
                         {{ d.name }}
                       </div>
-                      <div class="font-mono text-xs text-[#FC6714] font-medium mt-0.5">
-                        {{ d.code }}
+                      <div class="flex items-center gap-2 mt-0.5">
+                        <span class="font-mono text-xs text-[#FC6714] font-medium">{{ d.code }}</span>
+                        <span v-if="d.city" class="text-[11px] text-slate-400 dark:text-slate-500">
+                          • {{ d.city.name }} - {{ d.city.state?.code || '' }}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -1306,8 +1309,14 @@ interface Depot {
   name: string;
   code: string;
   type: string;
+  cluster_id?: number;
   cluster?: { id: number; name: string };
+  responsible_person_id?: number;
   responsible_person?: { id: number; name: string };
+  city_id?: number;
+  city?: { id: number; name: string; ibge_code?: string; state?: { id: number; code: string; name: string } };
+  description?: string;
+  is_active?: boolean;
 }
 
 interface Material {
