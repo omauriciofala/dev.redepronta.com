@@ -16,7 +16,7 @@ return new class extends Migration
                 $table->foreignId('current_depot_id')->constrained('depots')->onDelete('restrict');
                 $table->string('serial_number', 100)->comment('Número de série (GPON SN, Serial Fabricante)');
                 $table->string('mac_address', 50)->nullable()->comment('Endereço MAC físico');
-                $table->enum('status', ['IN_STOCK', 'IN_TRANSIT', 'INSTALLED_CUSTOMER', 'DEFECTIVE', 'DISCARDED'])->default('IN_STOCK');
+                $table->enum('status', ['IN_STOCK', 'IN_TRANSIT', 'INSTALLED_CUSTOMER', 'DEFECTIVE', 'DISCARDED', 'RETURNED'])->default('IN_STOCK');
                 $table->text('notes')->nullable();
                 $table->timestamps();
                 $table->softDeletes();

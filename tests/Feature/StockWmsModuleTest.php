@@ -988,29 +988,32 @@ class StockWmsModuleTest extends TestCase
      */
     public function test_can_execute_return_movement(): void
     {
-        $initialBalance = StockBalance::where('account_id', $this->account->id)
-            ->where('depot_id', $this->centralDepot->id)
-            ->where('material_id', $this->materialCable->id)
-            ->value('quantity') ?? 0;
+        $bal = StockBalance::firstOrCreate(
+            ['account_id' => $this->account->id, 'depot_id' => $this->centralDepot->id, 'material_id' => $this->materialCable->id],
+            ['quantity' => 0, 'reserved_quantity' => 0]
+        );
+        $bal->update(['quantity' => 100.0]);
 
         $response = $this->postJson('/api/v1/stock/movement', [
             'movement_type' => 'RETURN',
-            'destination_depot_id' => $this->centralDepot->id,
+            'source_depot_id' => $this->centralDepot->id,
             'material_id' => $this->materialCable->id,
             'quantity' => 50.0,
             'document_ref' => 'RET-001',
-            'notes' => 'Devolução de sobra de cabo da instalação',
+            'notes' => 'Devolução de cabo ao proprietário',
         ]);
 
         $response->assertStatus(201);
         $response->assertJsonPath('data.movement_type', 'RETURN');
+        $response->assertJsonPath('data.source_depot_id', $this->centralDepot->id);
+        $response->assertJsonPath('data.destination_depot_id', null);
 
         $newBalance = StockBalance::where('account_id', $this->account->id)
             ->where('depot_id', $this->centralDepot->id)
             ->where('material_id', $this->materialCable->id)
             ->value('quantity');
 
-        $this->assertEquals($initialBalance + 50.0, (float)$newBalance);
+        $this->assertEquals(50.0, (float)$newBalance);
     }
 
     /**

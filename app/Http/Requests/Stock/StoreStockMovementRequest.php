@@ -53,8 +53,8 @@ class StoreStockMovementRequest extends FormRequest
             $rules['source_depot_id'] = ['nullable', 'integer', 'exists:depots,id'];
             $rules['destination_depot_id'] = ['required', 'integer', 'exists:depots,id'];
         } elseif ($type === 'RETURN') {
-            $rules['source_depot_id'] = ['nullable', 'integer', 'exists:depots,id'];
-            $rules['destination_depot_id'] = ['required', 'integer', 'exists:depots,id'];
+            $rules['source_depot_id'] = ['required', 'integer', 'exists:depots,id'];
+            $rules['destination_depot_id'] = ['nullable', 'integer', 'exists:depots,id'];
         }
 
         return $rules;

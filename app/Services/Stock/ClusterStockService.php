@@ -432,12 +432,12 @@ class ClusterStockService
     }
 
     /**
-     * Realiza devolução de estoque (retorno de clientes, técnicos ou garantias).
+     * Realiza devolução de estoque ao proprietário (saída do depósito interno com baixa documental).
      */
     public function returnStock(array $data, int $accountId, ?int $userId = null): StockMovement
     {
-        $destDepotId = (int)$data['destination_depot_id'];
-        $sourceDepotId = !empty($data['source_depot_id']) ? (int)$data['source_depot_id'] : null;
+        $sourceDepotId = (int)$data['source_depot_id'];
+        $destDepotId = !empty($data['destination_depot_id']) ? (int)$data['destination_depot_id'] : null;
         $materialId = (int)$data['material_id'];
         $quantity = (float)$data['quantity'];
         $serialIds = $data['serial_ids'] ?? [];
@@ -450,11 +450,23 @@ class ClusterStockService
         }
 
         return DB::transaction(function () use ($accountId, $destDepotId, $sourceDepotId, $materialId, $quantity, $serialIds, $serialsData, $userId, $data) {
-            $destDepot = Depot::where('account_id', $accountId)->findOrFail($destDepotId);
+            $sourceDepot = Depot::where('account_id', $accountId)->findOrFail($sourceDepotId);
             $material = Material::where('account_id', $accountId)->findOrFail($materialId);
 
-            if ($sourceDepotId) {
-                Depot::where('account_id', $accountId)->findOrFail($sourceDepotId);
+            $sourceBalance = StockBalance::where('account_id', $accountId)
+                ->where('depot_id', $sourceDepotId)
+                ->where('material_id', $materialId)
+                ->lockForUpdate()
+                ->first();
+
+            $availableQty = $sourceBalance ? (float)$sourceBalance->quantity - (float)$sourceBalance->reserved_quantity : 0;
+
+            if ($availableQty < $quantity) {
+                throw ValidationException::withMessages([
+                    'quantity' => [
+                        "Saldo insuficiente no depósito '{$sourceDepot->name}'. Disponível: {$availableQty}, Solicitado para devolução: {$quantity}."
+                    ],
+                ]);
             }
 
             $affectedSerialIds = [];
@@ -469,14 +481,23 @@ class ClusterStockService
 
                     $existingSerials = StockSerial::where('account_id', $accountId)
                         ->where('material_id', $materialId)
+                        ->where('current_depot_id', $sourceDepotId)
+                        ->where('status', 'IN_STOCK')
                         ->whereIn('id', $serialIds)
                         ->lockForUpdate()
                         ->get();
 
+                    if ($existingSerials->count() !== count($serialIds)) {
+                        throw ValidationException::withMessages([
+                            'serial_ids' => [
+                                'Um ou mais números de série selecionados não estão disponíveis no depósito interno de origem com status EM ESTOQUE.'
+                            ],
+                        ]);
+                    }
+
                     foreach ($existingSerials as $serial) {
                         $serial->update([
-                            'current_depot_id' => $destDepotId,
-                            'status' => 'IN_STOCK',
+                            'status' => 'RETURNED',
                         ]);
                         $affectedSerialIds[] = $serial->id;
                     }
@@ -487,30 +508,35 @@ class ClusterStockService
                         ]);
                     }
 
+                    $snList = [];
                     foreach ($serialsData as $item) {
                         $sn = is_array($item) ? ($item['serial_number'] ?? '') : (string)$item;
                         $sn = trim($sn);
-                        if (empty($sn)) continue;
-
-                        $serial = StockSerial::where('account_id', $accountId)
-                            ->where('serial_number', $sn)
-                            ->first();
-
-                        if ($serial) {
-                            $serial->update([
-                                'material_id' => $materialId,
-                                'current_depot_id' => $destDepotId,
-                                'status' => 'IN_STOCK',
-                            ]);
-                        } else {
-                            $serial = StockSerial::create([
-                                'account_id' => $accountId,
-                                'material_id' => $materialId,
-                                'current_depot_id' => $destDepotId,
-                                'serial_number' => $sn,
-                                'status' => 'IN_STOCK',
-                            ]);
+                        if (!empty($sn)) {
+                            $snList[] = $sn;
                         }
+                    }
+
+                    $existingSerials = StockSerial::where('account_id', $accountId)
+                        ->where('material_id', $materialId)
+                        ->where('current_depot_id', $sourceDepotId)
+                        ->where('status', 'IN_STOCK')
+                        ->whereIn('serial_number', $snList)
+                        ->lockForUpdate()
+                        ->get();
+
+                    if ($existingSerials->count() !== count($snList)) {
+                        throw ValidationException::withMessages([
+                            'serials' => [
+                                'Um ou mais números de série informados não foram encontrados no depósito interno de origem com status EM ESTOQUE.'
+                            ],
+                        ]);
+                    }
+
+                    foreach ($existingSerials as $serial) {
+                        $serial->update([
+                            'status' => 'RETURNED',
+                        ]);
                         $affectedSerialIds[] = $serial->id;
                     }
                 } else {
@@ -520,18 +546,14 @@ class ClusterStockService
                 }
             }
 
-            // Incrementa saldo no depósito de destino
-            $destBalance = StockBalance::firstOrCreate(
-                ['account_id' => $accountId, 'depot_id' => $destDepotId, 'material_id' => $materialId],
-                ['quantity' => 0, 'reserved_quantity' => 0]
-            );
-            $destBalance->increment('quantity', $quantity);
+            // Débito no depósito interno de origem
+            $sourceBalance->decrement('quantity', $quantity);
 
             $movement = $this->createMovementRecord(
                 $accountId,
                 $materialId,
                 $sourceDepotId,
-                $destDepotId,
+                null,
                 $userId,
                 'RETURN',
                 $quantity,
@@ -542,7 +564,7 @@ class ClusterStockService
                 $movement->serials()->attach($affectedSerialIds);
             }
 
-            return $movement->load(['material.unit', 'destinationDepot', 'receiver', 'driver', 'attachments', 'serials']);
+            return $movement->load(['material.unit', 'sourceDepot', 'receiver', 'driver', 'attachments', 'serials']);
         });
     }
 

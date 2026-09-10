@@ -154,45 +154,33 @@
           <!-- Depósitos de Origem e Destino -->
           <div
             class="grid gap-4 pt-3 border-t border-slate-200/80 dark:border-slate-700/60"
-            :class="(form.movement_type === 'ENTRY' || form.movement_type === 'EXIT') ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'"
+            :class="(form.movement_type === 'ENTRY' || form.movement_type === 'EXIT' || form.movement_type === 'RETURN') ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'"
           >
             <!-- ORIGEM (Oculto em Entrada de Estoque) -->
             <div v-if="form.movement_type !== 'ENTRY'">
               <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                Depósito de Origem {{ isSourceRequired ? '*' : '(Opcional / Externo)' }}
+                Depósito de Origem *
               </label>
 
-              <template v-if="form.movement_type === 'RETURN'">
-                <select
-                  v-model="form.source_depot_id"
-                  class="w-full h-11 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-xs sm:text-sm focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-hidden cursor-pointer"
-                >
-                  <option value="">Origem Externa (Cliente / Técnico em Campo)</option>
-                  <option v-for="d in depots" :key="d.id" :value="String(d.id)">
-                    {{ d.name }} ({{ formatDepotType(d.type) }})
-                  </option>
-                </select>
-              </template>
-
-              <template v-else>
-                <select
-                  v-model="form.source_depot_id"
-                  :required="isSourceRequired"
-                  @change="onHeaderSourceChange"
-                  class="w-full h-11 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-xs sm:text-sm focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-hidden cursor-pointer"
-                >
-                  <option value="" disabled>Selecione o local de saída...</option>
-                  <option v-for="d in depots" :key="d.id" :value="String(d.id)">
-                    {{ d.name }} ({{ formatDepotType(d.type) }})
-                  </option>
-                </select>
-              </template>
+              <select
+                v-model="form.source_depot_id"
+                :required="isSourceRequired"
+                @change="onHeaderSourceChange"
+                class="w-full h-11 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-xs sm:text-sm focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-hidden cursor-pointer"
+              >
+                <option value="" disabled>
+                  {{ form.movement_type === 'RETURN' ? 'Selecione o depósito interno de onde sairá a devolução...' : 'Selecione o local de saída...' }}
+                </option>
+                <option v-for="d in depots" :key="d.id" :value="String(d.id)">
+                  {{ d.name }} ({{ formatDepotType(d.type) }})
+                </option>
+              </select>
             </div>
 
-            <!-- DESTINO (Oculto em Saída de Estoque) -->
-            <div v-if="form.movement_type !== 'EXIT'">
+            <!-- DESTINO (Oculto em Saída e Devolução ao Proprietário) -->
+            <div v-if="form.movement_type !== 'EXIT' && form.movement_type !== 'RETURN'">
               <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                Depósito de Destino {{ isDestRequired ? '*' : '(Opcional / Externo)' }}
+                Depósito de Destino *
               </label>
 
               <select
@@ -991,18 +979,18 @@ const destinationOptions = computed(() => {
 });
 
 const isSourceRequired = computed(() => {
-  return form.value.movement_type === 'TRANSFER' || form.value.movement_type === 'EXIT';
+  return form.value.movement_type === 'TRANSFER' || form.value.movement_type === 'EXIT' || form.value.movement_type === 'RETURN';
 });
 
 const isDestRequired = computed(() => {
-  return form.value.movement_type === 'TRANSFER' || form.value.movement_type === 'ENTRY' || form.value.movement_type === 'RETURN';
+  return form.value.movement_type === 'TRANSFER' || form.value.movement_type === 'ENTRY';
 });
 
 const typeLabel = computed(() => {
   const map: Record<MovementType, string> = {
     ENTRY: 'Entrada de Estoque',
     EXIT: 'Saída de Estoque',
-    RETURN: 'Devolução de Estoque',
+    RETURN: 'Devolução ao Proprietário',
     TRANSFER: 'Transferência de Estoque',
   };
   return map[form.value.movement_type];
@@ -1070,9 +1058,9 @@ const typeDescriptionText = computed(() => {
     case 'ENTRY':
       return 'Entrada física de materiais no depósito (compras, notas fiscais ou inventário inicial).';
     case 'EXIT':
-      return 'Baixa de itens do depósito (ordens de serviço, requisições de campo ou aplicação externa).';
+      return 'Baixa de itens do depósito (ordens de serviço, requisições de campo ou aplicação operacional).';
     case 'RETURN':
-      return 'Devolução de materiais para o depósito (retorno de técnicos, clientes ou garantias).';
+      return 'Devolução de materiais ao proprietário (saída do depósito interno com baixa documental).';
     case 'TRANSFER':
     default:
       return 'Transferência física atômica entre dois depósitos da organização.';
@@ -1092,7 +1080,7 @@ const docRefPlaceholder = computed(() => {
   switch (form.value.movement_type) {
     case 'ENTRY': return 'Ex: NF-e 10492 ou Pedido de Compra';
     case 'EXIT': return 'Ex: OS-9812 ou Requisição de Campo';
-    case 'RETURN': return 'Ex: Protocolo de Devolução ou OS-Retirada';
+    case 'RETURN': return 'Ex: NF-e de Devolução ou Guia de Remessa ao Proprietário';
     case 'TRANSFER': default: return 'Ex: REQ-2026-042 ou Guia de Transferência';
   }
 });
@@ -1101,7 +1089,7 @@ const notesPlaceholder = computed(() => {
   switch (form.value.movement_type) {
     case 'ENTRY': return 'Descreva detalhes da carga recebida, fornecedor ou lote...';
     case 'EXIT': return 'Descreva o técnico solicitante, cliente ou veículo de destino...';
-    case 'RETURN': return 'Descreva as condições físicas dos materiais devolvidos...';
+    case 'RETURN': return 'Descreva o motivo da devolução ao proprietário, dados da remessa ou transportador...';
     case 'TRANSFER': default: return 'Descreva o motivo da transferência física ou logística interna...';
   }
 });
@@ -1153,7 +1141,7 @@ function setMovementType(type: MovementType) {
     if (!form.value.destination_depot_id && props.depots.length > 0) {
       form.value.destination_depot_id = String(props.depots[0].id);
     }
-  } else if (type === 'EXIT') {
+  } else if (type === 'EXIT' || type === 'RETURN') {
     form.value.destination_depot_id = '';
     if (!form.value.source_depot_id && props.depots.length > 0) {
       form.value.source_depot_id = String(props.depots[0].id);
@@ -1162,8 +1150,8 @@ function setMovementType(type: MovementType) {
 }
 
 function onHeaderSourceChange() {
-  // Limpa seriais bipados na grid se a origem mudou em transferências/saídas
-  if (form.value.movement_type === 'TRANSFER' || form.value.movement_type === 'EXIT') {
+  // Limpa seriais bipados na grid se a origem mudou em transferências/saídas/devoluções
+  if (form.value.movement_type === 'TRANSFER' || form.value.movement_type === 'EXIT' || form.value.movement_type === 'RETURN') {
     gridItems.value.forEach(item => {
       if (item.material.has_serial) {
         item.serials = [];
@@ -1251,8 +1239,8 @@ async function onScanBarcodeEnter(item: GridItem) {
     return;
   }
 
-  // Se a operação for TRANSFER ou EXIT: o serial DEVE existir no depósito de origem com status IN_STOCK
-  if (form.value.movement_type === 'TRANSFER' || form.value.movement_type === 'EXIT') {
+  // Se a operação for TRANSFER, EXIT ou RETURN: o serial DEVE existir no depósito interno de origem com status IN_STOCK
+  if (form.value.movement_type === 'TRANSFER' || form.value.movement_type === 'EXIT' || form.value.movement_type === 'RETURN') {
     const depotId = form.value.source_depot_id;
     if (!depotId) {
       item.scanError = 'Selecione o Depósito de Origem no topo antes de bipar seriais.';
@@ -1286,7 +1274,7 @@ async function onScanBarcodeEnter(item: GridItem) {
     return;
   }
 
-  // Para ENTRY ou RETURN: aceita o serial bipado
+  // Para ENTRY: aceita o serial bipado
   item.serials.push({
     serial_number: raw,
   });
@@ -1434,7 +1422,7 @@ watch(
       form.value = {
         movement_type: initialType,
         source_depot_id: initialType === 'ENTRY' ? '' : defaultSource,
-        destination_depot_id: initialType === 'EXIT' ? '' : defaultDest,
+        destination_depot_id: (initialType === 'EXIT' || initialType === 'RETURN') ? '' : defaultDest,
         document_ref: '',
         document_number: '',
         document_date: '',
@@ -1491,12 +1479,14 @@ async function submitAllMovements() {
       errorMessage.value = 'O depósito de destino deve ser diferente do depósito de origem.';
       return;
     }
-  } else if (form.value.movement_type === 'EXIT') {
+  } else if (form.value.movement_type === 'EXIT' || form.value.movement_type === 'RETURN') {
     if (!form.value.source_depot_id) {
-      errorMessage.value = 'Selecione o depósito de onde os materiais sairão.';
+      errorMessage.value = form.value.movement_type === 'RETURN'
+        ? 'Selecione o depósito interno de onde os materiais serão devolvidos ao proprietário.'
+        : 'Selecione o depósito de onde os materiais sairão.';
       return;
     }
-  } else if (form.value.movement_type === 'ENTRY' || form.value.movement_type === 'RETURN') {
+  } else if (form.value.movement_type === 'ENTRY') {
     if (!form.value.destination_depot_id) {
       errorMessage.value = 'Selecione o depósito de destino para entrada dos materiais.';
       return;
@@ -1558,7 +1548,7 @@ async function submitAllMovements() {
         };
 
         if (item.material.has_serial) {
-          if (form.value.movement_type === 'TRANSFER' || form.value.movement_type === 'EXIT') {
+          if (form.value.movement_type === 'TRANSFER' || form.value.movement_type === 'EXIT' || form.value.movement_type === 'RETURN') {
             itemObj.serial_ids = item.serials.map(s => s.id).filter(Boolean);
           } else {
             itemObj.serials = item.serials.map(s => s.serial_number);
