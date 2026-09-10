@@ -70,8 +70,8 @@
         />
       </div>
 
-      <!-- Linha 3: Categoria, Unidade, Custo e Estoque Mínimo -->
-      <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+      <!-- Linha 3: Categoria, Unidade e Estoque Mínimo -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div>
           <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
             Categoria
@@ -107,19 +107,6 @@
               {{ u.code }} — {{ u.name }}
             </option>
           </select>
-        </div>
-
-        <div>
-          <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-            Custo Médio (R$)
-          </label>
-          <input
-            type="number"
-            step="0.01"
-            min="0"
-            v-model="form.unit_cost"
-            class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-slate-900 dark:text-slate-100 font-mono text-xs focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none"
-          />
         </div>
 
         <div>

@@ -706,20 +706,6 @@
                 <!-- Rastreabilidade -->
                 <th class="py-3.5 px-5 text-center">Rastreabilidade</th>
 
-                <!-- Custo Médio Unitário -->
-                <th
-                  @click="toggleSortMaterial('unit_cost')"
-                  class="py-3.5 px-5 text-right cursor-pointer hover:text-[#FC6714] dark:hover:text-[#FC6714] transition"
-                  title="Ordenar por Custo Médio"
-                >
-                  <div class="inline-flex items-center justify-end gap-1.5 w-full">
-                    <span>Custo Médio</span>
-                    <ArrowUp v-if="materialSortBy === 'unit_cost' && materialSortDir === 'asc'" class="w-3.5 h-3.5 text-[#FC6714]" />
-                    <ArrowDown v-else-if="materialSortBy === 'unit_cost' && materialSortDir === 'desc'" class="w-3.5 h-3.5 text-[#FC6714]" />
-                    <ArrowUpDown v-else class="w-3.5 h-3.5 text-slate-400 opacity-60" />
-                  </div>
-                </th>
-
                 <!-- Estoque Mínimo -->
                 <th class="py-3.5 px-5 text-right">Estoque Mín.</th>
 
@@ -729,7 +715,7 @@
             </thead>
             <tbody class="divide-y divide-slate-100 dark:divide-[#14147A]/60">
               <tr v-if="filteredMaterials.length === 0">
-                <td colspan="8" class="py-12 text-center text-slate-400 text-sm">
+                <td colspan="7" class="py-12 text-center text-slate-400 text-sm">
                   <div class="max-w-sm mx-auto space-y-2">
                     <Boxes class="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto" />
                     <p class="font-medium text-slate-700 dark:text-slate-300">Nenhum material encontrado</p>
@@ -798,11 +784,6 @@
                   >
                     A Granel / Lote
                   </span>
-                </td>
-
-                <!-- Custo Médio -->
-                <td class="py-4 px-5 text-right font-mono font-medium text-slate-700 dark:text-slate-300">
-                  R$ {{ formatNumber(m.unit_cost) }}
                 </td>
 
                 <!-- Estoque Mínimo -->

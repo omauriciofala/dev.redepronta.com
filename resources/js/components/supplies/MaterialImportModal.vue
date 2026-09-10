@@ -228,7 +228,6 @@
                     <th class="py-2 px-3">Categoria</th>
                     <th class="py-2 px-3">Unid.</th>
                     <th class="py-2 px-3 text-center">Serial?</th>
-                    <th class="py-2 px-3 text-right">Custo (R$)</th>
                     <th class="py-2 px-3 text-right">Est. Mín.</th>
                   </tr>
                 </thead>
@@ -246,7 +245,6 @@
                         {{ row.has_serial ? 'SIM' : 'NÃO' }}
                       </span>
                     </td>
-                    <td class="py-2 px-3 text-right font-mono">{{ row.unit_cost || '0,00' }}</td>
                     <td class="py-2 px-3 text-right font-mono">{{ row.min_stock || '0' }}</td>
                   </tr>
                 </tbody>
