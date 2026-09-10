@@ -53,7 +53,7 @@
           <span>Dados</span>
         </button>
 
-        <!-- Aba 2: Materiais (com a Grid) -->
+        <!-- Aba 2: Materiais (Grid) -->
         <button
           type="button"
           @click="currentTab = 'materials'"
@@ -63,7 +63,7 @@
           class="pb-3 border-b-2 text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer shrink-0"
         >
           <Layers class="w-4 h-4" />
-          <span>Materiais (Grid)</span>
+          <span>Materiais</span>
           <span
             v-if="gridItems.length > 0"
             class="px-2 py-0.5 rounded-full text-[11px] font-bold"
@@ -126,63 +126,25 @@
       <!-- ========================================================================= -->
       <div v-show="currentTab === 'data'" class="space-y-6">
         <div class="p-5 bg-slate-50/80 dark:bg-slate-800/40 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-5">
-          <!-- 4 Tipos Obrigatórios de Movimentação -->
+          <!-- Tipo de Movimentação de Estoque (Combobox) -->
           <div>
-            <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
               Tipo de Movimentação de Estoque *
             </label>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <!-- Entrada -->
-              <button
-                type="button"
-                @click="setMovementType('ENTRY')"
-                class="flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl border text-xs font-bold transition cursor-pointer"
-                :class="form.movement_type === 'ENTRY'
-                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-md ring-2 ring-emerald-500/30'
-                  : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/60'"
+            <div class="relative">
+              <select
+                :value="form.movement_type"
+                @change="setMovementType(($event.target as HTMLSelectElement).value as MovementType)"
+                class="w-full h-11 pl-3.5 pr-10 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm font-semibold focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-hidden cursor-pointer transition appearance-none"
               >
-                <ArrowDownToLine class="w-4 h-4" />
-                <span>Entrada</span>
-              </button>
-
-              <!-- Saída -->
-              <button
-                type="button"
-                @click="setMovementType('EXIT')"
-                class="flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl border text-xs font-bold transition cursor-pointer"
-                :class="form.movement_type === 'EXIT'
-                  ? 'bg-rose-600 text-white border-rose-600 shadow-md ring-2 ring-rose-500/30'
-                  : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/60'"
-              >
-                <ArrowUpFromLine class="w-4 h-4" />
-                <span>Saída</span>
-              </button>
-
-              <!-- Devolução -->
-              <button
-                type="button"
-                @click="setMovementType('RETURN')"
-                class="flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl border text-xs font-bold transition cursor-pointer"
-                :class="form.movement_type === 'RETURN'
-                  ? 'bg-indigo-600 text-white border-indigo-600 shadow-md ring-2 ring-indigo-500/30'
-                  : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/60'"
-              >
-                <RotateCcw class="w-4 h-4" />
-                <span>Devolução</span>
-              </button>
-
-              <!-- Transferência -->
-              <button
-                type="button"
-                @click="setMovementType('TRANSFER')"
-                class="flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl border text-xs font-bold transition cursor-pointer"
-                :class="form.movement_type === 'TRANSFER'
-                  ? 'bg-[#FC6714] text-white border-[#FC6714] shadow-md ring-2 ring-[#FC6714]/30'
-                  : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/60'"
-              >
-                <ArrowRightLeft class="w-4 h-4" />
-                <span>Transferência</span>
-              </button>
+                <option value="ENTRY">Entrada de Estoque</option>
+                <option value="EXIT">Saída de Estoque</option>
+                <option value="RETURN">Devolução de Estoque</option>
+                <option value="TRANSFER">Transferência de Estoque</option>
+              </select>
+              <div class="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 dark:text-slate-500">
+                <ChevronDown class="w-4 h-4" />
+              </div>
             </div>
             <p class="mt-2 text-xs font-medium" :class="typeDescriptionColor">
               {{ typeDescriptionText }}
@@ -327,18 +289,6 @@
             ></textarea>
           </div>
         </div>
-
-        <!-- Botão de Avanço de Aba -->
-        <div class="flex justify-end">
-          <button
-            type="button"
-            @click="currentTab = 'materials'"
-            class="h-10 px-5 rounded-xl bg-[#FC6714] hover:bg-[#E0530A] active:bg-[#C94605] text-white text-xs font-bold shadow-xs transition flex items-center gap-2 cursor-pointer"
-          >
-            <span>Avançar para Materiais (Grid)</span>
-            <ArrowRight class="w-4 h-4" />
-          </button>
-        </div>
       </div>
 
       <!-- ========================================================================= -->
@@ -359,28 +309,23 @@
             </span>
           </div>
 
-          <!-- Linha: Campo Novo Material + Campo Quantidade + Botão Adicionar -->
+          <!-- Linha: Campo Novo Material (Componente) + Campo Quantidade + Botão Adicionar -->
           <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
-            <!-- Campo 1: Material (8 colunas) -->
+            <!-- Campo 1: Material (8 colunas) com busca estilo cidade/pessoa -->
             <div class="md:col-span-8">
-              <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                Novo Material *
-              </label>
-              <select
+              <MaterialSearchSelect
                 v-model="newItem.material_id"
-                @change="onNewItemMaterialChange"
-                class="w-full h-11 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-xs font-medium focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none cursor-pointer"
-              >
-                <option value="" disabled>Selecione um material do catálogo para adicionar...</option>
-                <option v-for="m in materials" :key="m.id" :value="m.id">
-                  {{ m.code }} — {{ m.name }} [{{ m.unit?.code || 'UND' }}] {{ m.has_serial ? '• [Serial Obrigatório]' : '• [Convencional]' }}
-                </option>
-              </select>
+                :materials-list="materials"
+                label="Novo Material"
+                required
+                placeholder="Digite nome, código SKU ou categoria do material..."
+                @select="onMaterialSelected"
+              />
             </div>
 
             <!-- Campo 2: Quantidade (2 colunas) -->
             <div class="md:col-span-2">
-              <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                 Quantidade *
               </label>
               <input
@@ -389,7 +334,7 @@
                 min="1"
                 v-model.number="newItem.quantity"
                 placeholder="Qtd"
-                class="w-full h-11 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 font-mono text-xs font-bold focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none"
+                class="w-full h-11 px-3.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-mono text-xs font-bold focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-hidden"
               />
             </div>
 
@@ -399,10 +344,10 @@
                 type="button"
                 @click="addMaterialToGrid"
                 :disabled="!newItem.material_id || newItem.quantity <= 0"
-                class="w-full h-11 px-4 rounded-lg bg-[#FC6714] hover:bg-[#E0530A] active:bg-[#C94605] disabled:opacity-50 text-white text-xs font-bold shadow-xs transition active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+                class="w-full h-11 px-4 rounded-lg bg-[#FC6714] hover:bg-[#E0530A] active:bg-[#C94605] disabled:opacity-50 text-white text-xs font-bold shadow-xs transition active:scale-98 cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <Plus class="w-4 h-4" />
-                <span>Adicionar à Grid</span>
+                <span>Adicionar</span>
               </button>
             </div>
           </div>
@@ -553,27 +498,6 @@
               <span>Grid pronta para submissão</span>
             </div>
           </div>
-        </div>
-
-        <!-- Botões de Navegação -->
-        <div class="flex items-center justify-between pt-2">
-          <button
-            type="button"
-            @click="currentTab = 'data'"
-            class="h-10 px-4 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-semibold transition hover:bg-slate-50 cursor-pointer flex items-center gap-2"
-          >
-            <ArrowLeft class="w-4 h-4" />
-            <span>Voltar para Dados</span>
-          </button>
-
-          <button
-            type="button"
-            @click="currentTab = serializedGridItems.length > 0 ? 'serials' : 'attachments'"
-            class="h-10 px-5 rounded-xl bg-[#FC6714] hover:bg-[#E0530A] active:bg-[#C94605] text-white text-xs font-bold shadow-xs transition flex items-center gap-2 cursor-pointer"
-          >
-            <span>{{ serializedGridItems.length > 0 ? 'Avançar para Serializado' : 'Avançar para Anexos' }}</span>
-            <ArrowRight class="w-4 h-4" />
-          </button>
         </div>
       </div>
 
@@ -776,27 +700,6 @@
             </div>
           </div>
         </div>
-
-        <!-- Botões de Navegação -->
-        <div class="flex items-center justify-between pt-2">
-          <button
-            type="button"
-            @click="currentTab = 'materials'"
-            class="h-10 px-4 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-semibold transition hover:bg-slate-50 cursor-pointer flex items-center gap-2"
-          >
-            <ArrowLeft class="w-4 h-4" />
-            <span>Voltar para Materiais</span>
-          </button>
-
-          <button
-            type="button"
-            @click="currentTab = 'attachments'"
-            class="h-10 px-5 rounded-xl bg-[#FC6714] hover:bg-[#E0530A] active:bg-[#C94605] text-white text-xs font-bold shadow-xs transition flex items-center gap-2 cursor-pointer"
-          >
-            <span>Avançar para Anexos</span>
-            <ArrowRight class="w-4 h-4" />
-          </button>
-        </div>
       </div>
 
       <!-- ========================================================================= -->
@@ -912,18 +815,6 @@
             </div>
           </div>
         </div>
-
-        <!-- Botões de Navegação -->
-        <div class="flex items-center justify-between pt-2">
-          <button
-            type="button"
-            @click="currentTab = serializedGridItems.length > 0 ? 'serials' : 'materials'"
-            class="h-10 px-4 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-semibold transition hover:bg-slate-50 cursor-pointer flex items-center gap-2"
-          >
-            <ArrowLeft class="w-4 h-4" />
-            <span>{{ serializedGridItems.length > 0 ? 'Voltar para Serializado' : 'Voltar para Materiais' }}</span>
-          </button>
-        </div>
       </div>
     </div>
 
@@ -1010,10 +901,11 @@ import {
   Loader2,
   SlidersHorizontal,
   ArrowRight,
-  ArrowLeft,
+  ChevronDown,
 } from 'lucide-vue-next';
 import BaseModal from '@/components/common/BaseModal.vue';
 import PersonSearchSelect from '@/components/common/PersonSearchSelect.vue';
+import MaterialSearchSelect from '@/components/common/MaterialSearchSelect.vue';
 import DateInput from '@/components/common/DateInput.vue';
 
 type MovementType = 'ENTRY' | 'EXIT' | 'RETURN' | 'TRANSFER';
@@ -1091,8 +983,13 @@ const newItem = ref({
   quantity: 1,
 });
 
+const selectedMaterialObject = ref<any>(null);
+
 const selectedNewItemMaterial = computed(() => {
   if (!newItem.value.material_id) return null;
+  if (selectedMaterialObject.value && selectedMaterialObject.value.id === Number(newItem.value.material_id)) {
+    return selectedMaterialObject.value;
+  }
   return props.materials.find(m => m.id === Number(newItem.value.material_id)) || null;
 });
 
@@ -1296,8 +1193,9 @@ function formatDepotType(type: string): string {
   return map[type] || 'Depósito';
 }
 
-function onNewItemMaterialChange() {
-  if (selectedNewItemMaterial.value?.has_serial && newItem.value.quantity < 1) {
+function onMaterialSelected(mat: any) {
+  selectedMaterialObject.value = mat;
+  if (mat?.has_serial && (!newItem.value.quantity || newItem.value.quantity < 1)) {
     newItem.value.quantity = 1;
   }
 }
@@ -1310,7 +1208,7 @@ function addMaterialToGrid() {
     return;
   }
 
-  const mat = props.materials.find(m => m.id === Number(newItem.value.material_id));
+  const mat = selectedNewItemMaterial.value || props.materials.find(m => m.id === Number(newItem.value.material_id));
   if (!mat) return;
 
   const qty = Number(newItem.value.quantity);
@@ -1329,12 +1227,13 @@ function addMaterialToGrid() {
     serials: [],
     scannerInput: '',
     scanError: '',
-    showScanner: mat.has_serial, // abre o scanner imediatamente se for serializado
+    showScanner: Boolean(mat.has_serial), // abre o scanner imediatamente se for serializado
   });
 
   // Limpa o seletor da linha de inserção
   newItem.value.material_id = '';
   newItem.value.quantity = 1;
+  selectedMaterialObject.value = null;
 }
 
 function removeGridItem(index: number) {
@@ -1581,6 +1480,7 @@ watch(
         material_id: '',
         quantity: 1,
       };
+      selectedMaterialObject.value = null;
     }
   }
 );
