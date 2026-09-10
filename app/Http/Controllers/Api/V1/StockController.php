@@ -119,7 +119,8 @@ class StockController extends Controller
              'RETURN' => 'Devolução',
              'TRANSFER' => 'Transferência',
          ];
-         $label = $labels[$movement->movement_type] ?? 'Movimentação';
+         $type = strtoupper($request->input('movement_type', 'TRANSFER'));
+         $label = $labels[$type] ?? 'Movimentação';
  
          return response()->json([
              'message' => "{$label} de estoque realizada com sucesso.",

@@ -1047,6 +1047,87 @@ class StockWmsModuleTest extends TestCase
         $this->assertEquals(120.0, (float)$sourceBal->quantity);
         $this->assertEquals(80.0, (float)$destBal->quantity);
     }
+
+    /**
+     * Testa movimentação em lote (grid) com múltiplos materiais (convencional e serializado) em transação atômica.
+     */
+    public function test_can_execute_batch_movement_with_multiple_grid_items(): void
+    {
+        $payload = [
+            'movement_type' => 'ENTRY',
+            'destination_depot_id' => $this->centralDepot->id,
+            'document_ref' => 'LOTE-GRID-001',
+            'notes' => 'Recebimento de lote com múltiplos itens na grid',
+            'items' => [
+                [
+                    'material_id' => $this->materialCable->id,
+                    'quantity' => 250.0,
+                ],
+                [
+                    'material_id' => $this->materialOnu->id,
+                    'quantity' => 2,
+                    'serials' => ['GPON-LOTE-001', 'GPON-LOTE-002'],
+                ],
+            ],
+        ];
+
+        $response = $this->postJson('/api/v1/stock/movement', $payload);
+
+        $response->assertStatus(201);
+        $response->assertJsonStructure(['message', 'data']);
+
+        // Verifica que o cabo teve o saldo incrementado
+        $cableBalance = StockBalance::where('account_id', $this->account->id)
+            ->where('depot_id', $this->centralDepot->id)
+            ->where('material_id', $this->materialCable->id)
+            ->value('quantity');
+        $this->assertGreaterThanOrEqual(250.0, (float)$cableBalance);
+
+        // Verifica que os seriais da ONU foram criados no depósito destino
+        $this->assertDatabaseHas('stock_serials', [
+            'account_id' => $this->account->id,
+            'serial_number' => 'GPON-LOTE-001',
+            'current_depot_id' => $this->centralDepot->id,
+            'status' => 'IN_STOCK',
+        ]);
+        $this->assertDatabaseHas('stock_serials', [
+            'account_id' => $this->account->id,
+            'serial_number' => 'GPON-LOTE-002',
+            'current_depot_id' => $this->centralDepot->id,
+            'status' => 'IN_STOCK',
+        ]);
+    }
+
+    /**
+     * Testa que a movimentação em lote falha atomicamente se um dos itens serializados não tiver os seriais correspondentes.
+     */
+    public function test_batch_movement_fails_when_serialized_item_has_insufficient_serials(): void
+    {
+        $payload = [
+            'movement_type' => 'ENTRY',
+            'destination_depot_id' => $this->centralDepot->id,
+            'items' => [
+                [
+                    'material_id' => $this->materialCable->id,
+                    'quantity' => 100.0,
+                ],
+                [
+                    'material_id' => $this->materialOnu->id,
+                    'quantity' => 3, // Solicitado 3
+                    'serials' => ['GPON-ONLY-ONE'], // Informado apenas 1
+                ],
+            ],
+        ];
+
+        $response = $this->postJson('/api/v1/stock/movement', $payload);
+
+        $response->assertStatus(422);
+
+        // Garante que o serial não foi criado (rollback atômico total)
+        $this->assertDatabaseMissing('stock_serials', [
+            'serial_number' => 'GPON-ONLY-ONE',
+        ]);
+    }
 }
 
 

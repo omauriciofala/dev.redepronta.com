@@ -553,10 +553,36 @@ class ClusterStockService
 
     /**
      * Processador central de movimentações (Entrada, Saída, Devolução, Transferência).
+     * Suporta movimentação atômica de um único item ou de múltiplos itens em lote (grid).
+     *
+     * @return StockMovement|StockMovement[]
      */
-    public function processMovement(array $data, int $accountId, ?int $userId = null): StockMovement
+    public function processMovement(array $data, int $accountId, ?int $userId = null): StockMovement|array
     {
         $type = strtoupper($data['movement_type'] ?? 'TRANSFER');
+
+        if (!empty($data['items']) && is_array($data['items'])) {
+            return DB::transaction(function () use ($data, $accountId, $userId, $type) {
+                $createdMovements = [];
+                foreach ($data['items'] as $item) {
+                    $itemPayload = array_merge($data, $item);
+                    unset($itemPayload['items']);
+                    $itemPayload['movement_type'] = $type;
+
+                    $movement = match ($type) {
+                        'TRANSFER' => $this->transfer($itemPayload, $accountId, $userId),
+                        'ENTRY' => $this->entry($itemPayload, $accountId, $userId),
+                        'EXIT' => $this->exit($itemPayload, $accountId, $userId),
+                        'RETURN' => $this->returnStock($itemPayload, $accountId, $userId),
+                        default => throw ValidationException::withMessages([
+                            'movement_type' => ['Tipo de movimentação inválido. Permite apenas Entrada, Saída, Devolução ou Transferência.'],
+                        ]),
+                    };
+                    $createdMovements[] = $movement;
+                }
+                return $createdMovements;
+            });
+        }
 
         return match ($type) {
             'TRANSFER' => $this->transfer($data, $accountId, $userId),
