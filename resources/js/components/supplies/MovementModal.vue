@@ -424,7 +424,7 @@
                         {{ item.material.has_owner_alias ? `Cód. Proprietário: ${item.material.code}` : `SKU: ${item.material.code}` }}
                       </span>
                       <span v-if="item.material.has_owner_alias && item.material.system_code" class="text-slate-400">
-                        (SKU Sist: {{ item.material.system_code }})
+                        (SKU: {{ item.material.system_code }})
                       </span>
                       <span>• {{ item.material.unit?.code || 'UND' }}</span>
                     </div>

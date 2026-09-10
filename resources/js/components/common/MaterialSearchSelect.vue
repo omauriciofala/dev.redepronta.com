@@ -105,7 +105,7 @@
                   {{ material.has_owner_alias ? `Cód. Proprietário: ${material.code}` : `SKU: ${material.code}` }}
                 </span>
                 <span v-if="material.has_owner_alias && material.system_code" class="font-mono text-[10px] text-slate-400">
-                  (SKU Sist: {{ material.system_code }})
+                  (SKU: {{ material.system_code }})
                 </span>
                 <span v-if="material.category">• {{ material.category }}</span>
                 <span>• {{ material.unit?.code || material.unit || 'UND' }}</span>
@@ -221,7 +221,7 @@ const displayText = computed(() => {
     const unitStr = selectedMaterial.value.unit?.code ? ` [${selectedMaterial.value.unit.code}]` : '';
     const serialStr = selectedMaterial.value.has_serial ? ' (Serial)' : '';
     const aliasStr = selectedMaterial.value.has_owner_alias && selectedMaterial.value.system_code
-      ? ` (SKU Sist: ${selectedMaterial.value.system_code})`
+      ? ` (SKU: ${selectedMaterial.value.system_code})`
       : '';
     return `${selectedMaterial.value.code} - ${selectedMaterial.value.name}${aliasStr}${unitStr}${serialStr}`;
   }

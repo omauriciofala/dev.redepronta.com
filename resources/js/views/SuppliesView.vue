@@ -768,7 +768,7 @@
                     </button>
                   </div>
                   <div v-if="m.has_owner_alias && m.system_code" class="text-[10px] font-mono text-slate-400 mt-0.5">
-                    SKU Sist: {{ m.system_code }}
+                    SKU: {{ m.system_code }}
                   </div>
                 </td>
 
