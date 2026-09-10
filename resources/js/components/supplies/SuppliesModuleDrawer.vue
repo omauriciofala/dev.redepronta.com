@@ -153,6 +153,23 @@
 
           <button
             type="button"
+            @click="triggerAction('import-materials')"
+            class="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition flex items-center justify-between text-left cursor-pointer group shadow-2xs"
+          >
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-orange-50 dark:bg-orange-950/60 text-[#FC6714] flex items-center justify-center shrink-0">
+                <FileSpreadsheet class="w-4 h-4" />
+              </div>
+              <div>
+                <div class="font-bold text-slate-800 dark:text-slate-200">Importar Materiais (Planilha)</div>
+                <div class="text-[11px] text-slate-400">Download de modelo e upload em lote (.csv)</div>
+              </div>
+            </div>
+            <ArrowUpRight class="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition" />
+          </button>
+
+          <button
+            type="button"
             @click="triggerAction('depot')"
             class="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition flex items-center justify-between text-left cursor-pointer group shadow-2xs"
           >
@@ -224,7 +241,7 @@
 import { computed } from 'vue';
 import {
   Layers, Boxes, Warehouse, QrCode, ArrowRightLeft, Plus,
-  MapPin, Zap, ArrowUpRight, AlertTriangle
+  MapPin, Zap, ArrowUpRight, AlertTriangle, FileSpreadsheet
 } from 'lucide-vue-next';
 import BaseModal from '@/components/common/BaseModal.vue';
 
@@ -239,7 +256,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void;
   (e: 'navigate', tab: 'regional' | 'materials' | 'depots' | 'serials'): void;
-  (e: 'action', action: 'transfer' | 'material' | 'depot' | 'cluster'): void;
+  (e: 'action', action: 'transfer' | 'material' | 'depot' | 'cluster' | 'import-materials'): void;
 }>();
 
 const isOpenModel = computed({
@@ -256,7 +273,7 @@ function navigateToTab(tab: 'regional' | 'materials' | 'depots' | 'serials') {
   close();
 }
 
-function triggerAction(action: 'transfer' | 'material' | 'depot' | 'cluster') {
+function triggerAction(action: 'transfer' | 'material' | 'depot' | 'cluster' | 'import-materials') {
   emit('action', action);
   close();
 }

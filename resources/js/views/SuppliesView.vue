@@ -129,6 +129,15 @@
                   <Boxes class="w-4 h-4 text-slate-400" />
                   <span>Materiais</span>
                 </button>
+
+                <button
+                  type="button"
+                  @click="openMaterialImportModal"
+                  class="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] dark:hover:text-orange-300 transition cursor-pointer"
+                >
+                  <FileSpreadsheet class="w-4 h-4 text-slate-400" />
+                  <span>Importar Materiais</span>
+                </button>
               </div>
             </div>
           </Transition>
@@ -640,6 +649,17 @@
           <span class="text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
             {{ filteredMaterials.length }} materiais
           </span>
+
+          <!-- Botão Importar Planilha de Materiais -->
+          <button
+            type="button"
+            @click="openMaterialImportModal"
+            class="inline-flex items-center gap-2 h-11 px-3.5 rounded-lg border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 text-slate-700 dark:text-slate-200 hover:text-[#FC6714] dark:hover:text-orange-300 text-xs font-semibold shadow-2xs transition cursor-pointer"
+            title="Importar materiais em lote via planilha modelo (.CSV)"
+          >
+            <Upload class="w-4 h-4 text-[#FC6714]" />
+            <span>Importar Planilha</span>
+          </button>
         </div>
       </div>
 
@@ -1320,6 +1340,13 @@
       @saved="onDepotSaved"
     />
 
+    <!-- Modal 5: Importação de Materiais via Planilha -->
+    <MaterialImportModal
+      :is-open="isMaterialImportModalOpen"
+      @close="isMaterialImportModalOpen = false"
+      @imported="onMaterialsImported"
+    />
+
     <!-- Drawer Lateral do Módulo (☰) -->
     <SuppliesModuleDrawer
       v-model="isModuleDrawerOpen"
@@ -1362,11 +1389,13 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import {
   Package, ArrowRightLeft, Plus, Layers, Boxes, Warehouse, QrCode, RefreshCw,
   ChevronDown, X, Search, ArrowUp, ArrowDown, ArrowUpDown, Copy, Check,
-  AlertCircle, CheckCircle2, Menu, MapPin, Edit2, Tags, FolderTree, Scale, UserCheck
+  AlertCircle, CheckCircle2, Menu, MapPin, Edit2, Tags, FolderTree, Scale, UserCheck,
+  Upload, FileSpreadsheet
 } from 'lucide-vue-next';
 import TablePagination from '@/components/common/TablePagination.vue';
 import MovementModal from '@/components/supplies/MovementModal.vue';
 import MaterialModal from '@/components/supplies/MaterialModal.vue';
+import MaterialImportModal from '@/components/supplies/MaterialImportModal.vue';
 import ClusterCrudModal from '@/components/supplies/auxiliary/ClusterCrudModal.vue';
 import DepotTypeCrudModal from '@/components/supplies/auxiliary/DepotTypeCrudModal.vue';
 import MaterialCategoryCrudModal from '@/components/supplies/auxiliary/MaterialCategoryCrudModal.vue';
@@ -1447,6 +1476,7 @@ const materialCategoriesList = ref<any[]>([]);
 const isUnitModalOpen = ref(false);
 const isMaterialOwnerModalOpen = ref(false);
 const isMaterialModalOpen = ref(false);
+const isMaterialImportModalOpen = ref(false);
 const selectedMaterialForEdit = ref<any>(null);
 const materialFilterCategory = ref('all');
 const isDepotModalOpen = ref(false);
@@ -1538,11 +1568,12 @@ function navigateToTab(tab: 'regional' | 'materials' | 'depots' | 'serials') {
   activeTab.value = tab;
 }
 
-function handleDrawerAction(action: 'transfer' | 'material' | 'cluster' | 'depot') {
+function handleDrawerAction(action: 'transfer' | 'material' | 'cluster' | 'depot' | 'import-materials') {
   if (action === 'transfer') openTransferModal();
   else if (action === 'material') openCreateMaterialModal();
   else if (action === 'cluster') isClusterModalOpen.value = true;
   else if (action === 'depot') openCreateDepotModal();
+  else if (action === 'import-materials') openMaterialImportModal();
 }
 
 // ─── ABA 1: POSIÇÃO REGIONAL ──────────────────────────────────────────────────
@@ -1962,6 +1993,20 @@ function openEditMaterialModal(material: Material) {
 
 async function onMaterialSaved() {
   showToast('Catálogo de materiais atualizado com sucesso!');
+  await Promise.all([
+    loadMaterials(),
+    loadRegionalStock(),
+  ]);
+}
+
+function openMaterialImportModal() {
+  isHeaderMenuOpen.value = false;
+  isMaterialImportModalOpen.value = true;
+}
+
+async function onMaterialsImported(result: any) {
+  const count = (result?.imported_count || 0) + (result?.updated_count || 0);
+  showToast(`${count} material(is) processado(s) com sucesso via planilha!`);
   await Promise.all([
     loadMaterials(),
     loadRegionalStock(),

@@ -53,6 +53,8 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('material-categories', MaterialCategoryController::class);
     Route::apiResource('material-owners', MaterialOwnerController::class);
     Route::get('materials/units', [MaterialController::class, 'units']);
+    Route::get('materials/import-template', [MaterialController::class, 'downloadTemplate']);
+    Route::post('materials/import', [MaterialController::class, 'import']);
     Route::apiResource('materials', MaterialController::class);
 
     // Operações e Posição Regional de Estoque
