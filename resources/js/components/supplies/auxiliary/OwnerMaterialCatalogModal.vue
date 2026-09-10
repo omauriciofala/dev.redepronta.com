@@ -1,12 +1,207 @@
 <template>
   <BaseModal
     :model-value="isOpen"
-    @update:model-value="$emit('close')"
-    :title="`Catálogo de Materiais — ${owner?.code || ''}`"
-    :description="`Mapeamento de códigos e descrições técnicas do proprietário ${owner?.name || ''}`"
-    size="2xl"
+    @update:model-value="onModalClose"
+    :title="isPreviewMode ? `Pré-visualização da Importação — ${owner?.code || ''}` : `Catálogo de Materiais — ${owner?.code || ''}`"
+    :description="isPreviewMode ? 'Confira o mapeamento das 3 colunas e novos códigos gerados antes de gravar' : `Mapeamento de códigos e descrições técnicas do proprietário ${owner?.name || ''}`"
+    :size="isPreviewMode ? '4xl' : '2xl'"
   >
-    <div class="space-y-4">
+    <!-- ========================================================================= -->
+    <!-- TELA 1: PRÉ-VISUALIZAÇÃO DA IMPORTAÇÃO (PREVIEW ANTES DE GRAVAR)          -->
+    <!-- ========================================================================= -->
+    <div v-if="isPreviewMode" class="space-y-4">
+      <!-- Cabeçalho do Preview com Nome do Arquivo e Resumo Rápido -->
+      <div class="p-3 rounded-xl bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-[#FC6714]/30 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <div class="p-2 rounded-lg bg-white dark:bg-[#03032E] text-[#FC6714] shadow-2xs">
+            <FileSpreadsheet class="w-5 h-5" />
+          </div>
+          <div>
+            <h4 class="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+              <span>Arquivo: {{ previewFileName }}</span>
+            </h4>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400">
+              Colunas detectadas: <strong>Cód.</strong>, <strong>Nome do Material</strong> e <strong>Cód. Prop.</strong>
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          @click="cancelPreview"
+          class="px-2.5 py-1 text-xs rounded-lg border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 transition cursor-pointer font-medium"
+        >
+          Descartar Prévia
+        </button>
+      </div>
+
+      <!-- Cards de Métricas do Preview -->
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
+        <div class="p-2.5 rounded-lg border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E]">
+          <span class="text-[10px] uppercase font-bold text-slate-400 block">Total de Linhas</span>
+          <span class="text-lg font-bold text-slate-800 dark:text-slate-100">{{ previewSummary.total_rows }}</span>
+        </div>
+
+        <div class="p-2.5 rounded-lg border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/50 dark:bg-emerald-950/20 text-emerald-800 dark:text-emerald-300">
+          <span class="text-[10px] uppercase font-bold text-emerald-600 dark:text-emerald-400 block flex items-center gap-1">
+            <Sparkles class="w-3 h-3" />
+            <span>Novos Materiais</span>
+          </span>
+          <span class="text-lg font-bold">{{ previewSummary.to_create_material }}</span>
+          <span class="text-[10px] block opacity-80">(cód. 4 dígitos)</span>
+        </div>
+
+        <div class="p-2.5 rounded-lg border border-blue-200 dark:border-blue-900/60 bg-blue-50/50 dark:bg-blue-950/20 text-blue-800 dark:text-blue-300">
+          <span class="text-[10px] uppercase font-bold text-blue-600 dark:text-blue-400 block">Vincular Existentes</span>
+          <span class="text-lg font-bold">{{ previewSummary.to_link_existing }}</span>
+        </div>
+
+        <div class="p-2.5 rounded-lg border border-purple-200 dark:border-purple-900/60 bg-purple-50/50 dark:bg-purple-950/20 text-purple-800 dark:text-purple-300">
+          <span class="text-[10px] uppercase font-bold text-purple-600 dark:text-purple-400 block">Atualizar Vínculos</span>
+          <span class="text-lg font-bold">{{ previewSummary.to_update_link }}</span>
+        </div>
+
+        <div class="p-2.5 rounded-lg border border-rose-200 dark:border-rose-900/60 bg-rose-50/50 dark:bg-rose-950/20 text-rose-800 dark:text-rose-300">
+          <span class="text-[10px] uppercase font-bold text-rose-600 dark:text-rose-400 block">Erros / Avisos</span>
+          <span class="text-lg font-bold">{{ previewSummary.errors_count }}</span>
+          <span v-if="previewSummary.errors_count > 0" class="text-[10px] block opacity-80">(serão ignoradas)</span>
+        </div>
+      </div>
+
+      <!-- Tabela Confortável de Preview das Linhas -->
+      <div class="rounded-xl border border-slate-200 dark:border-[#14147A] overflow-hidden bg-white dark:bg-[#03032E] shadow-2xs">
+        <div class="max-h-[380px] overflow-y-auto overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead class="sticky top-0 bg-slate-50 dark:bg-[#06064D] border-b border-slate-200 dark:border-[#14147A] z-10">
+              <tr class="font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[11px]">
+                <th class="py-2.5 px-3 text-center w-12">Linha</th>
+                <th class="py-2.5 px-3">Cód. Sistema (Canônico)</th>
+                <th class="py-2.5 px-3">Nome do Material</th>
+                <th class="py-2.5 px-3">Cód. Proprietário</th>
+                <th class="py-2.5 px-3 text-right">Ação Prevista</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-[#14147A]/60">
+              <tr
+                v-for="row in previewRows"
+                :key="row.line"
+                class="hover:bg-slate-50/70 dark:hover:bg-white/5 transition"
+                :class="{ 'bg-rose-50/40 dark:bg-rose-950/20': row.status === 'error' }"
+              >
+                <!-- Linha -->
+                <td class="py-2.5 px-3 text-center font-mono text-slate-400 text-[11px]">
+                  #{{ row.line }}
+                </td>
+
+                <!-- Cód. Sistema -->
+                <td class="py-2.5 px-3">
+                  <div v-if="row.is_generated_code" class="inline-flex items-center gap-1 px-2 py-0.5 rounded font-mono font-bold text-xs bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+                    <Sparkles class="w-3 h-3 text-emerald-600" />
+                    <span>{{ row.system_code }}</span>
+                    <span class="text-[10px] font-normal opacity-75">(Gerado 4D)</span>
+                  </div>
+                  <div v-else-if="row.system_code" class="font-mono font-bold text-slate-700 dark:text-slate-200 text-xs">
+                    {{ row.system_code }}
+                  </div>
+                  <div v-else class="text-slate-400 italic text-[11px]">
+                    (Em branco)
+                  </div>
+                </td>
+
+                <!-- Nome do Material -->
+                <td class="py-2.5 px-3">
+                  <div class="font-semibold text-slate-900 dark:text-slate-100">
+                    {{ row.owner_name || '-' }}
+                  </div>
+                  <div class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
+                    <span v-if="row.name_source === 'inherited'" class="text-blue-600 dark:text-blue-400">
+                      • Herdará nome do sistema
+                    </span>
+                    <span v-else-if="row.name_source === 'new_material'" class="text-emerald-600 dark:text-emerald-400">
+                      • Cadastro de novo material
+                    </span>
+                    <span v-else class="text-slate-500">
+                      • Nome customizado no proprietário
+                    </span>
+                  </div>
+                </td>
+
+                <!-- Cód. Proprietário -->
+                <td class="py-2.5 px-3 font-mono font-bold text-[#FC6714]">
+                  {{ row.owner_code || '-' }}
+                </td>
+
+                <!-- Ação / Status -->
+                <td class="py-2.5 px-3 text-right">
+                  <span
+                    v-if="row.status === 'valid' && row.action === 'create_material_and_link'"
+                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800"
+                  >
+                    <Plus class="w-3 h-3" />
+                    <span>Criar Material e Vincular</span>
+                  </span>
+
+                  <span
+                    v-else-if="row.status === 'valid' && row.action === 'link_existing'"
+                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 border border-blue-300 dark:border-blue-800"
+                  >
+                    <Check class="w-3 h-3" />
+                    <span>Vincular Existente</span>
+                  </span>
+
+                  <span
+                    v-else-if="row.status === 'valid' && row.action === 'update_link'"
+                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 border border-purple-300 dark:border-purple-800"
+                  >
+                    <Edit2 class="w-3 h-3" />
+                    <span>Atualizar Vínculo</span>
+                  </span>
+
+                  <div v-else class="text-right">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-800">
+                      <AlertCircle class="w-3 h-3" />
+                      <span>Erro</span>
+                    </span>
+                    <span class="block text-[10px] text-rose-600 dark:text-rose-400 mt-0.5 max-w-[200px] ml-auto text-right">
+                      {{ row.message }}
+                    </span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Barra de Ações Inferior do Preview -->
+      <div class="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-800">
+        <button
+          type="button"
+          @click="cancelPreview"
+          class="px-3.5 py-2 text-xs font-semibold rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+        >
+          Cancelar
+        </button>
+
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            @click="confirmImport"
+            :disabled="!canImportPreview || isImporting"
+            class="inline-flex items-center gap-2 px-5 py-2 text-xs font-bold rounded-lg bg-[#FC6714] hover:bg-[#E0530A] disabled:opacity-50 disabled:cursor-not-allowed text-white shadow-xs transition cursor-pointer"
+          >
+            <Loader2 v-if="isImporting" class="w-4 h-4 animate-spin" />
+            <Check v-else class="w-4 h-4" />
+            <span>Confirmar e Importar ({{ validRowsCount }} linhas válidas)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- TELA 2: LISTAGEM E CADASTRO DO CATÁLOGO DO PROPRIETÁRIO                   -->
+    <!-- ========================================================================= -->
+    <div v-else class="space-y-4">
       <!-- Barra Superior: Busca, Ações em Lote e Botão Novo -->
       <div class="flex items-center justify-between gap-3 flex-wrap">
         <!-- Campo de Busca -->
@@ -22,29 +217,31 @@
 
         <!-- Botões de Ação -->
         <div class="flex items-center gap-2">
-          <!-- Download Modelo -->
+          <!-- Download Modelo 3 Colunas -->
           <button
             type="button"
             @click="downloadTemplate"
             class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-200 text-xs font-medium shadow-2xs transition cursor-pointer"
-            title="Baixar planilha CSV modelo para importação em lote"
+            title="Baixar planilha CSV modelo (3 colunas: Cód., Nome do Material, Cód. Prop.)"
           >
             <Download class="w-3.5 h-3.5 text-slate-400" />
-            <span>Modelo CSV</span>
+            <span>Modelo CSV (3 Colunas)</span>
           </button>
 
-          <!-- Importar Planilha -->
+          <!-- Importar Planilha com Preview -->
           <label
             class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-200 text-xs font-medium shadow-2xs transition cursor-pointer"
-            title="Importar planilha de De/Para do proprietário"
+            title="Importar planilha de materiais do proprietário com pré-visualização"
           >
-            <Upload class="w-3.5 h-3.5 text-[#FC6714]" />
-            <span>Importar</span>
+            <Loader2 v-if="isPreviewLoading" class="w-3.5 h-3.5 animate-spin text-[#FC6714]" />
+            <Upload v-else class="w-3.5 h-3.5 text-[#FC6714]" />
+            <span>{{ isPreviewLoading ? 'Analisando...' : 'Importar' }}</span>
             <input
               type="file"
               accept=".csv,.txt"
               class="hidden"
-              @change="handleFileUpload"
+              :disabled="isPreviewLoading"
+              @change="handleFileUploadForPreview"
             />
           </label>
 
@@ -225,7 +422,7 @@
               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] text-slate-700 dark:text-slate-300 text-xs font-medium hover:bg-slate-50 transition cursor-pointer"
             >
               <Download class="w-3.5 h-3.5 text-slate-400" />
-              <span>Baixar Modelo CSV</span>
+              <span>Baixar Modelo CSV (3 Colunas)</span>
             </button>
           </div>
         </div>
@@ -324,7 +521,7 @@ import { ref, computed, watch } from 'vue';
 import axios from 'axios';
 import {
   Search, Plus, Edit2, Trash2, X, Check, Loader2, AlertCircle, CheckCircle2,
-  Download, Upload, PackageSearch
+  Download, Upload, PackageSearch, FileSpreadsheet, Sparkles
 } from 'lucide-vue-next';
 import BaseModal from '@/components/common/BaseModal.vue';
 import MaterialSearchSelect from '@/components/common/MaterialSearchSelect.vue';
@@ -352,6 +549,21 @@ interface OwnerMaterialItem {
   };
 }
 
+interface PreviewRow {
+  line: number;
+  system_code: string;
+  is_generated_code: boolean;
+  system_name: string;
+  owner_name: string;
+  name_source: 'inherited' | 'custom' | 'new_material';
+  name_note: string;
+  owner_code: string;
+  action: 'create_material_and_link' | 'link_existing' | 'update_link' | 'error';
+  action_label: string;
+  status: 'valid' | 'error';
+  message: string | null;
+}
+
 const props = defineProps<{
   isOpen: boolean;
   owner: OwnerData | null;
@@ -374,6 +586,21 @@ const formError = ref('');
 const alertMessage = ref('');
 const alertSuccess = ref(true);
 
+// Estado de Preview da Importação
+const isPreviewMode = ref(false);
+const isPreviewLoading = ref(false);
+const isImporting = ref(false);
+const previewFileName = ref('');
+const previewRows = ref<PreviewRow[]>([]);
+const previewSummary = ref({
+  total_rows: 0,
+  to_create_material: 0,
+  to_link_existing: 0,
+  to_update_link: 0,
+  errors_count: 0,
+});
+const canImportPreview = ref(false);
+
 const form = ref({
   material_id: '' as string | number,
   owner_code: '',
@@ -395,18 +622,28 @@ const filteredItems = computed(() => {
   });
 });
 
+const validRowsCount = computed(() => {
+  return previewRows.value.filter(r => r.status === 'valid').length;
+});
+
 watch(
   () => [props.isOpen, props.owner],
   ([open, currentOwner]) => {
     if (open && currentOwner) {
       loadItems();
       closeForm();
+      cancelPreview();
       alertMessage.value = '';
       searchTerm.value = '';
     }
   },
   { immediate: true }
 );
+
+function onModalClose() {
+  cancelPreview();
+  emit('close');
+}
 
 async function loadItems() {
   if (!props.owner?.id) return;
@@ -459,7 +696,6 @@ function closeForm() {
 
 function onSystemMaterialSelected(material: any) {
   if (material) {
-    // Sugere o nome do sistema como inicial se o usuário ainda não digitou
     if (!form.value.owner_name.trim()) {
       form.value.owner_name = material.name || '';
     }
@@ -536,30 +772,74 @@ function downloadTemplate() {
   window.open(`/api/v1/material-owners/${props.owner.id}/materials/template`, '_blank');
 }
 
-async function handleFileUpload(event: Event) {
+/**
+ * Envia o arquivo para validação e pré-visualização (Preview)
+ */
+async function handleFileUploadForPreview(event: Event) {
   const target = event.target as HTMLInputElement;
   if (!target.files || target.files.length === 0 || !props.owner?.id) return;
 
   const file = target.files[0];
+  previewFileName.value = file.name;
+
   const formData = new FormData();
   formData.append('file', file);
 
-  isLoading.value = true;
+  isPreviewLoading.value = true;
   alertMessage.value = '';
   try {
-    const res = await axios.post(`/api/v1/material-owners/${props.owner.id}/materials/import`, formData, {
+    const res = await axios.post(`/api/v1/material-owners/${props.owner.id}/materials/preview`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
+
+    previewRows.value = res.data.preview_rows || [];
+    previewSummary.value = res.data.summary || {
+      total_rows: 0,
+      to_create_material: 0,
+      to_link_existing: 0,
+      to_update_link: 0,
+      errors_count: 0,
+    };
+    canImportPreview.value = Boolean(res.data.can_import);
+    isPreviewMode.value = true;
+  } catch (err: any) {
+    alertMessage.value = err.response?.data?.message || 'Falha ao analisar arquivo para prévia.';
+    alertSuccess.value = false;
+  } finally {
+    isPreviewLoading.value = false;
+    target.value = '';
+  }
+}
+
+function cancelPreview() {
+  isPreviewMode.value = false;
+  previewRows.value = [];
+  previewFileName.value = '';
+}
+
+/**
+ * Grava definitivamente as linhas validadas da prévia
+ */
+async function confirmImport() {
+  if (!props.owner?.id || !canImportPreview.value) return;
+
+  isImporting.value = true;
+  alertMessage.value = '';
+  try {
+    const res = await axios.post(`/api/v1/material-owners/${props.owner.id}/materials/import`, {
+      rows: previewRows.value,
+    });
+
     alertMessage.value = res.data.message || 'Importação realizada com sucesso!';
     alertSuccess.value = true;
+    cancelPreview();
     await loadItems();
     emit('updated');
   } catch (err: any) {
-    alertMessage.value = err.response?.data?.message || 'Erro ao importar planilha.';
+    alertMessage.value = err.response?.data?.message || 'Erro ao efetivar a importação dos materiais.';
     alertSuccess.value = false;
   } finally {
-    isLoading.value = false;
-    target.value = '';
+    isImporting.value = false;
   }
 }
 </script>

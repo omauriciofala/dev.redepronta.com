@@ -192,10 +192,12 @@ class OwnerMaterialController extends Controller
         $accountId = $this->getAccountId();
         abort_if($materialOwner->account_id !== $accountId, 403, 'Acesso negado.');
 
-        $headers = ['codigo_proprietario', 'nome_proprietario', 'codigo_sistema_sku', 'observacoes'];
+        // O Modelo consiste exatamente em 3 colunas: Cód., Nome do Material, Cód. Prop.
+        $headers = ['Cód.', 'Nome do Material', 'Cód. Prop.'];
         $examples = [
-            ['MAT-VIV-001', 'CABO DROP OPTICO 1 FO BOBINA 1KM', 'CAB-DROP-1FO', 'Código interno de rede FTTH'],
-            ['MAT-VIV-002', 'ONU XPON WIFI 6 DUAL BAND', 'ONU-XPON-GIGA', 'Homologado Anatel'],
+            ['MAT-001', 'CABO DROP OPTICO 1 FO BOBINA 1KM', 'TEL-CAB-01'],
+            ['MAT-002', '', 'TEL-ONT-02'],
+            ['', 'CONECTOR OPTICO SC-APC FAST CLIQUE', 'TEL-CON-APC'],
         ];
 
         $handle = fopen('php://temp', 'r+');
@@ -212,13 +214,72 @@ class OwnerMaterialController extends Controller
 
         return response($csv, 200, [
             'Content-Type' => 'text/csv; charset=UTF-8',
-            'Content-Disposition' => "attachment; filename=\"modelo_catalogo_proprietario_{$safeCode}.csv\"",
+            'Content-Disposition' => "attachment; filename=\"modelo_importacao_proprietario_{$safeCode}.csv\"",
             'Pragma' => 'no-cache',
             'Expires' => '0',
         ]);
     }
 
-    public function import(Request $request, MaterialOwner $materialOwner): JsonResponse
+    /**
+     * Gera um código de 4 caracteres alfanuméricos em maiúsculas (letras e números) único para o sistema.
+     */
+    protected function generateFourDigitCode(int $accountId, array $reserved = []): string
+    {
+        $chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        for ($attempt = 0; $attempt < 100; $attempt++) {
+            $code = '';
+            for ($i = 0; $i < 4; $i++) {
+                $code .= $chars[random_int(0, strlen($chars) - 1)];
+            }
+
+            if (in_array($code, $reserved, true)) {
+                continue;
+            }
+
+            $exists = Material::where('account_id', $accountId)->where('code', $code)->exists();
+            if (!$exists) {
+                return $code;
+            }
+        }
+
+        return strtoupper(substr(md5(uniqid((string) mt_rand(), true)), 0, 4));
+    }
+
+    /**
+     * Mapeia os índices das 3 colunas da planilha do proprietário.
+     */
+    protected function mapThreeColumnHeader(array $headerRow): array
+    {
+        $headerMap = [];
+        foreach ($headerRow as $idx => $headerName) {
+            $raw = mb_strtolower(trim($headerName), 'UTF-8');
+            $clean = str_replace(
+                ['á','à','ã','â','é','ê','í','ó','ô','õ','ú','ü','ç','.'],
+                ['a','a','a','a','e','e','i','o','o','o','u','u','c',''],
+                $raw
+            );
+
+            if (str_contains($clean, 'prop') && (str_contains($clean, 'cod') || str_contains($clean, 'sku') || str_contains($clean, 'codigo'))) {
+                $headerMap['owner_code'] = $idx;
+            } elseif (str_contains($clean, 'nome') || str_contains($clean, 'desc') || str_contains($clean, 'material')) {
+                $headerMap['material_name'] = $idx;
+            } elseif (str_contains($clean, 'cod') || str_contains($clean, 'sku') || str_contains($clean, 'sistema')) {
+                $headerMap['system_code'] = $idx;
+            }
+        }
+
+        // Posições padrão para 3 colunas se não mapeado pelos títulos
+        if (!isset($headerMap['system_code']) && isset($headerRow[0])) $headerMap['system_code'] = 0;
+        if (!isset($headerMap['material_name']) && isset($headerRow[1])) $headerMap['material_name'] = 1;
+        if (!isset($headerMap['owner_code']) && isset($headerRow[2])) $headerMap['owner_code'] = 2;
+
+        return $headerMap;
+    }
+
+    /**
+     * Pré-visualização da planilha antes de efetivar a importação.
+     */
+    public function preview(Request $request, MaterialOwner $materialOwner): JsonResponse
     {
         $accountId = $this->getAccountId();
         abort_if($materialOwner->account_id !== $accountId, 403, 'Acesso negado.');
@@ -226,14 +287,14 @@ class OwnerMaterialController extends Controller
         $request->validate([
             'file' => ['required', 'file', 'max:10240'],
         ], [
-            'file.required' => 'O arquivo de importação é obrigatório.',
+            'file.required' => 'O arquivo de importação é obrigatório para visualização prévia.',
         ]);
 
         $file = $request->file('file');
         $ext = strtolower($file->getClientOriginalExtension());
         if (!in_array($ext, ['csv', 'txt'])) {
             return response()->json([
-                'message' => 'No momento a importação do catálogo do proprietário aceita arquivos .csv ou .txt formatados com ponto e vírgula.',
+                'message' => 'A importação aceita arquivos .csv ou .txt delimitados por ponto e vírgula ou vírgula.',
             ], 422);
         }
 
@@ -242,64 +303,250 @@ class OwnerMaterialController extends Controller
             return response()->json(['message' => 'O arquivo enviado está vazio.'], 422);
         }
 
-        // Detecta separador
         $firstLine = $lines[0];
         $separator = str_contains($firstLine, ';') ? ';' : ',';
-
         $headerRow = str_getcsv(ltrim($firstLine, "\xEF\xBB\xBF"), $separator);
-        $headerMap = [];
-        foreach ($headerRow as $idx => $headerName) {
-            $raw = mb_strtolower(trim($headerName), 'UTF-8');
-            $clean = str_replace(
-                ['á','à','ã','â','é','ê','í','ó','ô','õ','ú','ü','ç'],
-                ['a','a','a','a','e','e','i','o','o','o','u','u','c'],
-                $raw
-            );
+        $headerMap = $this->mapThreeColumnHeader($headerRow);
 
-            if (str_contains($clean, 'proprietario') && (str_contains($clean, 'codigo') || str_contains($clean, 'sku'))) {
-                $headerMap['owner_code'] = $idx;
-            } elseif (str_contains($clean, 'proprietario') && (str_contains($clean, 'nome') || str_contains($clean, 'descricao'))) {
-                $headerMap['owner_name'] = $idx;
-            } elseif ((str_contains($clean, 'sistema') || str_contains($clean, 'interno') || str_contains($clean, 'canonico')) && (str_contains($clean, 'codigo') || str_contains($clean, 'sku'))) {
-                $headerMap['system_code'] = $idx;
-            } elseif (str_contains($clean, 'obs') || str_contains($clean, 'nota')) {
-                $headerMap['notes'] = $idx;
+        $previewRows = [];
+        $reservedCodes = [];
+        $toCreateMaterial = 0;
+        $toLinkExisting = 0;
+        $toUpdateLink = 0;
+        $errorsCount = 0;
+
+        for ($i = 1; $i < count($lines); $i++) {
+            $cols = str_getcsv($lines[$i], $separator);
+            $rawSystemCode = isset($headerMap['system_code'], $cols[$headerMap['system_code']]) ? trim($cols[$headerMap['system_code']]) : '';
+            $rawMaterialName = isset($headerMap['material_name'], $cols[$headerMap['material_name']]) ? trim($cols[$headerMap['material_name']]) : '';
+            $rawOwnerCode = isset($headerMap['owner_code'], $cols[$headerMap['owner_code']]) ? trim($cols[$headerMap['owner_code']]) : '';
+
+            // Pula linhas em branco
+            if ($rawSystemCode === '' && $rawMaterialName === '' && $rawOwnerCode === '') {
+                continue;
             }
-        }
 
-        // Fallbacks se nomes simples
-        if (!isset($headerMap['owner_code']) && isset($headerRow[0])) $headerMap['owner_code'] = 0;
-        if (!isset($headerMap['owner_name']) && isset($headerRow[1])) $headerMap['owner_name'] = 1;
-        if (!isset($headerMap['system_code']) && isset($headerRow[2])) $headerMap['system_code'] = 2;
+            $lineNum = $i + 1;
+            $status = 'valid';
+            $message = null;
+            $action = 'link_existing';
+            $actionLabel = 'Vincular Existente';
+            $nameSource = 'custom';
+            $nameNote = '';
+            $isGenerated = false;
+            $systemCode = $rawSystemCode;
+            $systemName = $rawMaterialName;
+            $ownerName = $rawMaterialName;
 
-        $imported = 0;
-        $updated = 0;
-        $errors = [];
-
-        DB::beginTransaction();
-        try {
-            for ($i = 1; $i < count($lines); $i++) {
-                $cols = str_getcsv($lines[$i], $separator);
-                $ownerCode = isset($headerMap['owner_code'], $cols[$headerMap['owner_code']]) ? trim($cols[$headerMap['owner_code']]) : '';
-                $ownerName = isset($headerMap['owner_name'], $cols[$headerMap['owner_name']]) ? trim($cols[$headerMap['owner_name']]) : '';
-                $systemCode = isset($headerMap['system_code'], $cols[$headerMap['system_code']]) ? trim($cols[$headerMap['system_code']]) : '';
-                $notes = isset($headerMap['notes'], $cols[$headerMap['notes']]) ? trim($cols[$headerMap['notes']]) : null;
-
-                if ($ownerCode === '' || $systemCode === '') {
-                    continue;
-                }
-
-                // Busca o material canônico
+            // Validação 1: Cód. Prop. é obrigatório
+            if ($rawOwnerCode === '') {
+                $status = 'error';
+                $action = 'error';
+                $actionLabel = 'Erro';
+                $message = 'Código do Proprietário (Cód. Prop.) não informado.';
+                $errorsCount++;
+            }
+            // Caso A: Cód. do sistema preenchido -> busca existente no sistema
+            elseif ($rawSystemCode !== '') {
                 $material = Material::where('account_id', $accountId)
-                    ->where(function ($q) use ($systemCode) {
-                        $q->where('code', $systemCode)
-                          ->orWhere('name', $systemCode);
+                    ->where(function ($q) use ($rawSystemCode) {
+                        $q->where('code', $rawSystemCode)
+                          ->orWhere('name', $rawSystemCode);
                     })
                     ->first();
 
                 if (!$material) {
-                    $errors[] = "Linha " . ($i + 1) . ": SKU do sistema '{$systemCode}' não encontrado.";
+                    $status = 'error';
+                    $action = 'error';
+                    $actionLabel = 'Erro';
+                    $message = "Código '{$rawSystemCode}' não encontrado no sistema. Para gerar um novo material, deixe a coluna Cód. em branco.";
+                    $errorsCount++;
+                } else {
+                    $systemCode = $material->code;
+                    $systemName = $material->name;
+
+                    // Herança de nome: se em branco ou igual, herda do sistema
+                    if ($rawMaterialName === '' || mb_strtolower($rawMaterialName) === mb_strtolower($material->name)) {
+                        $ownerName = $material->name;
+                        $nameSource = 'inherited';
+                        $nameNote = "Herdará o nome do sistema: {$material->name}";
+                    } else {
+                        $ownerName = $rawMaterialName;
+                        $nameSource = 'custom';
+                        $nameNote = 'Nome personalizado para o proprietário';
+                    }
+
+                    // Checa se vínculo já existe
+                    $existingLink = OwnerMaterial::where('account_id', $accountId)
+                        ->where('material_owner_id', $materialOwner->id)
+                        ->where(function ($q) use ($material, $rawOwnerCode) {
+                            $q->where('material_id', $material->id)
+                              ->orWhere('owner_code', $rawOwnerCode);
+                        })
+                        ->first();
+
+                    if ($existingLink) {
+                        $action = 'update_link';
+                        $actionLabel = 'Atualizar Vínculo';
+                        $toUpdateLink++;
+                    } else {
+                        $action = 'link_existing';
+                        $actionLabel = 'Vincular Existente';
+                        $toLinkExisting++;
+                    }
+                }
+            }
+            // Caso B: Cód. do sistema em branco -> gera código de 4 dígitos e cadastra material
+            else {
+                if ($rawMaterialName === '') {
+                    $status = 'error';
+                    $action = 'error';
+                    $actionLabel = 'Erro';
+                    $message = 'Nome do Material é obrigatório para cadastrar um novo material quando o Cód. estiver em branco.';
+                    $errorsCount++;
+                } else {
+                    $newCode = $this->generateFourDigitCode($accountId, $reservedCodes);
+                    $reservedCodes[] = $newCode;
+
+                    $systemCode = $newCode;
+                    $systemName = $rawMaterialName;
+                    $ownerName = $rawMaterialName;
+                    $isGenerated = true;
+                    $action = 'create_material_and_link';
+                    $actionLabel = 'Criar Material e Vincular';
+                    $nameSource = 'new_material';
+                    $nameNote = "Novo material no sistema com SKU de 4 dígitos [{$newCode}]";
+                    $toCreateMaterial++;
+                }
+            }
+
+            $previewRows[] = [
+                'line' => $lineNum,
+                'system_code' => $systemCode,
+                'is_generated_code' => $isGenerated,
+                'system_name' => $systemName,
+                'owner_name' => $ownerName,
+                'name_source' => $nameSource,
+                'name_note' => $nameNote,
+                'owner_code' => $rawOwnerCode,
+                'action' => $action,
+                'action_label' => $actionLabel,
+                'status' => $status,
+                'message' => $message,
+            ];
+        }
+
+        $canImport = ($toCreateMaterial + $toLinkExisting + $toUpdateLink) > 0;
+
+        return response()->json([
+            'can_import' => $canImport,
+            'summary' => [
+                'total_rows' => count($previewRows),
+                'to_create_material' => $toCreateMaterial,
+                'to_link_existing' => $toLinkExisting,
+                'to_update_link' => $toUpdateLink,
+                'errors_count' => $errorsCount,
+            ],
+            'preview_rows' => $previewRows,
+        ]);
+    }
+
+    /**
+     * Importação definitiva das linhas do catálogo do proprietário (após preview).
+     */
+    public function import(Request $request, MaterialOwner $materialOwner): JsonResponse
+    {
+        $accountId = $this->getAccountId();
+        abort_if($materialOwner->account_id !== $accountId, 403, 'Acesso negado.');
+
+        $rowsToProcess = [];
+
+        // Modo 1: Recebe array 'rows' aprovado na prévia
+        if ($request->has('rows') && is_array($request->input('rows'))) {
+            $rowsToProcess = $request->input('rows');
+        }
+        // Modo 2: Recebe arquivo direto (retrocompatibilidade)
+        elseif ($request->hasFile('file')) {
+            $previewResponse = $this->preview($request, $materialOwner);
+            $previewData = json_decode($previewResponse->getContent(), true);
+            $rowsToProcess = $previewData['preview_rows'] ?? [];
+        } else {
+            return response()->json([
+                'message' => 'Nenhum dado ou arquivo enviado para importação.',
+            ], 422);
+        }
+
+        if (empty($rowsToProcess)) {
+            return response()->json(['message' => 'Nenhuma linha válida encontrada para importar.'], 422);
+        }
+
+        // Unidade de medida padrão para materiais recém-criados
+        $defaultUnit = \App\Models\Unit::where('account_id', $accountId)->whereIn('code', ['UND', 'UN'])->first()
+            ?? \App\Models\Unit::whereIn('code', ['UND', 'UN'])->first()
+            ?? \App\Models\Unit::where('is_active', true)->first()
+            ?? \App\Models\Unit::create(['account_id' => $accountId, 'code' => 'UND', 'name' => 'Unidade', 'is_active' => true]);
+
+        $createdMaterials = 0;
+        $createdLinks = 0;
+        $updatedLinks = 0;
+        $failedRows = 0;
+        $errors = [];
+
+        DB::beginTransaction();
+        try {
+            foreach ($rowsToProcess as $row) {
+                if (($row['status'] ?? 'valid') === 'error') {
+                    $failedRows++;
+                    if (!empty($row['message'])) {
+                        $errors[] = "Linha " . ($row['line'] ?? '?') . ": " . $row['message'];
+                    }
                     continue;
+                }
+
+                $ownerCode = trim($row['owner_code'] ?? '');
+                $ownerName = trim($row['owner_name'] ?? '');
+                $systemCode = trim($row['system_code'] ?? '');
+                $systemName = trim($row['system_name'] ?? '') ?: $ownerName;
+                $isGenerated = (bool) ($row['is_generated_code'] ?? false);
+                $action = $row['action'] ?? '';
+
+                if ($ownerCode === '') {
+                    $failedRows++;
+                    continue;
+                }
+
+                $material = null;
+
+                // Caso: Criar novo material no sistema
+                if ($isGenerated || $action === 'create_material_and_link') {
+                    // Garante que o código de 4 dígitos não colidiu no intervalo
+                    $finalCode = $systemCode;
+                    if (Material::where('account_id', $accountId)->where('code', $finalCode)->exists()) {
+                        $finalCode = $this->generateFourDigitCode($accountId);
+                    }
+
+                    $material = Material::create([
+                        'account_id' => $accountId,
+                        'unit_id' => $defaultUnit->id,
+                        'code' => $finalCode,
+                        'name' => $systemName,
+                        'is_active' => true,
+                    ]);
+                    $createdMaterials++;
+                } else {
+                    // Busca material existente
+                    $material = Material::where('account_id', $accountId)
+                        ->where(function ($q) use ($systemCode) {
+                            $q->where('code', $systemCode)
+                              ->orWhere('name', $systemCode);
+                        })
+                        ->first();
+
+                    if (!$material) {
+                        $failedRows++;
+                        $errors[] = "Material com SKU '{$systemCode}' não foi localizado.";
+                        continue;
+                    }
                 }
 
                 if ($ownerName === '') {
@@ -309,16 +556,20 @@ class OwnerMaterialController extends Controller
                 // Cria ou atualiza o De/Para
                 $existing = OwnerMaterial::where('account_id', $accountId)
                     ->where('material_owner_id', $materialOwner->id)
-                    ->where('material_id', $material->id)
+                    ->where(function ($q) use ($material, $ownerCode) {
+                        $q->where('material_id', $material->id)
+                          ->orWhere('owner_code', $ownerCode);
+                    })
                     ->first();
 
                 if ($existing) {
                     $existing->update([
+                        'material_id' => $material->id,
                         'owner_code' => $ownerCode,
                         'owner_name' => $ownerName,
-                        'notes' => $notes ?: $existing->notes,
+                        'is_active' => true,
                     ]);
-                    $updated++;
+                    $updatedLinks++;
                 } else {
                     OwnerMaterial::create([
                         'account_id' => $accountId,
@@ -326,31 +577,42 @@ class OwnerMaterialController extends Controller
                         'material_id' => $material->id,
                         'owner_code' => $ownerCode,
                         'owner_name' => $ownerName,
-                        'notes' => $notes,
                         'is_active' => true,
                     ]);
-                    $imported++;
+                    $createdLinks++;
                 }
             }
 
             DB::commit();
 
+            $totalImported = $createdLinks + $createdMaterials;
+
             return response()->json([
-                'message' => sprintf('Importação concluída: %d inseridos, %d atualizados%s.', $imported, $updated, count($errors) > 0 ? ', com avisos em ' . count($errors) . ' linha(s)' : ''),
+                'message' => sprintf(
+                    'Importação concluída: %d novo(s) material(is) no sistema, %d novo(s) vínculo(s) e %d atualizado(s)%s.',
+                    $createdMaterials,
+                    $createdLinks,
+                    $updatedLinks,
+                    $failedRows > 0 ? " ({$failedRows} linha(s) ignorada(s))" : ''
+                ),
                 'data' => [
-                    'imported_count' => $imported,
-                    'updated_count' => $updated,
-                    'failed_count' => count($errors),
+                    'created_materials' => $createdMaterials,
+                    'created_links' => $createdLinks,
+                    'updated_links' => $updatedLinks,
+                    'imported_count' => $totalImported,
+                    'updated_count' => $updatedLinks,
+                    'failed_count' => $failedRows,
                     'errors' => $errors,
                 ],
-                'imported_count' => $imported,
-                'updated_count' => $updated,
+                'imported_count' => $totalImported,
+                'updated_count' => $updatedLinks,
+                'failed_count' => $failedRows,
                 'errors' => $errors,
             ]);
         } catch (\Throwable $e) {
             DB::rollBack();
             return response()->json([
-                'message' => 'Falha ao processar arquivo: ' . $e->getMessage(),
+                'message' => 'Falha ao processar importação: ' . $e->getMessage(),
             ], 422);
         }
     }

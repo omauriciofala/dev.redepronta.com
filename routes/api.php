@@ -54,6 +54,7 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('material-categories', MaterialCategoryController::class);
     Route::apiResource('material-owners', MaterialOwnerController::class);
     Route::get('material-owners/{materialOwner}/materials/template', [OwnerMaterialController::class, 'template']);
+    Route::post('material-owners/{materialOwner}/materials/preview', [OwnerMaterialController::class, 'preview']);
     Route::post('material-owners/{materialOwner}/materials/import', [OwnerMaterialController::class, 'import']);
     Route::apiResource('material-owners.materials', OwnerMaterialController::class)->parameters([
         'material-owners' => 'materialOwner',

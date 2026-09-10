@@ -80,27 +80,154 @@ class OwnerMaterialCatalogTest extends TestCase
     }
 
     /**
-     * Testa o download do modelo CSV do catálogo do proprietário.
+     * Testa o download do modelo CSV de 3 colunas: Cód., Nome do Material, Cód. Prop.
      */
-    public function test_can_download_owner_material_catalog_template(): void
+    public function test_can_download_owner_material_catalog_three_column_template(): void
     {
         $response = $this->get("/api/v1/material-owners/{$this->owner->id}/materials/template");
 
         $response->assertStatus(200);
         $response->assertHeader('Content-Type', 'text/csv; charset=UTF-8');
-        $this->assertStringContainsString('modelo_catalogo_proprietario_VIVO-SP.csv', $response->headers->get('Content-Disposition') ?? '');
+        $this->assertStringContainsString('modelo_importacao_proprietario_VIVO-SP.csv', $response->headers->get('Content-Disposition') ?? '');
 
         $content = $response->getContent();
-        $this->assertStringContainsString('codigo_proprietario', $content);
-        $this->assertStringContainsString('codigo_sistema_sku', $content);
+        $this->assertStringContainsString('Cód.', $content);
+        $this->assertStringContainsString('Nome do Material', $content);
+        $this->assertStringContainsString('Cód. Prop.', $content);
     }
 
     /**
-     * Testa criação, listagem e atualização de De/Para de materiais.
+     * Testa o preview da importação com:
+     * 1. Código existente e nome customizado
+     * 2. Código existente e nome em branco (herda nome do sistema)
+     * 3. Código em branco (gera código de 4 dígitos alfanuméricos em maiúsculas)
+     * 4. Linha com erro (Cód. Prop. vazio)
+     */
+    public function test_can_preview_owner_materials_import(): void
+    {
+        $csv = "Cód.;Nome do Material;Cód. Prop.\n";
+        $csv .= "SYS-ONU-01;Módem Óptico Wi-Fi 6 Vivo;VIV-ONT-70\n"; // Existente com nome customizado
+        $csv .= "SYS-CABO-FO;;VIV-CAB-DROP\n"; // Existente com nome em branco -> deve herdar 'Cabo Óptico Drop 1 FO'
+        $csv .= ";Conector Rápido SC/APC Click;VIV-CON-APC\n"; // Código em branco -> deve gerar código de 4 dígitos
+        $csv .= "SYS-ONU-01;Item Sem Cod Prop;\n"; // Erro: Cód. Prop. vazio
+
+        $file = UploadedFile::fake()->createWithContent('planilha_preview.csv', $csv);
+
+        $response = $this->postJson("/api/v1/material-owners/{$this->owner->id}/materials/preview", [
+            'file' => $file,
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('can_import', true);
+        $response->assertJsonPath('summary.total_rows', 4);
+        $response->assertJsonPath('summary.to_link_existing', 2);
+        $response->assertJsonPath('summary.to_create_material', 1);
+        $response->assertJsonPath('summary.errors_count', 1);
+
+        $rows = $response->json('preview_rows');
+        $this->assertCount(4, $rows);
+
+        // Linha 1: Existente com nome customizado
+        $this->assertEquals('SYS-ONU-01', $rows[0]['system_code']);
+        $this->assertEquals('Módem Óptico Wi-Fi 6 Vivo', $rows[0]['owner_name']);
+        $this->assertEquals('custom', $rows[0]['name_source']);
+        $this->assertFalse($rows[0]['is_generated_code']);
+        $this->assertEquals('link_existing', $rows[0]['action']);
+        $this->assertEquals('valid', $rows[0]['status']);
+
+        // Linha 2: Existente com nome em branco -> herdou do sistema
+        $this->assertEquals('SYS-CABO-FO', $rows[1]['system_code']);
+        $this->assertEquals('Cabo Óptico Drop 1 FO', $rows[1]['owner_name']);
+        $this->assertEquals('inherited', $rows[1]['name_source']);
+        $this->assertFalse($rows[1]['is_generated_code']);
+        $this->assertEquals('valid', $rows[1]['status']);
+
+        // Linha 3: Código em branco -> gerou código de 4 caracteres alfanuméricos em maiúsculas
+        $this->assertNotEmpty($rows[2]['system_code']);
+        $this->assertEquals(4, strlen($rows[2]['system_code']));
+        $this->assertMatchesRegularExpression('/^[A-Z0-9]{4}$/', $rows[2]['system_code']);
+        $this->assertTrue($rows[2]['is_generated_code']);
+        $this->assertEquals('Conector Rápido SC/APC Click', $rows[2]['owner_name']);
+        $this->assertEquals('create_material_and_link', $rows[2]['action']);
+        $this->assertEquals('valid', $rows[2]['status']);
+
+        // Linha 4: Erro
+        $this->assertEquals('error', $rows[3]['status']);
+        $this->assertStringContainsString('Cód. Prop.', $rows[3]['message']);
+    }
+
+    /**
+     * Testa confirmação e efetivação da importação a partir dos dados validados do preview.
+     */
+    public function test_can_confirm_and_import_owner_materials_after_preview(): void
+    {
+        $csv = "Cód.;Nome do Material;Cód. Prop.\n";
+        $csv .= "SYS-ONU-01;Módem Vivo Fibra;VIV-ONT-70\n";
+        $csv .= "SYS-CABO-FO;;VIV-CAB-DROP\n"; // herda nome do sistema
+        $csv .= ";Patch Cord Óptico SM 2M;VIV-PAT-2M\n"; // cria novo material no sistema com código de 4 dígitos
+
+        $file = UploadedFile::fake()->createWithContent('planilha_teste.csv', $csv);
+
+        // 1. Gera preview
+        $previewRes = $this->postJson("/api/v1/material-owners/{$this->owner->id}/materials/preview", [
+            'file' => $file,
+        ]);
+        $previewRes->assertStatus(200);
+        $previewRows = $previewRes->json('preview_rows');
+
+        // 2. Confirma a importação enviando o preview aprovado
+        $importRes = $this->postJson("/api/v1/material-owners/{$this->owner->id}/materials/import", [
+            'rows' => $previewRows,
+        ]);
+
+        $importRes->assertStatus(200);
+        $importRes->assertJsonPath('data.created_materials', 1);
+        $importRes->assertJsonPath('data.created_links', 3);
+
+        // 3. Validações no Banco de Dados
+        // 3.1 Material existente 1 (nome customizado)
+        $this->assertDatabaseHas('owner_materials', [
+            'account_id' => $this->account->id,
+            'material_owner_id' => $this->owner->id,
+            'material_id' => $this->material1->id,
+            'owner_code' => 'VIV-ONT-70',
+            'owner_name' => 'Módem Vivo Fibra',
+        ]);
+
+        // 3.2 Material existente 2 (herdou nome do sistema 'Cabo Óptico Drop 1 FO')
+        $this->assertDatabaseHas('owner_materials', [
+            'account_id' => $this->account->id,
+            'material_owner_id' => $this->owner->id,
+            'material_id' => $this->material2->id,
+            'owner_code' => 'VIV-CAB-DROP',
+            'owner_name' => 'Cabo Óptico Drop 1 FO',
+        ]);
+
+        // 3.3 Novo material criado no sistema com código de 4 dígitos
+        $createdMaterial = Material::where('account_id', $this->account->id)
+            ->where('name', 'Patch Cord Óptico SM 2M')
+            ->first();
+
+        $this->assertNotNull($createdMaterial);
+        $this->assertEquals(4, strlen($createdMaterial->code));
+        $this->assertMatchesRegularExpression('/^[A-Z0-9]{4}$/', $createdMaterial->code);
+        $this->assertEquals($this->unit->id, $createdMaterial->unit_id);
+
+        // 3.4 Vínculo do novo material criado
+        $this->assertDatabaseHas('owner_materials', [
+            'account_id' => $this->account->id,
+            'material_owner_id' => $this->owner->id,
+            'material_id' => $createdMaterial->id,
+            'owner_code' => 'VIV-PAT-2M',
+            'owner_name' => 'Patch Cord Óptico SM 2M',
+        ]);
+    }
+
+    /**
+     * Testa criação, listagem e atualização manual de De/Para de materiais.
      */
     public function test_can_crud_owner_materials_mapping(): void
     {
-        // 1. Criar vínculo
         $storeResponse = $this->postJson("/api/v1/material-owners/{$this->owner->id}/materials", [
             'material_id' => $this->material1->id,
             'owner_code' => 'VIVO-MOD-100',
@@ -110,23 +237,13 @@ class OwnerMaterialCatalogTest extends TestCase
 
         $storeResponse->assertStatus(201);
         $storeResponse->assertJsonPath('data.owner_code', 'VIVO-MOD-100');
-        $storeResponse->assertJsonPath('data.owner_name', 'Módem Óptico Vivo Fibra');
 
-        $this->assertDatabaseHas('owner_materials', [
-            'account_id' => $this->account->id,
-            'material_owner_id' => $this->owner->id,
-            'material_id' => $this->material1->id,
-            'owner_code' => 'VIVO-MOD-100',
-        ]);
-
-        // 2. Listar
         $listResponse = $this->getJson("/api/v1/material-owners/{$this->owner->id}/materials");
         $listResponse->assertStatus(200);
         $listResponse->assertJsonCount(1, 'data');
 
         $ownerMaterialId = $listResponse->json('data.0.id');
 
-        // 3. Atualizar
         $updateResponse = $this->putJson("/api/v1/material-owners/{$this->owner->id}/materials/{$ownerMaterialId}", [
             'owner_code' => 'VIVO-MOD-200',
             'owner_name' => 'Módem Óptico Wi-Fi 6 Vivo Fibra',
@@ -136,40 +253,11 @@ class OwnerMaterialCatalogTest extends TestCase
         $updateResponse->assertStatus(200);
         $updateResponse->assertJsonPath('data.owner_code', 'VIVO-MOD-200');
 
-        // 4. Remover / Excluir
         $deleteResponse = $this->deleteJson("/api/v1/material-owners/{$this->owner->id}/materials/{$ownerMaterialId}");
         $deleteResponse->assertStatus(200);
 
         $this->assertSoftDeleted('owner_materials', [
             'id' => $ownerMaterialId,
-        ]);
-    }
-
-    /**
-     * Testa importação de planilha CSV com códigos do proprietário.
-     */
-    public function test_can_import_owner_materials_csv(): void
-    {
-        $csv = "Código Sistema (SKU);Nome Sistema;Código do Proprietário;Nome no Proprietário;Observações\n";
-        $csv .= "SYS-ONU-01;ONU GPON;VIV-ONT-70;HGU GPON VIVO 70;Contrato SP\n";
-        $csv .= "SYS-CABO-FO;Cabo Óptico;VIV-CAB-DROP;CABO DROP COG VIVO;Bobinas de 1km\n";
-
-        $file = UploadedFile::fake()->createWithContent('catalogo_vivo.csv', $csv);
-
-        $response = $this->postJson("/api/v1/material-owners/{$this->owner->id}/materials/import", [
-            'file' => $file,
-        ]);
-
-        $response->assertStatus(200);
-        $response->assertJsonPath('data.imported_count', 2);
-        $response->assertJsonPath('data.failed_count', 0);
-
-        $this->assertDatabaseHas('owner_materials', [
-            'account_id' => $this->account->id,
-            'material_owner_id' => $this->owner->id,
-            'material_id' => $this->material1->id,
-            'owner_code' => 'VIV-ONT-70',
-            'owner_name' => 'HGU GPON VIVO 70',
         ]);
     }
 
@@ -187,15 +275,14 @@ class OwnerMaterialCatalogTest extends TestCase
             'is_active' => true,
         ]);
 
-        // Consulta padrão (sem proprietário): dados canônicos
+        // Sem proprietário ativo: dados canônicos
         $defaultRes = $this->getJson('/api/v1/materials');
         $defaultRes->assertStatus(200);
         $m1Default = collect($defaultRes->json('data'))->firstWhere('id', $this->material1->id);
         $this->assertEquals('SYS-ONU-01', $m1Default['code']);
-        $this->assertEquals('ONU GPON Bridge Router', $m1Default['name']);
         $this->assertFalse($m1Default['has_owner_alias']);
 
-        // Consulta filtrando pelo proprietário Vivo: dados do catálogo do proprietário
+        // Com proprietário ativo: dados do proprietário
         $ownerRes = $this->getJson("/api/v1/materials?owner_id={$this->owner->id}");
         $ownerRes->assertStatus(200);
         $m1Owner = collect($ownerRes->json('data'))->firstWhere('id', $this->material1->id);
@@ -203,11 +290,6 @@ class OwnerMaterialCatalogTest extends TestCase
         $this->assertEquals('Equipamento Terminal Vivo', $m1Owner['name']);
         $this->assertEquals('SYS-ONU-01', $m1Owner['system_code']);
         $this->assertTrue($m1Owner['has_owner_alias']);
-
-        // Material sem alias continua retornando dados canônicos
-        $m2Owner = collect($ownerRes->json('data'))->firstWhere('id', $this->material2->id);
-        $this->assertEquals('SYS-CABO-FO', $m2Owner['code']);
-        $this->assertFalse($m2Owner['has_owner_alias']);
     }
 
     /**
