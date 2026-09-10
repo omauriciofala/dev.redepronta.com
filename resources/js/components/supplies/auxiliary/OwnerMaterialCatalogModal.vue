@@ -466,7 +466,7 @@
           <table class="w-full text-left border-collapse text-xs">
             <thead>
               <tr class="border-b border-slate-200 dark:border-[#14147A] bg-slate-50/75 dark:bg-[#06064D]/50 font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[11px]">
-                <th class="py-3 px-4">Código (Proprietário)</th>
+                <th class="py-3 px-4">Código</th>
                 <th class="py-3 px-4">Nome no Proprietário</th>
                 <th class="py-3 px-4">Material no Sistema (SKU / Canônico)</th>
                 <th class="py-3 px-4">Unid.</th>

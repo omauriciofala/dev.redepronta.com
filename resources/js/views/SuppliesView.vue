@@ -712,7 +712,7 @@
                   title="Ordenar por Código"
                 >
                   <div class="inline-flex items-center gap-1.5">
-                    <span>{{ selectedMaterialOwnerInfo ? 'Código (Proprietário)' : 'Código / SKU' }}</span>
+                    <span>Código</span>
                     <ArrowUp v-if="materialSortBy === 'code' && materialSortDir === 'asc'" class="w-3.5 h-3.5 text-[#FC6714]" />
                     <ArrowDown v-else-if="materialSortBy === 'code' && materialSortDir === 'desc'" class="w-3.5 h-3.5 text-[#FC6714]" />
                     <ArrowUpDown v-else class="w-3.5 h-3.5 text-slate-400 opacity-60" />
@@ -777,13 +777,6 @@
                       <Check v-if="copiedKey === 'sku-cat-' + m.id" class="w-3 h-3 text-emerald-500" />
                       <Copy v-else class="w-3 h-3" />
                     </button>
-                    <span
-                      v-if="m.has_owner_alias"
-                      class="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-orange-100 dark:bg-[#FC6714]/20 text-[#FC6714] border border-orange-200 dark:border-[#FC6714]/30"
-                      :title="`Código do proprietário ativo. SKU original do sistema: ${m.system_code}`"
-                    >
-                      Proprietário
-                    </span>
                   </div>
                   <div v-if="m.has_owner_alias && m.system_code" class="text-[10px] font-mono text-slate-400 mt-0.5">
                     SKU Sist: {{ m.system_code }}
