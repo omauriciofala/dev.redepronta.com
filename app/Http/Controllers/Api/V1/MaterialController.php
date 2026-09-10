@@ -62,6 +62,18 @@ class MaterialController extends Controller
             $query->where('has_serial', $request->boolean('has_serial'));
         }
 
+        if ($request->has('track_batch')) {
+            $query->where('track_batch', $request->boolean('track_batch'));
+        }
+
+        if ($request->filled('tracking_type')) {
+            $tt = strtoupper(trim((string) $request->query('tracking_type')));
+            if ($tt === 'SERIALIZADO') $tt = 'SERIAL';
+            if (in_array($tt, ['LOTE', 'METRAGEM'])) $tt = 'BATCH';
+            if (in_array($tt, ['GRANEL', 'CONVENCIONAL'])) $tt = 'BULK';
+            $query->where('tracking_type', $tt);
+        }
+
         if ($request->boolean('active_only', false)) {
             $query->where('is_active', true);
         }

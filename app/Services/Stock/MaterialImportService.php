@@ -414,11 +414,40 @@ class MaterialImportService
                     }
                 }
 
-                // Serializado (S/N)
+                // Serializado e Rastreabilidade
                 $hasSerial = false;
+                $trackBatch = false;
+                $trackingType = 'BULK';
+
+                if (isset($columnMap['tracking_type']) && isset($row[$columnMap['tracking_type']])) {
+                    $rawTracking = mb_strtoupper(trim((string)$row[$columnMap['tracking_type']]));
+                    if (str_contains($rawTracking, 'SERIAL')) {
+                        $hasSerial = true;
+                        $trackingType = 'SERIAL';
+                    } elseif (str_contains($rawTracking, 'LOTE') || str_contains($rawTracking, 'METRAGEM') || str_contains($rawTracking, 'BATCH')) {
+                        $trackBatch = true;
+                        $trackingType = 'BATCH';
+                    } else {
+                        $trackingType = 'BULK';
+                    }
+                }
+
                 if (isset($columnMap['has_serial']) && isset($row[$columnMap['has_serial']])) {
                     $rawSerial = mb_strtoupper(trim((string)$row[$columnMap['has_serial']]));
-                    $hasSerial = in_array($rawSerial, ['S', 'SIM', 'TRUE', '1', 'Y', 'YES']);
+                    if (in_array($rawSerial, ['S', 'SIM', 'TRUE', '1', 'Y', 'YES'])) {
+                        $hasSerial = true;
+                        $trackBatch = false;
+                        $trackingType = 'SERIAL';
+                    }
+                }
+
+                if (isset($columnMap['track_batch']) && isset($row[$columnMap['track_batch']])) {
+                    $rawBatch = mb_strtoupper(trim((string)$row[$columnMap['track_batch']]));
+                    if (in_array($rawBatch, ['S', 'SIM', 'TRUE', '1', 'Y', 'YES'])) {
+                        $trackBatch = true;
+                        $hasSerial = false;
+                        $trackingType = 'BATCH';
+                    }
                 }
 
                 // Custo Unitário
@@ -454,7 +483,9 @@ class MaterialImportService
                             'name' => $name,
                             'category' => $category,
                             'unit_id' => $unitId,
+                            'tracking_type' => $trackingType,
                             'has_serial' => $hasSerial,
+                            'track_batch' => $trackBatch,
                             'unit_cost' => $unitCost > 0 ? $unitCost : $existingMaterial->unit_cost,
                             'min_stock' => $minStock > 0 ? $minStock : $existingMaterial->min_stock,
                             'is_active' => true,
@@ -468,7 +499,9 @@ class MaterialImportService
                         'name' => $name,
                         'category' => $category,
                         'unit_id' => $unitId,
+                        'tracking_type' => $trackingType,
                         'has_serial' => $hasSerial,
+                        'track_batch' => $trackBatch,
                         'unit_cost' => $unitCost,
                         'min_stock' => $minStock,
                         'is_active' => true,
@@ -512,6 +545,10 @@ class MaterialImportService
                 $map['unit'] = $index;
             } elseif (in_array($normalized, ['serializado', 'hasserial', 'serial', 'rastreamentoserial', 'serializadosn', 'exigeserial'])) {
                 $map['has_serial'] = $index;
+            } elseif (in_array($normalized, ['rastreabilidade', 'tracking', 'trackingtype', 'tiporastreio', 'tipoderastreio', 'tipoderastreabilidade'])) {
+                $map['tracking_type'] = $index;
+            } elseif (in_array($normalized, ['lote', 'batch', 'trackbatch', 'controledelote', 'lotedefabricacao', 'metragem', 'bobina'])) {
+                $map['track_batch'] = $index;
             } elseif (in_array($normalized, ['custo', 'custounitario', 'customedio', 'unitcost', 'preco', 'precocusto'])) {
                 $map['unit_cost'] = $index;
             } elseif (in_array($normalized, ['estoqueminimo', 'estoquemin', 'minstock', 'estminimo'])) {

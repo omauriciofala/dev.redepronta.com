@@ -1265,6 +1265,92 @@ class StockWmsModuleTest extends TestCase
         $this->assertEquals('Marcos Motorista Transportador', $firstMovement['driver']['name']);
         $this->assertCount(2, $firstMovement['attachments']);
     }
+
+    /**
+     * Testa cadastro de material com controle de Lote / Metragem (track_batch e tracking_type = BATCH).
+     */
+    public function test_can_create_material_with_batch_tracking(): void
+    {
+        $response = $this->postJson('/api/v1/materials', [
+            'unit_id' => $this->unitMt->id,
+            'code' => 'CABO-DROP-LOTE',
+            'name' => 'Cabo Drop Óptico 1FO com Rastreamento de Lote',
+            'category' => 'Cabos & Fibras',
+            'track_batch' => true,
+            'tracking_type' => 'BATCH',
+            'has_serial' => false,
+            'unit_cost' => 0.65,
+            'min_stock' => 1000,
+        ]);
+
+        $response->assertStatus(201);
+        $response->assertJsonPath('data.code', 'CABO-DROP-LOTE');
+        $response->assertJsonPath('data.track_batch', true);
+        $response->assertJsonPath('data.has_serial', false);
+        $response->assertJsonPath('data.tracking_type', 'BATCH');
+
+        $this->assertDatabaseHas('materials', [
+            'account_id' => $this->account->id,
+            'code' => 'CABO-DROP-LOTE',
+            'track_batch' => true,
+            'has_serial' => false,
+            'tracking_type' => 'BATCH',
+        ]);
+    }
+
+    /**
+     * Testa atualização de material existente para controle de Lote / Metragem.
+     */
+    public function test_can_update_material_to_batch_tracking(): void
+    {
+        $response = $this->putJson("/api/v1/materials/{$this->materialCable->id}", [
+            'unit_id' => $this->materialCable->unit_id,
+            'code' => $this->materialCable->code,
+            'name' => $this->materialCable->name,
+            'category' => $this->materialCable->category,
+            'track_batch' => true,
+            'tracking_type' => 'BATCH',
+            'has_serial' => false,
+            'unit_cost' => $this->materialCable->unit_cost,
+            'min_stock' => $this->materialCable->min_stock,
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.track_batch', true);
+        $response->assertJsonPath('data.tracking_type', 'BATCH');
+        $response->assertJsonPath('data.has_serial', false);
+
+        $this->materialCable->refresh();
+        $this->assertTrue($this->materialCable->track_batch);
+        $this->assertFalse($this->materialCable->has_serial);
+        $this->assertEquals('BATCH', $this->materialCable->tracking_type);
+    }
+
+    /**
+     * Testa filtro de materiais por controle de lote e rastreabilidade na API.
+     */
+    public function test_can_filter_materials_by_batch_and_tracking_type(): void
+    {
+        $this->materialCable->update([
+            'track_batch' => true,
+            'tracking_type' => 'BATCH',
+            'has_serial' => false,
+        ]);
+
+        // 1. Filtra por track_batch=1
+        $resBatch = $this->getJson('/api/v1/materials?track_batch=1');
+        $resBatch->assertStatus(200);
+        $batchCodes = collect($resBatch->json('data'))->pluck('code')->all();
+        $this->assertContains($this->materialCable->code, $batchCodes);
+        $this->assertNotContains($this->materialOnu->code, $batchCodes);
+
+        // 2. Filtra por tracking_type=BATCH
+        $resType = $this->getJson('/api/v1/materials?tracking_type=BATCH');
+        $resType->assertStatus(200);
+        $typeCodes = collect($resType->json('data'))->pluck('code')->all();
+        $this->assertContains($this->materialCable->code, $typeCodes);
+        $this->assertNotContains($this->materialOnu->code, $typeCodes);
+    }
 }
 
 

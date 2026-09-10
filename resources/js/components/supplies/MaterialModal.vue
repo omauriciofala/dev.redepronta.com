@@ -110,36 +110,119 @@
         </div>
       </div>
 
-      <!-- Parametrização de Rastreabilidade (Design System Box) -->
+      <!-- Parametrização de Rastreabilidade (3 Tipos Canônicos) -->
       <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/60 space-y-3">
-        <span class="font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider text-[11px] block">
-          Parâmetros de Controle WMS
-        </span>
+        <div class="flex items-center justify-between">
+          <span class="font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider text-[11px] block">
+            Rastreabilidade WMS
+          </span>
+          <span class="text-[11px] text-slate-500 dark:text-slate-400">
+            Selecione o modelo de controle físico no estoque
+          </span>
+        </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <label class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 cursor-pointer hover:border-orange-300 transition">
-            <input
-              type="checkbox"
-              v-model="form.has_serial"
-              class="w-4 h-4 rounded text-[#FC6714] focus:ring-[#FC6714]"
-            />
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <!-- 1. Serializado -->
+          <div
+            @click="setTrackingType('SERIAL')"
+            class="relative flex flex-col justify-between p-3.5 rounded-xl border cursor-pointer transition-all select-none"
+            :class="form.tracking_type === 'SERIAL'
+              ? 'border-[#FC6714] bg-orange-50/70 dark:bg-orange-950/30 ring-1 ring-[#FC6714]'
+              : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 hover:border-slate-300 dark:hover:border-slate-700'"
+          >
             <div>
-              <span class="font-bold text-slate-900 dark:text-slate-100 block">Rastreamento Serial Obrigatório</span>
-              <span class="text-[11px] text-slate-500 dark:text-slate-400">Exige número de série individual (Serializado)</span>
+              <div class="flex items-center justify-between mb-2">
+                <div
+                  class="p-2 rounded-lg"
+                  :class="form.tracking_type === 'SERIAL'
+                    ? 'bg-[#FC6714] text-white'
+                    : 'bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300'"
+                >
+                  <QrCode class="w-4 h-4" />
+                </div>
+                <span
+                  v-if="form.tracking_type === 'SERIAL'"
+                  class="w-4 h-4 rounded-full bg-[#FC6714] text-white flex items-center justify-center text-[10px]"
+                >
+                  <Check class="w-3 h-3 stroke-[3]" />
+                </span>
+              </div>
+              <h4 class="font-bold text-xs text-slate-900 dark:text-slate-100 mb-1">
+                Serializado
+              </h4>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
+                Exige número de série individual para cada unidade (ONUs, Roteadores).
+              </p>
             </div>
-          </label>
+          </div>
 
-          <label class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 cursor-pointer hover:border-orange-300 transition">
-            <input
-              type="checkbox"
-              v-model="form.track_batch"
-              class="w-4 h-4 rounded text-[#FC6714] focus:ring-[#FC6714]"
-            />
+          <!-- 2. Lote / Metragem -->
+          <div
+            @click="setTrackingType('BATCH')"
+            class="relative flex flex-col justify-between p-3.5 rounded-xl border cursor-pointer transition-all select-none"
+            :class="form.tracking_type === 'BATCH'
+              ? 'border-[#FC6714] bg-orange-50/70 dark:bg-orange-950/30 ring-1 ring-[#FC6714]'
+              : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 hover:border-slate-300 dark:hover:border-slate-700'"
+          >
             <div>
-              <span class="font-bold text-slate-900 dark:text-slate-100 block">Controle de Lote / Bobina</span>
-              <span class="text-[11px] text-slate-500 dark:text-slate-400">Rastreio de metragem e número de lote de fabricação</span>
+              <div class="flex items-center justify-between mb-2">
+                <div
+                  class="p-2 rounded-lg"
+                  :class="form.tracking_type === 'BATCH'
+                    ? 'bg-[#FC6714] text-white'
+                    : 'bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300'"
+                >
+                  <Layers class="w-4 h-4" />
+                </div>
+                <span
+                  v-if="form.tracking_type === 'BATCH'"
+                  class="w-4 h-4 rounded-full bg-[#FC6714] text-white flex items-center justify-center text-[10px]"
+                >
+                  <Check class="w-3 h-3 stroke-[3]" />
+                </span>
+              </div>
+              <h4 class="font-bold text-xs text-slate-900 dark:text-slate-100 mb-1">
+                Lote / Metragem
+              </h4>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
+                Rastreio de metragem e lote de fabricação/bobina (Cabos Drop, Fibras).
+              </p>
             </div>
-          </label>
+          </div>
+
+          <!-- 3. A Granel -->
+          <div
+            @click="setTrackingType('BULK')"
+            class="relative flex flex-col justify-between p-3.5 rounded-xl border cursor-pointer transition-all select-none"
+            :class="form.tracking_type === 'BULK'
+              ? 'border-[#FC6714] bg-orange-50/70 dark:bg-orange-950/30 ring-1 ring-[#FC6714]'
+              : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 hover:border-slate-300 dark:hover:border-slate-700'"
+          >
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <div
+                  class="p-2 rounded-lg"
+                  :class="form.tracking_type === 'BULK'
+                    ? 'bg-[#FC6714] text-white'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'"
+                >
+                  <Box class="w-4 h-4" />
+                </div>
+                <span
+                  v-if="form.tracking_type === 'BULK'"
+                  class="w-4 h-4 rounded-full bg-[#FC6714] text-white flex items-center justify-center text-[10px]"
+                >
+                  <Check class="w-3 h-3 stroke-[3]" />
+                </span>
+              </div>
+              <h4 class="font-bold text-xs text-slate-900 dark:text-slate-100 mb-1">
+                A Granel
+              </h4>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
+                Controle apenas por quantidade/saldo sem série ou lote (Conectores, Fitas).
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </form>
@@ -176,7 +259,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import axios from 'axios';
-import { AlertCircle } from 'lucide-vue-next';
+import { AlertCircle, QrCode, Layers, Box, Check } from 'lucide-vue-next';
 import BaseModal from '@/components/common/BaseModal.vue';
 
 const props = defineProps<{
@@ -189,6 +272,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'close'): void;
   (e: 'saved'): void;
+  (e: 'updated'): void;
 }>();
 
 const submitting = ref(false);
@@ -221,14 +305,31 @@ const form = ref({
   unit_id: '',
   unit_cost: 0,
   min_stock: 0,
+  tracking_type: 'BULK' as 'SERIAL' | 'BATCH' | 'BULK',
   has_serial: false,
   track_batch: false,
 });
+
+function setTrackingType(type: 'SERIAL' | 'BATCH' | 'BULK') {
+  form.value.tracking_type = type;
+  form.value.has_serial = (type === 'SERIAL');
+  form.value.track_batch = (type === 'BATCH');
+}
 
 watch(
   () => props.materialData,
   (val) => {
     if (val && val.id) {
+      let tracking: 'SERIAL' | 'BATCH' | 'BULK' = 'BULK';
+      const rawType = String(val.tracking_type || '').toUpperCase();
+      if (rawType === 'SERIAL' || val.has_serial) {
+        tracking = 'SERIAL';
+      } else if (rawType === 'BATCH' || val.track_batch) {
+        tracking = 'BATCH';
+      } else {
+        tracking = 'BULK';
+      }
+
       form.value = {
         code: val.code || '',
         name: val.name || '',
@@ -237,8 +338,9 @@ watch(
         unit_id: val.unit_id ? String(val.unit_id) : (val.unit?.id ? String(val.unit.id) : ''),
         unit_cost: Number(val.unit_cost) || 0,
         min_stock: Number(val.min_stock) || 0,
-        has_serial: Boolean(val.has_serial),
-        track_batch: Boolean(val.track_batch),
+        tracking_type: tracking,
+        has_serial: tracking === 'SERIAL',
+        track_batch: tracking === 'BATCH',
       };
     } else {
       form.value = {
@@ -249,6 +351,7 @@ watch(
         unit_id: props.unitsList[0]?.id ? String(props.unitsList[0].id) : '',
         unit_cost: 0,
         min_stock: 0,
+        tracking_type: 'BULK',
         has_serial: false,
         track_batch: false,
       };

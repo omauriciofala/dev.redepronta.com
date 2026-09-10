@@ -86,9 +86,12 @@
               class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
               :class="material.has_serial
                 ? 'bg-purple-100 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400'
-                : 'bg-orange-100 dark:bg-[#FC6714]/20 text-[#FC6714]'"
+                : (material.track_batch
+                  ? 'bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400'
+                  : 'bg-orange-100 dark:bg-[#FC6714]/20 text-[#FC6714]')"
             >
               <QrCode v-if="material.has_serial" class="w-4 h-4" />
+              <Layers v-else-if="material.track_batch" class="w-4 h-4" />
               <Package v-else class="w-4 h-4" />
             </div>
 
@@ -120,6 +123,13 @@
               <span>Serial</span>
             </span>
             <span
+              v-else-if="material.track_batch"
+              class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
+            >
+              <Layers class="w-3 h-3" />
+              <span>Lote</span>
+            </span>
+            <span
               v-else
               class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
             >
@@ -140,7 +150,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
-import { Search, Loader2, X, Package, QrCode } from 'lucide-vue-next';
+import { Search, Loader2, X, Package, QrCode, Layers } from 'lucide-vue-next';
 import axios from 'axios';
 
 interface MaterialItem {
@@ -150,6 +160,8 @@ interface MaterialItem {
   category?: string;
   unit?: any;
   has_serial?: boolean;
+  track_batch?: boolean;
+  tracking_type?: string;
   min_stock?: number;
   is_active?: boolean;
   system_code?: string;

@@ -479,6 +479,12 @@
                           >
                             Serializado
                           </span>
+                          <span
+                            v-else-if="m.track_batch"
+                            class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200/70 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800/60"
+                          >
+                            Lote / Metragem
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -643,9 +649,10 @@
             v-model="materialFilterType"
             class="h-11 px-3 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-xs font-semibold focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer"
           >
-            <option value="all">Todos os Tipos</option>
-            <option value="serialized">Apenas Serializados</option>
-            <option value="standard">Apenas Convencionais</option>
+            <option value="all">Todos os Tipos de Rastreio</option>
+            <option value="serialized">Serializado</option>
+            <option value="batch">Lote / Metragem</option>
+            <option value="bulk">A Granel</option>
           </select>
 
           <span class="text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
@@ -808,20 +815,33 @@
                   {{ m.unit?.code || 'UND' }}
                 </td>
 
-                <!-- Rastreabilidade -->
+                <!-- Rastreabilidade (3 Tipos Canônicos) -->
                 <td class="py-4 px-5 text-center">
+                  <!-- 1. Serializado -->
                   <span
-                    v-if="m.has_serial"
+                    v-if="m.tracking_type === 'SERIAL' || m.has_serial"
                     class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800/60"
                   >
                     <QrCode class="w-3.5 h-3.5" />
                     <span>Serializado</span>
                   </span>
+
+                  <!-- 2. Lote / Metragem -->
+                  <span
+                    v-else-if="m.tracking_type === 'BATCH' || m.track_batch"
+                    class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800/60"
+                  >
+                    <Layers class="w-3.5 h-3.5" />
+                    <span>Lote / Metragem</span>
+                  </span>
+
+                  <!-- 3. A Granel -->
                   <span
                     v-else
-                    class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700"
+                    class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700"
                   >
-                    A Granel / Lote
+                    <Box class="w-3.5 h-3.5" />
+                    <span>A Granel</span>
                   </span>
                 </td>
 
@@ -1453,7 +1473,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import {
-  Package, ArrowRightLeft, Plus, Layers, Boxes, Warehouse, QrCode, RefreshCw,
+  Package, ArrowRightLeft, Plus, Layers, Boxes, Box, Warehouse, QrCode, RefreshCw,
   ChevronDown, X, Search, ArrowUp, ArrowDown, ArrowUpDown, Copy, Check,
   AlertCircle, CheckCircle2, Menu, MapPin, Edit2, Tags, FolderTree, Scale, UserCheck,
   Upload, FileSpreadsheet
@@ -1512,6 +1532,7 @@ interface Material {
   category?: string;
   unit_cost: number;
   min_stock: number;
+  tracking_type?: string;
   has_serial: boolean;
   track_batch?: boolean;
   unit?: { id: number; code: string; name: string };
@@ -1799,9 +1820,11 @@ const filteredMaterials = computed(() => {
   let list = [...materials.value];
 
   if (materialFilterType.value === 'serialized') {
-    list = list.filter(m => m.has_serial);
-  } else if (materialFilterType.value === 'standard') {
-    list = list.filter(m => !m.has_serial);
+    list = list.filter(m => m.tracking_type === 'SERIAL' || m.has_serial);
+  } else if (materialFilterType.value === 'batch') {
+    list = list.filter(m => m.tracking_type === 'BATCH' || m.track_batch);
+  } else if (materialFilterType.value === 'bulk' || materialFilterType.value === 'standard') {
+    list = list.filter(m => m.tracking_type === 'BULK' || (!m.has_serial && !m.track_batch));
   }
 
   if (materialFilterCategory.value !== 'all') {
