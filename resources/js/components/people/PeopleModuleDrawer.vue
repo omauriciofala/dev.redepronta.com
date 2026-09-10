@@ -2,7 +2,7 @@
   <BaseModal
     v-model="isOpenModel"
     size="drawer"
-    title="Menu do Módulo de Pessoas"
+    title="Pessoas"
     description="Atalhos rápidos, relatórios operacionais, exportação e configurações do módulo"
     @close="close"
   >

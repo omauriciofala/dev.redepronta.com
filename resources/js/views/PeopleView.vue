@@ -120,8 +120,8 @@
           @click="isModuleDrawerOpen = true"
           class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition shadow-2xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#FC6714]"
           :class="{ 'bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white ring-2 ring-[#FC6714]/30': isModuleDrawerOpen }"
-          title="Menu do Módulo de Pessoas (☰)"
-          aria-label="Menu do Módulo de Pessoas"
+          title="Pessoas (☰)"
+          aria-label="Pessoas"
         >
           <!-- Ícone Hambúrguer (Menu) -->
           <Menu class="w-5 h-5" />
