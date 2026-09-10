@@ -858,11 +858,11 @@
 
                           <button
                             type="button"
-                            @click="handleMovementMaterial(m)"
+                            @click="copySkuAndClose(m.code, 'sku-cat-' + m.id)"
                             class="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] dark:hover:text-orange-300 transition cursor-pointer"
                           >
-                            <ArrowUpDown class="w-4 h-4 text-slate-400" />
-                            <span>Nova Movimentação</span>
+                            <Copy class="w-4 h-4 text-slate-400" />
+                            <span>Copiar Código SKU</span>
                           </button>
                         </div>
                       </div>
@@ -1603,9 +1603,9 @@ function handleEditMaterial(material: Material) {
   openEditMaterialModal(material);
 }
 
-function handleMovementMaterial(material: Material) {
+function copySkuAndClose(code: string, key: string) {
   activeDropdownMaterialId.value = null;
-  openMovementModal(material);
+  copyToClipboard(code, key);
 }
 
 function openClusterCrudModal() {
