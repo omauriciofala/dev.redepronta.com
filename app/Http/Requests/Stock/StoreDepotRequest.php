@@ -11,6 +11,15 @@ class StoreDepotRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'responsible_person_id' => $this->responsible_person_id ?: null,
+            'city_id' => $this->city_id ?: null,
+            'is_active' => $this->has('is_active') ? filter_var($this->is_active, FILTER_VALIDATE_BOOLEAN) : true,
+        ]);
+    }
+
     public function rules(): array
     {
         return [

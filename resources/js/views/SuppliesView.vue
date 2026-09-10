@@ -97,6 +97,15 @@
 
                 <button
                   type="button"
+                  @click="openCreateDepotModal(); isHeaderMenuOpen = false"
+                  class="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] dark:hover:text-orange-300 transition cursor-pointer"
+                >
+                  <Plus class="w-4 h-4 text-slate-400" />
+                  <span>Novo Depósito</span>
+                </button>
+
+                <button
+                  type="button"
                   @click="navigateToTab('materials')"
                   class="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] dark:hover:text-orange-300 transition cursor-pointer"
                 >
@@ -828,6 +837,16 @@
           <span class="text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
             {{ filteredDepots.length }} depósitos
           </span>
+
+          <!-- Botão Novo Depósito -->
+          <button
+            type="button"
+            @click="openCreateDepotModal"
+            class="h-11 px-4 text-xs font-semibold rounded-lg bg-[#FC6714] hover:bg-[#E0530A] active:bg-[#C94605] text-white shadow-sm hover:shadow transition cursor-pointer flex items-center gap-2 whitespace-nowrap shrink-0"
+          >
+            <Plus class="w-4 h-4" />
+            <span>Novo Depósito</span>
+          </button>
         </div>
       </div>
 
@@ -870,7 +889,15 @@
                   <div class="max-w-sm mx-auto space-y-2">
                     <Warehouse class="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto" />
                     <p class="font-medium text-slate-700 dark:text-slate-300">Nenhum depósito encontrado</p>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">Verifique os filtros selecionados.</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Cadastre depósitos ou verifique os filtros selecionados.</p>
+                    <button
+                      type="button"
+                      @click="openCreateDepotModal"
+                      class="mt-3 inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-[#FC6714] text-white hover:bg-[#E0530A] transition cursor-pointer"
+                    >
+                      <Plus class="w-3.5 h-3.5" />
+                      <span>Cadastrar Depósito</span>
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -927,14 +954,26 @@
 
                 <!-- Ações -->
                 <td class="py-4 px-5 text-right">
-                  <button
-                    type="button"
-                    @click="openTransferFromDepot(d)"
-                    class="h-8 px-3 text-xs font-medium rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-orange-50 hover:text-[#FC6714] hover:border-[#FC6714] dark:hover:bg-[#FC6714]/10 dark:hover:text-[#FC6714] transition cursor-pointer inline-flex items-center gap-1.5"
-                  >
-                    <ArrowRightLeft class="w-3.5 h-3.5" />
-                    <span>Transferir</span>
-                  </button>
+                  <div class="flex items-center justify-end gap-2">
+                    <button
+                      type="button"
+                      @click="openEditDepotModal(d)"
+                      class="h-8 px-2.5 text-xs font-medium rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-400 dark:hover:bg-blue-950/40 dark:hover:text-blue-300 transition cursor-pointer inline-flex items-center gap-1.5"
+                      title="Editar Depósito"
+                    >
+                      <Edit2 class="w-3.5 h-3.5" />
+                      <span>Editar</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      @click="openTransferFromDepot(d)"
+                      class="h-8 px-3 text-xs font-medium rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-orange-50 hover:text-[#FC6714] hover:border-[#FC6714] dark:hover:bg-[#FC6714]/10 dark:hover:text-[#FC6714] transition cursor-pointer inline-flex items-center gap-1.5"
+                    >
+                      <ArrowRightLeft class="w-3.5 h-3.5" />
+                      <span>Transferir</span>
+                    </button>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -1202,6 +1241,15 @@
       @updated="onClustersUpdated"
     />
 
+    <!-- Modal 4: Cadastro / Edição de Depósito -->
+    <DepotModal
+      :is-open="isDepotModalOpen"
+      :depot-data="selectedDepotForEdit"
+      :clusters-list="clusters"
+      @close="isDepotModalOpen = false"
+      @saved="onDepotSaved"
+    />
+
     <!-- Drawer Lateral do Módulo (☰) -->
     <SuppliesModuleDrawer
       v-model="isModuleDrawerOpen"
@@ -1250,6 +1298,7 @@ import TablePagination from '@/components/common/TablePagination.vue';
 import TransferModal from '@/components/supplies/TransferModal.vue';
 import MaterialModal from '@/components/supplies/MaterialModal.vue';
 import ClusterCrudModal from '@/components/supplies/auxiliary/ClusterCrudModal.vue';
+import DepotModal from '@/components/supplies/DepotModal.vue';
 import SuppliesModuleDrawer from '@/components/supplies/SuppliesModuleDrawer.vue';
 
 // ─── INTERFACES DE DOMÍNIO ───────────────────────────────────────────────────
@@ -1303,6 +1352,8 @@ const isModuleDrawerOpen = ref(false);
 const isClusterModalOpen = ref(false);
 const isMaterialModalOpen = ref(false);
 const selectedMaterialForEdit = ref<any>(null);
+const isDepotModalOpen = ref(false);
+const selectedDepotForEdit = ref<any>(null);
 const isTransferModalOpen = ref(false);
 const selectedMaterialForTransfer = ref<any>(null);
 const selectedDepotForTransfer = ref<any>(null);
@@ -1382,10 +1433,11 @@ function navigateToTab(tab: 'regional' | 'materials' | 'depots' | 'serials') {
   activeTab.value = tab;
 }
 
-function handleDrawerAction(action: 'transfer' | 'material' | 'cluster') {
+function handleDrawerAction(action: 'transfer' | 'material' | 'cluster' | 'depot') {
   if (action === 'transfer') openTransferModal();
   else if (action === 'material') openCreateMaterialModal();
   else if (action === 'cluster') isClusterModalOpen.value = true;
+  else if (action === 'depot') openCreateDepotModal();
 }
 
 // ─── ABA 1: POSIÇÃO REGIONAL ──────────────────────────────────────────────────
@@ -1800,6 +1852,26 @@ async function onMaterialSaved() {
 async function onClustersUpdated() {
   showToast('Posições regionais sincronizadas!');
   await loadClusters();
+  await loadRegionalStock();
+}
+
+// ─── AÇÕES DE MODAL: DEPÓSITOS ───────────────────────────────────────────────
+function openCreateDepotModal() {
+  selectedDepotForEdit.value = null;
+  isDepotModalOpen.value = true;
+}
+
+function openEditDepotModal(depot: Depot) {
+  selectedDepotForEdit.value = { ...depot };
+  isDepotModalOpen.value = true;
+}
+
+async function onDepotSaved() {
+  showToast(selectedDepotForEdit.value ? 'Depósito atualizado com sucesso!' : 'Depósito salvo com sucesso!');
+  await Promise.all([
+    loadDepots(),
+    loadClusters(),
+  ]);
   await loadRegionalStock();
 }
 

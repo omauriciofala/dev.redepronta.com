@@ -374,4 +374,90 @@ class StockWmsModuleTest extends TestCase
         $responseUnits->assertStatus(200);
         $responseUnits->assertJsonStructure(['data']);
     }
+
+    /**
+     * Testa criação de depósito com sanitização de campos opcionais vazios.
+     */
+    public function test_can_create_depot_successfully(): void
+    {
+        $payload = [
+            'cluster_id' => $this->cluster->id,
+            'name' => 'Novo Almoxarifado Zona Norte',
+            'code' => 'DEP-ZN',
+            'type' => 'REGIONAL_BASE',
+            'responsible_person_id' => '',
+            'city_id' => '',
+            'description' => 'Depósito de apoio operacional Zona Norte',
+            'is_active' => true,
+        ];
+
+        $response = $this->postJson('/api/v1/depots', $payload);
+
+        $response->assertStatus(201);
+        $response->assertJsonPath('data.name', 'Novo Almoxarifado Zona Norte');
+        $response->assertJsonPath('data.code', 'DEP-ZN');
+        $response->assertJsonPath('data.type', 'REGIONAL_BASE');
+        $response->assertJsonPath('data.responsible_person_id', null);
+        $response->assertJsonPath('data.city_id', null);
+
+        $this->assertDatabaseHas('depots', [
+            'name' => 'Novo Almoxarifado Zona Norte',
+            'code' => 'DEP-ZN',
+            'cluster_id' => $this->cluster->id,
+        ]);
+    }
+
+    /**
+     * Testa atualização de depósito existente.
+     */
+    public function test_can_update_depot_successfully(): void
+    {
+        $payload = [
+            'cluster_id' => $this->cluster->id,
+            'name' => 'Almoxarifado Central Matriz Renovado',
+            'code' => 'ALMOX-CENTRAL-MOD',
+            'type' => 'CENTRAL',
+            'description' => 'Atualizado para testes',
+            'is_active' => true,
+        ];
+
+        $response = $this->putJson("/api/v1/depots/{$this->centralDepot->id}", $payload);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.name', 'Almoxarifado Central Matriz Renovado');
+        $response->assertJsonPath('data.code', 'ALMOX-CENTRAL-MOD');
+
+        $this->centralDepot->refresh();
+        $this->assertEquals('Almoxarifado Central Matriz Renovado', $this->centralDepot->name);
+        $this->assertEquals('ALMOX-CENTRAL-MOD', $this->centralDepot->code);
+    }
+
+    /**
+     * Testa validação obrigatória ao cadastrar depósito.
+     */
+    public function test_create_depot_validation_fails_when_fields_missing(): void
+    {
+        $response = $this->postJson('/api/v1/depots', []);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['cluster_id', 'name', 'code', 'type']);
+    }
+
+    /**
+     * Testa bloqueio de exclusão de depósito quando houver saldo em estoque.
+     */
+    public function test_depot_cannot_be_deleted_if_has_stock_balance(): void
+    {
+        StockBalance::create([
+            'account_id' => $this->account->id,
+            'depot_id' => $this->secondaryDepot->id,
+            'material_id' => $this->materialCable->id,
+            'quantity' => 150.00,
+        ]);
+
+        $response = $this->deleteJson("/api/v1/depots/{$this->secondaryDepot->id}");
+
+        $response->assertStatus(422);
+        $this->assertDatabaseHas('depots', ['id' => $this->secondaryDepot->id]);
+    }
 }

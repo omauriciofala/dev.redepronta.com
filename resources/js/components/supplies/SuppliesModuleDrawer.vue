@@ -153,11 +153,28 @@
 
           <button
             type="button"
-            @click="triggerAction('cluster')"
+            @click="triggerAction('depot')"
             class="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition flex items-center justify-between text-left cursor-pointer group shadow-2xs"
           >
             <div class="flex items-center gap-3">
               <div class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                <Warehouse class="w-4 h-4" />
+              </div>
+              <div>
+                <div class="font-bold text-slate-800 dark:text-slate-200">Novo Depósito Físico</div>
+                <div class="text-[11px] text-slate-400">Cadastrar almoxarifado ou base operacional</div>
+              </div>
+            </div>
+            <ArrowUpRight class="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition" />
+          </button>
+
+          <button
+            type="button"
+            @click="triggerAction('cluster')"
+            class="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition flex items-center justify-between text-left cursor-pointer group shadow-2xs"
+          >
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
                 <MapPin class="w-4 h-4" />
               </div>
               <div>
@@ -222,7 +239,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void;
   (e: 'navigate', tab: 'regional' | 'materials' | 'depots' | 'serials'): void;
-  (e: 'action', action: 'transfer' | 'material' | 'cluster'): void;
+  (e: 'action', action: 'transfer' | 'material' | 'depot' | 'cluster'): void;
 }>();
 
 const isOpenModel = computed({
@@ -239,7 +256,7 @@ function navigateToTab(tab: 'regional' | 'materials' | 'depots' | 'serials') {
   close();
 }
 
-function triggerAction(action: 'transfer' | 'material' | 'cluster') {
+function triggerAction(action: 'transfer' | 'material' | 'depot' | 'cluster') {
   emit('action', action);
   close();
 }
