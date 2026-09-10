@@ -658,17 +658,6 @@
           <span class="text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
             {{ filteredMaterials.length }} materiais
           </span>
-
-          <!-- Botão Importar Planilha de Materiais -->
-          <button
-            type="button"
-            @click="openMaterialImportModal"
-            class="inline-flex items-center gap-2 h-11 px-3.5 rounded-lg border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 text-slate-700 dark:text-slate-200 hover:text-[#FC6714] dark:hover:text-orange-300 text-xs font-semibold shadow-2xs transition cursor-pointer"
-            title="Importar materiais em lote via planilha modelo (.CSV)"
-          >
-            <Upload class="w-4 h-4 text-[#FC6714]" />
-            <span>Importar Planilha</span>
-          </button>
         </div>
       </div>
 
