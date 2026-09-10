@@ -627,7 +627,7 @@
             class="h-11 px-3 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-xs font-semibold focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer"
             title="Filtrar por Proprietário para visualizar códigos e nomes do catálogo dele"
           >
-            <option value="">Todos os Proprietários (SKU Canônico)</option>
+            <option value="">Proprietários</option>
             <option v-for="o in materialOwnersList" :key="o.id" :value="o.id" :title="o.name">
               {{ o.code }}
             </option>
