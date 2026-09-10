@@ -91,7 +91,26 @@
         </div>
       </div>
 
-      <!-- Linha 3: Responsável e Município -->
+      <!-- Linha 3: Proprietário / Solicitante (Vínculo de Operação) -->
+      <div>
+        <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+          Proprietário / Solicitante do Depósito (Opcional)
+        </label>
+        <select
+          v-model="form.owner_id"
+          class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none cursor-pointer"
+        >
+          <option value="">Herdar da Região / Cluster selecionado ({{ currentClusterOwnerHint }})</option>
+          <option v-for="o in availableOwners" :key="o.id" :value="o.id">
+            {{ o.code }} — {{ o.name }}
+          </option>
+        </select>
+        <span class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">
+          Define para qual proprietário este depósito opera. Movimentações neste depósito utilizarão os códigos e catálogo deste proprietário.
+        </span>
+      </div>
+
+      <!-- Linha 4: Responsável e Município -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <PersonSearchSelect
@@ -224,15 +243,26 @@ const availableDepotTypes = ref<any[]>([
   { code: 'LAB_REPAIR', name: 'Laboratório de Reparo' },
 ]);
 
+const availableOwners = ref<any[]>([]);
+
 const form = ref({
   name: '',
   code: '',
   cluster_id: '' as string | number,
+  owner_id: '' as string | number,
   type: 'REGIONAL_BASE',
   responsible_person_id: null as number | null,
   city_id: null as number | null,
   description: '',
   is_active: true,
+});
+
+const currentClusterOwnerHint = computed(() => {
+  const selectedCluster = props.clustersList.find(c => c.id === Number(form.value.cluster_id));
+  if (selectedCluster?.owner) {
+    return `${selectedCluster.owner.code} - ${selectedCluster.owner.name}`;
+  }
+  return 'Próprio / Sem proprietário específico';
 });
 
 async function loadDepotTypes() {
@@ -247,11 +277,24 @@ async function loadDepotTypes() {
   }
 }
 
+async function loadOwners() {
+  try {
+    const res = await fetch('/api/v1/material-owners?active_only=true');
+    const json = await res.json();
+    if (json.data) {
+      availableOwners.value = json.data;
+    }
+  } catch (err) {
+    console.error('Erro ao carregar proprietários:', err);
+  }
+}
+
 watch(
   () => props.isOpen,
   (val) => {
     if (val) {
       loadDepotTypes();
+      loadOwners();
 
       if (props.depotData) {
         selectedPersonInfo.value = {
@@ -268,6 +311,7 @@ watch(
           name: props.depotData.name || '',
           code: props.depotData.code || '',
           cluster_id: props.depotData.cluster_id || (props.depotData.cluster?.id ?? (props.clustersList[0]?.id || '')),
+          owner_id: props.depotData.owner_id ? String(props.depotData.owner_id) : '',
           type: props.depotData.type || (availableDepotTypes.value[0]?.code || 'REGIONAL_BASE'),
           responsible_person_id: props.depotData.responsible_person_id || (props.depotData.responsible_person?.id ?? null),
           city_id: props.depotData.city_id || (props.depotData.city?.id ?? null),
@@ -289,6 +333,7 @@ watch(
           name: '',
           code: '',
           cluster_id: props.clustersList[0]?.id || '',
+          owner_id: '',
           type: availableDepotTypes.value[0]?.code || 'REGIONAL_BASE',
           responsible_person_id: null,
           city_id: null,
@@ -320,6 +365,7 @@ async function submitForm() {
     name: form.value.name.trim(),
     code: form.value.code.trim().toUpperCase(),
     cluster_id: Number(form.value.cluster_id),
+    owner_id: form.value.owner_id ? Number(form.value.owner_id) : null,
     type: form.value.type,
     responsible_person_id: form.value.responsible_person_id ? Number(form.value.responsible_person_id) : null,
     city_id: form.value.city_id ? Number(form.value.city_id) : null,

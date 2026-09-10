@@ -23,12 +23,34 @@ class MaterialController extends Controller
         $accountId = $this->getAccountId();
         $query = Material::where('account_id', $accountId)->with('unit');
 
+        $ownerId = $request->query('owner_id');
+        if (!$ownerId && $request->filled('depot_id')) {
+            $depot = \App\Models\Depot::with('cluster')->where('account_id', $accountId)->find($request->query('depot_id'));
+            $ownerId = $depot?->owner_id ?? $depot?->cluster?->owner_id;
+        }
+
+        if ($ownerId) {
+            $query->with(['ownerMaterials' => function ($q) use ($ownerId) {
+                $q->where('material_owner_id', $ownerId);
+            }]);
+        }
+
         if ($request->filled('search')) {
-            $s = $request->query('search');
-            $query->where(function ($q) use ($s) {
+            $s = trim($request->query('search'));
+            $query->where(function ($q) use ($s, $ownerId) {
                 $q->where('name', 'like', "%{$s}%")
                   ->orWhere('code', 'like', "%{$s}%")
                   ->orWhere('category', 'like', "%{$s}%");
+
+                if ($ownerId) {
+                    $q->orWhereHas('ownerMaterials', function ($omq) use ($s, $ownerId) {
+                        $omq->where('material_owner_id', $ownerId)
+                            ->where(function ($sub) use ($s) {
+                                $sub->where('owner_code', 'like', "%{$s}%")
+                                    ->orWhere('owner_name', 'like', "%{$s}%");
+                            });
+                    });
+                }
             });
         }
 
@@ -46,8 +68,33 @@ class MaterialController extends Controller
 
         $materials = $query->orderBy('name')->get();
 
+        $owner = $ownerId ? \App\Models\MaterialOwner::where('account_id', $accountId)->find($ownerId) : null;
+
+        $materials->transform(function ($material) use ($ownerId, $owner) {
+            $systemCode = $material->code;
+            $systemName = $material->name;
+            $ownerMat = $ownerId ? $material->ownerMaterials?->first() : null;
+
+            $data = $material->toArray();
+            $data['system_code'] = $systemCode;
+            $data['system_name'] = $systemName;
+            $data['owner_code'] = $ownerMat?->owner_code;
+            $data['owner_name'] = $ownerMat?->owner_name;
+            $data['has_owner_alias'] = (bool) $ownerMat;
+            $data['owner_id'] = $owner?->id;
+            $data['owner_info'] = $owner ? ['id' => $owner->id, 'code' => $owner->code, 'name' => $owner->name] : null;
+
+            if ($ownerMat) {
+                $data['code'] = $ownerMat->owner_code;
+                $data['name'] = $ownerMat->owner_name;
+            }
+
+            return $data;
+        });
+
         return response()->json([
             'data' => $materials,
+            'owner_active' => $ownerId ? true : false,
         ]);
     }
 

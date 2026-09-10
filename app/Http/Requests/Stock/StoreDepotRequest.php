@@ -14,6 +14,7 @@ class StoreDepotRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
+            'owner_id' => $this->owner_id ?: null,
             'responsible_person_id' => $this->responsible_person_id ?: null,
             'city_id' => $this->city_id ?: null,
             'is_active' => $this->has('is_active') ? filter_var($this->is_active, FILTER_VALIDATE_BOOLEAN) : true,
@@ -24,6 +25,7 @@ class StoreDepotRequest extends FormRequest
     {
         return [
             'cluster_id' => ['required', 'integer', 'exists:depot_clusters,id'],
+            'owner_id' => ['nullable', 'integer', 'exists:material_owners,id'],
             'name' => ['required', 'string', 'max:150'],
             'code' => ['required', 'string', 'max:50'],
             'type' => ['required', 'string', 'max:50'],

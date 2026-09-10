@@ -286,6 +286,22 @@
             </span>
           </div>
 
+          <!-- Banner de Operação Vinculada a Proprietário -->
+          <div
+            v-if="activeOperatingOwner"
+            class="p-3 rounded-xl border border-blue-200 dark:border-blue-800/60 bg-blue-50/60 dark:bg-blue-950/25 flex items-center justify-between gap-3 text-xs"
+          >
+            <div class="flex items-center gap-2 text-blue-900 dark:text-blue-300 font-medium">
+              <UserCheck class="w-4 h-4 text-blue-600 shrink-0" />
+              <span>
+                <strong>Operação com Proprietário:</strong> Depósito vinculado a <strong>{{ activeOperatingOwner.code }} — {{ activeOperatingOwner.name }}</strong>. Códigos e nomes do catálogo deste proprietário ativos.
+              </span>
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-200/70 dark:bg-blue-900 text-blue-800 dark:text-blue-200 shrink-0">
+              Códigos do Proprietário Ativos
+            </span>
+          </div>
+
           <!-- Linha: Campo Novo Material (Componente) + Campo Quantidade + Botão Adicionar -->
           <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
             <!-- Campo 1: Material (8 colunas) com busca estilo cidade/pessoa -->
@@ -293,9 +309,11 @@
               <MaterialSearchSelect
                 v-model="newItem.material_id"
                 :materials-list="materials"
+                :owner-id="activeOperatingOwner?.id"
+                :depot-id="activeOperatingDepotId"
                 label="Novo Material"
                 required
-                placeholder="Digite nome, código SKU ou categoria do material..."
+                :placeholder="activeOperatingOwner ? `Buscar por códigos ou descrição da ${activeOperatingOwner.name}...` : 'Digite nome, código SKU ou categoria do material...'"
                 @select="onMaterialSelected"
               />
             </div>
@@ -401,8 +419,14 @@
                     <div class="font-bold text-slate-900 dark:text-slate-100">
                       {{ item.material.name }}
                     </div>
-                    <div class="text-[11px] text-slate-400 font-mono mt-0.5">
-                      SKU: {{ item.material.code }} • {{ item.material.unit?.code || 'UND' }}
+                    <div class="text-[11px] text-slate-400 font-mono mt-0.5 flex items-center gap-1.5 flex-wrap">
+                      <span :class="item.material.has_owner_alias ? 'text-[#FC6714] font-bold' : ''">
+                        {{ item.material.has_owner_alias ? `Cód. Proprietário: ${item.material.code}` : `SKU: ${item.material.code}` }}
+                      </span>
+                      <span v-if="item.material.has_owner_alias && item.material.system_code" class="text-slate-400">
+                        (SKU Sist: {{ item.material.system_code }})
+                      </span>
+                      <span>• {{ item.material.unit?.code || 'UND' }}</span>
                     </div>
                   </td>
                   <td class="py-3.5 px-4">
@@ -879,6 +903,7 @@ import {
   SlidersHorizontal,
   ArrowRight,
   ChevronDown,
+  UserCheck,
 } from 'lucide-vue-next';
 import BaseModal from '@/components/common/BaseModal.vue';
 import PersonSearchSelect from '@/components/common/PersonSearchSelect.vue';
@@ -976,6 +1001,23 @@ const destinationOptions = computed(() => {
     return props.depots.filter(d => String(d.id) !== form.value.source_depot_id);
   }
   return props.depots;
+});
+
+// Depósito operacional e Proprietário ativos para resolução contextual de códigos e nomes
+const activeOperatingDepotId = computed(() => {
+  if (form.value.movement_type === 'ENTRY') {
+    return form.value.destination_depot_id ? Number(form.value.destination_depot_id) : null;
+  }
+  return form.value.source_depot_id ? Number(form.value.source_depot_id) : null;
+});
+
+const activeOperatingOwner = computed(() => {
+  if (!activeOperatingDepotId.value || !props.depots) return null;
+  const depot = props.depots.find((d: any) => d.id === activeOperatingDepotId.value);
+  if (depot?.owner) return depot.owner;
+  if (depot?.cluster?.owner) return depot.cluster.owner;
+  if (depot?.effective_owner) return depot.effective_owner;
+  return null;
 });
 
 const isSourceRequired = computed(() => {

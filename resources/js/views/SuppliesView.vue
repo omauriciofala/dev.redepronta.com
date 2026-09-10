@@ -614,7 +614,19 @@
           </button>
         </div>
 
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3 flex-wrap">
+          <!-- Filtro por Proprietário / Solicitante (Catálogo De/Para) -->
+          <select
+            v-model="materialFilterOwner"
+            class="h-11 px-3 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-xs font-semibold focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer"
+            title="Filtrar por Proprietário para visualizar códigos e nomes do catálogo dele"
+          >
+            <option value="">Todos os Proprietários (SKU Canônico)</option>
+            <option v-for="o in materialOwnersList" :key="o.id" :value="o.id">
+              {{ o.code }} — {{ o.name }}
+            </option>
+          </select>
+
           <!-- Filtro por Categoria -->
           <select
             v-model="materialFilterCategory"
@@ -653,6 +665,33 @@
         </div>
       </div>
 
+      <!-- Banner Informativo quando o filtro de proprietário estiver ativo -->
+      <div
+        v-if="selectedMaterialOwnerInfo"
+        class="p-4 rounded-xl border border-blue-200 dark:border-blue-800/60 bg-blue-50/60 dark:bg-blue-950/30 flex items-center justify-between gap-4 text-xs"
+      >
+        <div class="flex items-center gap-2.5">
+          <div class="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 shrink-0">
+            <UserCheck class="w-4 h-4" />
+          </div>
+          <div>
+            <span class="font-bold text-slate-900 dark:text-slate-100 block text-xs">
+              Catálogo do Proprietário Ativo: {{ selectedMaterialOwnerInfo.code }} — {{ selectedMaterialOwnerInfo.name }}
+            </span>
+            <span class="text-slate-600 dark:text-slate-300 text-[11px]">
+              Os códigos e nomes exibidos abaixo correspondem à nomenclatura utilizada por este proprietário. Materiais mapeados trazem o SKU do sistema como referência cruzada.
+            </span>
+          </div>
+        </div>
+        <button
+          type="button"
+          @click="materialFilterOwner = ''"
+          class="px-2.5 py-1 rounded-md border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition cursor-pointer shrink-0 font-medium text-[11px]"
+        >
+          Voltar para SKU Canônico
+        </button>
+      </div>
+
       <!-- TABELA CONFORTÁVEL 2: CATÁLOGO DE MATERIAIS (SEÇÃO 7 DESIGN SYSTEM) -->
       <div class="rounded-xl border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D]/50 shadow-xs overflow-hidden transition-colors duration-200">
         <div class="overflow-x-auto min-h-[280px]">
@@ -663,10 +702,10 @@
                 <th
                   @click="toggleSortMaterial('code')"
                   class="py-3.5 px-5 cursor-pointer hover:text-[#FC6714] dark:hover:text-[#FC6714] transition"
-                  title="Ordenar por Código SKU"
+                  title="Ordenar por Código"
                 >
                   <div class="inline-flex items-center gap-1.5">
-                    <span>Código / SKU</span>
+                    <span>{{ selectedMaterialOwnerInfo ? 'Código (Proprietário)' : 'Código / SKU' }}</span>
                     <ArrowUp v-if="materialSortBy === 'code' && materialSortDir === 'asc'" class="w-3.5 h-3.5 text-[#FC6714]" />
                     <ArrowDown v-else-if="materialSortBy === 'code' && materialSortDir === 'desc'" class="w-3.5 h-3.5 text-[#FC6714]" />
                     <ArrowUpDown v-else class="w-3.5 h-3.5 text-slate-400 opacity-60" />
@@ -680,7 +719,7 @@
                   title="Ordenar por Nome"
                 >
                   <div class="inline-flex items-center gap-1.5">
-                    <span>Nome do Material</span>
+                    <span>{{ selectedMaterialOwnerInfo ? 'Nome no Proprietário' : 'Nome do Material' }}</span>
                     <ArrowUp v-if="materialSortBy === 'name' && materialSortDir === 'asc'" class="w-3.5 h-3.5 text-[#FC6714]" />
                     <ArrowDown v-else-if="materialSortBy === 'name' && materialSortDir === 'desc'" class="w-3.5 h-3.5 text-[#FC6714]" />
                     <ArrowUpDown v-else class="w-3.5 h-3.5 text-slate-400 opacity-60" />
@@ -719,18 +758,28 @@
                 :key="m.id"
                 class="hover:bg-slate-50/70 dark:hover:bg-white/5 transition-colors"
               >
-                <!-- Código SKU -->
+                <!-- Código SKU / Proprietário -->
                 <td class="py-4 px-5">
-                  <div class="flex items-center gap-1.5">
+                  <div class="flex items-center gap-1.5 flex-wrap">
                     <span class="font-mono font-bold text-xs text-[#FC6714]">{{ m.code }}</span>
                     <button
                       @click="copyToClipboard(m.code, 'sku-cat-' + m.id)"
                       class="p-0.5 rounded text-slate-400 hover:text-[#FC6714] transition cursor-pointer"
-                      title="Copiar código SKU"
+                      title="Copiar código"
                     >
                       <Check v-if="copiedKey === 'sku-cat-' + m.id" class="w-3 h-3 text-emerald-500" />
                       <Copy v-else class="w-3 h-3" />
                     </button>
+                    <span
+                      v-if="m.has_owner_alias"
+                      class="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-orange-100 dark:bg-[#FC6714]/20 text-[#FC6714] border border-orange-200 dark:border-[#FC6714]/30"
+                      :title="`Código do proprietário ativo. SKU original do sistema: ${m.system_code}`"
+                    >
+                      Proprietário
+                    </span>
+                  </div>
+                  <div v-if="m.has_owner_alias && m.system_code" class="text-[10px] font-mono text-slate-400 mt-0.5">
+                    SKU Sist: {{ m.system_code }}
                   </div>
                 </td>
 
@@ -739,7 +788,10 @@
                   <div class="font-semibold text-slate-900 dark:text-slate-100 text-sm">
                     {{ m.name }}
                   </div>
-                  <div v-if="m.description" class="text-xs text-slate-500 dark:text-slate-400 truncate max-w-xs mt-0.5">
+                  <div v-if="m.has_owner_alias && m.system_name && m.system_name !== m.name" class="text-[11px] text-slate-400 mt-0.5">
+                    Nome no sistema: {{ m.system_name }}
+                  </div>
+                  <div v-else-if="m.description" class="text-xs text-slate-500 dark:text-slate-400 truncate max-w-xs mt-0.5">
                     {{ m.description }}
                   </div>
                 </td>
@@ -930,6 +982,9 @@
                 <!-- Posição Regional -->
                 <th class="py-3.5 px-5">Posição Regional</th>
 
+                <!-- Proprietário -->
+                <th class="py-3.5 px-5">Proprietário</th>
+
                 <!-- Responsável -->
                 <th class="py-3.5 px-5">Responsável</th>
 
@@ -939,7 +994,7 @@
             </thead>
             <tbody class="divide-y divide-slate-100 dark:divide-[#14147A]/60">
               <tr v-if="filteredDepots.length === 0">
-                <td colspan="5" class="py-12 text-center text-slate-400 text-sm">
+                <td colspan="6" class="py-12 text-center text-slate-400 text-sm">
                   <div class="max-w-sm mx-auto space-y-2">
                     <Warehouse class="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto" />
                     <p class="font-medium text-slate-700 dark:text-slate-300">Nenhum depósito encontrado</p>
@@ -1002,6 +1057,19 @@
                   <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs">
                     {{ d.cluster?.name || '-' }}
                   </span>
+                </td>
+
+                <!-- Proprietário Vinculado / Efetivo -->
+                <td class="py-4 px-5 text-sm">
+                  <div
+                    v-if="d.owner || d.cluster?.owner"
+                    class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800/60"
+                  >
+                    <UserCheck class="w-3.5 h-3.5 shrink-0" />
+                    <span>{{ (d.owner || d.cluster?.owner)?.code }}</span>
+                    <span v-if="!d.owner && d.cluster?.owner" class="text-[10px] text-blue-500 dark:text-blue-400 font-normal">(Região)</span>
+                  </div>
+                  <span v-else class="text-xs text-slate-400 dark:text-slate-500 italic">Sem proprietário</span>
                 </td>
 
                 <!-- Responsável -->
@@ -1383,7 +1451,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import {
   Package, ArrowRightLeft, Plus, Layers, Boxes, Warehouse, QrCode, RefreshCw,
   ChevronDown, X, Search, ArrowUp, ArrowDown, ArrowUpDown, Copy, Check,
@@ -1474,6 +1542,12 @@ const isMaterialCategoryModalOpen = ref(false);
 const materialCategoriesList = ref<any[]>([]);
 const isUnitModalOpen = ref(false);
 const isMaterialOwnerModalOpen = ref(false);
+const materialOwnersList = ref<any[]>([]);
+const materialFilterOwner = ref('');
+const selectedMaterialOwnerInfo = computed(() => {
+  if (!materialFilterOwner.value) return null;
+  return materialOwnersList.value.find(o => String(o.id) === String(materialFilterOwner.value)) || null;
+});
 const isMaterialModalOpen = ref(false);
 const isMaterialImportModalOpen = ref(false);
 const selectedMaterialForEdit = ref<any>(null);
@@ -1739,6 +1813,8 @@ const filteredMaterials = computed(() => {
     list = list.filter(m =>
       m.code.toLowerCase().includes(q) ||
       m.name.toLowerCase().includes(q) ||
+      (m.system_code && m.system_code.toLowerCase().includes(q)) ||
+      (m.system_name && m.system_name.toLowerCase().includes(q)) ||
       (m.category && m.category.toLowerCase().includes(q))
     );
   }
@@ -1776,13 +1852,33 @@ const materialToRecord = computed(() => {
 
 async function loadMaterials() {
   try {
-    const res = await fetch('/api/v1/materials');
+    const params = new URLSearchParams();
+    if (materialFilterOwner.value) {
+      params.append('owner_id', String(materialFilterOwner.value));
+    }
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+    const res = await fetch(`/api/v1/materials${queryString}`);
     const json = await res.json();
     materials.value = json.data || [];
   } catch (err) {
     console.error('Erro ao carregar materiais:', err);
   }
 }
+
+async function loadMaterialOwners() {
+  try {
+    const res = await fetch('/api/v1/material-owners?active_only=true');
+    const json = await res.json();
+    materialOwnersList.value = json.data || [];
+  } catch (err) {
+    console.error('Erro ao carregar proprietários de material:', err);
+  }
+}
+
+watch(materialFilterOwner, () => {
+  materialCurrentPage.value = 1;
+  loadMaterials();
+});
 
 async function loadUnits() {
   try {
@@ -2101,8 +2197,13 @@ function openMaterialOwnerCrudModal() {
   isMaterialOwnerModalOpen.value = true;
 }
 
-function onMaterialOwnersUpdated() {
+async function onMaterialOwnersUpdated() {
   showToast('Proprietários sincronizados com sucesso!');
+  await Promise.all([
+    loadMaterialOwners(),
+    loadMaterials(),
+    loadDepots(),
+  ]);
 }
 
 // ─── AÇÕES DE MODAL: DEPÓSITOS ───────────────────────────────────────────────
@@ -2135,6 +2236,7 @@ async function refreshCurrentTab() {
       loadClusters(),
       loadDepotTypes(),
       loadMaterialCategories(),
+      loadMaterialOwners(),
       loadMaterials(),
       loadUnits(),
       loadDepots(),
@@ -2154,6 +2256,7 @@ onMounted(async () => {
     loadClusters(),
     loadDepotTypes(),
     loadMaterialCategories(),
+    loadMaterialOwners(),
     loadMaterials(),
     loadUnits(),
     loadDepots(),

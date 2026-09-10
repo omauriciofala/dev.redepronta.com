@@ -48,4 +48,9 @@ class Material extends Model
     {
         return $this->hasMany(StockSerial::class);
     }
+
+    public function ownerMaterials()
+    {
+        return $this->hasMany(OwnerMaterial::class, 'material_id');
+    }
 }

@@ -220,7 +220,24 @@
                   </span>
                 </td>
                 <td class="py-3 px-4 text-right">
-                  <div class="flex items-center justify-end gap-1">
+                  <div class="flex items-center justify-end gap-1.5">
+                    <!-- Botão Gerenciar Catálogo de Materiais -->
+                    <button
+                      type="button"
+                      @click="openCatalogModal(owner)"
+                      class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-orange-50 dark:bg-[#FC6714]/15 hover:bg-[#FC6714] hover:text-white text-[#FC6714] dark:text-orange-400 font-semibold transition cursor-pointer text-xs"
+                      title="Gerenciar Catálogo de Materiais e Códigos deste Proprietário"
+                    >
+                      <BookOpen class="w-3.5 h-3.5" />
+                      <span>Catálogo</span>
+                      <span
+                        v-if="owner.owner_materials_count"
+                        class="ml-0.5 px-1.5 py-0.2 rounded-full text-[10px] bg-[#FC6714]/20 text-[#FC6714]"
+                      >
+                        {{ owner.owner_materials_count }}
+                      </span>
+                    </button>
+
                     <button
                       type="button"
                       @click="openEditForm(owner)"
@@ -273,6 +290,14 @@
       </div>
     </template>
   </BaseModal>
+
+  <!-- Modal do Catálogo de Materiais do Proprietário -->
+  <OwnerMaterialCatalogModal
+    :is-open="isCatalogModalOpen"
+    :owner="selectedOwnerForCatalog"
+    @close="isCatalogModalOpen = false"
+    @updated="onCatalogUpdated"
+  />
 </template>
 
 <script setup lang="ts">
@@ -286,9 +311,11 @@ import {
   X,
   AlertCircle,
   AlertTriangle,
+  BookOpen,
 } from 'lucide-vue-next';
 import BaseModal from '@/components/common/BaseModal.vue';
 import PersonSearchSelect from '@/components/common/PersonSearchSelect.vue';
+import OwnerMaterialCatalogModal from '@/components/supplies/auxiliary/OwnerMaterialCatalogModal.vue';
 
 export interface OwnerItem {
   id: number;
@@ -297,6 +324,7 @@ export interface OwnerItem {
   name: string;
   description?: string;
   is_active: boolean;
+  owner_materials_count?: number;
   person?: {
     id: number;
     name: string;
@@ -325,6 +353,20 @@ const editingId = ref<number | null>(null);
 const formError = ref('');
 const deleteError = ref('');
 const initialPersonName = ref('');
+
+// Gerenciamento de Catálogo do Proprietário
+const isCatalogModalOpen = ref(false);
+const selectedOwnerForCatalog = ref<OwnerItem | null>(null);
+
+function openCatalogModal(owner: OwnerItem) {
+  selectedOwnerForCatalog.value = owner;
+  isCatalogModalOpen.value = true;
+}
+
+function onCatalogUpdated() {
+  loadOwners();
+  emit('updated');
+}
 
 const form = ref({
   person_id: null as number | null,

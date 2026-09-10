@@ -97,8 +97,13 @@
               <span class="truncate block text-xs font-semibold text-slate-900 dark:text-slate-100">
                 {{ material.name }}
               </span>
-              <div class="flex items-center gap-2 text-[11px] text-slate-400 dark:text-slate-500 truncate">
-                <span class="font-mono font-bold text-slate-500 dark:text-slate-400">SKU: {{ material.code }}</span>
+              <div class="flex items-center gap-2 text-[11px] text-slate-400 dark:text-slate-500 truncate mt-0.5">
+                <span class="font-mono font-bold" :class="material.has_owner_alias ? 'text-[#FC6714]' : 'text-slate-500 dark:text-slate-400'">
+                  {{ material.has_owner_alias ? `Cód. Proprietário: ${material.code}` : `SKU: ${material.code}` }}
+                </span>
+                <span v-if="material.has_owner_alias && material.system_code" class="font-mono text-[10px] text-slate-400">
+                  (SKU Sist: {{ material.system_code }})
+                </span>
                 <span v-if="material.category">• {{ material.category }}</span>
                 <span>• {{ material.unit?.code || material.unit || 'UND' }}</span>
               </div>
@@ -147,6 +152,11 @@ interface MaterialItem {
   has_serial?: boolean;
   min_stock?: number;
   is_active?: boolean;
+  system_code?: string;
+  system_name?: string;
+  owner_code?: string;
+  owner_name?: string;
+  has_owner_alias?: boolean;
 }
 
 const props = withDefaults(defineProps<{
@@ -158,6 +168,8 @@ const props = withDefaults(defineProps<{
   required?: boolean;
   materialsList?: MaterialItem[];
   hasSerialOnly?: boolean;
+  ownerId?: number | string | null;
+  depotId?: number | string | null;
 }>(), {
   modelValue: null,
   initialMaterialName: '',
@@ -167,6 +179,8 @@ const props = withDefaults(defineProps<{
   required: false,
   materialsList: () => [],
   hasSerialOnly: false,
+  ownerId: null,
+  depotId: null,
 });
 
 const emit = defineEmits<{
@@ -194,7 +208,10 @@ const displayText = computed(() => {
   if (selectedMaterial.value) {
     const unitStr = selectedMaterial.value.unit?.code ? ` [${selectedMaterial.value.unit.code}]` : '';
     const serialStr = selectedMaterial.value.has_serial ? ' (Serial)' : '';
-    return `${selectedMaterial.value.code} - ${selectedMaterial.value.name}${unitStr}${serialStr}`;
+    const aliasStr = selectedMaterial.value.has_owner_alias && selectedMaterial.value.system_code
+      ? ` (SKU Sist: ${selectedMaterial.value.system_code})`
+      : '';
+    return `${selectedMaterial.value.code} - ${selectedMaterial.value.name}${aliasStr}${unitStr}${serialStr}`;
   }
   if (props.initialMaterialName) {
     return props.initialMaterialName;
@@ -216,15 +233,18 @@ const filterLocalList = (searchTerm: string): MaterialItem[] => {
     const nameMatch = m.name?.toLowerCase().includes(term);
     const codeMatch = m.code?.toLowerCase().includes(term);
     const catMatch = m.category?.toLowerCase().includes(term);
-    return nameMatch || codeMatch || catMatch;
+    const ownerCodeMatch = m.owner_code?.toLowerCase().includes(term);
+    const ownerNameMatch = m.owner_name?.toLowerCase().includes(term);
+    const sysCodeMatch = m.system_code?.toLowerCase().includes(term);
+    return nameMatch || codeMatch || catMatch || ownerCodeMatch || ownerNameMatch || sysCodeMatch;
   }).slice(0, 20);
 };
 
 const searchMaterials = async (searchTerm: string) => {
   hasSearched.value = true;
 
-  // Primeiro tenta filtrar na lista local se disponível
-  if (props.materialsList && props.materialsList.length > 0) {
+  // Primeiro tenta filtrar na lista local se disponível (apenas se não houver ownerId/depotId específico)
+  if (!props.ownerId && !props.depotId && props.materialsList && props.materialsList.length > 0) {
     const localMatches = filterLocalList(searchTerm);
     if (localMatches.length > 0 || searchTerm.length < 2) {
       results.value = localMatches;
@@ -234,7 +254,7 @@ const searchMaterials = async (searchTerm: string) => {
     }
   }
 
-  if (searchTerm.length < 2) {
+  if (searchTerm.length < 2 && !props.ownerId && !props.depotId) {
     results.value = filterLocalList('');
     isLoading.value = false;
     return;
@@ -248,6 +268,12 @@ const searchMaterials = async (searchTerm: string) => {
     };
     if (props.hasSerialOnly) {
       params.has_serial = true;
+    }
+    if (props.ownerId) {
+      params.owner_id = props.ownerId;
+    }
+    if (props.depotId) {
+      params.depot_id = props.depotId;
     }
 
     const response = await axios.get('/api/v1/materials', { params });

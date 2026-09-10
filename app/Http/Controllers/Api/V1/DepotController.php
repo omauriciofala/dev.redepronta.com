@@ -18,7 +18,7 @@ class DepotController extends Controller
     public function index(Request $request): JsonResponse
     {
         $accountId = $this->getAccountId();
-        $query = Depot::where('account_id', $accountId)->with(['cluster', 'responsiblePerson', 'city.state']);
+        $query = Depot::where('account_id', $accountId)->with(['cluster.owner', 'owner', 'responsiblePerson', 'city.state']);
 
         if ($request->filled('search')) {
             $s = $request->query('search');
@@ -30,6 +30,17 @@ class DepotController extends Controller
 
         if ($request->filled('cluster_id')) {
             $query->where('cluster_id', $request->query('cluster_id'));
+        }
+
+        if ($request->filled('owner_id')) {
+            $ownerId = $request->query('owner_id');
+            $query->where(function ($q) use ($ownerId) {
+                $q->where('owner_id', $ownerId)
+                  ->orWhere(function ($sub) use ($ownerId) {
+                      $sub->whereNull('owner_id')
+                          ->whereHas('cluster', fn($c) => $c->where('owner_id', $ownerId));
+                  });
+            });
         }
 
         if ($request->filled('type')) {
@@ -53,7 +64,7 @@ class DepotController extends Controller
         $data['account_id'] = $this->getAccountId();
 
         $depot = Depot::create($data);
-        $depot->load(['cluster', 'responsiblePerson', 'city.state']);
+        $depot->load(['cluster.owner', 'owner', 'responsiblePerson', 'city.state']);
 
         return response()->json([
             'message' => 'Depósito criado com sucesso.',
@@ -63,14 +74,14 @@ class DepotController extends Controller
 
     public function show(Depot $depot): JsonResponse
     {
-        $depot->load(['cluster', 'responsiblePerson', 'city.state', 'balances.material.unit']);
+        $depot->load(['cluster.owner', 'owner', 'responsiblePerson', 'city.state', 'balances.material.unit']);
         return response()->json(['data' => $depot]);
     }
 
     public function update(StoreDepotRequest $request, Depot $depot): JsonResponse
     {
         $depot->update($request->validated());
-        $depot->load(['cluster', 'responsiblePerson', 'city.state']);
+        $depot->load(['cluster.owner', 'owner', 'responsiblePerson', 'city.state']);
 
         return response()->json([
             'message' => 'Depósito atualizado com sucesso.',

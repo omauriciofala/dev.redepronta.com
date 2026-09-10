@@ -19,7 +19,7 @@ class MaterialOwnerController extends Controller
     public function index(Request $request): JsonResponse
     {
         $accountId = $this->getAccountId();
-        $query = MaterialOwner::where('account_id', $accountId)->with('person');
+        $query = MaterialOwner::where('account_id', $accountId)->with('person')->withCount('ownerMaterials');
 
         if ($request->filled('search')) {
             $s = $request->query('search');

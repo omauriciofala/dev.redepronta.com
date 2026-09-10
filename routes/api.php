@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\V1\DepotController;
 use App\Http\Controllers\Api\V1\MaterialCategoryController;
 use App\Http\Controllers\Api\V1\UnitController;
 use App\Http\Controllers\Api\V1\MaterialOwnerController;
+use App\Http\Controllers\Api\V1\OwnerMaterialController;
 use App\Http\Controllers\Api\V1\MaterialController;
 use App\Http\Controllers\Api\V1\StockController;
 
@@ -52,6 +53,12 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('units', UnitController::class);
     Route::apiResource('material-categories', MaterialCategoryController::class);
     Route::apiResource('material-owners', MaterialOwnerController::class);
+    Route::get('material-owners/{materialOwner}/materials/template', [OwnerMaterialController::class, 'template']);
+    Route::post('material-owners/{materialOwner}/materials/import', [OwnerMaterialController::class, 'import']);
+    Route::apiResource('material-owners.materials', OwnerMaterialController::class)->parameters([
+        'material-owners' => 'materialOwner',
+        'materials' => 'ownerMaterial',
+    ]);
     Route::get('materials/units', [MaterialController::class, 'units']);
     Route::get('materials/import-template', [MaterialController::class, 'downloadTemplate']);
     Route::post('materials/import', [MaterialController::class, 'import']);

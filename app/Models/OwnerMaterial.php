@@ -5,16 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class MaterialOwner extends Model
+class OwnerMaterial extends Model
 {
     use SoftDeletes;
 
     protected $fillable = [
         'account_id',
-        'person_id',
-        'code',
-        'name',
-        'description',
+        'material_owner_id',
+        'material_id',
+        'owner_code',
+        'owner_name',
+        'notes',
         'is_active',
     ];
 
@@ -27,13 +28,13 @@ class MaterialOwner extends Model
         return $this->belongsTo(Account::class);
     }
 
-    public function person()
+    public function owner()
     {
-        return $this->belongsTo(Person::class);
+        return $this->belongsTo(MaterialOwner::class, 'material_owner_id');
     }
 
-    public function ownerMaterials()
+    public function material()
     {
-        return $this->hasMany(OwnerMaterial::class, 'material_owner_id');
+        return $this->belongsTo(Material::class, 'material_id');
     }
 }

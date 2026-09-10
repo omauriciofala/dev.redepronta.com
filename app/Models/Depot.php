@@ -12,6 +12,7 @@ class Depot extends Model
     protected $fillable = [
         'account_id',
         'cluster_id',
+        'owner_id',
         'responsible_person_id',
         'city_id',
         'name',
@@ -25,6 +26,10 @@ class Depot extends Model
         'is_active' => 'boolean',
     ];
 
+    protected $appends = [
+        'effective_owner',
+    ];
+
     public function account()
     {
         return $this->belongsTo(Account::class);
@@ -33,6 +38,16 @@ class Depot extends Model
     public function cluster()
     {
         return $this->belongsTo(DepotCluster::class, 'cluster_id');
+    }
+
+    public function owner()
+    {
+        return $this->belongsTo(MaterialOwner::class, 'owner_id');
+    }
+
+    public function getEffectiveOwnerAttribute(): ?MaterialOwner
+    {
+        return $this->owner ?? $this->cluster?->owner;
     }
 
     public function responsiblePerson()
