@@ -3,13 +3,13 @@
     :model-value="isOpen"
     @update:model-value="$emit('close')"
     title="Transferência Atômica de Materiais"
-    description="Movimentação rastreável entre almoxarifados centrais, bases regionais e veículos de técnicos"
+    description="Movimentação rastreável entre almoxarifados centrais, bases e depósitos operacionais"
     size="lg"
   >
     <!-- Header Badge -->
     <template #header-badge>
       <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800">
-        Rastreabilidade FSM / WMS
+        Rastreabilidade WMS
       </span>
     </template>
 
@@ -72,7 +72,7 @@
         >
           <option value="" disabled>Selecione o item...</option>
           <option v-for="m in materials" :key="m.id" :value="m.id">
-            {{ m.code }} — {{ m.name }} ({{ m.has_serial ? 'Serializado ONU' : 'Convencional' }})
+            {{ m.code }} — {{ m.name }} ({{ m.has_serial ? 'Serializado' : 'Convencional' }})
           </option>
         </select>
       </div>
@@ -85,7 +85,7 @@
         <div class="flex items-center justify-between">
           <label class="font-bold text-purple-900 dark:text-purple-300 uppercase tracking-wider flex items-center gap-1.5">
             <QrCode class="w-4 h-4 text-purple-600" />
-            <span>Selecione as ONUs em Estoque no Depósito de Origem:</span>
+            <span>Selecione os Seriais em Estoque no Depósito de Origem:</span>
           </label>
           <span class="font-semibold text-purple-700 dark:text-purple-300">
             {{ form.serial_ids.length }} de {{ availableSerials.length }} selecionado(s)
@@ -96,7 +96,7 @@
           <span class="inline-block animate-spin mr-1.5">⟳</span> Localizando seriais disponíveis no depósito...
         </div>
         <div v-else-if="availableSerials.length === 0" class="py-4 text-center text-slate-500 dark:text-slate-400 italic">
-          Nenhuma ONU disponível com status 'Em Estoque' no depósito selecionado.
+          Nenhum serial disponível com status 'Em Estoque' no depósito selecionado.
         </div>
         <div v-else class="max-h-44 overflow-y-auto space-y-1.5 pr-1 divide-y divide-purple-100 dark:divide-purple-900/40">
           <label
@@ -234,10 +234,9 @@ function formatDepotType(type: string): string {
   const map: Record<string, string> = {
     CENTRAL: 'Almoxarifado Central',
     REGIONAL_BASE: 'Base Regional',
-    VEHICLE: 'Veículo em Campo',
     LAB_REPAIR: 'Laboratório de Reparo',
   };
-  return map[type] || type;
+  return map[type] || 'Depósito';
 }
 
 watch(

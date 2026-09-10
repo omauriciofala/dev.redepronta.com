@@ -13,7 +13,7 @@
             Suprimentos & WMS
           </h1>
           <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
-            Gestão de depósitos físicos, saldo virtual aglutinado de clusters e rastreabilidade serial
+            Gestão de depósitos físicos, posições regionais consolidadas e rastreabilidade serial
           </p>
         </div>
       </div>
@@ -52,7 +52,6 @@
             aria-haspopup="true"
             :aria-expanded="isHeaderMenuOpen"
           >
-            <!-- Três pontos verticais (Reticências) nativos -->
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5" viewBox="0 0 24 24" fill="currentColor">
               <circle cx="12" cy="5" r="2"></circle>
               <circle cx="12" cy="12" r="2"></circle>
@@ -84,7 +83,7 @@
                   class="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] dark:hover:text-orange-300 transition cursor-pointer"
                 >
                   <MapPin class="w-4 h-4 text-slate-400" />
-                  <span>Clusters Regionais</span>
+                  <span>Posições Regionais</span>
                 </button>
 
                 <button
@@ -93,7 +92,7 @@
                   class="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] dark:hover:text-orange-300 transition cursor-pointer"
                 >
                   <Warehouse class="w-4 h-4 text-slate-400" />
-                  <span>Depósitos & Veículos</span>
+                  <span>Depósitos</span>
                 </button>
 
                 <button
@@ -147,7 +146,7 @@
         class="pb-3 border-b-2 text-sm flex items-center gap-2 transition cursor-pointer shrink-0"
       >
         <Layers class="w-4 h-4" />
-        <span>Posição Regional (Saldo Virtual Aglutinado)</span>
+        <span>Posição Regional</span>
         <span
           v-if="regionalMaterials.length > 0"
           class="px-2 py-0.5 rounded-full text-[11px] font-bold"
@@ -185,7 +184,7 @@
         class="pb-3 border-b-2 text-sm flex items-center gap-2 transition cursor-pointer shrink-0"
       >
         <Warehouse class="w-4 h-4" />
-        <span>Depósitos & Veículos</span>
+        <span>Depósitos</span>
         <span
           v-if="depots.length > 0"
           class="px-2 py-0.5 rounded-full text-[11px] font-bold"
@@ -204,7 +203,7 @@
         class="pb-3 border-b-2 text-sm flex items-center gap-2 transition cursor-pointer shrink-0"
       >
         <QrCode class="w-4 h-4" />
-        <span>Seriais (ONUs & GPON)</span>
+        <span>Serializado</span>
         <span
           v-if="serialsList.length > 0"
           class="px-2 py-0.5 rounded-full text-[11px] font-bold"
@@ -216,14 +215,14 @@
     </div>
 
     <!-- ============================================================================= -->
-    <!-- ABA 1: POSIÇÃO REGIONAL (SALDO VIRTUAL AGLUTINADO) -->
+    <!-- ABA 1: POSIÇÃO REGIONAL -->
     <!-- ============================================================================= -->
     <div v-if="activeTab === 'regional'" class="space-y-6">
-      <!-- Seletor Confortável de Cluster Regional -->
+      <!-- Seletor Confortável de Posição Regional -->
       <div class="p-4 bg-white dark:bg-[#06064D]/50 rounded-xl border border-slate-200 dark:border-[#14147A] flex flex-wrap items-center justify-between gap-4 text-sm shadow-2xs">
         <div class="flex items-center gap-3">
           <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-            Cluster Regional:
+            Posição Regional:
           </span>
           <div class="flex flex-wrap gap-2">
             <button
@@ -245,12 +244,12 @@
         <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
           <span class="inline-flex items-center gap-1.5">
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            Aglutinação em tempo real (Base Física + Técnicos em Campo)
+            Consolidação dos saldos dos depósitos da região em tempo real
           </span>
         </div>
       </div>
 
-      <!-- 4 Cards Métricos de Estoque do Cluster -->
+      <!-- 4 Cards Métricos de Estoque da Posição Regional -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="p-5 rounded-xl border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D]/50 shadow-xs flex items-center gap-3.5">
           <div class="p-3 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 shrink-0">
@@ -269,7 +268,7 @@
             <Warehouse class="w-6 h-6" />
           </div>
           <div>
-            <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Saldo Físico (Base)</p>
+            <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Saldo Físico Consolidado</p>
             <h3 class="text-xl font-bold text-slate-900 dark:text-slate-100 mt-0.5">
               {{ formatNumber(currentClusterSummary.total_items_count || 0) }}
             </h3>
@@ -281,7 +280,7 @@
             <QrCode class="w-6 h-6" />
           </div>
           <div>
-            <p class="text-xs font-medium text-slate-500 dark:text-slate-400">ONUs / Seriais Prontos</p>
+            <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Itens Serializados</p>
             <h3 class="text-xl font-bold text-slate-900 dark:text-slate-100 mt-0.5">
               {{ currentClusterSummary.total_serials_in_stock || 0 }}
             </h3>
@@ -290,18 +289,18 @@
 
         <div class="p-5 rounded-xl border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D]/50 shadow-xs flex items-center gap-3.5">
           <div class="p-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 shrink-0">
-            <Truck class="w-6 h-6" />
+            <Warehouse class="w-6 h-6" />
           </div>
           <div>
-            <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Veículos no Cluster</p>
+            <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Depósitos na Região</p>
             <h3 class="text-xl font-bold text-slate-900 dark:text-slate-100 mt-0.5">
-              {{ currentClusterSummary.vehicles_count || 0 }} técnicos
+              {{ currentClusterSummary.depots_count || 0 }} depósitos
             </h3>
           </div>
         </div>
       </div>
 
-      <!-- Barra de Filtro e Busca Rápida na Aba Regional -->
+      <!-- Barra de Filtro e Busca Rápida na Posição Regional -->
       <div class="p-4 bg-white dark:bg-[#06064D]/50 rounded-xl border border-slate-200 dark:border-[#14147A] flex flex-wrap items-center justify-between gap-4 text-sm shadow-2xs">
         <div class="relative flex-1 min-w-[280px]">
           <Search class="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400 pointer-events-none" />
@@ -326,7 +325,7 @@
         </div>
       </div>
 
-      <!-- TABELA CONFORTÁVEL 1: POSIÇÃO REGIONAL AGLUTINADA (SEÇÃO 7 DESIGN SYSTEM) -->
+      <!-- TABELA CONFORTÁVEL 1: POSIÇÃO REGIONAL (SEÇÃO 7 DESIGN SYSTEM) -->
       <div class="rounded-xl border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D]/50 shadow-xs overflow-hidden transition-colors duration-200">
         <div class="overflow-x-auto min-h-[280px]">
           <table class="w-full text-left border-collapse text-sm">
@@ -349,42 +348,31 @@
                 <!-- Unidade -->
                 <th class="py-3.5 px-5">Unidade</th>
 
-                <!-- Saldo Base Física -->
+                <!-- Custo Médio Unitário -->
                 <th
-                  @click="toggleSortRegional('base_quantity')"
+                  @click="toggleSortRegional('unit_cost')"
                   class="py-3.5 px-5 text-right cursor-pointer hover:text-[#FC6714] dark:hover:text-[#FC6714] transition"
-                  title="Ordenar por Saldo na Base"
+                  title="Ordenar por Custo Médio"
                 >
                   <div class="inline-flex items-center justify-end gap-1.5 w-full">
-                    <span>Saldo Base Física</span>
-                    <ArrowUp v-if="regionalSortBy === 'base_quantity' && regionalSortDir === 'asc'" class="w-3.5 h-3.5 text-[#FC6714]" />
-                    <ArrowDown v-else-if="regionalSortBy === 'base_quantity' && regionalSortDir === 'desc'" class="w-3.5 h-3.5 text-[#FC6714]" />
+                    <span>Custo Médio</span>
+                    <ArrowUp v-if="regionalSortBy === 'unit_cost' && regionalSortDir === 'asc'" class="w-3.5 h-3.5 text-[#FC6714]" />
+                    <ArrowDown v-else-if="regionalSortBy === 'unit_cost' && regionalSortDir === 'desc'" class="w-3.5 h-3.5 text-[#FC6714]" />
                     <ArrowUpDown v-else class="w-3.5 h-3.5 text-slate-400 opacity-60" />
                   </div>
                 </th>
 
-                <!-- Saldo em Veículos -->
-                <th
-                  @click="toggleSortRegional('vehicles_quantity')"
-                  class="py-3.5 px-5 text-right cursor-pointer hover:text-[#FC6714] dark:hover:text-[#FC6714] transition"
-                  title="Ordenar por Saldo em Veículos"
-                >
-                  <div class="inline-flex items-center justify-end gap-1.5 w-full">
-                    <span>Saldo Veículos (Campo)</span>
-                    <ArrowUp v-if="regionalSortBy === 'vehicles_quantity' && regionalSortDir === 'asc'" class="w-3.5 h-3.5 text-[#FC6714]" />
-                    <ArrowDown v-else-if="regionalSortBy === 'vehicles_quantity' && regionalSortDir === 'desc'" class="w-3.5 h-3.5 text-[#FC6714]" />
-                    <ArrowUpDown v-else class="w-3.5 h-3.5 text-slate-400 opacity-60" />
-                  </div>
-                </th>
+                <!-- Estoque Mínimo -->
+                <th class="py-3.5 px-5 text-right">Estoque Mín.</th>
 
-                <!-- Saldo Virtual Aglutinado -->
+                <!-- Saldo na Região -->
                 <th
                   @click="toggleSortRegional('total_virtual_quantity')"
                   class="py-3.5 px-5 text-right cursor-pointer hover:text-[#FC6714] dark:hover:text-[#FC6714] transition"
-                  title="Ordenar por Saldo Aglutinado Total"
+                  title="Ordenar por Saldo na Região"
                 >
                   <div class="inline-flex items-center justify-end gap-1.5 w-full">
-                    <span>Saldo Virtual Aglutinado</span>
+                    <span>Saldo na Região</span>
                     <ArrowUp v-if="regionalSortBy === 'total_virtual_quantity' && regionalSortDir === 'asc'" class="w-3.5 h-3.5 text-[#FC6714]" />
                     <ArrowDown v-else-if="regionalSortBy === 'total_virtual_quantity' && regionalSortDir === 'desc'" class="w-3.5 h-3.5 text-[#FC6714]" />
                     <ArrowUpDown v-else class="w-3.5 h-3.5 text-slate-400 opacity-60" />
@@ -400,9 +388,9 @@
                 <td colspan="6" class="py-12 text-center text-slate-400 text-sm">
                   <div class="max-w-sm mx-auto space-y-2">
                     <Boxes class="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto" />
-                    <p class="font-medium text-slate-700 dark:text-slate-300">Nenhum material encontrado no cluster</p>
+                    <p class="font-medium text-slate-700 dark:text-slate-300">Nenhum material encontrado nesta posição regional</p>
                     <p class="text-xs text-slate-500 dark:text-slate-400">
-                      Faça uma transferência de estoque para a base deste cluster ou selecione outra região.
+                      Faça uma transferência de estoque para os depósitos desta região ou selecione outra posição regional.
                     </p>
                   </div>
                 </td>
@@ -414,13 +402,13 @@
                   <!-- Identificação do Material -->
                   <td class="py-4 px-5">
                     <div class="flex items-center gap-3">
-                      <!-- Botão expansível se houver veículos -->
+                      <!-- Botão expansível se houver detalhamento de depósitos -->
                       <button
-                        v-if="m.vehicles_detail && m.vehicles_detail.length > 0"
+                        v-if="m.breakdown && m.breakdown.length > 0"
                         type="button"
                         @click="toggleExpand(m.material_id)"
                         class="p-1 rounded-md text-slate-400 hover:text-[#FC6714] hover:bg-orange-50 dark:hover:bg-[#FC6714]/10 transition cursor-pointer"
-                        :title="expandedRows.includes(m.material_id) ? 'Recolher detalhes de veículos' : 'Expandir detalhes de veículos'"
+                        :title="expandedRows.includes(m.material_id) ? 'Recolher detalhes por depósito' : 'Ver distribuição por depósito'"
                       >
                         <ChevronDown
                           class="w-4 h-4 transition-transform duration-200"
@@ -437,6 +425,14 @@
                           <span class="font-mono text-xs text-slate-500 dark:text-slate-400">
                             SKU: {{ m.code }}
                           </span>
+                          <button
+                            @click="copyToClipboard(m.code, 'sku-reg-' + m.material_id)"
+                            class="p-0.5 rounded text-slate-400 hover:text-[#FC6714] transition cursor-pointer"
+                            title="Copiar código SKU"
+                          >
+                            <Check v-if="copiedKey === 'sku-reg-' + m.material_id" class="w-3 h-3 text-emerald-500" />
+                            <Copy v-else class="w-3 h-3" />
+                          </button>
                           <span
                             v-if="m.has_serial"
                             class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-purple-50 text-purple-700 border border-purple-200/70 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800/60"
@@ -453,25 +449,21 @@
                     {{ m.unit || 'UND' }}
                   </td>
 
-                  <!-- Saldo na Base Física -->
-                  <td class="py-4 px-5 text-right font-mono text-sm font-semibold text-slate-900 dark:text-slate-100">
-                    {{ formatNumber(m.base_quantity) }}
+                  <!-- Custo Médio -->
+                  <td class="py-4 px-5 text-right font-mono text-sm text-slate-700 dark:text-slate-300">
+                    R$ {{ formatNumber(m.unit_cost) }}
                   </td>
 
-                  <!-- Saldo Veículos (Campo) -->
-                  <td class="py-4 px-5 text-right font-mono text-sm">
-                    <span
-                      v-if="m.vehicles_quantity > 0"
-                      class="text-blue-600 dark:text-blue-400 font-semibold"
-                    >
-                      {{ formatNumber(m.vehicles_quantity) }}
+                  <!-- Estoque Mínimo -->
+                  <td class="py-4 px-5 text-right font-mono text-sm text-slate-700 dark:text-slate-300">
+                    <span :class="{ 'text-rose-600 dark:text-rose-400 font-bold': m.is_low_stock }">
+                      {{ formatNumber(m.min_stock) }}
                     </span>
-                    <span v-else class="text-slate-400">0</span>
                   </td>
 
-                  <!-- Saldo Virtual Aglutinado (Destacado) -->
+                  <!-- Saldo na Região (Destacado) -->
                   <td class="py-4 px-5 text-right">
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold bg-[#FC6714]/10 text-[#FC6714] border border-[#FC6714]/30">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-[#FC6714]/10 text-[#FC6714] border border-[#FC6714]/30">
                       {{ formatNumber(m.total_virtual_quantity) }} {{ m.unit || 'UND' }}
                     </span>
                   </td>
@@ -489,54 +481,54 @@
                   </td>
                 </tr>
 
-                <!-- Linha Sub-Tabela Confortável: Detalhamento de Veículos -->
+                <!-- Linha Sub-Tabela Confortável: Distribuição por Depósitos da Região -->
                 <tr v-if="expandedRows.includes(m.material_id)" class="bg-slate-50/60 dark:bg-[#03032E]/40">
                   <td colspan="6" class="p-4 pl-14">
                     <div class="rounded-xl border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D]/80 shadow-xs overflow-hidden">
                       <div class="px-4 py-2.5 bg-slate-100/70 dark:bg-[#03032E] border-b border-slate-200 dark:border-[#14147A] flex items-center justify-between text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
                         <span class="flex items-center gap-1.5">
-                          <Truck class="w-3.5 h-3.5 text-blue-500" />
-                          Distribuição em Veículos de Técnicos (FSM)
+                          <Warehouse class="w-3.5 h-3.5 text-blue-500" />
+                          Distribuição por Depósito na Posição Regional
                         </span>
                         <span class="text-slate-400 font-medium lowercase">
-                          {{ m.vehicles_detail.length }} veículo(s) com este item
+                          {{ m.breakdown.length }} depósito(s) com este item
                         </span>
                       </div>
                       <table class="w-full text-left text-xs border-collapse">
                         <thead>
                           <tr class="border-b border-slate-200 dark:border-[#14147A] bg-slate-50/50 dark:bg-[#03032E]/30 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
-                            <th class="py-2.5 px-4">Veículo / Depósito</th>
-                            <th class="py-2.5 px-4">Placa</th>
-                            <th class="py-2.5 px-4">Técnico Responsável</th>
-                            <th class="py-2.5 px-4 text-right">Quantidade em Campo</th>
+                            <th class="py-2.5 px-4">Depósito</th>
+                            <th class="py-2.5 px-4">Tipo</th>
+                            <th class="py-2.5 px-4">Responsável</th>
+                            <th class="py-2.5 px-4 text-right">Saldo no Depósito</th>
                             <th class="py-2.5 px-4 text-right">Ação</th>
                           </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 dark:divide-[#14147A]/60">
                           <tr
-                            v-for="(vd, vIdx) in m.vehicles_detail"
-                            :key="vIdx"
+                            v-for="(bk, bIdx) in m.breakdown"
+                            :key="bIdx"
                             class="hover:bg-slate-50/70 dark:hover:bg-white/5 transition"
                           >
                             <td class="py-3 px-4 font-semibold text-slate-800 dark:text-slate-200">
-                              {{ vd.depot_name }}
+                              {{ bk.depot_name }}
                             </td>
-                            <td class="py-3 px-4 font-mono text-slate-600 dark:text-slate-300">
-                              {{ vd.vehicle_plate || '-' }}
+                            <td class="py-3 px-4 text-slate-600 dark:text-slate-300">
+                              {{ formatDepotType(bk.depot_type) }}
                             </td>
                             <td class="py-3 px-4 text-slate-700 dark:text-slate-300">
-                              {{ vd.responsible_person || 'Não atribuído' }}
+                              {{ bk.responsible_name || '-' }}
                             </td>
                             <td class="py-3 px-4 text-right font-mono font-bold text-blue-600 dark:text-blue-400">
-                              {{ formatNumber(vd.quantity) }} {{ m.unit || 'UND' }}
+                              {{ formatNumber(bk.quantity) }} {{ m.unit || 'UND' }}
                             </td>
                             <td class="py-3 px-4 text-right">
                               <button
                                 type="button"
-                                @click="openTransferFromVehicle(vd, m)"
+                                @click="openTransferFromBreakdown(bk, m)"
                                 class="h-7 px-2.5 text-[11px] font-medium rounded-md border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] text-slate-700 dark:text-slate-200 hover:bg-orange-50 hover:text-[#FC6714] transition cursor-pointer"
                               >
-                                Reabastecer / Retirar
+                                Movimentar
                               </button>
                             </td>
                           </tr>
@@ -595,8 +587,8 @@
             v-model="materialFilterType"
             class="h-11 px-3 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-xs font-semibold focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer"
           >
-            <option value="all">Todos os Tipos de Rastreio</option>
-            <option value="serialized">Apenas Serializados (ONUs)</option>
+            <option value="all">Todos os Tipos</option>
+            <option value="serialized">Apenas Serializados</option>
             <option value="standard">Apenas Convencionais</option>
           </select>
 
@@ -646,7 +638,7 @@
                 <!-- Unidade -->
                 <th class="py-3.5 px-5">Unidade</th>
 
-                <!-- Tipo Rastreio -->
+                <!-- Rastreabilidade -->
                 <th class="py-3.5 px-5 text-center">Rastreabilidade</th>
 
                 <!-- Custo Médio Unitário -->
@@ -726,14 +718,14 @@
                   {{ m.unit?.code || 'UND' }}
                 </td>
 
-                <!-- Tipo Rastreio -->
+                <!-- Rastreabilidade -->
                 <td class="py-4 px-5 text-center">
                   <span
                     v-if="m.has_serial"
                     class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800/60"
                   >
                     <QrCode class="w-3.5 h-3.5" />
-                    <span>Serial / GPON</span>
+                    <span>Serializado</span>
                   </span>
                   <span
                     v-else
@@ -798,7 +790,7 @@
     </div>
 
     <!-- ============================================================================= -->
-    <!-- ABA 3: DEPÓSITOS & VEÍCULOS -->
+    <!-- ABA 3: DEPÓSITOS -->
     <!-- ============================================================================= -->
     <div v-if="activeTab === 'depots'" class="space-y-4">
       <!-- Barra de Filtros e Busca de Depósitos -->
@@ -808,7 +800,7 @@
           <input
             type="text"
             v-model="depotSearch"
-            placeholder="Buscar por nome do depósito, placa do veículo ou técnico responsável..."
+            placeholder="Buscar por nome ou código do depósito, ou responsável..."
             class="w-full h-11 pl-10 pr-10 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 text-sm transition"
           />
           <button
@@ -827,10 +819,9 @@
             v-model="depotFilterType"
             class="h-11 px-3 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-xs font-semibold focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer"
           >
-            <option value="all">Todos os Tipos</option>
+            <option value="all">Todos os Tipos de Depósito</option>
             <option value="CENTRAL">Almoxarifados Centrais</option>
             <option value="REGIONAL_BASE">Bases Regionais</option>
-            <option value="VEHICLE">Veículos em Campo</option>
             <option value="LAB_REPAIR">Laboratórios de Reparo</option>
           </select>
 
@@ -840,7 +831,7 @@
         </div>
       </div>
 
-      <!-- TABELA CONFORTÁVEL 3: DEPÓSITOS & VEÍCULOS (SEÇÃO 7 DESIGN SYSTEM) -->
+      <!-- TABELA CONFORTÁVEL 3: DEPÓSITOS (SEÇÃO 7 DESIGN SYSTEM) -->
       <div class="rounded-xl border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D]/50 shadow-xs overflow-hidden transition-colors duration-200">
         <div class="overflow-x-auto min-h-[280px]">
           <table class="w-full text-left border-collapse text-sm">
@@ -863,14 +854,11 @@
                 <!-- Tipo -->
                 <th class="py-3.5 px-5">Tipo de Depósito</th>
 
-                <!-- Cluster Regional -->
-                <th class="py-3.5 px-5">Cluster Vinculado</th>
+                <!-- Posição Regional -->
+                <th class="py-3.5 px-5">Posição Regional</th>
 
-                <!-- Veículo / Placa -->
-                <th class="py-3.5 px-5">Veículo / Placa</th>
-
-                <!-- Responsável / Técnico -->
-                <th class="py-3.5 px-5">Técnico / Responsável</th>
+                <!-- Responsável -->
+                <th class="py-3.5 px-5">Responsável</th>
 
                 <!-- Ações -->
                 <th class="py-3.5 px-5 text-right">Ação</th>
@@ -878,7 +866,7 @@
             </thead>
             <tbody class="divide-y divide-slate-100 dark:divide-[#14147A]/60">
               <tr v-if="filteredDepots.length === 0">
-                <td colspan="6" class="py-12 text-center text-slate-400 text-sm">
+                <td colspan="5" class="py-12 text-center text-slate-400 text-sm">
                   <div class="max-w-sm mx-auto space-y-2">
                     <Warehouse class="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto" />
                     <p class="font-medium text-slate-700 dark:text-slate-300">Nenhum depósito encontrado</p>
@@ -896,12 +884,8 @@
                 <!-- Identificação / Nome -->
                 <td class="py-4 px-5">
                   <div class="flex items-center gap-3">
-                    <div
-                      class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-                      :class="d.type === 'VEHICLE' ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-600' : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600'"
-                    >
-                      <Truck v-if="d.type === 'VEHICLE'" class="w-5 h-5" />
-                      <Warehouse v-else class="w-5 h-5" />
+                    <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600">
+                      <Warehouse class="w-5 h-5" />
                     </div>
                     <div>
                       <div class="font-semibold text-slate-900 dark:text-slate-100 text-sm">
@@ -921,36 +905,22 @@
                     :class="{
                       'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800/60': d.type === 'CENTRAL',
                       'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60': d.type === 'REGIONAL_BASE',
-                      'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800/60': d.type === 'VEHICLE',
                       'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/60': d.type === 'LAB_REPAIR',
+                      'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800/60': d.type !== 'CENTRAL' && d.type !== 'REGIONAL_BASE' && d.type !== 'LAB_REPAIR'
                     }"
                   >
                     {{ formatDepotType(d.type) }}
                   </span>
                 </td>
 
-                <!-- Cluster Vinculado -->
+                <!-- Posição Regional Vinculada -->
                 <td class="py-4 px-5 text-slate-700 dark:text-slate-300 font-medium text-sm">
-                  {{ d.cluster?.name || '-' }}
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs">
+                    {{ d.cluster?.name || '-' }}
+                  </span>
                 </td>
 
-                <!-- Veículo / Placa -->
-                <td class="py-4 px-5 font-mono text-sm">
-                  <div v-if="d.vehicle_plate" class="flex items-center gap-1.5">
-                    <span class="font-bold text-slate-800 dark:text-slate-200">{{ d.vehicle_plate }}</span>
-                    <button
-                      @click="copyToClipboard(d.vehicle_plate, 'plate-' + d.id)"
-                      class="p-0.5 rounded text-slate-400 hover:text-[#FC6714] transition cursor-pointer"
-                      title="Copiar placa"
-                    >
-                      <Check v-if="copiedKey === 'plate-' + d.id" class="w-3 h-3 text-emerald-500" />
-                      <Copy v-else class="w-3 h-3" />
-                    </button>
-                  </div>
-                  <span v-else class="text-xs text-slate-400 italic">-</span>
-                </td>
-
-                <!-- Responsável / Técnico -->
+                <!-- Responsável -->
                 <td class="py-4 px-5 text-slate-700 dark:text-slate-300 font-medium text-sm">
                   {{ d.responsible_person?.name || '-' }}
                 </td>
@@ -987,7 +957,7 @@
     </div>
 
     <!-- ============================================================================= -->
-    <!-- ABA 4: RASTREABILIDADE DE SERIAIS (ONUs & GPON) -->
+    <!-- ABA 4: SERIALIZADO -->
     <!-- ============================================================================= -->
     <div v-if="activeTab === 'serials'" class="space-y-4">
       <!-- Barra de Filtros e Busca de Seriais -->
@@ -998,7 +968,7 @@
             type="text"
             v-model="serialSearch"
             @input="debounceLoadSerials"
-            placeholder="Buscar por número de série (GPON SN) ou MAC address..."
+            placeholder="Buscar por número de série ou endereço MAC..."
             class="w-full h-11 pl-10 pr-10 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 text-sm transition"
           />
           <button
@@ -1020,7 +990,7 @@
           >
             <option value="">Todos os Status</option>
             <option value="IN_STOCK">Em Estoque (Disponível)</option>
-            <option value="IN_TRANSIT">Em Trânsito / Veículo</option>
+            <option value="IN_TRANSIT">Em Trânsito</option>
             <option value="INSTALLED_CLIENT">Instalado no Cliente</option>
             <option value="DEFECTIVE">Com Defeito / Reparo</option>
             <option value="RESERVED">Reservado para OS</option>
@@ -1032,7 +1002,7 @@
         </div>
       </div>
 
-      <!-- TABELA CONFORTÁVEL 4: SERIAIS (ONUs) (SEÇÃO 7 DESIGN SYSTEM) -->
+      <!-- TABELA CONFORTÁVEL 4: SERIALIZADO (SEÇÃO 7 DESIGN SYSTEM) -->
       <div class="rounded-xl border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D]/50 shadow-xs overflow-hidden transition-colors duration-200">
         <div class="overflow-x-auto min-h-[280px]">
           <table class="w-full text-left border-collapse text-sm">
@@ -1045,7 +1015,7 @@
                   title="Ordenar por Serial"
                 >
                   <div class="inline-flex items-center gap-1.5">
-                    <span>Número de Série (GPON SN)</span>
+                    <span>Número de Série</span>
                     <ArrowUp v-if="serialSortBy === 'serial_number' && serialSortDir === 'asc'" class="w-3.5 h-3.5 text-[#FC6714]" />
                     <ArrowDown v-else-if="serialSortBy === 'serial_number' && serialSortDir === 'desc'" class="w-3.5 h-3.5 text-[#FC6714]" />
                     <ArrowUpDown v-else class="w-3.5 h-3.5 text-slate-400 opacity-60" />
@@ -1070,7 +1040,7 @@
                 </th>
 
                 <!-- Depósito Atual -->
-                <th class="py-3.5 px-5">Localização Atual (Depósito)</th>
+                <th class="py-3.5 px-5">Depósito Atual</th>
 
                 <!-- Responsável -->
                 <th class="py-3.5 px-5">Responsável</th>
@@ -1087,9 +1057,9 @@
                 <td colspan="7" class="py-12 text-center text-slate-400 text-sm">
                   <div class="max-w-sm mx-auto space-y-2">
                     <QrCode class="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto" />
-                    <p class="font-medium text-slate-700 dark:text-slate-300">Nenhum serial encontrado</p>
+                    <p class="font-medium text-slate-700 dark:text-slate-300">Nenhum equipamento serializado encontrado</p>
                     <p class="text-xs text-slate-500 dark:text-slate-400">
-                      Não há seriais com os critérios de filtro pesquisados.
+                      Não há seriais correspondentes aos critérios de busca.
                     </p>
                   </div>
                 </td>
@@ -1110,7 +1080,7 @@
                     <button
                       @click="copyToClipboard(s.serial_number, 'sn-' + s.id)"
                       class="p-0.5 rounded text-slate-400 hover:text-[#FC6714] transition cursor-pointer"
-                      title="Copiar Serial GPON"
+                      title="Copiar Serial"
                     >
                       <Check v-if="copiedKey === 'sn-' + s.id" class="w-3.5 h-3.5 text-emerald-500" />
                       <Copy v-else class="w-3.5 h-3.5" />
@@ -1147,8 +1117,7 @@
                 <!-- Depósito Atual -->
                 <td class="py-4 px-5">
                   <div class="flex items-center gap-2">
-                    <Truck v-if="s.current_depot?.type === 'VEHICLE'" class="w-4 h-4 text-blue-500 shrink-0" />
-                    <Warehouse v-else class="w-4 h-4 text-emerald-500 shrink-0" />
+                    <Warehouse class="w-4 h-4 text-emerald-500 shrink-0" />
                     <span class="font-medium text-slate-800 dark:text-slate-200 text-sm">
                       {{ s.current_depot?.name || '-' }}
                     </span>
@@ -1226,7 +1195,7 @@
       @saved="onMaterialSaved"
     />
 
-    <!-- Modal 3: Gestão Completa de Clusters Regionais -->
+    <!-- Modal 3: Gestão Completa de Posições Regionais -->
     <ClusterCrudModal
       :is-open="isClusterModalOpen"
       @close="isClusterModalOpen = false"
@@ -1239,7 +1208,7 @@
       :total-materials="materials.length"
       :total-base-items="Number(currentClusterSummary.total_items_count) || 0"
       :total-serials-in-stock="Number(currentClusterSummary.total_serials_in_stock) || 0"
-      :vehicles-count="Number(currentClusterSummary.vehicles_count) || 0"
+      :depots-count="Number(currentClusterSummary.depots_count) || 0"
       @navigate="(tab) => activeTab = tab"
       @action="handleDrawerAction"
     />
@@ -1274,7 +1243,7 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import {
   Package, ArrowRightLeft, Plus, Layers, Boxes, Warehouse, QrCode, RefreshCw,
-  Truck, ChevronDown, X, Search, ArrowUp, ArrowDown, ArrowUpDown, Copy, Check,
+  ChevronDown, X, Search, ArrowUp, ArrowDown, ArrowUpDown, Copy, Check,
   AlertCircle, CheckCircle2, Menu, MapPin, Edit2
 } from 'lucide-vue-next';
 import TablePagination from '@/components/common/TablePagination.vue';
@@ -1297,7 +1266,6 @@ interface Depot {
   name: string;
   code: string;
   type: string;
-  vehicle_plate?: string;
   cluster?: { id: number; name: string };
   responsible_person?: { id: number; name: string };
 }
@@ -1366,10 +1334,9 @@ function formatDepotType(type: string): string {
   const map: Record<string, string> = {
     CENTRAL: 'Almoxarifado Central',
     REGIONAL_BASE: 'Base Regional',
-    VEHICLE: 'Veículo em Campo',
     LAB_REPAIR: 'Laboratório de Reparo',
   };
-  return map[type] || type;
+  return map[type] || 'Depósito';
 }
 
 function formatSerialStatusLabel(status: string): string {
@@ -1421,7 +1388,7 @@ function handleDrawerAction(action: 'transfer' | 'material' | 'cluster') {
   else if (action === 'cluster') isClusterModalOpen.value = true;
 }
 
-// ─── ABA 1: POSIÇÃO REGIONAL (SALDO VIRTUAL AGLUTINADO) ──────────────────────
+// ─── ABA 1: POSIÇÃO REGIONAL ──────────────────────────────────────────────────
 const clusters = ref<Cluster[]>([]);
 const selectedClusterId = ref<number | null>(null);
 const currentClusterSummary = ref<any>({});
@@ -1489,7 +1456,7 @@ function toggleExpand(matId: number) {
   if (idx >= 0) {
     expandedRows.value.splice(idx, 1);
   } else {
-    expandedRows.push(matId);
+    expandedRows.value.push(matId);
   }
 }
 
@@ -1502,7 +1469,7 @@ async function loadClusters() {
       selectedClusterId.value = clusters.value[0].id;
     }
   } catch (err) {
-    console.error('Erro ao carregar clusters:', err);
+    console.error('Erro ao carregar posições regionais:', err);
   }
 }
 
@@ -1617,7 +1584,7 @@ async function loadUnits() {
   }
 }
 
-// ─── ABA 3: DEPÓSITOS & VEÍCULOS ─────────────────────────────────────────────
+// ─── ABA 3: DEPÓSITOS ─────────────────────────────────────────────────────────
 const depots = ref<Depot[]>([]);
 const depotSearch = ref('');
 const depotFilterType = ref('all');
@@ -1647,7 +1614,6 @@ const filteredDepots = computed(() => {
     list = list.filter(d =>
       d.name.toLowerCase().includes(q) ||
       d.code.toLowerCase().includes(q) ||
-      (d.vehicle_plate && d.vehicle_plate.toLowerCase().includes(q)) ||
       (d.responsible_person?.name && d.responsible_person.name.toLowerCase().includes(q))
     );
   }
@@ -1693,7 +1659,7 @@ async function loadDepots() {
   }
 }
 
-// ─── ABA 4: SERIAIS DE ONUs ───────────────────────────────────────────────────
+// ─── ABA 4: SERIALIZADO ───────────────────────────────────────────────────────
 const serialsList = ref<any[]>([]);
 const serialSearch = ref('');
 const serialStatusFilter = ref('');
@@ -1788,8 +1754,8 @@ function openTransferFromDepot(depot: Depot) {
   isTransferModalOpen.value = true;
 }
 
-function openTransferFromVehicle(vehicleDetail: any, material: any) {
-  const originDepot = depots.value.find(d => d.name === vehicleDetail.depot_name) || null;
+function openTransferFromBreakdown(breakdownItem: any, material: any) {
+  const originDepot = depots.value.find(d => d.id === breakdownItem.depot_id || d.name === breakdownItem.depot_name) || null;
   selectedDepotForTransfer.value = originDepot;
   selectedMaterialForTransfer.value = material;
   isTransferModalOpen.value = true;
@@ -1802,7 +1768,7 @@ function openTransferFromSerial(serial: any) {
 }
 
 async function onTransferSuccess() {
-  showToast('Transferência atômica executada com sucesso!');
+  showToast('Transferência executada com sucesso!');
   await Promise.all([
     loadRegionalStock(),
     loadMaterials(),
@@ -1830,9 +1796,9 @@ async function onMaterialSaved() {
   ]);
 }
 
-// ─── AÇÕES DE MODAL: CLUSTERS ────────────────────────────────────────────────
+// ─── AÇÕES DE MODAL: POSIÇÕES REGIONAIS ──────────────────────────────────────
 async function onClustersUpdated() {
-  showToast('Clusters regionais sincronizados!');
+  showToast('Posições regionais sincronizadas!');
   await loadClusters();
   await loadRegionalStock();
 }

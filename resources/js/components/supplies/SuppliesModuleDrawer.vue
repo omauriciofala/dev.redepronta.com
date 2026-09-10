@@ -3,7 +3,7 @@
     v-model="isOpenModel"
     size="drawer"
     title="Menu do Módulo de Suprimentos & WMS"
-    description="Atalhos rápidos, posição de estoque, alertas de reposição e ferramentas de gestão"
+    description="Atalhos rápidos, posições de estoque, alertas de reposição e ferramentas de gestão"
     @close="close"
   >
     <!-- Header Badge -->
@@ -18,7 +18,7 @@
       <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 space-y-3">
         <div class="flex items-center justify-between">
           <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-            Resumo do Cluster Ativo
+            Resumo da Posição Regional
           </span>
           <span class="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -32,15 +32,15 @@
           </div>
           <div class="p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs">
             <div class="text-base font-bold font-heading text-emerald-600 dark:text-emerald-400">{{ totalBaseItems }}</div>
-            <div class="text-[10px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">Base Física</div>
+            <div class="text-[10px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">Saldo Físico</div>
           </div>
           <div class="p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs">
             <div class="text-base font-bold font-heading text-purple-600 dark:text-purple-400">{{ totalSerialsInStock }}</div>
-            <div class="text-[10px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">ONUs Prontas</div>
+            <div class="text-[10px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">Serializados</div>
           </div>
           <div class="p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs">
-            <div class="text-base font-bold font-heading text-blue-600 dark:text-blue-400">{{ vehiclesCount }}</div>
-            <div class="text-[10px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">Veículos</div>
+            <div class="text-base font-bold font-heading text-blue-600 dark:text-blue-400">{{ depotsCount }}</div>
+            <div class="text-[10px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">Depósitos</div>
           </div>
         </div>
       </div>
@@ -62,7 +62,7 @@
             </div>
             <div class="truncate">
               <div class="font-bold text-slate-800 dark:text-slate-200 truncate">Posição Regional</div>
-              <div class="text-[10px] text-slate-400">Saldo Aglutinado</div>
+              <div class="text-[10px] text-slate-400">Saldo por Região</div>
             </div>
           </button>
 
@@ -89,8 +89,8 @@
               <Warehouse class="w-4 h-4" />
             </div>
             <div class="truncate">
-              <div class="font-bold text-slate-800 dark:text-slate-200 truncate">Depósitos & Carros</div>
-              <div class="text-[10px] text-slate-400">Bases e Veículos</div>
+              <div class="font-bold text-slate-800 dark:text-slate-200 truncate">Depósitos</div>
+              <div class="text-[10px] text-slate-400">Locais Físicos e Bases</div>
             </div>
           </button>
 
@@ -103,8 +103,8 @@
               <QrCode class="w-4 h-4" />
             </div>
             <div class="truncate">
-              <div class="font-bold text-slate-800 dark:text-slate-200 truncate">Rastreio Seriais</div>
-              <div class="text-[10px] text-slate-400">ONUs e GPON SN</div>
+              <div class="font-bold text-slate-800 dark:text-slate-200 truncate">Serializado</div>
+              <div class="text-[10px] text-slate-400">Rastreabilidade e Seriais</div>
             </div>
           </button>
         </div>
@@ -128,7 +128,7 @@
               </div>
               <div>
                 <div class="font-bold text-slate-900 dark:text-slate-100">Nova Transferência Atômica</div>
-                <div class="text-[11px] text-slate-500 dark:text-slate-400">Movimentar entre base central, regional e técnicos</div>
+                <div class="text-[11px] text-slate-500 dark:text-slate-400">Movimentar materiais entre depósitos</div>
               </div>
             </div>
             <ArrowUpRight class="w-4 h-4 text-[#FC6714] opacity-70 group-hover:opacity-100 transition" />
@@ -161,8 +161,8 @@
                 <MapPin class="w-4 h-4" />
               </div>
               <div>
-                <div class="font-bold text-slate-800 dark:text-slate-200">Gerenciar Clusters Regionais</div>
-                <div class="text-[11px] text-slate-400">Agrupamentos geográficos de depósitos e bases</div>
+                <div class="font-bold text-slate-800 dark:text-slate-200">Gerenciar Posições Regionais</div>
+                <div class="text-[11px] text-slate-400">Agrupamentos geográficos de depósitos</div>
               </div>
             </div>
             <ArrowUpRight class="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition" />
@@ -170,7 +170,7 @@
         </div>
       </div>
 
-      <!-- 4. ALERTAS DE ESTOQUE CRÍTICO -->
+      <!-- 4. ALERTAS DE INTEGRIDADE -->
       <div class="p-4 rounded-xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/60 space-y-2.5">
         <div class="flex items-center justify-between text-amber-800 dark:text-amber-300 font-bold">
           <span class="flex items-center gap-1.5">
@@ -182,7 +182,7 @@
           </span>
         </div>
         <p class="text-[11px] text-amber-700/90 dark:text-amber-400/90 leading-relaxed">
-          Materiais, depósitos e seriais vinculados a transferências ou ordens de serviço estão protegidos com integridade estrita no banco MariaDB contra exclusão acidental.
+          Materiais, depósitos e seriais vinculados a transferências ou movimentações estão protegidos com integridade estrita no banco de dados contra exclusão acidental.
         </p>
       </div>
     </div>
@@ -190,7 +190,7 @@
     <!-- Footer do Drawer -->
     <template #footer>
       <div class="w-full flex items-center justify-between">
-        <span class="text-xs text-slate-400 font-medium">ERP Rede Pronta • Sprint 2 WMS</span>
+        <span class="text-xs text-slate-400 font-medium">ERP Rede Pronta • Suprimentos & WMS</span>
         <button
           type="button"
           @click="close"
@@ -216,7 +216,7 @@ const props = defineProps<{
   totalMaterials: number;
   totalBaseItems: number;
   totalSerialsInStock: number;
-  vehiclesCount: number;
+  depotsCount: number;
 }>();
 
 const emit = defineEmits<{

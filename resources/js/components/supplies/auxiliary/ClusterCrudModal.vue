@@ -2,8 +2,8 @@
   <BaseModal
     :model-value="isOpen"
     @update:model-value="$emit('close')"
-    title="Gerenciar Clusters Regionais"
-    description="Agrupamentos de bases físicas, almoxarifados e veículos de técnicos por região operacional"
+    title="Gerenciar Posições Regionais"
+    description="Definição de posições geográficas e regiões para agrupamento e consolidação de depósitos"
     size="xl"
   >
     <div class="space-y-4">
@@ -14,7 +14,7 @@
           <input
             v-model="searchTerm"
             type="text"
-            placeholder="Buscar cluster por nome ou código..."
+            placeholder="Buscar posição regional por nome ou código..."
             class="w-full h-10 pl-9 pr-4 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714] focus:outline-none transition"
           />
         </div>
@@ -26,7 +26,7 @@
           class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#FC6714] hover:bg-[#E0530A] text-white text-xs font-semibold shadow-xs transition cursor-pointer"
         >
           <Plus class="w-4 h-4" />
-          <span>Novo Cluster</span>
+          <span>Nova Posição Regional</span>
         </button>
       </div>
 
@@ -46,12 +46,12 @@
           <div class="flex items-center justify-between pb-2 border-b border-orange-200/60 dark:border-[#FC6714]/20">
             <h4 class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
               <component :is="editingId ? Edit2 : Plus" class="w-3.5 h-3.5 text-[#FC6714]" />
-              <span>{{ editingId ? 'Editar Cluster Regional' : 'Novo Cluster Regional' }}</span>
+              <span>{{ editingId ? 'Editar Posição Regional' : 'Nova Posição Regional' }}</span>
             </h4>
             <button
               type="button"
               @click="closeForm"
-              class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1"
+              class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 cursor-pointer"
             >
               <X class="w-4 h-4" />
             </button>
@@ -70,19 +70,19 @@
               <input
                 v-model="form.code"
                 type="text"
-                placeholder="Ex: CLU-MG-BH"
+                placeholder="Ex: REG-CAMPINAS"
                 class="w-full h-9 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-mono focus:ring-2 focus:ring-[#FC6714] outline-none uppercase"
               />
             </div>
 
             <div class="sm:col-span-2">
               <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
-                Nome do Cluster *
+                Nome da Posição Regional *
               </label>
               <input
                 v-model="form.name"
                 type="text"
-                placeholder="Ex: Belo Horizonte e Região Metropolitana"
+                placeholder="Ex: Região de Campinas e RMC"
                 class="w-full h-9 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-[#FC6714] outline-none"
               />
             </div>
@@ -113,7 +113,7 @@
               <input
                 v-model="form.description"
                 type="text"
-                placeholder="Ex: Cobre as cidades de BH, Contagem, Betim e Sabará"
+                placeholder="Ex: Cobre Campinas, Valinhos, Vinhedo, Sumaré e Paulínia"
                 class="w-full h-9 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-[#FC6714] outline-none"
               />
             </div>
@@ -123,7 +123,7 @@
             <button
               type="button"
               @click="closeForm"
-              class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+              class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
             >
               Cancelar
             </button>
@@ -134,20 +134,20 @@
               class="px-4 py-1.5 rounded-lg text-xs font-semibold bg-[#FC6714] hover:bg-[#E0530A] text-white shadow-xs transition cursor-pointer flex items-center gap-1.5"
             >
               <span v-if="saving" class="inline-block animate-spin mr-1">⟳</span>
-              <span>{{ saving ? 'Salvando...' : (editingId ? 'Atualizar Cluster' : 'Criar Cluster') }}</span>
+              <span>{{ saving ? 'Salvando...' : (editingId ? 'Atualizar Região' : 'Criar Região') }}</span>
             </button>
           </div>
         </div>
       </Transition>
 
-      <!-- Tabela Confortável de Clusters (Item 7 Design System) -->
+      <!-- Tabela Confortável de Posições Regionais (Item 7 Design System) -->
       <div class="border border-slate-200 dark:border-[#14147A] rounded-xl overflow-hidden shadow-2xs">
         <div class="overflow-x-auto max-h-[380px]">
           <table class="w-full text-left border-collapse text-xs">
             <thead class="sticky top-0 bg-slate-100/90 dark:bg-[#03032E]/90 backdrop-blur-xs border-b border-slate-200 dark:border-[#14147A] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-bold z-10">
               <tr>
                 <th class="py-3 px-4 w-36">Código</th>
-                <th class="py-3 px-4">Cluster Regional</th>
+                <th class="py-3 px-4">Posição Regional</th>
                 <th class="py-3 px-4">Abrangência</th>
                 <th class="py-3 px-4 w-28 text-center">Depósitos</th>
                 <th class="py-3 px-4 text-right w-28">Ações</th>
@@ -156,12 +156,12 @@
             <tbody class="divide-y divide-slate-100 dark:divide-[#14147A]/60">
               <tr v-if="loading">
                 <td colspan="5" class="py-8 text-center text-slate-400">
-                  <span class="inline-block animate-spin mr-1.5 text-[#FC6714]">⟳</span> Carregando clusters...
+                  <span class="inline-block animate-spin mr-1.5 text-[#FC6714]">⟳</span> Carregando posições regionais...
                 </td>
               </tr>
               <tr v-else-if="filteredClusters.length === 0">
                 <td colspan="5" class="py-8 text-center text-slate-400">
-                  Nenhum cluster regional encontrado.
+                  Nenhuma posição regional encontrada.
                 </td>
               </tr>
               <tr
@@ -186,26 +186,24 @@
                 </td>
 
                 <!-- Descrição -->
-                <td class="py-3 px-4 text-slate-500 dark:text-slate-400">
+                <td class="py-3 px-4 text-slate-600 dark:text-slate-400 truncate max-w-xs">
                   {{ c.description || '-' }}
                 </td>
 
-                <!-- Depósitos -->
-                <td class="py-3 px-4 text-center">
-                  <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                    {{ c.depots_count ?? 0 }} depósitos
-                  </span>
+                <!-- Quantidade de Depósitos -->
+                <td class="py-3 px-4 text-center font-mono font-semibold text-slate-700 dark:text-slate-300">
+                  {{ c.depots_count ?? (c.depots ? c.depots.length : 0) }}
                 </td>
 
                 <!-- Ações -->
                 <td class="py-3 px-4 text-right">
                   <button
                     type="button"
-                    @click="startEdit(c)"
-                    class="p-1.5 rounded-lg text-slate-500 hover:text-[#FC6714] hover:bg-orange-50 dark:hover:bg-[#FC6714]/10 transition cursor-pointer"
-                    title="Editar cluster"
+                    @click="editCluster(c)"
+                    class="h-7 px-2.5 rounded text-xs font-medium border border-slate-300 dark:border-slate-700 hover:bg-orange-50 hover:text-[#FC6714] hover:border-[#FC6714] transition cursor-pointer inline-flex items-center gap-1"
                   >
-                    <Edit2 class="w-3.5 h-3.5" />
+                    <Edit2 class="w-3 h-3" />
+                    <span>Editar</span>
                   </button>
                 </td>
               </tr>
@@ -218,7 +216,7 @@
     <template #footer>
       <div class="w-full flex items-center justify-between">
         <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">
-          {{ clustersList.length }} clusters cadastrados
+          {{ clustersList.length }} posições regionais cadastradas
         </span>
         <button
           type="button"
@@ -248,11 +246,11 @@ const emit = defineEmits<{
 
 const clustersList = ref<any[]>([]);
 const loading = ref(false);
-const saving = ref(false);
 const searchTerm = ref('');
 const isFormOpen = ref(false);
-const editingId = ref<number | null>(null);
+const saving = ref(false);
 const formError = ref('');
+const editingId = ref<number | null>(null);
 
 const form = ref({
   code: '',
@@ -265,9 +263,9 @@ const filteredClusters = computed(() => {
   if (!searchTerm.value.trim()) return clustersList.value;
   const q = searchTerm.value.toLowerCase();
   return clustersList.value.filter(c =>
-    c.name?.toLowerCase().includes(q) ||
-    c.code?.toLowerCase().includes(q) ||
-    c.description?.toLowerCase().includes(q)
+    c.name.toLowerCase().includes(q) ||
+    c.code.toLowerCase().includes(q) ||
+    (c.description && c.description.toLowerCase().includes(q))
   );
 });
 
@@ -278,7 +276,7 @@ async function loadClusters() {
     const json = await res.json();
     clustersList.value = json.data || [];
   } catch (err) {
-    console.error('Erro ao carregar clusters:', err);
+    console.error('Erro ao carregar posições regionais:', err);
   } finally {
     loading.value = false;
   }
@@ -296,14 +294,14 @@ function openCreateForm() {
   isFormOpen.value = true;
 }
 
-function startEdit(c: any) {
-  editingId.value = c.id;
+function editCluster(cluster: any) {
+  editingId.value = cluster.id;
   formError.value = '';
   form.value = {
-    code: c.code || '',
-    name: c.name || '',
-    color: c.color || '#FC6714',
-    description: c.description || '',
+    code: cluster.code,
+    name: cluster.name,
+    color: cluster.color || '#FC6714',
+    description: cluster.description || '',
   };
   isFormOpen.value = true;
 }
@@ -315,13 +313,17 @@ function closeForm() {
 }
 
 async function saveCluster() {
-  if (!form.value.name.trim() || !form.value.code.trim()) {
-    formError.value = 'Código e Nome são obrigatórios.';
+  formError.value = '';
+  if (!form.value.name.trim()) {
+    formError.value = 'O nome da posição regional é obrigatório.';
+    return;
+  }
+  if (!form.value.code.trim()) {
+    formError.value = 'O código da posição regional é obrigatório.';
     return;
   }
 
   saving.value = true;
-  formError.value = '';
   try {
     const url = editingId.value ? `/api/v1/clusters/${editingId.value}` : '/api/v1/clusters';
     const method = editingId.value ? 'PUT' : 'POST';
@@ -337,7 +339,7 @@ async function saveCluster() {
 
     const json = await res.json();
     if (!res.ok) {
-      formError.value = json.message || 'Erro ao salvar cluster.';
+      formError.value = json.message || 'Erro ao salvar posição regional.';
       return;
     }
 
@@ -345,7 +347,7 @@ async function saveCluster() {
     await loadClusters();
     emit('updated');
   } catch (err: any) {
-    formError.value = err.message || 'Erro de conexão ao salvar cluster.';
+    formError.value = err.message || 'Erro de conexão com o servidor.';
   } finally {
     saving.value = false;
   }
