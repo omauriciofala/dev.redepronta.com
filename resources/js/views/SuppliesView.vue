@@ -1,7 +1,7 @@
 <template>
   <div class="py-8 w-full space-y-6">
     <!-- ============================================================================= -->
-    <!-- CABEÇALHO DA PÁGINA (DESIGN SYSTEM PADRÃO) -->
+    <!-- CABEÇALHO PADRÃO DO MÓDULO (DESIGN SYSTEM CANÔNICO) -->
     <!-- ============================================================================= -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div class="flex items-center gap-3">
@@ -19,7 +19,7 @@
       </div>
 
       <!-- Ações do Cabeçalho -->
-      <div class="flex items-center gap-2.5 shrink-0">
+      <div class="flex items-center gap-2 shrink-0">
         <!-- Botão Primário Laranja (#FC6714) -->
         <button
           type="button"
@@ -33,11 +33,92 @@
         <!-- Botão Secundário de Contorno -->
         <button
           type="button"
-          @click="openMaterialCreateModal()"
+          @click="openCreateMaterialModal()"
           class="inline-flex items-center gap-2 h-10 px-3.5 rounded-lg border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 text-sm font-medium shadow-2xs transition cursor-pointer"
         >
           <Plus class="w-4 h-4 text-[#FC6714]" />
           <span>Novo Material</span>
+        </button>
+
+        <!-- Menu de Cadastros Base / Tabelas de Apoio (Três Pontos Verticais ⋮) -->
+        <div class="relative" ref="headerMenuContainerRef">
+          <button
+            type="button"
+            @click.stop="isHeaderMenuOpen = !isHeaderMenuOpen"
+            class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition shadow-2xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#FC6714]"
+            :class="{ 'bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white ring-2 ring-[#FC6714]/30': isHeaderMenuOpen }"
+            title="Cadastros de Apoio e Tabelas Base"
+            aria-label="Cadastros de Apoio e Tabelas Base"
+            aria-haspopup="true"
+            :aria-expanded="isHeaderMenuOpen"
+          >
+            <!-- Três pontos verticais (Reticências) nativos -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="12" cy="5" r="2"></circle>
+              <circle cx="12" cy="12" r="2"></circle>
+              <circle cx="12" cy="19" r="2"></circle>
+            </svg>
+          </button>
+
+          <!-- Dropdown Flutuante de Cadastros de Apoio -->
+          <Transition
+            enter-active-class="transition duration-100 ease-out"
+            enter-from-class="transform scale-95 opacity-0"
+            enter-to-class="transform scale-100 opacity-100"
+            leave-active-class="transition duration-75 ease-in"
+            leave-from-class="transform scale-100 opacity-100"
+            leave-to-class="transform scale-95 opacity-0"
+          >
+            <div
+              v-if="isHeaderMenuOpen"
+              @click.stop
+              class="absolute right-0 mt-2 w-56 rounded-xl bg-white dark:bg-[#06064D] border border-slate-200 dark:border-[#14147A] shadow-2xl z-50 py-1 text-xs font-medium divide-y divide-slate-100 dark:divide-[#14147A]/60 focus:outline-hidden"
+            >
+              <div class="px-3.5 py-2 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">
+                <span>Cadastros de Apoio</span>
+              </div>
+              <div class="py-1">
+                <button
+                  type="button"
+                  @click="openClusterCrudModal"
+                  class="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] dark:hover:text-orange-300 transition cursor-pointer"
+                >
+                  <MapPin class="w-4 h-4 text-slate-400" />
+                  <span>Clusters Regionais</span>
+                </button>
+
+                <button
+                  type="button"
+                  @click="navigateToTab('depots')"
+                  class="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] dark:hover:text-orange-300 transition cursor-pointer"
+                >
+                  <Warehouse class="w-4 h-4 text-slate-400" />
+                  <span>Depósitos & Veículos</span>
+                </button>
+
+                <button
+                  type="button"
+                  @click="navigateToTab('materials')"
+                  class="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] dark:hover:text-orange-300 transition cursor-pointer"
+                >
+                  <Boxes class="w-4 h-4 text-slate-400" />
+                  <span>Catálogo de Materiais</span>
+                </button>
+              </div>
+            </div>
+          </Transition>
+        </div>
+
+        <!-- Menu Hambúrguer (☰) — Abre Drawer Lateral do Módulo -->
+        <button
+          type="button"
+          @click="isModuleDrawerOpen = true"
+          class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition shadow-2xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#FC6714]"
+          :class="{ 'bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white ring-2 ring-[#FC6714]/30': isModuleDrawerOpen }"
+          title="Menu do Módulo de Suprimentos (☰)"
+          aria-label="Menu do Módulo de Suprimentos"
+        >
+          <Menu class="w-5 h-5" />
         </button>
 
         <!-- Botão de Recarregar Dados -->
@@ -138,7 +219,7 @@
     <!-- ABA 1: POSIÇÃO REGIONAL (SALDO VIRTUAL AGLUTINADO) -->
     <!-- ============================================================================= -->
     <div v-if="activeTab === 'regional'" class="space-y-6">
-      <!-- Seletor de Cluster Regional -->
+      <!-- Seletor Confortável de Cluster Regional -->
       <div class="p-4 bg-white dark:bg-[#06064D]/50 rounded-xl border border-slate-200 dark:border-[#14147A] flex flex-wrap items-center justify-between gap-4 text-sm shadow-2xs">
         <div class="flex items-center gap-3">
           <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
@@ -161,10 +242,10 @@
           </div>
         </div>
 
-        <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-          <span class="inline-flex items-center gap-1">
+        <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
+          <span class="inline-flex items-center gap-1.5">
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            Aglutinação em tempo real (Base + Técnicos)
+            Aglutinação em tempo real (Base Física + Técnicos em Campo)
           </span>
         </div>
       </div>
@@ -188,7 +269,7 @@
             <Warehouse class="w-6 h-6" />
           </div>
           <div>
-            <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Saldo Físico (Base Regional)</p>
+            <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Saldo Físico (Base)</p>
             <h3 class="text-xl font-bold text-slate-900 dark:text-slate-100 mt-0.5">
               {{ formatNumber(currentClusterSummary.total_items_count || 0) }}
             </h3>
@@ -246,11 +327,11 @@
       </div>
 
       <!-- TABELA CONFORTÁVEL 1: POSIÇÃO REGIONAL AGLUTINADA (SEÇÃO 7 DESIGN SYSTEM) -->
-      <div class="bg-white dark:bg-[#06064D]/50 rounded-xl border border-slate-200 dark:border-[#14147A] overflow-hidden shadow-xs transition-colors duration-200">
+      <div class="rounded-xl border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D]/50 shadow-xs overflow-hidden transition-colors duration-200">
         <div class="overflow-x-auto min-h-[280px]">
           <table class="w-full text-left border-collapse text-sm">
             <thead>
-              <tr class="border-b border-slate-200 dark:border-[#14147A] bg-slate-50/80 dark:bg-[#03032E]/70 text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider select-none">
+              <tr class="border-b border-slate-200 dark:border-[#14147A] bg-slate-50/80 dark:bg-[#03032E]/70 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider select-none">
                 <!-- Material / Código -->
                 <th
                   @click="toggleSortRegional('name')"
@@ -300,127 +381,106 @@
                 <th
                   @click="toggleSortRegional('total_virtual_quantity')"
                   class="py-3.5 px-5 text-right cursor-pointer hover:text-[#FC6714] dark:hover:text-[#FC6714] transition"
-                  title="Ordenar por Saldo Virtual Aglutinado"
+                  title="Ordenar por Saldo Aglutinado Total"
                 >
                   <div class="inline-flex items-center justify-end gap-1.5 w-full">
-                    <span>Saldo Aglutinado</span>
+                    <span>Saldo Virtual Aglutinado</span>
                     <ArrowUp v-if="regionalSortBy === 'total_virtual_quantity' && regionalSortDir === 'asc'" class="w-3.5 h-3.5 text-[#FC6714]" />
                     <ArrowDown v-else-if="regionalSortBy === 'total_virtual_quantity' && regionalSortDir === 'desc'" class="w-3.5 h-3.5 text-[#FC6714]" />
                     <ArrowUpDown v-else class="w-3.5 h-3.5 text-slate-400 opacity-60" />
                   </div>
                 </th>
 
-                <!-- Rastreabilidade -->
-                <th class="py-3.5 px-5 text-center">Rastreabilidade</th>
-
-                <!-- Ações -->
+                <!-- Ações da Linha -->
                 <th class="py-3.5 px-5 text-right">Ação</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 dark:divide-[#14147A]/60">
-              <!-- Loading -->
-              <tr v-if="loading">
-                <td colspan="7" class="py-12 text-center text-slate-400 text-sm">
-                  <span class="inline-block animate-spin mr-2 text-[#FC6714]">⟳</span> Carregando posição regional aglutinada...
-                </td>
-              </tr>
-
-              <!-- Vazio -->
-              <tr v-else-if="filteredRegionalMaterials.length === 0">
-                <td colspan="7" class="py-12 text-center text-slate-400 text-sm">
+              <tr v-if="filteredRegionalMaterials.length === 0">
+                <td colspan="6" class="py-12 text-center text-slate-400 text-sm">
                   <div class="max-w-sm mx-auto space-y-2">
-                    <Package class="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto" />
-                    <p class="font-medium text-slate-700 dark:text-slate-300">Nenhum saldo registrado</p>
+                    <Boxes class="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto" />
+                    <p class="font-medium text-slate-700 dark:text-slate-300">Nenhum material encontrado no cluster</p>
                     <p class="text-xs text-slate-500 dark:text-slate-400">
-                      Nenhum material com saldo registrado neste cluster regional. Realize uma transferência ou entrada.
+                      Faça uma transferência de estoque para a base deste cluster ou selecione outra região.
                     </p>
                   </div>
                 </td>
               </tr>
 
-              <!-- Linhas da Tabela Confortável com py-4 px-5 -->
-              <template v-else v-for="mat in paginatedRegionalMaterials" :key="mat.material_id">
+              <template v-else v-for="m in paginatedRegionalMaterials" :key="m.material_id">
+                <!-- Linha Principal do Material -->
                 <tr class="hover:bg-slate-50/70 dark:hover:bg-white/5 transition-colors">
-                  <!-- Material & Código SKU -->
+                  <!-- Identificação do Material -->
                   <td class="py-4 px-5">
-                    <div class="flex items-start gap-2.5">
+                    <div class="flex items-center gap-3">
+                      <!-- Botão expansível se houver veículos -->
+                      <button
+                        v-if="m.vehicles_detail && m.vehicles_detail.length > 0"
+                        type="button"
+                        @click="toggleExpand(m.material_id)"
+                        class="p-1 rounded-md text-slate-400 hover:text-[#FC6714] hover:bg-orange-50 dark:hover:bg-[#FC6714]/10 transition cursor-pointer"
+                        :title="expandedRows.includes(m.material_id) ? 'Recolher detalhes de veículos' : 'Expandir detalhes de veículos'"
+                      >
+                        <ChevronDown
+                          class="w-4 h-4 transition-transform duration-200"
+                          :class="{ 'rotate-180 text-[#FC6714]': expandedRows.includes(m.material_id) }"
+                        />
+                      </button>
+                      <div v-else class="w-6 shrink-0"></div>
+
                       <div>
                         <div class="font-semibold text-slate-900 dark:text-slate-100 text-sm">
-                          {{ mat.name }}
+                          {{ m.name }}
                         </div>
-                        <div class="flex items-center gap-1.5 mt-0.5">
-                          <span class="font-mono text-xs font-bold text-[#FC6714]">{{ mat.code }}</span>
-                          <button
-                            @click="copyToClipboard(mat.code, 'sku-' + mat.material_id)"
-                            class="p-0.5 rounded text-slate-400 hover:text-[#FC6714] transition cursor-pointer"
-                            title="Copiar código SKU"
+                        <div class="flex items-center gap-2 mt-0.5">
+                          <span class="font-mono text-xs text-slate-500 dark:text-slate-400">
+                            SKU: {{ m.code }}
+                          </span>
+                          <span
+                            v-if="m.has_serial"
+                            class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-purple-50 text-purple-700 border border-purple-200/70 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800/60"
                           >
-                            <Check v-if="copiedKey === 'sku-' + mat.material_id" class="w-3 h-3 text-emerald-500" />
-                            <Copy v-else class="w-3 h-3" />
-                          </button>
+                            Serializado
+                          </span>
                         </div>
                       </div>
                     </div>
                   </td>
 
-                  <!-- Unidade -->
-                  <td class="py-4 px-5 text-slate-600 dark:text-slate-300">
-                    <span class="px-2 py-0.5 rounded text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-                      {{ mat.unit }}
-                    </span>
+                  <!-- Unidade de Medida -->
+                  <td class="py-4 px-5 text-slate-600 dark:text-slate-300 font-mono text-sm">
+                    {{ m.unit || 'UND' }}
                   </td>
 
-                  <!-- Saldo Base Física -->
-                  <td class="py-4 px-5 text-right font-mono font-medium text-slate-800 dark:text-slate-200">
-                    {{ formatNumber(mat.base_quantity) }}
+                  <!-- Saldo na Base Física -->
+                  <td class="py-4 px-5 text-right font-mono text-sm font-semibold text-slate-900 dark:text-slate-100">
+                    {{ formatNumber(m.base_quantity) }}
                   </td>
 
-                  <!-- Saldo Veículos (Campo) com Botão Expansível -->
-                  <td class="py-4 px-5 text-right font-mono font-medium text-blue-600 dark:text-blue-400">
-                    <button
-                      type="button"
-                      @click="toggleExpand(mat.material_id)"
-                      class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md hover:bg-blue-50 dark:hover:bg-blue-950/40 transition cursor-pointer"
-                      title="Clique para expandir o detalhamento por veículo"
+                  <!-- Saldo Veículos (Campo) -->
+                  <td class="py-4 px-5 text-right font-mono text-sm">
+                    <span
+                      v-if="m.vehicles_quantity > 0"
+                      class="text-blue-600 dark:text-blue-400 font-semibold"
                     >
-                      <Truck class="w-3.5 h-3.5 text-blue-500" />
-                      <span>{{ formatNumber(mat.vehicles_quantity) }}</span>
-                      <ChevronDown class="w-3.5 h-3.5 transition-transform" :class="{ 'rotate-180 text-[#FC6714]': expandedRows.includes(mat.material_id) }" />
-                    </button>
+                      {{ formatNumber(m.vehicles_quantity) }}
+                    </span>
+                    <span v-else class="text-slate-400">0</span>
                   </td>
 
-                  <!-- Saldo Virtual Aglutinado -->
+                  <!-- Saldo Virtual Aglutinado (Destacado) -->
                   <td class="py-4 px-5 text-right">
-                    <div class="font-mono text-sm font-bold" :class="mat.is_low_stock ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'">
-                      {{ formatNumber(mat.total_virtual_quantity) }}
-                    </div>
-                    <div v-if="mat.is_low_stock" class="text-[10px] font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-tight mt-0.5">
-                      Estoque Baixo
-                    </div>
-                  </td>
-
-                  <!-- Rastreabilidade Serial -->
-                  <td class="py-4 px-5 text-center">
-                    <span
-                      v-if="mat.has_serial"
-                      class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200/80 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800/60"
-                    >
-                      <QrCode class="w-3.5 h-3.5" />
-                      <span>{{ mat.serials_in_stock }} ONUs</span>
-                    </span>
-                    <span
-                      v-else
-                      class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
-                    >
-                      Convencional
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold bg-[#FC6714]/10 text-[#FC6714] border border-[#FC6714]/30">
+                      {{ formatNumber(m.total_virtual_quantity) }} {{ m.unit || 'UND' }}
                     </span>
                   </td>
 
-                  <!-- Ações Rápidas Confortáveis -->
+                  <!-- Ação de Transferir -->
                   <td class="py-4 px-5 text-right">
                     <button
                       type="button"
-                      @click="openTransferModal(mat)"
+                      @click="openTransferModal(m)"
                       class="h-8 px-3 text-xs font-medium rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-orange-50 hover:text-[#FC6714] hover:border-[#FC6714] dark:hover:bg-[#FC6714]/10 dark:hover:text-[#FC6714] transition cursor-pointer inline-flex items-center gap-1.5"
                     >
                       <ArrowRightLeft class="w-3.5 h-3.5" />
@@ -429,39 +489,59 @@
                   </td>
                 </tr>
 
-                <!-- Linha Expansível: Detalhamento por Veículo / Técnico -->
-                <tr v-if="expandedRows.includes(mat.material_id)" class="bg-slate-50/60 dark:bg-[#03032E]/40">
-                  <td colspan="7" class="py-4 px-6">
-                    <div class="pl-4 border-l-3 border-[#FC6714] space-y-2.5">
-                      <div class="flex items-center justify-between">
-                        <p class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2">
-                          <Layers class="w-3.5 h-3.5 text-[#FC6714]" />
-                          Distribuição Física nos Depósitos do Cluster:
-                        </p>
-                        <span class="text-[11px] text-slate-400">Total de locais: {{ mat.breakdown?.length || 0 }}</span>
+                <!-- Linha Sub-Tabela Confortável: Detalhamento de Veículos -->
+                <tr v-if="expandedRows.includes(m.material_id)" class="bg-slate-50/60 dark:bg-[#03032E]/40">
+                  <td colspan="6" class="p-4 pl-14">
+                    <div class="rounded-xl border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D]/80 shadow-xs overflow-hidden">
+                      <div class="px-4 py-2.5 bg-slate-100/70 dark:bg-[#03032E] border-b border-slate-200 dark:border-[#14147A] flex items-center justify-between text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                        <span class="flex items-center gap-1.5">
+                          <Truck class="w-3.5 h-3.5 text-blue-500" />
+                          Distribuição em Veículos de Técnicos (FSM)
+                        </span>
+                        <span class="text-slate-400 font-medium lowercase">
+                          {{ m.vehicles_detail.length }} veículo(s) com este item
+                        </span>
                       </div>
-
-                      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs">
-                        <div
-                          v-for="d in mat.breakdown"
-                          :key="d.depot_id"
-                          class="p-3.5 rounded-xl bg-white dark:bg-[#06064D] border border-slate-200 dark:border-[#14147A] shadow-2xs flex items-center justify-between"
-                        >
-                          <div>
-                            <div class="flex items-center gap-1.5 font-semibold text-slate-900 dark:text-slate-100">
-                              <Truck v-if="d.depot_type === 'VEHICLE'" class="w-3.5 h-3.5 text-blue-500" />
-                              <Warehouse v-else class="w-3.5 h-3.5 text-emerald-500" />
-                              <span>{{ d.depot_name }}</span>
-                            </div>
-                            <p v-if="d.responsible_name" class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                              Técnico: <strong class="text-slate-700 dark:text-slate-200">{{ d.responsible_name }}</strong>
-                            </p>
-                          </div>
-                          <span class="font-bold text-slate-900 dark:text-slate-100 font-mono text-sm">
-                            {{ formatNumber(d.quantity) }} {{ mat.unit }}
-                          </span>
-                        </div>
-                      </div>
+                      <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                          <tr class="border-b border-slate-200 dark:border-[#14147A] bg-slate-50/50 dark:bg-[#03032E]/30 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
+                            <th class="py-2.5 px-4">Veículo / Depósito</th>
+                            <th class="py-2.5 px-4">Placa</th>
+                            <th class="py-2.5 px-4">Técnico Responsável</th>
+                            <th class="py-2.5 px-4 text-right">Quantidade em Campo</th>
+                            <th class="py-2.5 px-4 text-right">Ação</th>
+                          </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 dark:divide-[#14147A]/60">
+                          <tr
+                            v-for="(vd, vIdx) in m.vehicles_detail"
+                            :key="vIdx"
+                            class="hover:bg-slate-50/70 dark:hover:bg-white/5 transition"
+                          >
+                            <td class="py-3 px-4 font-semibold text-slate-800 dark:text-slate-200">
+                              {{ vd.depot_name }}
+                            </td>
+                            <td class="py-3 px-4 font-mono text-slate-600 dark:text-slate-300">
+                              {{ vd.vehicle_plate || '-' }}
+                            </td>
+                            <td class="py-3 px-4 text-slate-700 dark:text-slate-300">
+                              {{ vd.responsible_person || 'Não atribuído' }}
+                            </td>
+                            <td class="py-3 px-4 text-right font-mono font-bold text-blue-600 dark:text-blue-400">
+                              {{ formatNumber(vd.quantity) }} {{ m.unit || 'UND' }}
+                            </td>
+                            <td class="py-3 px-4 text-right">
+                              <button
+                                type="button"
+                                @click="openTransferFromVehicle(vd, m)"
+                                class="h-7 px-2.5 text-[11px] font-medium rounded-md border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] text-slate-700 dark:text-slate-200 hover:bg-orange-50 hover:text-[#FC6714] transition cursor-pointer"
+                              >
+                                Reabastecer / Retirar
+                              </button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
                     </div>
                   </td>
                 </tr>
@@ -470,7 +550,7 @@
           </table>
         </div>
 
-        <!-- Rodapé de Paginação Avançado -->
+        <!-- Rodapé de Paginação Confortável -->
         <TablePagination
           v-model:currentPage="regionalCurrentPage"
           v-model:perPage="regionalPerPage"
@@ -496,7 +576,7 @@
           <input
             type="text"
             v-model="materialSearch"
-            placeholder="Buscar por código SKU, nome do produto ou categoria..."
+            placeholder="Buscar por nome do item, código SKU ou categoria..."
             class="w-full h-11 pl-10 pr-10 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 text-sm transition"
           />
           <button
@@ -526,12 +606,12 @@
         </div>
       </div>
 
-      <!-- TABELA CONFORTÁVEL 2: MATERIAIS (SEÇÃO 7 DESIGN SYSTEM) -->
-      <div class="bg-white dark:bg-[#06064D]/50 rounded-xl border border-slate-200 dark:border-[#14147A] overflow-hidden shadow-xs transition-colors duration-200">
+      <!-- TABELA CONFORTÁVEL 2: CATÁLOGO DE MATERIAIS (SEÇÃO 7 DESIGN SYSTEM) -->
+      <div class="rounded-xl border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D]/50 shadow-xs overflow-hidden transition-colors duration-200">
         <div class="overflow-x-auto min-h-[280px]">
           <table class="w-full text-left border-collapse text-sm">
             <thead>
-              <tr class="border-b border-slate-200 dark:border-[#14147A] bg-slate-50/80 dark:bg-[#03032E]/70 text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider select-none">
+              <tr class="border-b border-slate-200 dark:border-[#14147A] bg-slate-50/80 dark:bg-[#03032E]/70 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider select-none">
                 <!-- Código SKU -->
                 <th
                   @click="toggleSortMaterial('code')"
@@ -567,7 +647,7 @@
                 <th class="py-3.5 px-5">Unidade</th>
 
                 <!-- Tipo Rastreio -->
-                <th class="py-3.5 px-5 text-center">Tipo Rastreio</th>
+                <th class="py-3.5 px-5 text-center">Rastreabilidade</th>
 
                 <!-- Custo Médio Unitário -->
                 <th
@@ -587,7 +667,7 @@
                 <th class="py-3.5 px-5 text-right">Estoque Mín.</th>
 
                 <!-- Ações -->
-                <th class="py-3.5 px-5 text-right">Ação</th>
+                <th class="py-3.5 px-5 text-right">Ações</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 dark:divide-[#14147A]/60">
@@ -636,13 +716,13 @@
 
                 <!-- Categoria -->
                 <td class="py-4 px-5 text-slate-600 dark:text-slate-300">
-                  <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                  <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700">
                     {{ m.category || 'Geral' }}
                   </span>
                 </td>
 
                 <!-- Unidade -->
-                <td class="py-4 px-5 text-slate-700 dark:text-slate-300 font-medium">
+                <td class="py-4 px-5 text-slate-700 dark:text-slate-300 font-mono text-sm">
                   {{ m.unit?.code || 'UND' }}
                 </td>
 
@@ -650,16 +730,16 @@
                 <td class="py-4 px-5 text-center">
                   <span
                     v-if="m.has_serial"
-                    class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200/80 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800/60"
+                    class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800/60"
                   >
-                    <QrCode class="w-3 h-3" />
-                    <span>Serializado (ONU)</span>
+                    <QrCode class="w-3.5 h-3.5" />
+                    <span>Serial / GPON</span>
                   </span>
                   <span
                     v-else
-                    class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
+                    class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700"
                   >
-                    Convencional
+                    A Granel / Lote
                   </span>
                 </td>
 
@@ -673,23 +753,36 @@
                   {{ formatNumber(m.min_stock) }}
                 </td>
 
-                <!-- Ação -->
+                <!-- Ações -->
                 <td class="py-4 px-5 text-right">
-                  <button
-                    type="button"
-                    @click="openTransferModal(m)"
-                    class="h-8 px-3 text-xs font-medium rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-orange-50 hover:text-[#FC6714] hover:border-[#FC6714] dark:hover:bg-[#FC6714]/10 dark:hover:text-[#FC6714] transition cursor-pointer inline-flex items-center gap-1.5"
-                  >
-                    <ArrowRightLeft class="w-3.5 h-3.5" />
-                    <span>Movimentar</span>
-                  </button>
+                  <div class="inline-flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      @click="openEditMaterialModal(m)"
+                      class="h-8 px-2.5 text-xs font-medium rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 transition cursor-pointer inline-flex items-center gap-1"
+                      title="Editar dados do material"
+                    >
+                      <Edit2 class="w-3.5 h-3.5" />
+                      <span>Editar</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      @click="openTransferModal(m)"
+                      class="h-8 px-2.5 text-xs font-medium rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-orange-50 hover:text-[#FC6714] hover:border-[#FC6714] dark:hover:bg-[#FC6714]/10 dark:hover:text-[#FC6714] transition cursor-pointer inline-flex items-center gap-1"
+                      title="Transferir material entre depósitos"
+                    >
+                      <ArrowRightLeft class="w-3.5 h-3.5" />
+                      <span>Transferir</span>
+                    </button>
+                  </div>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        <!-- Rodapé de Paginação Avançado -->
+        <!-- Rodapé de Paginação Confortável -->
         <TablePagination
           v-model:currentPage="materialCurrentPage"
           v-model:perPage="materialPerPage"
@@ -748,11 +841,11 @@
       </div>
 
       <!-- TABELA CONFORTÁVEL 3: DEPÓSITOS & VEÍCULOS (SEÇÃO 7 DESIGN SYSTEM) -->
-      <div class="bg-white dark:bg-[#06064D]/50 rounded-xl border border-slate-200 dark:border-[#14147A] overflow-hidden shadow-xs transition-colors duration-200">
+      <div class="rounded-xl border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D]/50 shadow-xs overflow-hidden transition-colors duration-200">
         <div class="overflow-x-auto min-h-[280px]">
           <table class="w-full text-left border-collapse text-sm">
             <thead>
-              <tr class="border-b border-slate-200 dark:border-[#14147A] bg-slate-50/80 dark:bg-[#03032E]/70 text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider select-none">
+              <tr class="border-b border-slate-200 dark:border-[#14147A] bg-slate-50/80 dark:bg-[#03032E]/70 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider select-none">
                 <!-- Nome / Identificação -->
                 <th
                   @click="toggleSortDepot('name')"
@@ -821,10 +914,10 @@
                   </div>
                 </td>
 
-                <!-- Tipo -->
+                <!-- Tipo com Badge Confortável -->
                 <td class="py-4 px-5">
                   <span
-                    class="px-2.5 py-1 rounded-full text-xs font-semibold border"
+                    class="px-2.5 py-1 rounded-md text-xs font-semibold border"
                     :class="{
                       'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800/60': d.type === 'CENTRAL',
                       'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60': d.type === 'REGIONAL_BASE',
@@ -837,7 +930,7 @@
                 </td>
 
                 <!-- Cluster Vinculado -->
-                <td class="py-4 px-5 text-slate-700 dark:text-slate-300 font-medium">
+                <td class="py-4 px-5 text-slate-700 dark:text-slate-300 font-medium text-sm">
                   {{ d.cluster?.name || '-' }}
                 </td>
 
@@ -858,7 +951,7 @@
                 </td>
 
                 <!-- Responsável / Técnico -->
-                <td class="py-4 px-5 text-slate-700 dark:text-slate-300 font-medium">
+                <td class="py-4 px-5 text-slate-700 dark:text-slate-300 font-medium text-sm">
                   {{ d.responsible_person?.name || '-' }}
                 </td>
 
@@ -878,7 +971,7 @@
           </table>
         </div>
 
-        <!-- Rodapé de Paginação Avançado -->
+        <!-- Rodapé de Paginação Confortável -->
         <TablePagination
           v-model:currentPage="depotCurrentPage"
           v-model:perPage="depotPerPage"
@@ -940,11 +1033,11 @@
       </div>
 
       <!-- TABELA CONFORTÁVEL 4: SERIAIS (ONUs) (SEÇÃO 7 DESIGN SYSTEM) -->
-      <div class="bg-white dark:bg-[#06064D]/50 rounded-xl border border-slate-200 dark:border-[#14147A] overflow-hidden shadow-xs transition-colors duration-200">
+      <div class="rounded-xl border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D]/50 shadow-xs overflow-hidden transition-colors duration-200">
         <div class="overflow-x-auto min-h-[280px]">
           <table class="w-full text-left border-collapse text-sm">
             <thead>
-              <tr class="border-b border-slate-200 dark:border-[#14147A] bg-slate-50/80 dark:bg-[#03032E]/70 text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider select-none">
+              <tr class="border-b border-slate-200 dark:border-[#14147A] bg-slate-50/80 dark:bg-[#03032E]/70 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider select-none">
                 <!-- Número de Série -->
                 <th
                   @click="toggleSortSerial('serial_number')"
@@ -984,11 +1077,14 @@
 
                 <!-- Status -->
                 <th class="py-3.5 px-5 text-center">Status Operacional</th>
+
+                <!-- Ações -->
+                <th class="py-3.5 px-5 text-right">Ação</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 dark:divide-[#14147A]/60">
               <tr v-if="filteredSerials.length === 0">
-                <td colspan="6" class="py-12 text-center text-slate-400 text-sm">
+                <td colspan="7" class="py-12 text-center text-slate-400 text-sm">
                   <div class="max-w-sm mx-auto space-y-2">
                     <QrCode class="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto" />
                     <p class="font-medium text-slate-700 dark:text-slate-300">Nenhum serial encontrado</p>
@@ -1043,7 +1139,7 @@
                   <div class="font-semibold text-slate-900 dark:text-slate-100 text-sm">
                     {{ s.material?.name || '-' }}
                   </div>
-                  <div class="font-mono text-xs text-slate-400">
+                  <div class="font-mono text-xs text-slate-400 mt-0.5">
                     SKU: {{ s.material?.code }}
                   </div>
                 </td>
@@ -1060,25 +1156,38 @@
                 </td>
 
                 <!-- Responsável -->
-                <td class="py-4 px-5 text-slate-700 dark:text-slate-300 font-medium">
+                <td class="py-4 px-5 text-slate-700 dark:text-slate-300 font-medium text-sm">
                   {{ s.current_depot?.responsible_person?.name || '-' }}
                 </td>
 
-                <!-- Status com Badge Semântico -->
+                <!-- Status com Badge Confortável -->
                 <td class="py-4 px-5 text-center">
                   <span
-                    class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold border"
+                    class="inline-block px-2.5 py-1 rounded-md text-xs font-semibold border"
                     :class="formatSerialStatusBadge(s.status)"
                   >
                     {{ formatSerialStatusLabel(s.status) }}
                   </span>
+                </td>
+
+                <!-- Ações -->
+                <td class="py-4 px-5 text-right">
+                  <button
+                    type="button"
+                    @click="openTransferFromSerial(s)"
+                    class="h-8 px-2.5 text-xs font-medium rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-orange-50 hover:text-[#FC6714] hover:border-[#FC6714] transition cursor-pointer inline-flex items-center gap-1"
+                    title="Transferir este equipamento"
+                  >
+                    <ArrowRightLeft class="w-3.5 h-3.5" />
+                    <span>Movimentar</span>
+                  </button>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        <!-- Rodapé de Paginação Avançado -->
+        <!-- Rodapé de Paginação Confortável -->
         <TablePagination
           v-model:currentPage="serialCurrentPage"
           v-model:perPage="serialPerPage"
@@ -1094,367 +1203,46 @@
     </div>
 
     <!-- ============================================================================= -->
-    <!-- MODAL 1: TRANSFERÊNCIA ATÔMICA DE ESTOQUE (DESIGN SYSTEM SEÇÃO 8) -->
+    <!-- COMPONENTES MODAIS INTEGRADOS (BASE MODAL CANÔNICO) -->
     <!-- ============================================================================= -->
-    <div
-      v-if="showTransferModal"
-      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 dark:bg-slate-950/80 backdrop-blur-xs animate-in fade-in duration-150"
-    >
-      <div class="w-full max-w-xl rounded-2xl border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-        <!-- Header do Modal -->
-        <div class="px-6 py-4 border-b border-slate-200 dark:border-[#14147A] flex items-center justify-between bg-slate-50/80 dark:bg-[#03032E]/70">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-[#FC6714]/10 text-[#FC6714] flex items-center justify-center">
-              <ArrowRightLeft class="w-4 h-4" />
-            </div>
-            <div>
-              <h2 class="text-base font-bold font-heading text-[#06064D] dark:text-white">
-                Transferência Atômica de Materiais
-              </h2>
-              <p class="text-xs text-slate-500 dark:text-slate-400">
-                Movimentação rastreável entre almoxarifados centrais, bases e veículos de técnicos
-              </p>
-            </div>
-          </div>
-          <button
-            type="button"
-            @click="showTransferModal = false"
-            class="p-2 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 transition cursor-pointer"
-          >
-            <X class="w-5 h-5" />
-          </button>
-        </div>
 
-        <!-- Formulário do Modal -->
-        <form @submit.prevent="submitTransfer" class="p-6 space-y-4 overflow-y-auto flex-1">
-          <div v-if="transferError" class="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-xs font-medium flex items-center gap-2">
-            <AlertCircle class="w-4 h-4 shrink-0 text-rose-600" />
-            <span>{{ transferError }}</span>
-          </div>
+    <!-- Modal 1: Transferência Atômica de Materiais -->
+    <TransferModal
+      :is-open="isTransferModalOpen"
+      :depots="depots"
+      :materials="materials"
+      :initial-material="selectedMaterialForTransfer"
+      :initial-depot="selectedDepotForTransfer"
+      @close="isTransferModalOpen = false"
+      @transferred="onTransferSuccess"
+    />
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                Depósito de Origem *
-              </label>
-              <select
-                v-model="transferForm.source_depot_id"
-                required
-                @change="onSourceDepotChange"
-                class="w-full h-11 px-3 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer"
-              >
-                <option value="" disabled>Selecione a origem...</option>
-                <option v-for="d in depots" :key="d.id" :value="d.id">
-                  {{ d.name }} ({{ formatDepotType(d.type) }})
-                </option>
-              </select>
-            </div>
+    <!-- Modal 2: Cadastro / Edição de Material de Estoque -->
+    <MaterialModal
+      :is-open="isMaterialModalOpen"
+      :material-data="selectedMaterialForEdit"
+      :units-list="unitsList"
+      @close="isMaterialModalOpen = false"
+      @saved="onMaterialSaved"
+    />
 
-            <div>
-              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                Depósito de Destino *
-              </label>
-              <select
-                v-model="transferForm.destination_depot_id"
-                required
-                class="w-full h-11 px-3 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer"
-              >
-                <option value="" disabled>Selecione o destino...</option>
-                <option v-for="d in destinationDepotsList" :key="d.id" :value="d.id">
-                  {{ d.name }} ({{ formatDepotType(d.type) }})
-                </option>
-              </select>
-            </div>
-          </div>
+    <!-- Modal 3: Gestão Completa de Clusters Regionais -->
+    <ClusterCrudModal
+      :is-open="isClusterModalOpen"
+      @close="isClusterModalOpen = false"
+      @updated="onClustersUpdated"
+    />
 
-          <div>
-            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-              Material a Transferir *
-            </label>
-            <select
-              v-model="transferForm.material_id"
-              required
-              @change="onMaterialChange"
-              class="w-full h-11 px-3 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer"
-            >
-              <option value="" disabled>Selecione o item...</option>
-              <option v-for="m in materials" :key="m.id" :value="m.id">
-                {{ m.code }} — {{ m.name }} ({{ m.has_serial ? 'Serializado' : 'Convencional' }})
-              </option>
-            </select>
-          </div>
-
-          <!-- Seleção de Seriais se for material serializado (ONU) -->
-          <div
-            v-if="selectedMaterialForTransfer?.has_serial"
-            class="space-y-2 p-3.5 rounded-xl bg-purple-50/60 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-800/60"
-          >
-            <div class="flex items-center justify-between">
-              <label class="block text-xs font-bold text-purple-800 dark:text-purple-300 uppercase tracking-wider">
-                Selecione os Seriais em Estoque na Origem:
-              </label>
-              <span class="text-xs font-semibold text-purple-700 dark:text-purple-300">
-                {{ transferForm.serial_ids.length }} de {{ availableSerialsForTransfer.length }} selecionado(s)
-              </span>
-            </div>
-
-            <div v-if="loadingSerialsTransfer" class="py-4 text-center text-xs text-purple-600 dark:text-purple-400">
-              <span class="inline-block animate-spin mr-1">⟳</span> Carregando seriais disponíveis no depósito...
-            </div>
-            <div v-else-if="availableSerialsForTransfer.length === 0" class="py-4 text-center text-xs text-slate-500 italic">
-              Nenhum serial disponível no depósito de origem para este material.
-            </div>
-            <div v-else class="max-h-40 overflow-y-auto space-y-1.5 pr-1 divide-y divide-purple-100 dark:divide-purple-900/40">
-              <label
-                v-for="s in availableSerialsForTransfer"
-                :key="s.id"
-                class="flex items-center gap-2.5 p-2 rounded-lg hover:bg-purple-100/50 dark:hover:bg-purple-900/30 text-xs cursor-pointer select-none"
-              >
-                <input
-                  type="checkbox"
-                  :value="s.id"
-                  v-model="transferForm.serial_ids"
-                  @change="transferForm.quantity = transferForm.serial_ids.length"
-                  class="rounded text-[#FC6714] focus:ring-[#FC6714] w-4 h-4"
-                />
-                <span class="font-mono font-bold text-slate-900 dark:text-slate-100">{{ s.serial_number }}</span>
-                <span v-if="s.mac_address" class="text-slate-500 font-mono text-[11px]">({{ s.mac_address }})</span>
-              </label>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                Quantidade a Transferir *
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                min="0.01"
-                v-model="transferForm.quantity"
-                :readonly="selectedMaterialForTransfer?.has_serial"
-                required
-                class="w-full h-11 px-3 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25"
-                :class="{ 'opacity-70 cursor-not-allowed': selectedMaterialForTransfer?.has_serial }"
-              />
-            </div>
-
-            <div>
-              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                Documento de Ref. / OFS
-              </label>
-              <input
-                type="text"
-                v-model="transferForm.document_ref"
-                placeholder="Ex: REQ-0042 ou OS-1892"
-                class="w-full h-11 px-3 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-              Observações & Justificativa
-            </label>
-            <textarea
-              v-model="transferForm.notes"
-              rows="2"
-              placeholder="Descreva o motivo da movimentação física..."
-              class="w-full p-3 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25"
-            ></textarea>
-          </div>
-
-          <!-- Footer do Modal -->
-          <div class="pt-4 border-t border-slate-200 dark:border-[#14147A] flex items-center justify-end gap-3">
-            <button
-              type="button"
-              @click="showTransferModal = false"
-              class="h-10 px-4 text-sm font-medium rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/80 transition cursor-pointer"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              :disabled="submittingTransfer"
-              class="h-10 px-5 bg-[#FC6714] hover:bg-[#E0530A] active:bg-[#C94605] text-white text-sm font-semibold rounded-lg shadow-sm transition active:scale-98 disabled:opacity-50 cursor-pointer flex items-center gap-2"
-            >
-              <span v-if="submittingTransfer" class="inline-block animate-spin mr-1">⟳</span>
-              <span>{{ submittingTransfer ? 'Processando...' : 'Confirmar Transferência' }}</span>
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- ============================================================================= -->
-    <!-- MODAL 2: CADASTRO DE NOVO MATERIAL (DESIGN SYSTEM SEÇÃO 8) -->
-    <!-- ============================================================================= -->
-    <div
-      v-if="showMaterialModal"
-      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 dark:bg-slate-950/80 backdrop-blur-xs animate-in fade-in duration-150"
-    >
-      <div class="w-full max-w-lg rounded-2xl border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-        <!-- Header do Modal -->
-        <div class="px-6 py-4 border-b border-slate-200 dark:border-[#14147A] flex items-center justify-between bg-slate-50/80 dark:bg-[#03032E]/70">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-[#FC6714]/10 text-[#FC6714] flex items-center justify-center">
-              <Plus class="w-4 h-4" />
-            </div>
-            <div>
-              <h2 class="text-base font-bold font-heading text-[#06064D] dark:text-white">
-                Novo Material de Estoque
-              </h2>
-              <p class="text-xs text-slate-500 dark:text-slate-400">
-                Cadastro no catálogo oficial de suprimentos com parametrização serial
-              </p>
-            </div>
-          </div>
-          <button
-            type="button"
-            @click="showMaterialModal = false"
-            class="p-2 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 transition cursor-pointer"
-          >
-            <X class="w-5 h-5" />
-          </button>
-        </div>
-
-        <!-- Formulário do Modal -->
-        <form @submit.prevent="submitMaterial" class="p-6 space-y-4 overflow-y-auto flex-1">
-          <div v-if="materialError" class="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-xs font-medium flex items-center gap-2">
-            <AlertCircle class="w-4 h-4 shrink-0 text-rose-600" />
-            <span>{{ materialError }}</span>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div class="sm:col-span-1">
-              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                Código / SKU *
-              </label>
-              <input
-                type="text"
-                v-model="materialForm.code"
-                required
-                placeholder="Ex: ONU-GPON-01"
-                class="w-full h-11 px-3 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 font-mono text-sm uppercase focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25"
-              />
-            </div>
-
-            <div class="sm:col-span-2">
-              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                Nome do Material *
-              </label>
-              <input
-                type="text"
-                v-model="materialForm.name"
-                required
-                placeholder="Ex: ONU GPON Wi-Fi AC 1200"
-                class="w-full h-11 px-3 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25"
-              />
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                Categoria *
-              </label>
-              <input
-                type="text"
-                v-model="materialForm.category"
-                required
-                placeholder="Ex: ONUs, Cabos, Conectores"
-                class="w-full h-11 px-3 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25"
-              />
-            </div>
-
-            <div>
-              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                Unidade de Medida *
-              </label>
-              <select
-                v-model="materialForm.unit_id"
-                required
-                class="w-full h-11 px-3 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer"
-              >
-                <option value="" disabled>Selecione a unidade...</option>
-                <option v-for="u in unitsList" :key="u.id" :value="u.id">
-                  {{ u.code }} — {{ u.name }}
-                </option>
-              </select>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                Custo Médio Unitário (R$)
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                v-model="materialForm.unit_cost"
-                class="w-full h-11 px-3 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25"
-              />
-            </div>
-
-            <div>
-              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                Estoque Mínimo de Alerta
-              </label>
-              <input
-                type="number"
-                step="1"
-                min="0"
-                v-model="materialForm.min_stock"
-                class="w-full h-11 px-3 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25"
-              />
-            </div>
-          </div>
-
-          <!-- Opções Booleanas de Rastreio -->
-          <div class="p-3.5 rounded-xl border border-slate-200 dark:border-[#14147A] bg-slate-50/50 dark:bg-[#03032E]/30 space-y-2">
-            <label class="flex items-center gap-2.5 cursor-pointer text-xs font-semibold text-slate-800 dark:text-slate-200">
-              <input
-                type="checkbox"
-                v-model="materialForm.has_serial"
-                class="rounded text-[#FC6714] focus:ring-[#FC6714] w-4 h-4"
-              />
-              <span>Rastreabilidade Serial Obrigatória (Ex: ONUs, Roteadores, OLTs)</span>
-            </label>
-
-            <label class="flex items-center gap-2.5 cursor-pointer text-xs font-semibold text-slate-800 dark:text-slate-200">
-              <input
-                type="checkbox"
-                v-model="materialForm.track_batch"
-                class="rounded text-[#FC6714] focus:ring-[#FC6714] w-4 h-4"
-              />
-              <span>Rastreabilidade por Número de Lote / Bobina (Cabos ópticos)</span>
-            </label>
-          </div>
-
-          <!-- Footer do Modal -->
-          <div class="pt-4 border-t border-slate-200 dark:border-[#14147A] flex items-center justify-end gap-3">
-            <button
-              type="button"
-              @click="showMaterialModal = false"
-              class="h-10 px-4 text-sm font-medium rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/80 transition cursor-pointer"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              :disabled="submittingMaterial"
-              class="h-10 px-5 bg-[#FC6714] hover:bg-[#E0530A] active:bg-[#C94605] text-white text-sm font-semibold rounded-lg shadow-sm transition active:scale-98 disabled:opacity-50 cursor-pointer flex items-center gap-2"
-            >
-              <span v-if="submittingMaterial" class="inline-block animate-spin mr-1">⟳</span>
-              <span>{{ submittingMaterial ? 'Salvando...' : 'Salvar Material' }}</span>
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+    <!-- Drawer Lateral do Módulo (☰) -->
+    <SuppliesModuleDrawer
+      v-model="isModuleDrawerOpen"
+      :total-materials="materials.length"
+      :total-base-items="Number(currentClusterSummary.total_items_count) || 0"
+      :total-serials-in-stock="Number(currentClusterSummary.total_serials_in_stock) || 0"
+      :vehicles-count="Number(currentClusterSummary.vehicles_count) || 0"
+      @navigate="(tab) => activeTab = tab"
+      @action="handleDrawerAction"
+    />
 
     <!-- ============================================================================= -->
     <!-- TOAST DE FEEDBACK TEMPORÁRIO (DESIGN SYSTEM) -->
@@ -1483,13 +1271,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import {
   Package, ArrowRightLeft, Plus, Layers, Boxes, Warehouse, QrCode, RefreshCw,
   Truck, ChevronDown, X, Search, ArrowUp, ArrowDown, ArrowUpDown, Copy, Check,
-  AlertCircle, CheckCircle2
+  AlertCircle, CheckCircle2, Menu, MapPin, Edit2
 } from 'lucide-vue-next';
 import TablePagination from '@/components/common/TablePagination.vue';
+import TransferModal from '@/components/supplies/TransferModal.vue';
+import MaterialModal from '@/components/supplies/MaterialModal.vue';
+import ClusterCrudModal from '@/components/supplies/auxiliary/ClusterCrudModal.vue';
+import SuppliesModuleDrawer from '@/components/supplies/SuppliesModuleDrawer.vue';
 
 // ─── INTERFACES DE DOMÍNIO ───────────────────────────────────────────────────
 interface Cluster {
@@ -1519,6 +1311,7 @@ interface Material {
   unit_cost: number;
   min_stock: number;
   has_serial: boolean;
+  track_batch?: boolean;
   unit?: { id: number; code: string; name: string };
 }
 
@@ -1528,12 +1321,23 @@ interface Unit {
   name: string;
 }
 
-// ─── ESTADOS GERAIS ──────────────────────────────────────────────────────────
+// ─── ESTADOS GERAIS DO MÓDULO ────────────────────────────────────────────────
 const activeTab = ref<'regional' | 'materials' | 'depots' | 'serials'>('regional');
 const loading = ref(false);
 const toastMessage = ref('');
 const toastType = ref<'success' | 'error'>('success');
 const copiedKey = ref<string | null>(null);
+
+// Menus e Modais
+const isHeaderMenuOpen = ref(false);
+const headerMenuContainerRef = ref<HTMLElement | null>(null);
+const isModuleDrawerOpen = ref(false);
+const isClusterModalOpen = ref(false);
+const isMaterialModalOpen = ref(false);
+const selectedMaterialForEdit = ref<any>(null);
+const isTransferModalOpen = ref(false);
+const selectedMaterialForTransfer = ref<any>(null);
+const selectedDepotForTransfer = ref<any>(null);
 
 function showToast(msg: string, type: 'success' | 'error' = 'success') {
   toastMessage.value = msg;
@@ -1592,6 +1396,29 @@ function formatSerialStatusBadge(status: string): string {
     default:
       return 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/60';
   }
+}
+
+// Fechar menu de apoio ao clicar fora
+function handleDocumentClick(event: MouseEvent) {
+  if (headerMenuContainerRef.value && !headerMenuContainerRef.value.contains(event.target as Node)) {
+    isHeaderMenuOpen.value = false;
+  }
+}
+
+function openClusterCrudModal() {
+  isHeaderMenuOpen.value = false;
+  isClusterModalOpen.value = true;
+}
+
+function navigateToTab(tab: 'regional' | 'materials' | 'depots' | 'serials') {
+  isHeaderMenuOpen.value = false;
+  activeTab.value = tab;
+}
+
+function handleDrawerAction(action: 'transfer' | 'material' | 'cluster') {
+  if (action === 'transfer') openTransferModal();
+  else if (action === 'material') openCreateMaterialModal();
+  else if (action === 'cluster') isClusterModalOpen.value = true;
 }
 
 // ─── ABA 1: POSIÇÃO REGIONAL (SALDO VIRTUAL AGLUTINADO) ──────────────────────
@@ -1662,7 +1489,7 @@ function toggleExpand(matId: number) {
   if (idx >= 0) {
     expandedRows.value.splice(idx, 1);
   } else {
-    expandedRows.value.push(matId);
+    expandedRows.push(matId);
   }
 }
 
@@ -1948,185 +1775,66 @@ async function loadSerials() {
   }
 }
 
-// ─── MODAL DE TRANSFERÊNCIA DE ESTOQUE (ATÔMICA) ─────────────────────────────
-const showTransferModal = ref(false);
-const submittingTransfer = ref(false);
-const transferError = ref('');
-const loadingSerialsTransfer = ref(false);
-const availableSerialsForTransfer = ref<any[]>([]);
-const selectedMaterialForTransfer = ref<Material | null>(null);
-
-const transferForm = ref({
-  source_depot_id: '',
-  destination_depot_id: '',
-  material_id: '',
-  quantity: 1,
-  serial_ids: [] as number[],
-  document_ref: '',
-  notes: '',
-});
-
-const destinationDepotsList = computed(() => {
-  return depots.value.filter(d => d.id !== Number(transferForm.value.source_depot_id));
-});
-
+// ─── AÇÕES DE MODAL: TRANSFERÊNCIA ───────────────────────────────────────────
 function openTransferModal(material?: any) {
-  transferError.value = '';
-  transferForm.value = {
-    source_depot_id: depots.value[0]?.id ? String(depots.value[0].id) : '',
-    destination_depot_id: depots.value[1]?.id ? String(depots.value[1].id) : '',
-    material_id: material?.material_id ? String(material.material_id) : (material?.id ? String(material.id) : (materials.value[0]?.id ? String(materials.value[0].id) : '')),
-    quantity: 1,
-    serial_ids: [],
-    document_ref: '',
-    notes: '',
-  };
-  onMaterialChange();
-  showTransferModal.value = true;
+  selectedMaterialForTransfer.value = material || null;
+  selectedDepotForTransfer.value = null;
+  isTransferModalOpen.value = true;
 }
 
 function openTransferFromDepot(depot: Depot) {
-  transferError.value = '';
-  const otherDepot = depots.value.find(d => d.id !== depot.id);
-  transferForm.value = {
-    source_depot_id: String(depot.id),
-    destination_depot_id: otherDepot ? String(otherDepot.id) : '',
-    material_id: materials.value[0]?.id ? String(materials.value[0].id) : '',
-    quantity: 1,
-    serial_ids: [],
-    document_ref: '',
-    notes: '',
-  };
-  onMaterialChange();
-  showTransferModal.value = true;
+  selectedDepotForTransfer.value = depot;
+  selectedMaterialForTransfer.value = null;
+  isTransferModalOpen.value = true;
 }
 
-function onSourceDepotChange() {
-  loadSerialsForTransfer();
+function openTransferFromVehicle(vehicleDetail: any, material: any) {
+  const originDepot = depots.value.find(d => d.name === vehicleDetail.depot_name) || null;
+  selectedDepotForTransfer.value = originDepot;
+  selectedMaterialForTransfer.value = material;
+  isTransferModalOpen.value = true;
 }
 
-function onMaterialChange() {
-  const matId = Number(transferForm.value.material_id);
-  selectedMaterialForTransfer.value = materials.value.find(m => m.id === matId) || null;
-  loadSerialsForTransfer();
+function openTransferFromSerial(serial: any) {
+  selectedMaterialForTransfer.value = serial.material || null;
+  selectedDepotForTransfer.value = serial.current_depot || null;
+  isTransferModalOpen.value = true;
 }
 
-async function loadSerialsForTransfer() {
-  transferForm.value.serial_ids = [];
-  if (!selectedMaterialForTransfer.value?.has_serial) {
-    availableSerialsForTransfer.value = [];
-    return;
-  }
-  const depotId = transferForm.value.source_depot_id;
-  const matId = transferForm.value.material_id;
-  if (!depotId || !matId) return;
-
-  loadingSerialsTransfer.value = true;
-  try {
-    const res = await fetch(`/api/v1/stock/serials?depot_id=${depotId}&material_id=${matId}&status=IN_STOCK`);
-    const json = await res.json();
-    availableSerialsForTransfer.value = json.data || [];
-  } catch (err) {
-    console.error('Erro ao carregar seriais para transferência:', err);
-  } finally {
-    loadingSerialsTransfer.value = false;
-  }
+async function onTransferSuccess() {
+  showToast('Transferência atômica executada com sucesso!');
+  await Promise.all([
+    loadRegionalStock(),
+    loadMaterials(),
+    loadDepots(),
+    loadSerials(),
+  ]);
 }
 
-async function submitTransfer() {
-  transferError.value = '';
-  submittingTransfer.value = true;
-  try {
-    const res = await fetch('/api/v1/stock/transfer', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      body: JSON.stringify(transferForm.value),
-    });
-
-    const json = await res.json();
-    if (!res.ok) {
-      transferError.value = json.message || 'Erro ao realizar transferência.';
-      return;
-    }
-
-    showTransferModal.value = false;
-    showToast('Transferência atômica concluída com sucesso!');
-    await Promise.all([
-      loadRegionalStock(),
-      loadMaterials(),
-      loadSerials(),
-    ]);
-  } catch (err: any) {
-    transferError.value = err.message || 'Erro de conexão com o servidor.';
-  } finally {
-    submittingTransfer.value = false;
-  }
+// ─── AÇÕES DE MODAL: MATERIAIS ───────────────────────────────────────────────
+function openCreateMaterialModal() {
+  selectedMaterialForEdit.value = null;
+  isMaterialModalOpen.value = true;
 }
 
-// ─── MODAL DE CADASTRO DE MATERIAL ────────────────────────────────────────────
-const showMaterialModal = ref(false);
-const submittingMaterial = ref(false);
-const materialError = ref('');
-
-const materialForm = ref({
-  code: '',
-  name: '',
-  category: '',
-  unit_id: '',
-  unit_cost: 0,
-  min_stock: 5,
-  has_serial: false,
-  track_batch: false,
-});
-
-function openMaterialCreateModal() {
-  materialError.value = '';
-  materialForm.value = {
-    code: '',
-    name: '',
-    category: 'Geral',
-    unit_id: unitsList.value[0]?.id ? String(unitsList.value[0].id) : '',
-    unit_cost: 0,
-    min_stock: 5,
-    has_serial: false,
-    track_batch: false,
-  };
-  showMaterialModal.value = true;
+function openEditMaterialModal(material: Material) {
+  selectedMaterialForEdit.value = { ...material };
+  isMaterialModalOpen.value = true;
 }
 
-async function submitMaterial() {
-  materialError.value = '';
-  submittingMaterial.value = true;
-  try {
-    const res = await fetch('/api/v1/materials', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      body: JSON.stringify(materialForm.value),
-    });
+async function onMaterialSaved() {
+  showToast('Catálogo de materiais atualizado com sucesso!');
+  await Promise.all([
+    loadMaterials(),
+    loadRegionalStock(),
+  ]);
+}
 
-    const json = await res.json();
-    if (!res.ok) {
-      materialError.value = json.message || 'Erro ao cadastrar material.';
-      return;
-    }
-
-    showMaterialModal.value = false;
-    showToast('Material cadastrado com sucesso no catálogo!');
-    await Promise.all([
-      loadMaterials(),
-      loadRegionalStock(),
-    ]);
-  } catch (err: any) {
-    materialError.value = err.message || 'Erro de conexão ao salvar material.';
-  } finally {
-    submittingMaterial.value = false;
-  }
+// ─── AÇÕES DE MODAL: CLUSTERS ────────────────────────────────────────────────
+async function onClustersUpdated() {
+  showToast('Clusters regionais sincronizados!');
+  await loadClusters();
+  await loadRegionalStock();
 }
 
 // ─── RECARREGAR ABA ATUAL ─────────────────────────────────────────────────────
@@ -2136,6 +1844,7 @@ async function refreshCurrentTab() {
     await Promise.all([
       loadClusters(),
       loadMaterials(),
+      loadUnits(),
       loadDepots(),
       loadSerials(),
     ]);
@@ -2148,6 +1857,7 @@ async function refreshCurrentTab() {
 
 // ─── CICLO DE VIDA ────────────────────────────────────────────────────────────
 onMounted(async () => {
+  document.addEventListener('click', handleDocumentClick);
   await Promise.all([
     loadClusters(),
     loadMaterials(),
@@ -2156,5 +1866,9 @@ onMounted(async () => {
     loadSerials(),
   ]);
   loadRegionalStock();
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleDocumentClick);
 });
 </script>
