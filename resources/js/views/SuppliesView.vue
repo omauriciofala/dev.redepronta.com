@@ -742,7 +742,7 @@
 
               <tr
                 v-else
-                v-for="m in paginatedMaterials"
+                v-for="(m, index) in paginatedMaterials"
                 :key="m.id"
                 class="hover:bg-slate-50/70 dark:hover:bg-white/5 transition-colors"
               >
@@ -810,28 +810,63 @@
                   {{ formatNumber(m.min_stock) }}
                 </td>
 
-                <!-- Ações -->
-                <td class="py-4 px-5 text-right">
-                  <div class="inline-flex items-center gap-1.5">
+                <!-- Ações (Menu de Reticências Verticais) -->
+                <td class="py-4 px-5 text-right relative">
+                  <div class="inline-block text-left relative">
                     <button
                       type="button"
-                      @click="openEditMaterialModal(m)"
-                      class="h-8 px-2.5 text-xs font-medium rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 transition cursor-pointer inline-flex items-center gap-1"
-                      title="Editar dados do material"
+                      @click.stop="toggleMaterialActionsDropdown(m.id)"
+                      class="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:text-[#FC6714] hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 transition cursor-pointer focus:outline-hidden focus:ring-2 focus:ring-[#FC6714]"
+                      :class="{ 'bg-orange-50 dark:bg-[#FC6714]/15 text-[#FC6714] ring-2 ring-[#FC6714]/40': activeDropdownMaterialId === m.id }"
+                      title="Mais opções do material"
+                      aria-label="Mais opções do material"
+                      aria-haspopup="true"
+                      :aria-expanded="activeDropdownMaterialId === m.id"
                     >
-                      <Edit2 class="w-3.5 h-3.5" />
-                      <span>Editar</span>
+                      <!-- Três pontos verticais (Reticências) nativos e nítidos -->
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                        <circle cx="12" cy="5" r="2"></circle>
+                        <circle cx="12" cy="12" r="2"></circle>
+                        <circle cx="12" cy="19" r="2"></circle>
+                      </svg>
                     </button>
 
-                    <button
-                      type="button"
-                      @click="openMovementModal(m)"
-                      class="h-8 px-2.5 text-xs font-medium rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-orange-50 hover:text-[#FC6714] hover:border-[#FC6714] dark:hover:bg-[#FC6714]/10 dark:hover:text-[#FC6714] transition cursor-pointer inline-flex items-center gap-1"
-                      title="Movimentar estoque do material"
+                    <!-- Dropdown Menu Flutuante -->
+                    <Transition
+                      enter-active-class="transition duration-100 ease-out"
+                      enter-from-class="transform scale-95 opacity-0"
+                      enter-to-class="transform scale-100 opacity-100"
+                      leave-active-class="transition duration-75 ease-in"
+                      leave-from-class="transform scale-100 opacity-100"
+                      leave-to-class="transform scale-95 opacity-0"
                     >
-                      <ArrowUpDown class="w-3.5 h-3.5" />
-                      <span>Movimentar</span>
-                    </button>
+                      <div
+                        v-if="activeDropdownMaterialId === m.id"
+                        @click.stop
+                        class="absolute right-0 w-48 rounded-xl bg-white dark:bg-[#06064D] border border-slate-200 dark:border-[#14147A] shadow-2xl z-50 py-1 text-xs font-medium divide-y divide-slate-100 dark:divide-[#14147A]/60 focus:outline-hidden"
+                        :class="index >= paginatedMaterials.length - 2 && paginatedMaterials.length > 2 ? 'bottom-full mb-1.5' : 'top-full mt-1.5'"
+                      >
+                        <div class="py-1">
+                          <button
+                            type="button"
+                            @click="handleEditMaterial(m)"
+                            class="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] dark:hover:text-orange-300 transition cursor-pointer"
+                          >
+                            <Edit2 class="w-4 h-4 text-slate-400" />
+                            <span>Editar Material</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            @click="handleMovementMaterial(m)"
+                            class="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] dark:hover:text-orange-300 transition cursor-pointer"
+                          >
+                            <ArrowUpDown class="w-4 h-4 text-slate-400" />
+                            <span>Nova Movimentação</span>
+                          </button>
+                        </div>
+                      </div>
+                    </Transition>
                   </div>
                 </td>
               </tr>
@@ -1468,6 +1503,7 @@ const copiedKey = ref<string | null>(null);
 const isHeaderMenuOpen = ref(false);
 const headerMenuContainerRef = ref<HTMLElement | null>(null);
 const isModuleDrawerOpen = ref(false);
+const activeDropdownMaterialId = ref<number | null>(null);
 const isClusterModalOpen = ref(false);
 const isDepotTypeModalOpen = ref(false);
 const depotTypesList = ref<any[]>([]);
@@ -1546,11 +1582,30 @@ function formatSerialStatusBadge(status: string): string {
   }
 }
 
-// Fechar menu de apoio ao clicar fora
+// Fechar menu de apoio e dropdowns ao clicar fora
 function handleDocumentClick(event: MouseEvent) {
   if (headerMenuContainerRef.value && !headerMenuContainerRef.value.contains(event.target as Node)) {
     isHeaderMenuOpen.value = false;
   }
+  activeDropdownMaterialId.value = null;
+}
+
+function toggleMaterialActionsDropdown(id: number) {
+  if (activeDropdownMaterialId.value === id) {
+    activeDropdownMaterialId.value = null;
+  } else {
+    activeDropdownMaterialId.value = id;
+  }
+}
+
+function handleEditMaterial(material: Material) {
+  activeDropdownMaterialId.value = null;
+  openEditMaterialModal(material);
+}
+
+function handleMovementMaterial(material: Material) {
+  activeDropdownMaterialId.value = null;
+  openMovementModal(material);
 }
 
 function openClusterCrudModal() {
