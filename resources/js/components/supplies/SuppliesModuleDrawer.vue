@@ -75,7 +75,7 @@
               <Boxes class="w-4 h-4" />
             </div>
             <div class="truncate">
-              <div class="font-bold text-slate-800 dark:text-slate-200 truncate">Catálogo Materiais</div>
+              <div class="font-bold text-slate-800 dark:text-slate-200 truncate">Materiais</div>
               <div class="text-[10px] text-slate-400">SKUs e Especificações</div>
             </div>
           </button>

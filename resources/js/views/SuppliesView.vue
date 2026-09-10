@@ -200,7 +200,7 @@
         class="pb-3 border-b-2 text-sm flex items-center gap-2 transition cursor-pointer shrink-0"
       >
         <Boxes class="w-4 h-4" />
-        <span>Catálogo de Materiais</span>
+        <span>Materiais</span>
         <span
           v-if="materials.length > 0"
           class="px-2 py-0.5 rounded-full text-[11px] font-bold"
