@@ -354,4 +354,65 @@ class OwnerMaterialCatalogTest extends TestCase
         $this->assertEquals('VIV-DEPOT-RESOLVED', $m1Inherited['code']);
         $this->assertTrue($m1Inherited['has_owner_alias']);
     }
+
+    /**
+     * Testa o download do modelo XLSX de 3 colunas para o proprietário.
+     */
+    public function test_can_download_owner_material_catalog_xlsx_template(): void
+    {
+        $response = $this->get("/api/v1/material-owners/{$this->owner->id}/materials/template?format=xlsx");
+
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $this->assertStringContainsString('modelo_importacao_proprietario_VIVO-SP.xlsx', $response->headers->get('Content-Disposition') ?? '');
+    }
+
+    /**
+     * Testa prévia e importação a partir do arquivo XLSX modelo de 3 colunas no catálogo do proprietário.
+     */
+    public function test_can_preview_and_import_owner_materials_from_xlsx_file(): void
+    {
+        $xlsxPath = base_path('docs/modelo_importacao_materiais.xlsx');
+        if (!file_exists($xlsxPath)) {
+            $this->markTestSkipped('Arquivo modelo_importacao_materiais.xlsx não encontrado.');
+        }
+
+        $file = new UploadedFile($xlsxPath, 'modelo_importacao_materiais.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', null, true);
+
+        // 1. Cadastra os materiais no catálogo geral primeiro para existirem no sistema
+        $importService = app(\App\Services\Stock\MaterialImportService::class);
+        $importService->importFromUploadedFile($file, $this->account->id, true);
+
+        // 2. Preview no catálogo do proprietário com o mesmo arquivo XLSX de 3 colunas
+        $previewRes = $this->postJson("/api/v1/material-owners/{$this->owner->id}/materials/preview", [
+            'file' => $file,
+        ]);
+
+        $previewRes->assertStatus(200);
+        $previewRes->assertJsonPath('can_import', true);
+        $this->assertGreaterThan(100, $previewRes->json('summary.total_rows'));
+        $this->assertEquals(0, $previewRes->json('summary.errors_count'));
+        $this->assertGreaterThan(100, $previewRes->json('summary.to_link_existing'));
+
+        // 3. Importação dos dados da prévia
+        $previewRows = $previewRes->json('preview_rows');
+        // Pega as primeiras 5 linhas para importar com velocidade
+        $subsetRows = array_slice($previewRows, 0, 5);
+
+        $importRes = $this->postJson("/api/v1/material-owners/{$this->owner->id}/materials/import", [
+            'rows' => $subsetRows,
+        ]);
+
+        $importRes->assertStatus(200);
+        $this->assertEquals(5, $importRes->json('data.imported_count'));
+
+        // Valida que o primeiro item foi criado/vinculado com o código de proprietário
+        $firstItem = $subsetRows[0];
+        $this->assertDatabaseHas('owner_materials', [
+            'account_id' => $this->account->id,
+            'material_owner_id' => $this->owner->id,
+            'owner_code' => $firstItem['owner_code'],
+        ]);
+    }
 }
+

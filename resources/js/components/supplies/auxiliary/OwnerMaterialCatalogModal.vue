@@ -21,7 +21,7 @@
               <span>Arquivo: {{ previewFileName }}</span>
             </h4>
             <p class="text-[11px] text-slate-500 dark:text-slate-400">
-              Colunas detectadas: <strong>Cód.</strong>, <strong>Nome do Material</strong> e <strong>Cód. Prop.</strong>
+              Colunas detectadas: <strong>COD.</strong>, <strong>NOME DO MATERIAL</strong> e <strong>COD. PROP.</strong>
             </p>
           </div>
         </div>
@@ -217,28 +217,38 @@
 
         <!-- Botões de Ação -->
         <div class="flex items-center gap-2">
-          <!-- Download Modelo 3 Colunas -->
+          <!-- Download Modelo 3 Colunas: Excel e CSV -->
           <button
             type="button"
-            @click="downloadTemplate"
+            @click="downloadTemplate('xlsx')"
             class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-200 text-xs font-medium shadow-2xs transition cursor-pointer"
-            title="Baixar planilha CSV modelo (3 colunas: Cód., Nome do Material, Cód. Prop.)"
+            title="Baixar planilha Excel modelo (.xlsx) com 3 colunas: COD., NOME DO MATERIAL, COD. PROP."
+          >
+            <Download class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+            <span>Modelo Excel (.xlsx)</span>
+          </button>
+
+          <button
+            type="button"
+            @click="downloadTemplate('csv')"
+            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-200 text-xs font-medium shadow-2xs transition cursor-pointer"
+            title="Baixar planilha CSV modelo (3 colunas: COD., NOME DO MATERIAL, COD. PROP.)"
           >
             <Download class="w-3.5 h-3.5 text-slate-400" />
-            <span>Modelo CSV (3 Colunas)</span>
+            <span>Modelo CSV</span>
           </button>
 
           <!-- Importar Planilha com Preview -->
           <label
             class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-200 text-xs font-medium shadow-2xs transition cursor-pointer"
-            title="Importar planilha de materiais do proprietário com pré-visualização"
+            title="Importar planilha Excel (.xlsx) ou CSV de materiais com pré-visualização"
           >
             <Loader2 v-if="isPreviewLoading" class="w-3.5 h-3.5 animate-spin text-[#FC6714]" />
             <Upload v-else class="w-3.5 h-3.5 text-[#FC6714]" />
             <span>{{ isPreviewLoading ? 'Analisando...' : 'Importar' }}</span>
             <input
               type="file"
-              accept=".csv,.txt"
+              accept=".xlsx,.csv,.txt"
               class="hidden"
               :disabled="isPreviewLoading"
               @change="handleFileUploadForPreview"
@@ -767,9 +777,9 @@ async function deleteItem(item: OwnerMaterialItem) {
   }
 }
 
-function downloadTemplate() {
+function downloadTemplate(format: 'xlsx' | 'csv' = 'xlsx') {
   if (!props.owner?.id) return;
-  window.open(`/api/v1/material-owners/${props.owner.id}/materials/template`, '_blank');
+  window.open(`/api/v1/material-owners/${props.owner.id}/materials/template?format=${format}`, '_blank');
 }
 
 /**

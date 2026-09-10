@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Material;
 use App\Models\MaterialOwner;
 use App\Models\OwnerMaterial;
+use App\Services\Stock\MaterialImportService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -187,10 +188,21 @@ class OwnerMaterialController extends Controller
         ]);
     }
 
-    public function template(MaterialOwner $materialOwner): Response
+    public function template(Request $request, MaterialOwner $materialOwner, MaterialImportService $importService): Response|\Symfony\Component\HttpFoundation\BinaryFileResponse
     {
         $accountId = $this->getAccountId();
         abort_if($materialOwner->account_id !== $accountId, 403, 'Acesso negado.');
+
+        $format = strtolower($request->query('format', 'csv'));
+        $safeCode = preg_replace('/[^a-zA-Z0-9_-]/', '_', $materialOwner->code);
+
+        if ($format === 'xlsx' && $importService->hasXlsxTemplate()) {
+            return response()->download(
+                $importService->getXlsxTemplatePath(),
+                "modelo_importacao_proprietario_{$safeCode}.xlsx",
+                ['Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
+            );
+        }
 
         // O Modelo consiste exatamente em 3 colunas: Cód., Nome do Material, Cód. Prop.
         $headers = ['Cód.', 'Nome do Material', 'Cód. Prop.'];
@@ -209,8 +221,6 @@ class OwnerMaterialController extends Controller
         rewind($handle);
         $csv = stream_get_contents($handle);
         fclose($handle);
-
-        $safeCode = preg_replace('/[^a-zA-Z0-9_-]/', '_', $materialOwner->code);
 
         return response($csv, 200, [
             'Content-Type' => 'text/csv; charset=UTF-8',
@@ -279,7 +289,7 @@ class OwnerMaterialController extends Controller
     /**
      * Pré-visualização da planilha antes de efetivar a importação.
      */
-    public function preview(Request $request, MaterialOwner $materialOwner): JsonResponse
+    public function preview(Request $request, MaterialOwner $materialOwner, MaterialImportService $importService): JsonResponse
     {
         $accountId = $this->getAccountId();
         abort_if($materialOwner->account_id !== $accountId, 403, 'Acesso negado.');
@@ -292,20 +302,34 @@ class OwnerMaterialController extends Controller
 
         $file = $request->file('file');
         $ext = strtolower($file->getClientOriginalExtension());
-        if (!in_array($ext, ['csv', 'txt'])) {
+        if (!in_array($ext, ['xlsx', 'csv', 'txt'])) {
             return response()->json([
-                'message' => 'A importação aceita arquivos .csv ou .txt delimitados por ponto e vírgula ou vírgula.',
+                'message' => 'O arquivo deve estar no formato Excel (.xlsx) ou CSV (.csv, .txt).',
             ], 422);
         }
 
-        $lines = file($file->getRealPath(), FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-        if (empty($lines)) {
-            return response()->json(['message' => 'O arquivo enviado está vazio.'], 422);
+        if ($ext === 'xlsx') {
+            $parsedRows = $importService->parseXlsxRows($file->getRealPath());
+            if (empty($parsedRows)) {
+                return response()->json(['message' => 'O arquivo enviado está vazio.'], 422);
+            }
+            $headerRow = $parsedRows[0];
+            $dataRows = array_slice($parsedRows, 1);
+        } else {
+            $lines = file($file->getRealPath(), FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            if (empty($lines)) {
+                return response()->json(['message' => 'O arquivo enviado está vazio.'], 422);
+            }
+
+            $firstLine = $lines[0];
+            $separator = str_contains($firstLine, ';') ? ';' : ',';
+            $headerRow = str_getcsv(ltrim($firstLine, "\xEF\xBB\xBF"), $separator);
+            $dataRows = [];
+            for ($i = 1; $i < count($lines); $i++) {
+                $dataRows[] = str_getcsv($lines[$i], $separator);
+            }
         }
 
-        $firstLine = $lines[0];
-        $separator = str_contains($firstLine, ';') ? ';' : ',';
-        $headerRow = str_getcsv(ltrim($firstLine, "\xEF\xBB\xBF"), $separator);
         $headerMap = $this->mapThreeColumnHeader($headerRow);
 
         $previewRows = [];
@@ -315,18 +339,17 @@ class OwnerMaterialController extends Controller
         $toUpdateLink = 0;
         $errorsCount = 0;
 
-        for ($i = 1; $i < count($lines); $i++) {
-            $cols = str_getcsv($lines[$i], $separator);
-            $rawSystemCode = isset($headerMap['system_code'], $cols[$headerMap['system_code']]) ? trim($cols[$headerMap['system_code']]) : '';
-            $rawMaterialName = isset($headerMap['material_name'], $cols[$headerMap['material_name']]) ? trim($cols[$headerMap['material_name']]) : '';
-            $rawOwnerCode = isset($headerMap['owner_code'], $cols[$headerMap['owner_code']]) ? trim($cols[$headerMap['owner_code']]) : '';
+        foreach ($dataRows as $idx => $cols) {
+            $rawSystemCode = isset($headerMap['system_code'], $cols[$headerMap['system_code']]) ? trim((string)$cols[$headerMap['system_code']]) : '';
+            $rawMaterialName = isset($headerMap['material_name'], $cols[$headerMap['material_name']]) ? trim((string)$cols[$headerMap['material_name']]) : '';
+            $rawOwnerCode = isset($headerMap['owner_code'], $cols[$headerMap['owner_code']]) ? trim((string)$cols[$headerMap['owner_code']]) : '';
 
             // Pula linhas em branco
             if ($rawSystemCode === '' && $rawMaterialName === '' && $rawOwnerCode === '') {
                 continue;
             }
 
-            $lineNum = $i + 1;
+            $lineNum = $idx + 2;
             $status = 'valid';
             $message = null;
             $action = 'link_existing';
@@ -454,7 +477,7 @@ class OwnerMaterialController extends Controller
     /**
      * Importação definitiva das linhas do catálogo do proprietário (após preview).
      */
-    public function import(Request $request, MaterialOwner $materialOwner): JsonResponse
+    public function import(Request $request, MaterialOwner $materialOwner, MaterialImportService $importService): JsonResponse
     {
         $accountId = $this->getAccountId();
         abort_if($materialOwner->account_id !== $accountId, 403, 'Acesso negado.');
@@ -467,7 +490,7 @@ class OwnerMaterialController extends Controller
         }
         // Modo 2: Recebe arquivo direto (retrocompatibilidade)
         elseif ($request->hasFile('file')) {
-            $previewResponse = $this->preview($request, $materialOwner);
+            $previewResponse = $this->preview($request, $materialOwner, $importService);
             $previewData = json_decode($previewResponse->getContent(), true);
             $rowsToProcess = $previewData['preview_rows'] ?? [];
         } else {

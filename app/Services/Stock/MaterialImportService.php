@@ -214,8 +214,20 @@ class MaterialImportService
 
         $rows = [];
         foreach ($sheetXml->sheetData->row as $row) {
-            $rowValues = [];
+            $rowMap = [];
+            $maxColIdx = -1;
             foreach ($row->c as $cell) {
+                $cellRef = (string)($cell['r'] ?? '');
+                $colLetters = preg_replace('/[0-9]/', '', $cellRef);
+                $colIdx = 0;
+                for ($k = 0; $k < strlen($colLetters); $k++) {
+                    $colIdx = $colIdx * 26 + (ord(strtoupper($colLetters[$k])) - ord('A') + 1);
+                }
+                $colIdx -= 1; // 0-indexado (A=0, B=1, C=2)
+                if ($colIdx > $maxColIdx) {
+                    $maxColIdx = $colIdx;
+                }
+
                 $type = (string)($cell['t'] ?? '');
                 $val = (string)($cell->v ?? '');
 
@@ -225,9 +237,16 @@ class MaterialImportService
                     $val = (string)$cell->is->t;
                 }
 
-                $rowValues[] = trim($val);
+                $rowMap[$colIdx] = trim($val);
             }
-            $rows[] = $rowValues;
+
+            if ($maxColIdx >= 0) {
+                $rowValues = [];
+                for ($c = 0; $c <= $maxColIdx; $c++) {
+                    $rowValues[$c] = $rowMap[$c] ?? '';
+                }
+                $rows[] = $rowValues;
+            }
         }
 
         return $rows;
