@@ -152,23 +152,20 @@
           </div>
 
           <!-- Depósitos de Origem e Destino -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3 border-t border-slate-200/80 dark:border-slate-700/60">
-            <!-- ORIGEM -->
-            <div>
-              <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+          <div
+            class="grid gap-4 pt-3 border-t border-slate-200/80 dark:border-slate-700/60"
+            :class="form.movement_type === 'ENTRY' ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'"
+          >
+            <!-- ORIGEM (Oculto em Entrada de Estoque) -->
+            <div v-if="form.movement_type !== 'ENTRY'">
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                 Depósito de Origem {{ isSourceRequired ? '*' : '(Opcional / Externo)' }}
               </label>
 
-              <template v-if="form.movement_type === 'ENTRY'">
-                <div class="h-10 px-3.5 rounded-lg border border-dashed border-slate-300 dark:border-slate-700 bg-white/60 dark:bg-slate-800/40 text-slate-400 dark:text-slate-500 text-xs flex items-center select-none">
-                  Fornecedor / Compra / Inventário Inicial
-                </div>
-              </template>
-
-              <template v-else-if="form.movement_type === 'RETURN'">
+              <template v-if="form.movement_type === 'RETURN'">
                 <select
                   v-model="form.source_depot_id"
-                  class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none cursor-pointer"
+                  class="w-full h-11 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-xs sm:text-sm focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-hidden cursor-pointer"
                 >
                   <option value="">Origem Externa (Cliente / Técnico em Campo)</option>
                   <option v-for="d in depots" :key="d.id" :value="String(d.id)">
@@ -182,7 +179,7 @@
                   v-model="form.source_depot_id"
                   :required="isSourceRequired"
                   @change="onHeaderSourceChange"
-                  class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none cursor-pointer"
+                  class="w-full h-11 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-xs sm:text-sm focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-hidden cursor-pointer"
                 >
                   <option value="" disabled>Selecione o local de saída...</option>
                   <option v-for="d in depots" :key="d.id" :value="String(d.id)">
@@ -194,12 +191,12 @@
 
             <!-- DESTINO -->
             <div>
-              <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                 Depósito de Destino {{ isDestRequired ? '*' : '(Opcional / Externo)' }}
               </label>
 
               <template v-if="form.movement_type === 'EXIT'">
-                <div class="h-10 px-3.5 rounded-lg border border-dashed border-slate-300 dark:border-slate-700 bg-white/60 dark:bg-slate-800/40 text-slate-400 dark:text-slate-500 text-xs flex items-center select-none">
+                <div class="h-11 px-3.5 rounded-lg border border-dashed border-slate-300 dark:border-slate-700 bg-white/60 dark:bg-slate-900/40 text-slate-400 dark:text-slate-500 text-xs flex items-center select-none">
                   Aplicação Operacional / Técnico / Cliente
                 </div>
               </template>
@@ -208,7 +205,7 @@
                 <select
                   v-model="form.destination_depot_id"
                   :required="isDestRequired"
-                  class="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none cursor-pointer"
+                  class="w-full h-11 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-xs sm:text-sm focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-hidden cursor-pointer"
                 >
                   <option value="" disabled>Selecione o local de entrada...</option>
                   <option v-for="d in destinationOptions" :key="d.id" :value="String(d.id)">
