@@ -13,7 +13,7 @@
             Suprimentos & WMS
           </h1>
           <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
-            Gestão de depósitos físicos, posições regionais consolidadas e rastreabilidade serial
+            Catálogo de materiais, rastreabilidade serial e movimentação de estoque
           </p>
         </div>
       </div>
@@ -87,7 +87,7 @@
 
                 <button
                   type="button"
-                  @click="openCreateDepotModal"
+                  @click="openDepotCrudModal"
                   class="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] dark:hover:text-orange-300 transition cursor-pointer"
                 >
                   <Warehouse class="w-4 h-4 text-slate-400" />
@@ -174,25 +174,6 @@
     <div class="flex border-b border-slate-200 dark:border-[#14147A] gap-6 overflow-x-auto select-none">
       <button
         type="button"
-        @click="activeTab = 'regional'"
-        :class="activeTab === 'regional'
-          ? 'border-[#FC6714] text-[#FC6714] font-bold'
-          : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium'"
-        class="pb-3 border-b-2 text-sm flex items-center gap-2 transition cursor-pointer shrink-0"
-      >
-        <Layers class="w-4 h-4" />
-        <span>Posição Regional</span>
-        <span
-          v-if="regionalMaterials.length > 0"
-          class="px-2 py-0.5 rounded-full text-[11px] font-bold"
-          :class="activeTab === 'regional' ? 'bg-[#FC6714]/15 text-[#FC6714]' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'"
-        >
-          {{ regionalMaterials.length }}
-        </span>
-      </button>
-
-      <button
-        type="button"
         @click="activeTab = 'materials'"
         :class="activeTab === 'materials'
           ? 'border-[#FC6714] text-[#FC6714] font-bold'
@@ -207,25 +188,6 @@
           :class="activeTab === 'materials' ? 'bg-[#FC6714]/15 text-[#FC6714]' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'"
         >
           {{ materials.length }}
-        </span>
-      </button>
-
-      <button
-        type="button"
-        @click="activeTab = 'depots'"
-        :class="activeTab === 'depots'
-          ? 'border-[#FC6714] text-[#FC6714] font-bold'
-          : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium'"
-        class="pb-3 border-b-2 text-sm flex items-center gap-2 transition cursor-pointer shrink-0"
-      >
-        <Warehouse class="w-4 h-4" />
-        <span>Depósitos</span>
-        <span
-          v-if="depots.length > 0"
-          class="px-2 py-0.5 rounded-full text-[11px] font-bold"
-          :class="activeTab === 'depots' ? 'bg-[#FC6714]/15 text-[#FC6714]' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'"
-        >
-          {{ depots.length }}
         </span>
       </button>
 
@@ -250,354 +212,7 @@
     </div>
 
     <!-- ============================================================================= -->
-    <!-- ABA 1: POSIÇÃO REGIONAL -->
-    <!-- ============================================================================= -->
-    <div v-if="activeTab === 'regional'" class="space-y-6">
-      <!-- Seletor Confortável de Posição Regional -->
-      <div class="p-4 bg-white dark:bg-[#06064D]/50 rounded-xl border border-slate-200 dark:border-[#14147A] flex flex-wrap items-center justify-between gap-4 text-sm shadow-2xs">
-        <div class="flex items-center gap-3">
-          <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-            Posição Regional:
-          </span>
-          <div class="flex flex-wrap gap-2">
-            <button
-              v-for="c in clusters"
-              :key="c.id"
-              type="button"
-              @click="selectCluster(c.id)"
-              :class="selectedClusterId === c.id
-                ? 'bg-[#FC6714] text-white font-bold shadow-xs'
-                : 'bg-slate-50 dark:bg-[#03032E] text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-200 dark:border-[#14147A]'"
-              class="px-3.5 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer flex items-center gap-2"
-            >
-              <span class="w-2.5 h-2.5 rounded-full" :style="{ backgroundColor: c.color || '#FC6714' }"></span>
-              <span>{{ c.name }}</span>
-              <span
-                v-if="c.owner"
-                class="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold tracking-wide"
-                :class="selectedClusterId === c.id ? 'bg-white/25 text-white' : 'bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-300'"
-                :title="`Proprietário: ${c.owner.code} - ${c.owner.name}`"
-              >
-                {{ c.owner.code }}
-              </span>
-            </button>
-          </div>
-        </div>
-
-        <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
-          <span class="inline-flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            Consolidação dos saldos dos depósitos da região em tempo real
-          </span>
-        </div>
-      </div>
-
-      <!-- 4 Cards Métricos de Estoque da Posição Regional -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="p-5 rounded-xl border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D]/50 shadow-xs flex items-center gap-3.5">
-          <div class="p-3 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 shrink-0">
-            <Boxes class="w-6 h-6" />
-          </div>
-          <div>
-            <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Tipos de Materiais</p>
-            <h3 class="text-xl font-bold text-slate-900 dark:text-slate-100 mt-0.5">
-              {{ currentClusterSummary.total_materials || 0 }}
-            </h3>
-          </div>
-        </div>
-
-        <div class="p-5 rounded-xl border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D]/50 shadow-xs flex items-center gap-3.5">
-          <div class="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 shrink-0">
-            <Warehouse class="w-6 h-6" />
-          </div>
-          <div>
-            <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Saldo Físico Consolidado</p>
-            <h3 class="text-xl font-bold text-slate-900 dark:text-slate-100 mt-0.5">
-              {{ formatNumber(currentClusterSummary.total_items_count || 0) }}
-            </h3>
-          </div>
-        </div>
-
-        <div class="p-5 rounded-xl border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D]/50 shadow-xs flex items-center gap-3.5">
-          <div class="p-3 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 shrink-0">
-            <QrCode class="w-6 h-6" />
-          </div>
-          <div>
-            <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Itens Serializados</p>
-            <h3 class="text-xl font-bold text-slate-900 dark:text-slate-100 mt-0.5">
-              {{ currentClusterSummary.total_serials_in_stock || 0 }}
-            </h3>
-          </div>
-        </div>
-
-        <div class="p-5 rounded-xl border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D]/50 shadow-xs flex items-center gap-3.5">
-          <div class="p-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 shrink-0">
-            <Warehouse class="w-6 h-6" />
-          </div>
-          <div>
-            <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Depósitos na Região</p>
-            <h3 class="text-xl font-bold text-slate-900 dark:text-slate-100 mt-0.5">
-              {{ currentClusterSummary.depots_count || 0 }} depósitos
-            </h3>
-          </div>
-        </div>
-      </div>
-
-      <!-- Barra de Filtro e Busca Rápida na Posição Regional -->
-      <div class="p-4 bg-white dark:bg-[#06064D]/50 rounded-xl border border-slate-200 dark:border-[#14147A] flex flex-wrap items-center justify-between gap-4 text-sm shadow-2xs">
-        <div class="relative flex-1 min-w-[280px]">
-          <Search class="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400 pointer-events-none" />
-          <input
-            type="text"
-            v-model="regionalSearch"
-            placeholder="Filtrar por nome do material ou código SKU..."
-            class="w-full h-11 pl-10 pr-10 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 text-sm transition"
-          />
-          <button
-            v-if="regionalSearch"
-            @click="regionalSearch = ''"
-            class="absolute right-3 top-3 p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition cursor-pointer"
-            title="Limpar filtro"
-          >
-            <X class="w-3.5 h-3.5" />
-          </button>
-        </div>
-
-        <div class="text-xs text-slate-500 dark:text-slate-400 font-medium">
-          Exibindo {{ paginatedRegionalMaterials.length }} de {{ filteredRegionalMaterials.length }} materiais
-        </div>
-      </div>
-
-      <!-- TABELA CONFORTÁVEL 1: POSIÇÃO REGIONAL (SEÇÃO 7 DESIGN SYSTEM) -->
-      <div class="rounded-xl border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D]/50 shadow-xs overflow-hidden transition-colors duration-200">
-        <div class="overflow-x-auto min-h-[280px]">
-          <table class="w-full text-left border-collapse text-sm">
-            <thead>
-              <tr class="border-b border-slate-200 dark:border-[#14147A] bg-slate-50/80 dark:bg-[#03032E]/70 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider select-none">
-                <!-- Material / Código -->
-                <th
-                  @click="toggleSortRegional('name')"
-                  class="py-3.5 px-5 cursor-pointer hover:text-[#FC6714] dark:hover:text-[#FC6714] transition"
-                  title="Clique para ordenar por Material"
-                >
-                  <div class="inline-flex items-center gap-1.5">
-                    <span>Material / Código</span>
-                    <ArrowUp v-if="regionalSortBy === 'name' && regionalSortDir === 'asc'" class="w-3.5 h-3.5 text-[#FC6714]" />
-                    <ArrowDown v-else-if="regionalSortBy === 'name' && regionalSortDir === 'desc'" class="w-3.5 h-3.5 text-[#FC6714]" />
-                    <ArrowUpDown v-else class="w-3.5 h-3.5 text-slate-400 opacity-60" />
-                  </div>
-                </th>
-
-                <!-- Unidade -->
-                <th class="py-3.5 px-5">Unidade</th>
-
-                <!-- Custo Médio Unitário -->
-                <th
-                  @click="toggleSortRegional('unit_cost')"
-                  class="py-3.5 px-5 text-right cursor-pointer hover:text-[#FC6714] dark:hover:text-[#FC6714] transition"
-                  title="Ordenar por Custo Médio"
-                >
-                  <div class="inline-flex items-center justify-end gap-1.5 w-full">
-                    <span>Custo Médio</span>
-                    <ArrowUp v-if="regionalSortBy === 'unit_cost' && regionalSortDir === 'asc'" class="w-3.5 h-3.5 text-[#FC6714]" />
-                    <ArrowDown v-else-if="regionalSortBy === 'unit_cost' && regionalSortDir === 'desc'" class="w-3.5 h-3.5 text-[#FC6714]" />
-                    <ArrowUpDown v-else class="w-3.5 h-3.5 text-slate-400 opacity-60" />
-                  </div>
-                </th>
-
-                <!-- Saldo na Região -->
-                <th
-                  @click="toggleSortRegional('total_virtual_quantity')"
-                  class="py-3.5 px-5 text-right cursor-pointer hover:text-[#FC6714] dark:hover:text-[#FC6714] transition"
-                  title="Ordenar por Saldo na Região"
-                >
-                  <div class="inline-flex items-center justify-end gap-1.5 w-full">
-                    <span>Saldo na Região</span>
-                    <ArrowUp v-if="regionalSortBy === 'total_virtual_quantity' && regionalSortDir === 'asc'" class="w-3.5 h-3.5 text-[#FC6714]" />
-                    <ArrowDown v-else-if="regionalSortBy === 'total_virtual_quantity' && regionalSortDir === 'desc'" class="w-3.5 h-3.5 text-[#FC6714]" />
-                    <ArrowUpDown v-else class="w-3.5 h-3.5 text-slate-400 opacity-60" />
-                  </div>
-                </th>
-
-                <!-- Ações da Linha -->
-                <th class="py-3.5 px-5 text-right">Ação</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100 dark:divide-[#14147A]/60">
-              <tr v-if="filteredRegionalMaterials.length === 0">
-                <td colspan="5" class="py-12 text-center text-slate-400 text-sm">
-                  <div class="max-w-sm mx-auto space-y-2">
-                    <Boxes class="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto" />
-                    <p class="font-medium text-slate-700 dark:text-slate-300">Nenhum material encontrado nesta posição regional</p>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">
-                      Faça uma transferência de estoque para os depósitos desta região ou selecione outra posição regional.
-                    </p>
-                  </div>
-                </td>
-              </tr>
-
-              <template v-else v-for="m in paginatedRegionalMaterials" :key="m.material_id">
-                <!-- Linha Principal do Material -->
-                <tr class="hover:bg-slate-50/70 dark:hover:bg-white/5 transition-colors">
-                  <!-- Identificação do Material -->
-                  <td class="py-4 px-5">
-                    <div class="flex items-center gap-3">
-                      <!-- Botão expansível se houver detalhamento de depósitos -->
-                      <button
-                        v-if="m.breakdown && m.breakdown.length > 0"
-                        type="button"
-                        @click="toggleExpand(m.material_id)"
-                        class="p-1 rounded-md text-slate-400 hover:text-[#FC6714] hover:bg-orange-50 dark:hover:bg-[#FC6714]/10 transition cursor-pointer"
-                        :title="expandedRows.includes(m.material_id) ? 'Recolher detalhes por depósito' : 'Ver distribuição por depósito'"
-                      >
-                        <ChevronDown
-                          class="w-4 h-4 transition-transform duration-200"
-                          :class="{ 'rotate-180 text-[#FC6714]': expandedRows.includes(m.material_id) }"
-                        />
-                      </button>
-                      <div v-else class="w-6 shrink-0"></div>
-
-                      <div>
-                        <div class="font-semibold text-slate-900 dark:text-slate-100 text-sm">
-                          {{ m.name }}
-                        </div>
-                        <div class="flex items-center gap-2 mt-0.5">
-                          <span class="font-mono text-xs text-slate-500 dark:text-slate-400">
-                            SKU: {{ m.code }}
-                          </span>
-                          <button
-                            @click="copyToClipboard(m.code, 'sku-reg-' + m.material_id)"
-                            class="p-0.5 rounded text-slate-400 hover:text-[#FC6714] transition cursor-pointer"
-                            title="Copiar código SKU"
-                          >
-                            <Check v-if="copiedKey === 'sku-reg-' + m.material_id" class="w-3 h-3 text-emerald-500" />
-                            <Copy v-else class="w-3 h-3" />
-                          </button>
-                          <span
-                            v-if="m.has_serial"
-                            class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-purple-50 text-purple-700 border border-purple-200/70 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800/60"
-                          >
-                            Serializado
-                          </span>
-                          <span
-                            v-else-if="m.track_batch"
-                            class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200/70 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800/60"
-                          >
-                            Lote / Metragem
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-
-                  <!-- Unidade de Medida -->
-                  <td class="py-4 px-5 text-slate-600 dark:text-slate-300 font-mono text-sm">
-                    {{ m.unit || 'UND' }}
-                  </td>
-
-                  <!-- Custo Médio -->
-                  <td class="py-4 px-5 text-right font-mono text-sm text-slate-700 dark:text-slate-300">
-                    R$ {{ formatNumber(m.unit_cost) }}
-                  </td>
-
-                  <!-- Saldo na Região (Destacado) -->
-                  <td class="py-4 px-5 text-right">
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-[#FC6714]/10 text-[#FC6714] border border-[#FC6714]/30">
-                      {{ formatNumber(m.total_virtual_quantity) }} {{ m.unit || 'UND' }}
-                    </span>
-                  </td>
-
-                  <!-- Ação de Movimentar -->
-                  <td class="py-4 px-5 text-right">
-                    <button
-                      type="button"
-                      @click="openMovementModal(m)"
-                      class="h-8 px-3 text-xs font-medium rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-orange-50 hover:text-[#FC6714] hover:border-[#FC6714] dark:hover:bg-[#FC6714]/10 dark:hover:text-[#FC6714] transition cursor-pointer inline-flex items-center gap-1.5"
-                    >
-                      <ArrowUpDown class="w-3.5 h-3.5" />
-                      <span>Movimentar</span>
-                    </button>
-                  </td>
-                </tr>
-
-                <!-- Linha Sub-Tabela Confortável: Distribuição por Depósitos da Região -->
-                <tr v-if="expandedRows.includes(m.material_id)" class="bg-slate-50/60 dark:bg-[#03032E]/40">
-                  <td colspan="6" class="p-4 pl-14">
-                    <div class="rounded-xl border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D]/80 shadow-xs overflow-hidden">
-                      <div class="px-4 py-2.5 bg-slate-100/70 dark:bg-[#03032E] border-b border-slate-200 dark:border-[#14147A] flex items-center justify-between text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
-                        <span class="flex items-center gap-1.5">
-                          <Warehouse class="w-3.5 h-3.5 text-blue-500" />
-                          Distribuição por Depósito na Posição Regional
-                        </span>
-                        <span class="text-slate-400 font-medium lowercase">
-                          {{ m.breakdown.length }} depósito(s) com este item
-                        </span>
-                      </div>
-                      <table class="w-full text-left text-xs border-collapse">
-                        <thead>
-                          <tr class="border-b border-slate-200 dark:border-[#14147A] bg-slate-50/50 dark:bg-[#03032E]/30 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
-                            <th class="py-2.5 px-4">Depósito</th>
-                            <th class="py-2.5 px-4">Tipo</th>
-                            <th class="py-2.5 px-4">Responsável</th>
-                            <th class="py-2.5 px-4 text-right">Saldo no Depósito</th>
-                            <th class="py-2.5 px-4 text-right">Ação</th>
-                          </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100 dark:divide-[#14147A]/60">
-                          <tr
-                            v-for="(bk, bIdx) in m.breakdown"
-                            :key="bIdx"
-                            class="hover:bg-slate-50/70 dark:hover:bg-white/5 transition"
-                          >
-                            <td class="py-3 px-4 font-semibold text-slate-800 dark:text-slate-200">
-                              {{ bk.depot_name }}
-                            </td>
-                            <td class="py-3 px-4 text-slate-600 dark:text-slate-300">
-                              {{ formatDepotType(bk.depot_type) }}
-                            </td>
-                            <td class="py-3 px-4 text-slate-700 dark:text-slate-300">
-                              {{ bk.responsible_name || '-' }}
-                            </td>
-                            <td class="py-3 px-4 text-right font-mono font-bold text-blue-600 dark:text-blue-400">
-                              {{ formatNumber(bk.quantity) }} {{ m.unit || 'UND' }}
-                            </td>
-                            <td class="py-3 px-4 text-right">
-                              <button
-                                type="button"
-                                @click="openTransferFromBreakdown(bk, m)"
-                                class="h-7 px-2.5 text-[11px] font-medium rounded-md border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] text-slate-700 dark:text-slate-200 hover:bg-orange-50 hover:text-[#FC6714] transition cursor-pointer"
-                              >
-                                Movimentar
-                              </button>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </td>
-                </tr>
-              </template>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Rodapé de Paginação Confortável -->
-        <TablePagination
-          v-model:currentPage="regionalCurrentPage"
-          v-model:perPage="regionalPerPage"
-          :lastPage="regionalLastPage"
-          :totalRecords="filteredRegionalMaterials.length"
-          :fromRecord="regionalFromRecord"
-          :toRecord="regionalToRecord"
-          :loading="loading"
-          @changePage="(p) => regionalCurrentPage = p"
-          @changePerPage="(pp) => { regionalPerPage = pp; regionalCurrentPage = 1; }"
-        />
-      </div>
-    </div>
-
-    <!-- ============================================================================= -->
-    <!-- ABA 2: CATÁLOGO DE MATERIAIS -->
+    <!-- ABA: MATERIAIS -->
     <!-- ============================================================================= -->
     <div v-if="activeTab === 'materials'" class="space-y-4">
       <!-- Barra de Filtros e Busca de Materiais -->
@@ -907,223 +522,7 @@
     </div>
 
     <!-- ============================================================================= -->
-    <!-- ABA 3: DEPÓSITOS -->
-    <!-- ============================================================================= -->
-    <div v-if="activeTab === 'depots'" class="space-y-4">
-      <!-- Barra de Filtros e Busca de Depósitos -->
-      <div class="p-4 bg-white dark:bg-[#06064D]/50 rounded-xl border border-slate-200 dark:border-[#14147A] flex flex-wrap items-center justify-between gap-4 text-sm shadow-2xs">
-        <div class="relative flex-1 min-w-[280px]">
-          <Search class="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400 pointer-events-none" />
-          <input
-            type="text"
-            v-model="depotSearch"
-            placeholder="Buscar por nome ou código do depósito, ou responsável..."
-            class="w-full h-11 pl-10 pr-10 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 text-sm transition"
-          />
-          <button
-            v-if="depotSearch"
-            @click="depotSearch = ''"
-            class="absolute right-3 top-3 p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition cursor-pointer"
-            title="Limpar busca"
-          >
-            <X class="w-3.5 h-3.5" />
-          </button>
-        </div>
-
-        <div class="flex items-center gap-3">
-          <!-- Filtro de Tipo de Depósito Dinâmico -->
-          <select
-            v-model="depotFilterType"
-            class="h-11 px-3 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-xs font-semibold focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer"
-          >
-            <option value="all">Todos os Tipos de Depósito</option>
-            <option v-for="t in depotTypesList" :key="t.code" :value="t.code">
-              {{ t.name }}
-            </option>
-          </select>
-
-          <span class="text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
-            {{ filteredDepots.length }} depósitos
-          </span>
-
-          <!-- Botão Novo Depósito -->
-          <button
-            type="button"
-            @click="openCreateDepotModal"
-            class="h-11 px-4 text-xs font-semibold rounded-lg bg-[#FC6714] hover:bg-[#E0530A] active:bg-[#C94605] text-white shadow-sm hover:shadow transition cursor-pointer flex items-center gap-2 whitespace-nowrap shrink-0"
-          >
-            <Plus class="w-4 h-4" />
-            <span>Novo Depósito</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- TABELA CONFORTÁVEL 3: DEPÓSITOS (SEÇÃO 7 DESIGN SYSTEM) -->
-      <div class="rounded-xl border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D]/50 shadow-xs overflow-hidden transition-colors duration-200">
-        <div class="overflow-x-auto min-h-[280px]">
-          <table class="w-full text-left border-collapse text-sm">
-            <thead>
-              <tr class="border-b border-slate-200 dark:border-[#14147A] bg-slate-50/80 dark:bg-[#03032E]/70 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider select-none">
-                <!-- Nome / Identificação -->
-                <th
-                  @click="toggleSortDepot('name')"
-                  class="py-3.5 px-5 cursor-pointer hover:text-[#FC6714] dark:hover:text-[#FC6714] transition"
-                  title="Ordenar por Nome"
-                >
-                  <div class="inline-flex items-center gap-1.5">
-                    <span>Identificação do Depósito</span>
-                    <ArrowUp v-if="depotSortBy === 'name' && depotSortDir === 'asc'" class="w-3.5 h-3.5 text-[#FC6714]" />
-                    <ArrowDown v-else-if="depotSortBy === 'name' && depotSortDir === 'desc'" class="w-3.5 h-3.5 text-[#FC6714]" />
-                    <ArrowUpDown v-else class="w-3.5 h-3.5 text-slate-400 opacity-60" />
-                  </div>
-                </th>
-
-                <!-- Tipo -->
-                <th class="py-3.5 px-5">Tipo de Depósito</th>
-
-                <!-- Posição Regional -->
-                <th class="py-3.5 px-5">Posição Regional</th>
-
-                <!-- Proprietário -->
-                <th class="py-3.5 px-5">Proprietário</th>
-
-                <!-- Responsável -->
-                <th class="py-3.5 px-5">Responsável</th>
-
-                <!-- Ações -->
-                <th class="py-3.5 px-5 text-right">Ação</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100 dark:divide-[#14147A]/60">
-              <tr v-if="filteredDepots.length === 0">
-                <td colspan="6" class="py-12 text-center text-slate-400 text-sm">
-                  <div class="max-w-sm mx-auto space-y-2">
-                    <Warehouse class="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto" />
-                    <p class="font-medium text-slate-700 dark:text-slate-300">Nenhum depósito encontrado</p>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">Cadastre depósitos ou verifique os filtros selecionados.</p>
-                    <button
-                      type="button"
-                      @click="openCreateDepotModal"
-                      class="mt-3 inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-[#FC6714] text-white hover:bg-[#E0530A] transition cursor-pointer"
-                    >
-                      <Plus class="w-3.5 h-3.5" />
-                      <span>Cadastrar Depósito</span>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-
-              <tr
-                v-else
-                v-for="d in paginatedDepots"
-                :key="d.id"
-                class="hover:bg-slate-50/70 dark:hover:bg-white/5 transition-colors"
-              >
-                <!-- Identificação / Nome -->
-                <td class="py-4 px-5">
-                  <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600">
-                      <Warehouse class="w-5 h-5" />
-                    </div>
-                    <div>
-                      <div class="font-semibold text-slate-900 dark:text-slate-100 text-sm">
-                        {{ d.name }}
-                      </div>
-                      <div class="flex items-center gap-2 mt-0.5">
-                        <span class="font-mono text-xs text-[#FC6714] font-medium">{{ d.code }}</span>
-                        <span v-if="d.city" class="text-[11px] text-slate-400 dark:text-slate-500">
-                          • {{ d.city.name }} - {{ d.city.state?.code || '' }}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-
-                <!-- Tipo com Badge Confortável -->
-                <td class="py-4 px-5">
-                  <span
-                    class="px-2.5 py-1 rounded-md text-xs font-semibold border"
-                    :class="{
-                      'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800/60': d.type === 'CENTRAL',
-                      'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60': d.type === 'REGIONAL_BASE',
-                      'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/60': d.type === 'LAB_REPAIR',
-                      'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800/60': d.type !== 'CENTRAL' && d.type !== 'REGIONAL_BASE' && d.type !== 'LAB_REPAIR'
-                    }"
-                  >
-                    {{ formatDepotType(d.type) }}
-                  </span>
-                </td>
-
-                <!-- Posição Regional Vinculada -->
-                <td class="py-4 px-5 text-slate-700 dark:text-slate-300 font-medium text-sm">
-                  <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs">
-                    {{ d.cluster?.name || '-' }}
-                  </span>
-                </td>
-
-                <!-- Proprietário Vinculado / Efetivo -->
-                <td class="py-4 px-5 text-sm">
-                  <div
-                    v-if="d.owner || d.cluster?.owner"
-                    class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800/60"
-                  >
-                    <UserCheck class="w-3.5 h-3.5 shrink-0" />
-                    <span>{{ (d.owner || d.cluster?.owner)?.code }}</span>
-                    <span v-if="!d.owner && d.cluster?.owner" class="text-[10px] text-blue-500 dark:text-blue-400 font-normal">(Região)</span>
-                  </div>
-                  <span v-else class="text-xs text-slate-400 dark:text-slate-500 italic">Sem proprietário</span>
-                </td>
-
-                <!-- Responsável -->
-                <td class="py-4 px-5 text-slate-700 dark:text-slate-300 font-medium text-sm">
-                  {{ d.responsible_person?.name || '-' }}
-                </td>
-
-                <!-- Ações -->
-                <td class="py-4 px-5 text-right">
-                  <div class="flex items-center justify-end gap-2">
-                    <button
-                      type="button"
-                      @click="openEditDepotModal(d)"
-                      class="h-8 px-2.5 text-xs font-medium rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-400 dark:hover:bg-blue-950/40 dark:hover:text-blue-300 transition cursor-pointer inline-flex items-center gap-1.5"
-                      title="Editar Depósito"
-                    >
-                      <Edit2 class="w-3.5 h-3.5" />
-                      <span>Editar</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      @click="openTransferFromDepot(d)"
-                      class="h-8 px-3 text-xs font-medium rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-orange-50 hover:text-[#FC6714] hover:border-[#FC6714] dark:hover:bg-[#FC6714]/10 dark:hover:text-[#FC6714] transition cursor-pointer inline-flex items-center gap-1.5"
-                    >
-                      <ArrowRightLeft class="w-3.5 h-3.5" />
-                      <span>Transferir</span>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Rodapé de Paginação Confortável -->
-        <TablePagination
-          v-model:currentPage="depotCurrentPage"
-          v-model:perPage="depotPerPage"
-          :lastPage="depotLastPage"
-          :totalRecords="filteredDepots.length"
-          :fromRecord="depotFromRecord"
-          :toRecord="depotToRecord"
-          :loading="loading"
-          @changePage="(p) => depotCurrentPage = p"
-          @changePerPage="(pp) => { depotPerPage = pp; depotCurrentPage = 1; }"
-        />
-      </div>
-    </div>
-
-    <!-- ============================================================================= -->
-    <!-- ABA 4: SERIALIZADO -->
+    <!-- ABA: SERIALIZADO -->
     <!-- ============================================================================= -->
     <div v-if="activeTab === 'serials'" class="space-y-4">
       <!-- Barra de Filtros e Busca de Seriais -->
@@ -1408,6 +807,16 @@
       @saved="onDepotSaved"
     />
 
+    <!-- Modal 4.1: Gestão Completa de Depósitos (Tabela de Apoio) -->
+    <DepotCrudModal
+      :is-open="isDepotCrudModalOpen"
+      :depot-types-list="depotTypesList"
+      @close="isDepotCrudModalOpen = false"
+      @create="openCreateDepotModal"
+      @edit="openEditDepotModal"
+      @updated="onDepotCrudUpdated"
+    />
+
     <!-- Modal 5: Importação de Materiais via Planilha -->
     <MaterialImportModal
       :is-open="isMaterialImportModalOpen"
@@ -1456,9 +865,9 @@
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import {
   Package, ArrowRightLeft, Plus, Layers, Boxes, Box, Warehouse, QrCode, RefreshCw,
-  ChevronDown, X, Search, ArrowUp, ArrowDown, ArrowUpDown, Copy, Check,
+  X, Search, ArrowUp, ArrowDown, ArrowUpDown, Copy, Check,
   AlertCircle, CheckCircle2, Menu, MapPin, Edit2, Tags, FolderTree, Scale, UserCheck,
-  Upload, FileSpreadsheet
+  FileSpreadsheet
 } from 'lucide-vue-next';
 import TablePagination from '@/components/common/TablePagination.vue';
 import MovementModal from '@/components/supplies/MovementModal.vue';
@@ -1470,6 +879,7 @@ import MaterialCategoryCrudModal from '@/components/supplies/auxiliary/MaterialC
 import UnitCrudModal from '@/components/supplies/auxiliary/UnitCrudModal.vue';
 import MaterialOwnerCrudModal from '@/components/supplies/auxiliary/MaterialOwnerCrudModal.vue';
 import DepotModal from '@/components/supplies/DepotModal.vue';
+import DepotCrudModal from '@/components/supplies/auxiliary/DepotCrudModal.vue';
 import SuppliesModuleDrawer from '@/components/supplies/SuppliesModuleDrawer.vue';
 
 // ─── INTERFACES DE DOMÍNIO ───────────────────────────────────────────────────
@@ -1527,8 +937,8 @@ interface Unit {
 }
 
 // ─── ESTADOS GERAIS DO MÓDULO ────────────────────────────────────────────────
-type TabKey = 'regional' | 'materials' | 'depots' | 'serials';
-const VALID_TABS: TabKey[] = ['regional', 'materials', 'depots', 'serials'];
+type TabKey = 'materials' | 'serials';
+const VALID_TABS: TabKey[] = ['materials', 'serials'];
 
 function getInitialTab(): TabKey {
   try {
@@ -1556,7 +966,7 @@ function getInitialTab(): TabKey {
     // Fallback silencioso
   }
 
-  return 'regional';
+  return 'materials';
 }
 
 const activeTab = ref<TabKey>(getInitialTab());
@@ -1709,90 +1119,23 @@ function openDepotTypeCrudModal() {
   isDepotTypeModalOpen.value = true;
 }
 
-function navigateToTab(tab: 'regional' | 'materials' | 'depots' | 'serials') {
+function navigateToTab(tab: 'materials' | 'serials') {
   isHeaderMenuOpen.value = false;
   activeTab.value = tab;
 }
 
 function handleDrawerAction(action: 'transfer' | 'material' | 'cluster' | 'depot' | 'import-materials') {
-  if (action === 'transfer') openTransferModal();
+  if (action === 'transfer') openMovementModal();
   else if (action === 'material') openCreateMaterialModal();
   else if (action === 'cluster') isClusterModalOpen.value = true;
-  else if (action === 'depot') openCreateDepotModal();
+  else if (action === 'depot') openDepotCrudModal();
   else if (action === 'import-materials') openMaterialImportModal();
 }
 
-// ─── ABA 1: POSIÇÃO REGIONAL ──────────────────────────────────────────────────
+// ─── CADASTROS DE APOIO: POSIÇÕES REGIONAIS & RESUMO ──────────────────────────
 const clusters = ref<Cluster[]>([]);
 const selectedClusterId = ref<number | null>(null);
 const currentClusterSummary = ref<any>({});
-const regionalMaterials = ref<any[]>([]);
-const regionalSearch = ref('');
-const expandedRows = ref<number[]>([]);
-
-const regionalSortBy = ref('name');
-const regionalSortDir = ref<'asc' | 'desc'>('asc');
-const regionalCurrentPage = ref(1);
-const regionalPerPage = ref(10);
-
-function toggleSortRegional(col: string) {
-  if (regionalSortBy.value === col) {
-    regionalSortDir.value = regionalSortDir.value === 'asc' ? 'desc' : 'asc';
-  } else {
-    regionalSortBy.value = col;
-    regionalSortDir.value = 'asc';
-  }
-}
-
-const filteredRegionalMaterials = computed(() => {
-  let list = [...regionalMaterials.value];
-  if (regionalSearch.value.trim()) {
-    const q = regionalSearch.value.toLowerCase();
-    list = list.filter(m =>
-      m.name.toLowerCase().includes(q) ||
-      m.code.toLowerCase().includes(q)
-    );
-  }
-
-  list.sort((a, b) => {
-    let va = a[regionalSortBy.value];
-    let vb = b[regionalSortBy.value];
-    if (typeof va === 'string') va = va.toLowerCase();
-    if (typeof vb === 'string') vb = vb.toLowerCase();
-    if (va < vb) return regionalSortDir.value === 'asc' ? -1 : 1;
-    if (va > vb) return regionalSortDir.value === 'asc' ? 1 : -1;
-    return 0;
-  });
-
-  return list;
-});
-
-const regionalLastPage = computed(() => {
-  return Math.ceil(filteredRegionalMaterials.value.length / regionalPerPage.value) || 1;
-});
-
-const paginatedRegionalMaterials = computed(() => {
-  const start = (regionalCurrentPage.value - 1) * regionalPerPage.value;
-  return filteredRegionalMaterials.value.slice(start, start + regionalPerPage.value);
-});
-
-const regionalFromRecord = computed(() => {
-  if (filteredRegionalMaterials.value.length === 0) return 0;
-  return (regionalCurrentPage.value - 1) * regionalPerPage.value + 1;
-});
-
-const regionalToRecord = computed(() => {
-  return Math.min(regionalCurrentPage.value * regionalPerPage.value, filteredRegionalMaterials.value.length);
-});
-
-function toggleExpand(matId: number) {
-  const idx = expandedRows.value.indexOf(matId);
-  if (idx >= 0) {
-    expandedRows.value.splice(idx, 1);
-  } else {
-    expandedRows.value.push(matId);
-  }
-}
 
 async function loadClusters() {
   try {
@@ -1808,26 +1151,19 @@ async function loadClusters() {
 }
 
 async function loadRegionalStock() {
+  if (!selectedClusterId.value && clusters.value.length > 0) {
+    selectedClusterId.value = clusters.value[0].id;
+  }
   if (!selectedClusterId.value) return;
-  loading.value = true;
   try {
     const res = await fetch(`/api/v1/stock/regional-position?cluster_id=${selectedClusterId.value}`);
     const json = await res.json();
     if (json.data) {
       currentClusterSummary.value = json.data.summary || {};
-      regionalMaterials.value = json.data.materials || [];
     }
   } catch (err) {
     console.error('Erro ao carregar posição regional:', err);
-  } finally {
-    loading.value = false;
   }
-}
-
-function selectCluster(id: number) {
-  selectedClusterId.value = id;
-  regionalCurrentPage.value = 1;
-  loadRegionalStock();
 }
 
 // ─── ABA 2: CATÁLOGO DE MATERIAIS ─────────────────────────────────────────────
@@ -1946,70 +1282,8 @@ async function loadUnits() {
   }
 }
 
-// ─── ABA 3: DEPÓSITOS ─────────────────────────────────────────────────────────
+// ─── CADASTROS DE APOIO: DEPÓSITOS ───────────────────────────────────────────
 const depots = ref<Depot[]>([]);
-const depotSearch = ref('');
-const depotFilterType = ref('all');
-const depotSortBy = ref('name');
-const depotSortDir = ref<'asc' | 'desc'>('asc');
-const depotCurrentPage = ref(1);
-const depotPerPage = ref(10);
-
-function toggleSortDepot(col: string) {
-  if (depotSortBy.value === col) {
-    depotSortDir.value = depotSortDir.value === 'asc' ? 'desc' : 'asc';
-  } else {
-    depotSortBy.value = col;
-    depotSortDir.value = 'asc';
-  }
-}
-
-const filteredDepots = computed(() => {
-  let list = [...depots.value];
-
-  if (depotFilterType.value !== 'all') {
-    list = list.filter(d => d.type === depotFilterType.value);
-  }
-
-  if (depotSearch.value.trim()) {
-    const q = depotSearch.value.toLowerCase();
-    list = list.filter(d =>
-      d.name.toLowerCase().includes(q) ||
-      d.code.toLowerCase().includes(q) ||
-      (d.responsible_person?.name && d.responsible_person.name.toLowerCase().includes(q))
-    );
-  }
-
-  list.sort((a, b) => {
-    let va = (a as any)[depotSortBy.value];
-    let vb = (b as any)[depotSortBy.value];
-    if (typeof va === 'string') va = va.toLowerCase();
-    if (typeof vb === 'string') vb = vb.toLowerCase();
-    if (va < vb) return depotSortDir.value === 'asc' ? -1 : 1;
-    if (va > vb) return depotSortDir.value === 'asc' ? 1 : -1;
-    return 0;
-  });
-
-  return list;
-});
-
-const depotLastPage = computed(() => {
-  return Math.ceil(filteredDepots.value.length / depotPerPage.value) || 1;
-});
-
-const paginatedDepots = computed(() => {
-  const start = (depotCurrentPage.value - 1) * depotPerPage.value;
-  return filteredDepots.value.slice(start, start + depotPerPage.value);
-});
-
-const depotFromRecord = computed(() => {
-  if (filteredDepots.value.length === 0) return 0;
-  return (depotCurrentPage.value - 1) * depotPerPage.value + 1;
-});
-
-const depotToRecord = computed(() => {
-  return Math.min(depotCurrentPage.value * depotPerPage.value, filteredDepots.value.length);
-});
 
 async function loadDepots() {
   try {
@@ -2263,6 +1537,13 @@ async function onMaterialOwnersUpdated() {
 }
 
 // ─── AÇÕES DE MODAL: DEPÓSITOS ───────────────────────────────────────────────
+const isDepotCrudModalOpen = ref(false);
+
+function openDepotCrudModal() {
+  isHeaderMenuOpen.value = false;
+  isDepotCrudModalOpen.value = true;
+}
+
 function openCreateDepotModal() {
   isHeaderMenuOpen.value = false;
   selectedDepotForEdit.value = null;
@@ -2272,6 +1553,16 @@ function openCreateDepotModal() {
 function openEditDepotModal(depot: Depot) {
   selectedDepotForEdit.value = { ...depot };
   isDepotModalOpen.value = true;
+}
+
+async function onDepotCrudUpdated() {
+  showToast('Depósitos sincronizados com sucesso!');
+  await Promise.all([
+    loadDepots(),
+    loadClusters(),
+    loadDepotTypes(),
+  ]);
+  await loadRegionalStock();
 }
 
 async function onDepotSaved() {

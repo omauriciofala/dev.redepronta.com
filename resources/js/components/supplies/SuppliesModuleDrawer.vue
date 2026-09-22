@@ -54,20 +54,6 @@
         <div class="grid grid-cols-2 gap-2">
           <button
             type="button"
-            @click="navigateToTab('regional')"
-            class="p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-orange-300 dark:hover:border-[#FC6714]/50 bg-white dark:bg-slate-900 hover:bg-orange-50/50 dark:hover:bg-[#FC6714]/10 transition flex items-center gap-2.5 text-left cursor-pointer group shadow-2xs"
-          >
-            <div class="w-8 h-8 rounded-lg bg-orange-100 dark:bg-orange-950/80 text-[#FC6714] flex items-center justify-center shrink-0 group-hover:scale-105 transition">
-              <Layers class="w-4 h-4" />
-            </div>
-            <div class="truncate">
-              <div class="font-bold text-slate-800 dark:text-slate-200 truncate">Posição Regional</div>
-              <div class="text-[10px] text-slate-400">Saldo por Região</div>
-            </div>
-          </button>
-
-          <button
-            type="button"
             @click="navigateToTab('materials')"
             class="p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-orange-300 dark:hover:border-[#FC6714]/50 bg-white dark:bg-slate-900 hover:bg-orange-50/50 dark:hover:bg-[#FC6714]/10 transition flex items-center gap-2.5 text-left cursor-pointer group shadow-2xs"
           >
@@ -77,20 +63,6 @@
             <div class="truncate">
               <div class="font-bold text-slate-800 dark:text-slate-200 truncate">Materiais</div>
               <div class="text-[10px] text-slate-400">SKUs e Especificações</div>
-            </div>
-          </button>
-
-          <button
-            type="button"
-            @click="navigateToTab('depots')"
-            class="p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-orange-300 dark:hover:border-[#FC6714]/50 bg-white dark:bg-slate-900 hover:bg-orange-50/50 dark:hover:bg-[#FC6714]/10 transition flex items-center gap-2.5 text-left cursor-pointer group shadow-2xs"
-          >
-            <div class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition">
-              <Warehouse class="w-4 h-4" />
-            </div>
-            <div class="truncate">
-              <div class="font-bold text-slate-800 dark:text-slate-200 truncate">Depósitos</div>
-              <div class="text-[10px] text-slate-400">Locais Físicos e Bases</div>
             </div>
           </button>
 
@@ -178,8 +150,8 @@
                 <Warehouse class="w-4 h-4" />
               </div>
               <div>
-                <div class="font-bold text-slate-800 dark:text-slate-200">Novo Depósito Físico</div>
-                <div class="text-[11px] text-slate-400">Cadastrar almoxarifado ou base operacional</div>
+                <div class="font-bold text-slate-800 dark:text-slate-200">Gerenciar Depósitos Físicos</div>
+                <div class="text-[11px] text-slate-400">Cadastrar e gerenciar almoxarifados ou bases operacionais</div>
               </div>
             </div>
             <ArrowUpRight class="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition" />
@@ -255,7 +227,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void;
-  (e: 'navigate', tab: 'regional' | 'materials' | 'depots' | 'serials'): void;
+  (e: 'navigate', tab: 'materials' | 'serials'): void;
   (e: 'action', action: 'transfer' | 'material' | 'depot' | 'cluster' | 'import-materials'): void;
 }>();
 
@@ -268,7 +240,7 @@ function close() {
   emit('update:modelValue', false);
 }
 
-function navigateToTab(tab: 'regional' | 'materials' | 'depots' | 'serials') {
+function navigateToTab(tab: 'materials' | 'serials') {
   emit('navigate', tab);
   close();
 }
