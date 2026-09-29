@@ -15,24 +15,191 @@
       :badge-text="`${stats.users_total} Usuários`"
       badge-variant="neutral"
     >
+      <template #breadcrumb-right>
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-900">
+          Controle de Acesso (RBAC)
+        </span>
+      </template>
+
       <template #actions>
+        <!-- Botão Secundário: Novo Papel (Role) -->
         <button
           type="button"
           @click="openNewRoleModal"
-          class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold shadow-2xs transition cursor-pointer"
+          class="inline-flex items-center gap-2 h-10 px-3.5 rounded-lg border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-200 text-sm font-semibold shadow-2xs transition cursor-pointer focus:ring-2 focus:ring-[#FC6714] focus:outline-none"
         >
-          <Plus class="w-3.5 h-3.5 text-indigo-600" />
+          <Plus class="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
           <span>Novo Papel (Role)</span>
         </button>
 
+        <!-- Botão Primário Laranja (#FC6714): Novo Usuário -->
         <button
           type="button"
           @click="openNewUserModal"
-          class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#FC6714] hover:bg-[#e05609] active:scale-[0.99] text-white text-xs font-bold tracking-wide transition shadow-xs cursor-pointer"
+          class="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-[#FC6714] hover:bg-[#E0530A] active:bg-[#C94605] text-white text-sm font-semibold shadow-sm transition active:scale-98 cursor-pointer focus:ring-2 focus:ring-[#FC6714] focus:ring-offset-2 focus:outline-none"
         >
           <UserPlus class="w-4 h-4" />
           <span>Novo Usuário</span>
         </button>
+
+        <!-- Menu de Apoio e Governança (Três Pontos Verticais ⋮) -->
+        <div class="relative" ref="headerMenuContainerRef">
+          <button
+            type="button"
+            @click.stop="isHeaderMenuOpen = !isHeaderMenuOpen"
+            class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition shadow-2xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#FC6714]"
+            :class="{ 'bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white ring-2 ring-[#FC6714]/30': isHeaderMenuOpen }"
+            title="Ações de Apoio & Governança"
+            aria-label="Ações de Apoio & Governança"
+            aria-haspopup="true"
+            :aria-expanded="isHeaderMenuOpen"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="12" cy="5" r="2"></circle>
+              <circle cx="12" cy="12" r="2"></circle>
+              <circle cx="12" cy="19" r="2"></circle>
+            </svg>
+          </button>
+
+          <!-- Dropdown Flutuante de Apoio -->
+          <Transition
+            enter-active-class="transition duration-100 ease-out"
+            enter-from-class="transform scale-95 opacity-0"
+            enter-to-class="transform scale-100 opacity-100"
+            leave-active-class="transition duration-75 ease-in"
+            leave-from-class="transform scale-100 opacity-100"
+            leave-to-class="transform scale-95 opacity-0"
+          >
+            <div
+              v-if="isHeaderMenuOpen"
+              @click.stop
+              class="absolute right-0 mt-2 w-56 rounded-xl bg-white dark:bg-[#06064D] border border-slate-200 dark:border-[#14147A] shadow-2xl z-50 py-1 text-xs font-medium divide-y divide-slate-100 dark:divide-[#14147A]/60 focus:outline-hidden"
+            >
+              <div class="px-3.5 py-2 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">
+                <span>Governança & Apoio</span>
+              </div>
+              <div class="py-1">
+                <button
+                  type="button"
+                  @click="openNewUserModal(); isHeaderMenuOpen = false"
+                  class="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] dark:hover:text-orange-300 transition cursor-pointer"
+                >
+                  <UserPlus class="w-4 h-4 text-slate-400" />
+                  <span>Cadastrar Usuário</span>
+                </button>
+
+                <button
+                  type="button"
+                  @click="openNewRoleModal(); isHeaderMenuOpen = false"
+                  class="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] dark:hover:text-orange-300 transition cursor-pointer"
+                >
+                  <ShieldCheck class="w-4 h-4 text-slate-400" />
+                  <span>Cadastrar Papel (Role)</span>
+                </button>
+
+                <button
+                  type="button"
+                  @click="filterSuperAdmins"
+                  class="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] dark:hover:text-orange-300 transition cursor-pointer"
+                >
+                  <Crown class="w-4 h-4 text-amber-500" />
+                  <span>Super Admins (Acesso Livre)</span>
+                </button>
+
+                <button
+                  type="button"
+                  @click="setTab('permissions'); isHeaderMenuOpen = false"
+                  class="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] dark:hover:text-orange-300 transition cursor-pointer"
+                >
+                  <KeyRound class="w-4 h-4 text-slate-400" />
+                  <span>Matriz de Permissões</span>
+                </button>
+              </div>
+
+              <div class="py-1">
+                <button
+                  type="button"
+                  @click="refreshAllData"
+                  class="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-orange-50 dark:hover:bg-[#FC6714]/15 hover:text-[#FC6714] dark:hover:text-orange-300 transition cursor-pointer"
+                >
+                  <RotateCcw class="w-4 h-4 text-slate-400" />
+                  <span>Recarregar Todos os Dados</span>
+                </button>
+              </div>
+            </div>
+          </Transition>
+        </div>
+
+        <!-- Botão de Recarregar Dados -->
+        <button
+          type="button"
+          @click="refreshAllData"
+          :disabled="isLoadingUsers"
+          class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition shadow-2xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#FC6714]"
+          title="Recarregar dados"
+          aria-label="Recarregar dados"
+        >
+          <RefreshCw class="w-4 h-4 text-slate-500 dark:text-slate-400" :class="{ 'animate-spin text-[#FC6714]': isLoadingUsers }" />
+        </button>
+      </template>
+
+      <!-- Linha 3: Barra de Abas do Módulo (Variação 1) -->
+      <template #tabs>
+        <div class="flex border-b border-slate-200 dark:border-[#14147A] gap-6 overflow-x-auto select-none pt-2">
+          <button
+            type="button"
+            @click="setTab('users')"
+            :class="currentTab === 'users'
+              ? 'border-[#FC6714] text-[#FC6714] font-bold border-b-2'
+              : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium border-b-2'"
+            class="pb-3 border-b-2 text-sm flex items-center gap-2 transition cursor-pointer shrink-0"
+          >
+            <Users class="w-4 h-4" />
+            <span>Usuários do Sistema</span>
+            <span
+              class="px-2 py-0.5 rounded-md text-[11px] font-bold transition"
+              :class="currentTab === 'users' ? 'bg-[#FC6714]/15 text-[#FC6714]' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'"
+            >
+              {{ stats.users_total }}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            @click="setTab('roles')"
+            :class="currentTab === 'roles'
+              ? 'border-[#FC6714] text-[#FC6714] font-bold border-b-2'
+              : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium border-b-2'"
+            class="pb-3 border-b-2 text-sm flex items-center gap-2 transition cursor-pointer shrink-0"
+          >
+            <ShieldCheck class="w-4 h-4" />
+            <span>Papéis de Usuários (Roles)</span>
+            <span
+              class="px-2 py-0.5 rounded-md text-[11px] font-bold transition"
+              :class="currentTab === 'roles' ? 'bg-[#FC6714]/15 text-[#FC6714]' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'"
+            >
+              {{ rolesList.length }}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            @click="setTab('permissions')"
+            :class="currentTab === 'permissions'
+              ? 'border-[#FC6714] text-[#FC6714] font-bold border-b-2'
+              : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium border-b-2'"
+            class="pb-3 border-b-2 text-sm flex items-center gap-2 transition cursor-pointer shrink-0"
+          >
+            <KeyRound class="w-4 h-4" />
+            <span>Matriz de Permissões</span>
+            <span
+              class="px-2 py-0.5 rounded-md text-[11px] font-bold transition"
+              :class="currentTab === 'permissions' ? 'bg-[#FC6714]/15 text-[#FC6714]' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'"
+            >
+              {{ stats.permissions_total }}
+            </span>
+          </button>
+        </div>
       </template>
     </BasePageHeader>
 
@@ -108,53 +275,6 @@
       </div>
     </div>
 
-    <!-- Navegação por Abas do Módulo -->
-    <div class="border-b border-slate-200 dark:border-slate-800 flex items-center gap-2 select-none">
-      <button
-        type="button"
-        @click="currentTab = 'users'"
-        :class="currentTab === 'users'
-          ? 'border-[#FC6714] text-[#FC6714] font-bold border-b-2'
-          : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 font-medium'"
-        class="px-4 py-2.5 border-b-2 transition flex items-center gap-2 text-sm cursor-pointer"
-      >
-        <Users class="w-4 h-4" />
-        <span>Usuários do Sistema</span>
-        <span class="px-2 py-0.2 rounded-full text-[11px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-          {{ stats.users_total }}
-        </span>
-      </button>
-
-      <button
-        type="button"
-        @click="currentTab = 'roles'"
-        :class="currentTab === 'roles'
-          ? 'border-[#FC6714] text-[#FC6714] font-bold border-b-2'
-          : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 font-medium'"
-        class="px-4 py-2.5 border-b-2 transition flex items-center gap-2 text-sm cursor-pointer"
-      >
-        <ShieldCheck class="w-4 h-4" />
-        <span>Papéis de Usuários (Roles)</span>
-        <span class="px-2 py-0.2 rounded-full text-[11px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-          {{ rolesList.length }}
-        </span>
-      </button>
-
-      <button
-        type="button"
-        @click="currentTab = 'permissions'"
-        :class="currentTab === 'permissions'
-          ? 'border-[#FC6714] text-[#FC6714] font-bold border-b-2'
-          : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 font-medium'"
-        class="px-4 py-2.5 border-b-2 transition flex items-center gap-2 text-sm cursor-pointer"
-      >
-        <KeyRound class="w-4 h-4" />
-        <span>Matriz de Permissões</span>
-        <span class="px-2 py-0.2 rounded-full text-[11px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-          {{ stats.permissions_total }}
-        </span>
-      </button>
-    </div>
 
     <!-- ============================================================== -->
     <!-- ABA 1: LISTAGEM DE USUÁRIOS DO SISTEMA                        -->
@@ -797,7 +917,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, onBeforeUnmount, watch } from 'vue';
 import axios from 'axios';
 import {
   ShieldCheck,
@@ -808,6 +928,7 @@ import {
   KeyRound,
   Search,
   RotateCcw,
+  RefreshCw,
   Pencil,
   Power,
   Trash2,
@@ -824,7 +945,89 @@ import BaseModal from '../components/common/BaseModal.vue';
 import PersonSearchSelect from '../components/common/PersonSearchSelect.vue';
 import TablePagination from '../components/common/TablePagination.vue';
 
-const currentTab = ref<'users' | 'roles' | 'permissions'>('users');
+type TabKey = 'users' | 'roles' | 'permissions';
+
+function getInitialTab(): TabKey {
+  try {
+    const hash = window.location.hash || '';
+    const params = new URLSearchParams(hash.split('?')[1] || '');
+    const tabParam = params.get('tab') as TabKey;
+    if (tabParam && ['users', 'roles', 'permissions'].includes(tabParam)) {
+      return tabParam;
+    }
+    const saved = localStorage.getItem('rp_users_active_tab') as TabKey;
+    if (saved && ['users', 'roles', 'permissions'].includes(saved)) {
+      return saved;
+    }
+  } catch (e) {
+    // Fallback silencioso
+  }
+  return 'users';
+}
+
+const currentTab = ref<TabKey>(getInitialTab());
+
+function setTab(tab: TabKey) {
+  currentTab.value = tab;
+  updateTabInUrlAndStorage(tab);
+}
+
+function updateTabInUrlAndStorage(tab: TabKey) {
+  try {
+    localStorage.setItem('rp_users_active_tab', tab);
+    const currentHash = window.location.hash.replace(/^#\/?/, '').split('?')[0].split('/')[0] || 'users';
+    const newHash = `${currentHash}?tab=${tab}`;
+    if (window.location.hash !== `#${newHash}`) {
+      history.replaceState(null, '', `#${newHash}`);
+    }
+  } catch (e) {
+    // Fallback silencioso
+  }
+}
+
+watch(currentTab, (newTab) => {
+  updateTabInUrlAndStorage(newTab);
+});
+
+function handleHashChangeForTabs() {
+  const currentTabInHash = getInitialTab();
+  if (currentTabInHash && currentTabInHash !== currentTab.value) {
+    currentTab.value = currentTabInHash;
+  }
+}
+
+// Menu de Apoio & Governança (Dropdown ⋮)
+const isHeaderMenuOpen = ref(false);
+const headerMenuContainerRef = ref<HTMLElement | null>(null);
+
+function handleDocumentClick(event: MouseEvent) {
+  if (headerMenuContainerRef.value && !headerMenuContainerRef.value.contains(event.target as Node)) {
+    isHeaderMenuOpen.value = false;
+  }
+}
+
+function filterSuperAdmins() {
+  isHeaderMenuOpen.value = false;
+  setTab('users');
+  filters.is_super_admin = '1';
+  filters.role_id = null;
+  pagination.current_page = 1;
+  loadUsers();
+}
+
+async function refreshAllData() {
+  isHeaderMenuOpen.value = false;
+  isLoadingUsers.value = true;
+  try {
+    await Promise.all([
+      loadUsers(),
+      loadRoles(),
+      loadPermissions(),
+    ]);
+  } finally {
+    isLoadingUsers.value = false;
+  }
+}
 
 const stats = reactive({
   users_total: 0,
@@ -1155,8 +1358,16 @@ const saveRole = async () => {
 };
 
 onMounted(() => {
+  window.addEventListener('hashchange', handleHashChangeForTabs);
+  document.addEventListener('click', handleDocumentClick);
+  updateTabInUrlAndStorage(currentTab.value);
   loadUsers();
   loadRoles();
   loadPermissions();
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('hashchange', handleHashChangeForTabs);
+  document.removeEventListener('click', handleDocumentClick);
 });
 </script>
