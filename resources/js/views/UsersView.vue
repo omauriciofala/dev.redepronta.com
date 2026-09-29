@@ -205,77 +205,7 @@
       </template>
     </BasePageHeader>
 
-    <!-- Linha 3: Cards de Indicadores / Estatísticas Rápidas -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <!-- Total de Usuários -->
-      <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs flex items-center justify-between">
-        <div>
-          <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Total de Usuários</p>
-          <p class="text-2xl font-bold font-heading text-slate-900 dark:text-slate-100 mt-0.5">
-            {{ stats.users_total }}
-          </p>
-          <p class="text-[11px] text-slate-400 mt-1">
-            {{ stats.users_active }} ativos • {{ stats.users_inactive }} inativos
-          </p>
-        </div>
-        <div class="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center">
-          <Users class="w-5 h-5" />
-        </div>
-      </div>
 
-      <!-- Super Admins Livres -->
-      <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs flex items-center justify-between">
-        <div>
-          <div class="flex items-center gap-1.5">
-            <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Super Admins</p>
-            <span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300">
-              Livre
-            </span>
-          </div>
-          <p class="text-2xl font-bold font-heading text-amber-600 dark:text-amber-400 mt-0.5">
-            {{ stats.users_super_admin }}
-          </p>
-          <p class="text-[11px] text-slate-400 mt-1">
-            Acesso irrestrito a todas as rotas
-          </p>
-        </div>
-        <div class="w-10 h-10 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-          <Crown class="w-5 h-5" />
-        </div>
-      </div>
-
-      <!-- Papéis Cadastrados -->
-      <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs flex items-center justify-between">
-        <div>
-          <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Papéis de Acesso</p>
-          <p class="text-2xl font-bold font-heading text-slate-900 dark:text-slate-100 mt-0.5">
-            {{ rolesList.length }}
-          </p>
-          <p class="text-[11px] text-slate-400 mt-1">
-            Perfis com matriz RBAC
-          </p>
-        </div>
-        <div class="w-10 h-10 rounded-lg bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center">
-          <Layers class="w-5 h-5" />
-        </div>
-      </div>
-
-      <!-- Permissões Catalogadas -->
-      <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs flex items-center justify-between">
-        <div>
-          <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Permissões do Sistema</p>
-          <p class="text-2xl font-bold font-heading text-slate-900 dark:text-slate-100 mt-0.5">
-            {{ stats.permissions_total }}
-          </p>
-          <p class="text-[11px] text-slate-400 mt-1">
-            Ações auditáveis e mapeadas
-          </p>
-        </div>
-        <div class="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-          <KeyRound class="w-5 h-5" />
-        </div>
-      </div>
-    </div>
 
 
     <!-- ============================================================== -->
