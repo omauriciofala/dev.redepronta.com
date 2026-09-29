@@ -23,7 +23,7 @@
     <template #tabs>
       <div class="flex items-center gap-2 overflow-x-auto text-sm">
         <button
-          v-for="(tab, idx) in tabs"
+          v-for="(tab, idx) in availableTabs"
           :key="tab.id"
           type="button"
           @click="activeTab = tab.id"
@@ -409,6 +409,36 @@
                 <span
                   class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-xs ring-0 transition duration-200 ease-in-out"
                   :class="form.is_requester ? 'translate-x-4' : 'translate-x-0'"
+                />
+              </button>
+            </div>
+
+            <!-- 9. Usuário do Sistema -->
+            <div
+              @click="toggleUserRole"
+              :class="form.is_user
+                ? 'border-indigo-500 bg-indigo-50/70 dark:bg-indigo-950/40 shadow-xs ring-1 ring-indigo-500/30'
+                : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 hover:border-slate-300 dark:hover:border-slate-700'"
+              class="p-3 rounded-xl border flex items-center justify-between gap-3 cursor-pointer transition select-none"
+            >
+              <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" :class="form.is_user ? 'bg-indigo-600 text-white' : 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400'">
+                  <KeyRound class="w-3.5 h-3.5" />
+                </div>
+                <span class="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
+                  Usuário
+                </span>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                :aria-checked="form.is_user"
+                class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+                :class="form.is_user ? 'bg-indigo-600' : 'bg-slate-200 dark:bg-slate-700'"
+              >
+                <span
+                  class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-xs ring-0 transition duration-200 ease-in-out"
+                  :class="form.is_user ? 'translate-x-4' : 'translate-x-0'"
                 />
               </button>
             </div>
@@ -1057,6 +1087,240 @@
         </div>
       </div>
 
+      <!-- ========================================== -->
+      <!-- ABA 5: USUÁRIO DO SISTEMA (ACESSO & PERMISSÕES) -->
+      <!-- ========================================== -->
+      <div v-show="activeTab === 'usuario'" class="space-y-6">
+        <!-- 1. Destaque Super Admin (Livre) -->
+        <div
+          @click="form.user_is_super_admin = !form.user_is_super_admin"
+          :class="form.user_is_super_admin
+            ? 'border-amber-500 bg-amber-50/70 dark:bg-amber-950/40 shadow-xs ring-1 ring-amber-500/30'
+            : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-700'"
+          class="p-5 rounded-xl border flex items-center justify-between gap-4 cursor-pointer transition select-none shadow-2xs"
+        >
+          <div class="flex items-center gap-3.5">
+            <div
+              class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+              :class="form.user_is_super_admin ? 'bg-amber-500 text-white' : 'bg-amber-50 dark:bg-amber-950/60 text-amber-600'"
+            >
+              <Crown class="w-5 h-5" />
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-bold text-slate-900 dark:text-slate-100">
+                  Super Admin (Acesso Livre)
+                </span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-100">
+                  Acesso Total Irrestrito
+                </span>
+              </div>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-xl">
+                O Super Admin é livre de restrições de permissão. Possui acesso total e irrestrito a todos os módulos, rotas e recursos do sistema.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            :aria-checked="form.user_is_super_admin"
+            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+            :class="form.user_is_super_admin ? 'bg-amber-500' : 'bg-slate-200 dark:bg-slate-700'"
+          >
+            <span
+              class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-xs ring-0 transition duration-200 ease-in-out"
+              :class="form.user_is_super_admin ? 'translate-x-5' : 'translate-x-0'"
+            />
+          </button>
+        </div>
+
+        <!-- 2. Credenciais de Acesso (Usuário e Senha) -->
+        <div class="p-5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-2xs">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+            <div class="flex items-center gap-2">
+              <KeyRound class="w-4 h-4 text-[#FC6714]" />
+              <h3 class="text-sm font-bold text-slate-900 dark:text-slate-100">Credenciais de Autenticação</h3>
+            </div>
+            <span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300">
+              Operador do Sistema
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Usuário / E-mail de Login -->
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  Usuário (E-mail de Acesso) <span class="text-red-500">*</span>
+                </label>
+                <button
+                  v-if="form.email && form.user_email !== form.email"
+                  type="button"
+                  @click="form.user_email = form.email"
+                  class="text-[11px] text-[#FC6714] hover:underline font-semibold cursor-pointer"
+                >
+                  Usar e-mail do cadastro
+                </button>
+              </div>
+              <div class="relative">
+                <Mail class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  v-model="form.user_email"
+                  type="email"
+                  placeholder="usuario@redepronta.com"
+                  class="w-full pl-9 pr-3.5 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714] focus:outline-none"
+                />
+              </div>
+            </div>
+
+            <!-- Senha -->
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  Senha de Acesso {{ isEditing ? '(Deixe em branco para manter)' : '*' }}
+                </label>
+                <button
+                  type="button"
+                  @click="generateRandomPassword"
+                  class="text-[11px] text-indigo-600 dark:text-indigo-400 hover:underline font-semibold cursor-pointer"
+                >
+                  Gerar senha forte
+                </button>
+              </div>
+              <div class="relative">
+                <Lock class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  v-model="form.user_password"
+                  :type="showPasswordInPersonModal ? 'text' : 'password'"
+                  placeholder="••••••••"
+                  class="w-full pl-9 pr-10 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714] focus:outline-none"
+                />
+                <button
+                  type="button"
+                  @click="showPasswordInPersonModal = !showPasswordInPersonModal"
+                  class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                  tabindex="-1"
+                >
+                  <EyeOff v-if="showPasswordInPersonModal" class="w-3.5 h-3.5" />
+                  <Eye v-else class="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+
+            <!-- Papel de Usuário (Perfil / Role) -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Papel de Usuário (Role)
+              </label>
+              <select
+                v-model="form.user_role_id"
+                @change="onRoleChangeInPersonModal"
+                class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714] focus:outline-none"
+              >
+                <option :value="null">Nenhum papel pré-definido</option>
+                <option v-for="r in rolesListInModal" :key="r.id" :value="r.id">
+                  {{ r.name }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Status do Usuário -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Status da Conta de Acesso
+              </label>
+              <select
+                v-model="form.user_status"
+                class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714] focus:outline-none"
+              >
+                <option value="active">Ativo (Acesso Liberado)</option>
+                <option value="inactive">Inativo (Acesso Bloqueado)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Permissões Granulares -->
+        <div class="p-5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-2xs">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900 dark:text-slate-100">Permissões de Acesso</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                {{ form.user_is_super_admin ? 'Super Admin tem acesso livre e irrestrito a todas as permissões.' : 'Defina as permissões individuais ou herde as permissões do papel selecionado.' }}
+              </p>
+            </div>
+
+            <span
+              v-if="form.user_is_super_admin"
+              class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800"
+            >
+              Liberado Totalmente
+            </span>
+            <span
+              v-else
+              class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
+            >
+              {{ form.user_permissions.length }} selecionadas
+            </span>
+          </div>
+
+          <!-- Banner Informativo quando Super Admin está marcado -->
+          <div
+            v-if="form.user_is_super_admin"
+            class="p-4 rounded-lg bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/60 text-amber-800 dark:text-amber-200 text-xs flex items-center gap-3"
+          >
+            <Crown class="w-5 h-5 text-amber-600 shrink-0" />
+            <div>
+              <p class="font-bold">Acesso Total Concedido (Super Admin)</p>
+              <p class="text-[11px] opacity-90 mt-0.5">
+                Por ser um Super Administrador, este usuário não depende da marcação individual de caixas abaixo. Todas as operações estão liberadas.
+              </p>
+            </div>
+          </div>
+
+          <!-- Matriz de Permissões por Módulo -->
+          <div class="space-y-4" :class="{ 'opacity-50 pointer-events-none': form.user_is_super_admin }">
+            <div
+              v-for="(modulePerms, moduleName) in permissionsGroupedInModal"
+              :key="moduleName"
+              class="p-3.5 rounded-lg border border-slate-200/80 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-950/40 space-y-2.5"
+            >
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+                  {{ formatModuleName(moduleName) }}
+                </span>
+                <button
+                  type="button"
+                  @click="toggleAllModulePermissionsInPersonModal(modulePerms)"
+                  class="text-[11px] text-[#FC6714] hover:underline font-semibold cursor-pointer"
+                >
+                  {{ isAllModuleSelectedInPersonModal(modulePerms) ? 'Desmarcar todos' : 'Marcar todos' }}
+                </button>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                <label
+                  v-for="p in modulePerms"
+                  :key="p.slug"
+                  class="flex items-start gap-2 p-2 rounded-md hover:bg-white dark:hover:bg-slate-900 border border-transparent hover:border-slate-200 dark:hover:border-slate-800 cursor-pointer select-none text-xs transition"
+                >
+                  <input
+                    type="checkbox"
+                    :value="p.slug"
+                    v-model="form.user_permissions"
+                    class="w-4 h-4 rounded-sm border-slate-300 text-[#FC6714] focus:ring-[#FC6714] mt-0.5"
+                  />
+                  <div>
+                    <span class="font-semibold text-slate-800 dark:text-slate-200 block">{{ p.name }}</span>
+                    <span class="text-[10px] text-slate-400 font-mono">{{ p.slug }}</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Mensagens de Erro da API -->
       <div v-if="errorMessage" class="p-4 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 rounded-xl text-red-700 dark:text-red-400 text-sm font-medium flex items-center gap-3">
         <AlertCircle class="w-5 h-5 shrink-0" />
@@ -1114,11 +1378,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue';
+import { ref, reactive, watch, computed } from 'vue';
 import {
   FileText, ShieldCheck, Mail, MapPin, Tag, Users, Truck, Briefcase, Wrench, UserCheck,
   BadgePercent, Car, Package, Phone, MessageSquare, AlertCircle,
-  Loader2, Check, Home, Building2, Search, Compass, Navigation, Zap, Trash2
+  Loader2, Check, Home, Building2, Search, Compass, Navigation, Zap, Trash2,
+  Crown, KeyRound, Lock, Eye, EyeOff
 } from 'lucide-vue-next';
 import axios from 'axios';
 import BaseModal from '../common/BaseModal.vue';
@@ -1161,14 +1426,21 @@ const commercialCityInfo = reactive({
   ibge_code: '',
 });
 
-// Abas de Navegação Interna Simplificadas (3 abas limpas e diretas)
+// Abas de Navegação Interna Dinâmicas
 const activeTab = ref('principal');
-const tabs = [
-  { id: 'principal', label: 'Principal', icon: FileText },
-  { id: 'documentos', label: 'Documentos', icon: ShieldCheck },
-  { id: 'contatos', label: 'Contatos', icon: Mail },
-  { id: 'endereco', label: 'Endereços', icon: MapPin },
-];
+
+const availableTabs = computed(() => {
+  const list = [
+    { id: 'principal', label: 'Principal', icon: FileText },
+    { id: 'documentos', label: 'Documentos', icon: ShieldCheck },
+    { id: 'contatos', label: 'Contatos', icon: Mail },
+    { id: 'endereco', label: 'Endereços', icon: MapPin },
+  ];
+  if (form.is_user) {
+    list.push({ id: 'usuario', label: 'Usuário', icon: KeyRound });
+  }
+  return list;
+});
 
 // Grupos de Pessoas do Cadastro Básico
 interface PersonGroupOption {
@@ -1231,6 +1503,15 @@ const defaultForm = () => ({
   is_driver: false,
   is_carrier: false,
   is_requester: false,
+  is_user: false,
+
+  // Campos de Acesso e Permissões de Usuário
+  user_email: '',
+  user_password: '',
+  user_is_super_admin: false,
+  user_role_id: null as number | null,
+  user_permissions: [] as string[],
+  user_status: 'active',
 
   // Endereço Residencial / Principal
   city_id: null,
@@ -1264,6 +1545,97 @@ const defaultForm = () => ({
 });
 
 const form = reactive(defaultForm());
+
+// ==============================================================
+// GESTÃO DO PAPEL DE USUÁRIO & PERMISSÕES
+// ==============================================================
+const rolesListInModal = ref<any[]>([]);
+const permissionsGroupedInModal = ref<Record<string, any[]>>({});
+const showPasswordInPersonModal = ref(false);
+
+const loadRolesAndPermissions = async () => {
+  try {
+    const [rolesRes, permsRes] = await Promise.all([
+      axios.get('/api/v1/roles'),
+      axios.get('/api/v1/permissions'),
+    ]);
+    rolesListInModal.value = rolesRes.data?.data || [];
+    permissionsGroupedInModal.value = permsRes.data?.data?.modules || {};
+  } catch (e) {
+    console.error('Erro ao carregar papéis e permissões no modal:', e);
+  }
+};
+
+const toggleUserRole = () => {
+  form.is_user = !form.is_user;
+  if (form.is_user) {
+    if (!form.user_email && form.email) {
+      form.user_email = form.email;
+    }
+    activeTab.value = 'usuario';
+  } else {
+    if (activeTab.value === 'usuario') {
+      activeTab.value = 'principal';
+    }
+  }
+};
+
+const generateRandomPassword = () => {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%&*';
+  let pwd = '';
+  for (let i = 0; i < 10; i++) {
+    pwd += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  form.user_password = pwd;
+  showPasswordInPersonModal.value = true;
+};
+
+const onRoleChangeInPersonModal = () => {
+  if (!form.user_role_id) return;
+  const selectedRole = rolesListInModal.value.find((r) => r.id === Number(form.user_role_id));
+  if (selectedRole && selectedRole.permissions) {
+    form.user_permissions = [...selectedRole.permissions];
+  }
+};
+
+const formatModuleName = (mod: string) => {
+  const map: Record<string, string> = {
+    people: 'Pessoas & Clientes',
+    supplies: 'Suprimentos & WMS',
+    access: 'Usuários & Permissões',
+    basics: 'Cadastros Básicos',
+    integrations: 'Integrações & APIs',
+    developer: 'Desenvolvedor & Governança',
+  };
+  return map[mod] || mod;
+};
+
+const isAllModuleSelectedInPersonModal = (modulePerms: any[]) => {
+  return modulePerms.every((p) => form.user_permissions.includes(p.slug));
+};
+
+const toggleAllModulePermissionsInPersonModal = (modulePerms: any[]) => {
+  const allSelected = isAllModuleSelectedInPersonModal(modulePerms);
+  if (allSelected) {
+    const toRemove = modulePerms.map((p) => p.slug);
+    form.user_permissions = form.user_permissions.filter((s) => !toRemove.includes(s));
+  } else {
+    modulePerms.forEach((p) => {
+      if (!form.user_permissions.includes(p.slug)) {
+        form.user_permissions.push(p.slug);
+      }
+    });
+  }
+};
+
+watch(() => form.is_user, (newVal) => {
+  if (!newVal && activeTab.value === 'usuario') {
+    activeTab.value = 'principal';
+  }
+  if (newVal && !form.user_email && form.email) {
+    form.user_email = form.email;
+  }
+});
 
 // Integração com ViaCEP
 const handleCepSearch = async (type: 'residential' | 'commercial') => {
@@ -1359,7 +1731,10 @@ watch(() => props.isOpen, async (open) => {
     cepErrorResidential.value = '';
     cepErrorCommercial.value = '';
 
-    await loadPersonGroups();
+    await Promise.all([
+      loadPersonGroups(),
+      loadRolesAndPermissions(),
+    ]);
 
     if (props.personToEdit) {
       isEditing.value = true;
@@ -1402,6 +1777,15 @@ watch(() => props.isOpen, async (open) => {
         is_driver: Boolean(roles.driver ?? personas.is_driver),
         is_carrier: Boolean(roles.carrier ?? personas.is_carrier),
         is_requester: Boolean(personas.is_requester),
+        is_user: Boolean(personas.is_user ?? roles.user ?? p.is_user),
+
+        // Dados de Acesso do Usuário
+        user_email: p.user?.email || p.contact?.email || p.email || '',
+        user_password: '',
+        user_is_super_admin: Boolean(p.user?.is_super_admin),
+        user_role_id: p.user?.role_id || null,
+        user_permissions: p.user?.permissions ? [...p.user.permissions] : [],
+        user_status: p.user?.status || 'active',
 
         // Residencial
         city_id: resAddr.city_id || null,

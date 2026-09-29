@@ -30,6 +30,19 @@
         <span>Pessoas</span>
       </button>
 
+      <!-- Item Usuários & Acessos (RBAC) -->
+      <button
+        type="button"
+        @click="setView('users')"
+        :class="currentView === 'users'
+          ? 'bg-[#FC6714] text-white font-bold shadow-xs'
+          : 'text-slate-300 hover:text-white hover:bg-white/10 font-medium'"
+        class="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm rounded-lg transition-colors cursor-pointer text-left focus:ring-2 focus:ring-[#FC6714] focus:outline-none"
+      >
+        <ShieldCheck class="w-5 h-5" :class="currentView === 'users' ? 'text-white' : 'text-slate-300'" />
+        <span>Usuários & Acessos</span>
+      </button>
+
       <!-- Operações & WMS (Sprint 2 Ativo) -->
       <div class="pt-4 px-3 pb-2 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
         Operações & WMS
@@ -126,37 +139,61 @@
       </div>
     </nav>
 
-    <!-- Rodapé Interno da Sidebar: Alternar Tema & Perfil -->
+    <!-- Rodapé Interno da Sidebar: Perfil do Usuário, Tema & Logout -->
     <div class="p-3.5 border-t border-[#14147A] flex items-center justify-between bg-[#03032E]">
-      <div class="flex items-center gap-2.5 overflow-hidden">
-        <div class="w-7 h-7 rounded-full bg-[#FC6714]/20 text-[#FC6714] border border-[#FC6714]/40 flex items-center justify-center text-xs font-bold">
-          M
+      <div class="flex items-center gap-2.5 overflow-hidden flex-1 mr-2">
+        <div class="w-7 h-7 rounded-full bg-[#FC6714]/20 text-[#FC6714] border border-[#FC6714]/40 flex items-center justify-center text-xs font-bold shrink-0">
+          {{ (currentUser?.name || 'M').charAt(0).toUpperCase() }}
         </div>
         <div class="truncate">
-          <p class="text-xs font-semibold text-white truncate leading-tight">Matriz</p>
-          <p class="text-[11px] text-slate-300 truncate">admin@redepronta.com</p>
+          <p class="text-xs font-semibold text-white truncate leading-tight">
+            {{ currentUser?.name || 'Administrador Matriz' }}
+          </p>
+          <p class="text-[11px] text-slate-300 truncate">
+            {{ currentUser?.email || 'admin@redepronta.com' }}
+          </p>
         </div>
       </div>
 
-      <!-- Botão Tema (Dark / Light) -->
-      <button
-        type="button"
-        @click="toggleTheme"
-        class="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-white/10 transition cursor-pointer focus:ring-2 focus:ring-[#FC6714] focus:outline-none"
-        :title="theme === 'dark' ? 'Mudar para Tema Claro' : 'Mudar para Tema Escuro'"
-      >
-        <Sun v-if="theme === 'dark'" class="w-4 h-4 text-amber-400" />
-        <Moon v-else class="w-4 h-4 text-slate-300" />
-      </button>
+      <div class="flex items-center gap-1 shrink-0">
+        <!-- Botão Tema (Dark / Light) -->
+        <button
+          type="button"
+          @click="toggleTheme"
+          class="p-1.5 text-slate-300 hover:text-white rounded-lg hover:bg-white/10 transition cursor-pointer focus:ring-2 focus:ring-[#FC6714] focus:outline-none"
+          :title="theme === 'dark' ? 'Mudar para Tema Claro' : 'Mudar para Tema Escuro'"
+        >
+          <Sun v-if="theme === 'dark'" class="w-4 h-4 text-amber-400" />
+          <Moon v-else class="w-4 h-4 text-slate-300" />
+        </button>
+
+        <!-- Botão Logout (Sair) -->
+        <button
+          type="button"
+          @click="handleLogout"
+          class="p-1.5 text-slate-400 hover:text-red-400 rounded-lg hover:bg-white/10 transition cursor-pointer focus:ring-2 focus:ring-red-500 focus:outline-none"
+          title="Encerrar sessão (Logout)"
+        >
+          <LogOut class="w-4 h-4" />
+        </button>
+      </div>
     </div>
   </aside>
 </template>
 
 <script setup lang="ts">
-import { Users, Terminal, Palette, History, Network, Package, CheckSquare, CreditCard, MessageSquare, Sun, Moon } from 'lucide-vue-next';
+import { Users, Terminal, Palette, History, Network, Package, CheckSquare, CreditCard, MessageSquare, Sun, Moon, ShieldCheck, LogOut } from 'lucide-vue-next';
 import { useTheme } from '../../composables/useTheme';
 import { useNavigation } from '../../composables/useNavigation';
+import { useAuth } from '../../composables/useAuth';
 
 const { theme, toggleTheme } = useTheme();
 const { currentView, setView } = useNavigation();
+const { currentUser, logout } = useAuth();
+
+const handleLogout = async () => {
+  if (confirm('Deseja realmente sair do sistema?')) {
+    await logout();
+  }
+};
 </script>

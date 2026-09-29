@@ -96,6 +96,16 @@ class UpdatePersonRequest extends FormRequest
             'is_driver' => ['boolean'],
             'is_carrier' => ['boolean'],
             'is_requester' => ['boolean'],
+            'is_user' => ['boolean'],
+
+            // Dados e permissões do usuário vinculado quando is_user = true
+            'user_email' => ['nullable', 'string', 'max:150'],
+            'user_password' => ['nullable', 'string', 'min:6'],
+            'user_is_super_admin' => ['nullable', 'boolean'],
+            'user_role_id' => ['nullable', 'exists:roles,id'],
+            'user_permissions' => ['nullable', 'array'],
+            'user_permissions.*' => ['string'],
+            'user_status' => ['nullable', 'in:active,inactive'],
 
             'gender_id' => ['nullable', 'exists:genders,id'],
             'city_id' => ['nullable', 'exists:cities,id'],

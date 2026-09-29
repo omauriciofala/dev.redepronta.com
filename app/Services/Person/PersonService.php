@@ -82,6 +82,7 @@ class PersonService
                 'driver' => $query->where('is_driver', true),
                 'carrier' => $query->where('is_carrier', true),
                 'requester' => $query->where('is_requester', true),
+                'user' => $query->where('is_user', true),
                 default => null,
             };
         }
@@ -121,7 +122,8 @@ class PersonService
                 COALESCE(SUM(CASE WHEN is_seller = 1 THEN 1 ELSE 0 END), 0) as seller,
                 COALESCE(SUM(CASE WHEN is_driver = 1 THEN 1 ELSE 0 END), 0) as driver,
                 COALESCE(SUM(CASE WHEN is_carrier = 1 THEN 1 ELSE 0 END), 0) as carrier,
-                COALESCE(SUM(CASE WHEN is_requester = 1 THEN 1 ELSE 0 END), 0) as requester
+                COALESCE(SUM(CASE WHEN is_requester = 1 THEN 1 ELSE 0 END), 0) as requester,
+                COALESCE(SUM(CASE WHEN is_user = 1 THEN 1 ELSE 0 END), 0) as user
             ")->first();
 
         return [
@@ -134,6 +136,7 @@ class PersonService
             'driver' => (int) ($row->driver ?? 0),
             'carrier' => (int) ($row->carrier ?? 0),
             'requester' => (int) ($row->requester ?? 0),
+            'user' => (int) ($row->user ?? 0),
         ];
     }
 
@@ -149,7 +152,9 @@ class PersonService
                     $data['group_name'] = $grp->name;
                 }
             }
-            return Person::create($data);
+            $person = Person::create($data);
+            $this->syncUser($person, $data);
+            return $person->fresh(['city.state', 'gender', 'group', 'user.role', 'user.permissions']);
         });
     }
 
@@ -166,8 +171,70 @@ class PersonService
             }
 
             $person->update($data);
-            return $person->fresh(['city.state', 'gender', 'group']);
+            $this->syncUser($person, $data);
+            return $person->fresh(['city.state', 'gender', 'group', 'user.role', 'user.permissions']);
         });
+    }
+
+    /**
+     * Sincroniza os dados de acesso de usuário com a pessoa.
+     */
+    protected function syncUser(Person $person, array $data): void
+    {
+        $isUser = filter_var($data['is_user'] ?? $person->is_user, FILTER_VALIDATE_BOOLEAN);
+
+        if ($isUser) {
+            $email = !empty($data['user_email']) ? trim($data['user_email']) : trim($person->email ?? '');
+            if (empty($email)) {
+                return;
+            }
+
+            $user = \App\Models\User::where('person_id', $person->id)->first();
+            if (!$user) {
+                $user = \App\Models\User::where('account_id', $person->account_id)
+                    ->where('email', $email)
+                    ->first();
+            }
+
+            if (!$user) {
+                $user = new \App\Models\User();
+                $user->account_id = $person->account_id;
+                $user->person_id = $person->id;
+                $password = !empty($data['user_password']) ? $data['user_password'] : '12345678';
+                $user->password = bcrypt($password);
+            } else {
+                $user->person_id = $person->id;
+                if (!empty($data['user_password'])) {
+                    $user->password = bcrypt($data['user_password']);
+                }
+            }
+
+            $user->name = $person->name;
+            $user->email = $email;
+            $user->status = $data['user_status'] ?? ($user->status ?: 'active');
+
+            if (array_key_exists('user_is_super_admin', $data)) {
+                $user->is_super_admin = filter_var($data['user_is_super_admin'], FILTER_VALIDATE_BOOLEAN);
+            }
+
+            if (array_key_exists('user_role_id', $data)) {
+                $user->role_id = $data['user_role_id'] ? (int) $data['user_role_id'] : null;
+            }
+
+            $user->save();
+
+            // Sincronizar permissões diretas se enviadas
+            if (isset($data['user_permissions']) && is_array($data['user_permissions'])) {
+                $permIds = \App\Models\Permission::whereIn('slug', $data['user_permissions'])->pluck('id')->all();
+                $user->permissions()->sync($permIds);
+            }
+        } else {
+            // Se desmarcou o papel de usuário, inativa o usuário vinculado
+            $user = \App\Models\User::where('person_id', $person->id)->first();
+            if ($user) {
+                $user->update(['status' => 'inactive']);
+            }
+        }
     }
 
     /**

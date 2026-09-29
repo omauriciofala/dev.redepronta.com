@@ -18,6 +18,10 @@ use App\Http\Controllers\Api\V1\MaterialOwnerController;
 use App\Http\Controllers\Api\V1\OwnerMaterialController;
 use App\Http\Controllers\Api\V1\MaterialController;
 use App\Http\Controllers\Api\V1\StockController;
+use App\Http\Controllers\Api\V1\UserController;
+use App\Http\Controllers\Api\V1\RoleController;
+use App\Http\Controllers\Api\V1\PermissionController;
+use App\Http\Controllers\Api\V1\AuthController;
 
 Route::prefix('v1')->group(function () {
     // APIs e Integrações (CNPJá, ViaCEP, Catálogo de Serviços)
@@ -45,6 +49,19 @@ Route::prefix('v1')->group(function () {
     // Pessoas
     Route::apiResource('people', PersonController::class);
     Route::patch('people/{person}/toggle-status', [PersonController::class, 'toggleStatus']);
+
+    // Autenticação & Sessão
+    Route::prefix('auth')->group(function () {
+        Route::post('login', [AuthController::class, 'login']);
+        Route::post('logout', [AuthController::class, 'logout']);
+        Route::get('me', [AuthController::class, 'me']);
+    });
+
+    // Gestão de Usuários, Papéis de Usuários e Permissões
+    Route::apiResource('users', UserController::class);
+    Route::patch('users/{user}/toggle-status', [UserController::class, 'toggleStatus']);
+    Route::apiResource('roles', RoleController::class);
+    Route::get('permissions', [PermissionController::class, 'index']);
 
     // Suprimentos, Depósitos Físicos & Clusters Regionais (Sprint 2 - WMS)
     Route::apiResource('clusters', ClusterController::class);

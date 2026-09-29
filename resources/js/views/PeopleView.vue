@@ -1038,6 +1038,7 @@ const counts = ref<Record<string, number>>({
   driver: 0,
   carrier: 0,
   requester: 0,
+  user: 0,
 });
 
 // Ordenação de Colunas
@@ -1069,6 +1070,7 @@ const AVAILABLE_FILTER_FIELDS = [
 ];
 
 const roleOptions = [
+  { label: 'Usuário', value: 'user' },
   { label: 'Funcionário', value: 'employee' },
   { label: 'Solicitante', value: 'requester' },
   { label: 'Cliente', value: 'client' },
@@ -1294,6 +1296,12 @@ const ROLE_CONFIGS = [
     personaKey: 'is_requester',
     label: 'Solicitante',
     badgeClass: 'bg-orange-50 text-[#FC6714] border-orange-200/80 dark:bg-[#FC6714]/10 dark:text-orange-300 dark:border-[#FC6714]/30',
+  },
+  {
+    key: 'user',
+    personaKey: 'is_user',
+    label: 'Usuário',
+    badgeClass: 'bg-indigo-50 text-indigo-700 border-indigo-200/80 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800/60',
   },
 ];
 

@@ -131,6 +131,34 @@
               <div class="text-[10px] text-slate-400">Condutores</div>
             </div>
           </button>
+
+          <button
+            type="button"
+            @click="applyRoleFilter('requester')"
+            class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-orange-300 dark:hover:border-[#FC6714]/50 bg-white dark:bg-slate-900 hover:bg-orange-50/50 dark:hover:bg-[#FC6714]/10 transition flex items-center gap-2.5 text-left cursor-pointer group shadow-2xs"
+          >
+            <div class="w-7 h-7 rounded-lg bg-orange-100 dark:bg-[#FC6714]/20 text-[#FC6714] flex items-center justify-center shrink-0 group-hover:scale-105 transition">
+              <UserCheck class="w-3.5 h-3.5" />
+            </div>
+            <div class="truncate">
+              <div class="font-bold text-slate-800 dark:text-slate-200 truncate">Solicitantes</div>
+              <div class="text-[10px] text-slate-400">Requisitantes</div>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            @click="applyRoleFilter('user')"
+            class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-orange-300 dark:hover:border-[#FC6714]/50 bg-white dark:bg-slate-900 hover:bg-orange-50/50 dark:hover:bg-[#FC6714]/10 transition flex items-center gap-2.5 text-left cursor-pointer group shadow-2xs"
+          >
+            <div class="w-7 h-7 rounded-lg bg-indigo-100 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition">
+              <KeyRound class="w-3.5 h-3.5" />
+            </div>
+            <div class="truncate">
+              <div class="font-bold text-slate-800 dark:text-slate-200 truncate">Usuários</div>
+              <div class="text-[10px] text-slate-400">Acesso ERP</div>
+            </div>
+          </button>
         </div>
       </div>
 
@@ -285,6 +313,7 @@ import {
   TrendingUp,
   Truck,
   Car,
+  KeyRound,
   DownloadCloud,
   FileSpreadsheet,
   Download,

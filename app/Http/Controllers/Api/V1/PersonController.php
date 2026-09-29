@@ -42,7 +42,7 @@ class PersonController extends Controller
     public function store(StorePersonRequest $request): JsonResponse
     {
         $person = $this->personService->create($request->validated());
-        $person->load(['city.state', 'gender', 'group']);
+        $person->load(['city.state', 'gender', 'group', 'user.role', 'user.permissions']);
 
         return (new PersonResource($person))
             ->response()
@@ -51,7 +51,7 @@ class PersonController extends Controller
 
     public function show(Person $person): PersonResource
     {
-        $person->load(['city.state', 'gender', 'group']);
+        $person->load(['city.state', 'gender', 'group', 'user.role', 'user.permissions']);
         return new PersonResource($person);
     }
 

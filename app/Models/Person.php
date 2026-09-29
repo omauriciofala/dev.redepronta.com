@@ -35,6 +35,7 @@ class Person extends Model
         'is_driver',
         'is_carrier',
         'is_requester',
+        'is_user',
 
         // Contatos
         'email',
@@ -78,6 +79,7 @@ class Person extends Model
         'is_driver' => 'boolean',
         'is_carrier' => 'boolean',
         'is_requester' => 'boolean',
+        'is_user' => 'boolean',
         'commercial_same_as_residential' => 'boolean',
         'latitude' => 'float',
         'longitude' => 'float',
@@ -111,6 +113,11 @@ class Person extends Model
     public function group(): BelongsTo
     {
         return $this->belongsTo(PersonGroup::class, 'group_id');
+    }
+
+    public function user(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(User::class);
     }
 
     // Scopes de busca e papéis
@@ -167,6 +174,11 @@ class Person extends Model
     public function scopeRequesters(Builder $query): Builder
     {
         return $query->where('is_requester', true);
+    }
+
+    public function scopeUsers(Builder $query): Builder
+    {
+        return $query->where('is_user', true);
     }
 
     // Mutator para birth_date (DD/MM/AAAA -> YYYY-MM-DD)

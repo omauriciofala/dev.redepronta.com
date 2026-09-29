@@ -61,6 +61,7 @@ class PersonResource extends JsonResource
                 'is_driver' => (bool) $this->is_driver,
                 'is_carrier' => (bool) $this->is_carrier,
                 'is_requester' => (bool) $this->is_requester,
+                'is_user' => (bool) $this->is_user,
             ],
             'roles' => [
                 'client' => (bool) $this->is_client,
@@ -70,7 +71,17 @@ class PersonResource extends JsonResource
                 'seller' => (bool) $this->is_seller,
                 'driver' => (bool) $this->is_driver,
                 'carrier' => (bool) $this->is_carrier,
+                'user' => (bool) $this->is_user,
             ],
+            'user' => $this->user ? [
+                'id' => $this->user->id,
+                'email' => $this->user->email,
+                'is_super_admin' => (bool) $this->user->is_super_admin,
+                'role_id' => $this->user->role_id,
+                'role_name' => $this->user->role?->name,
+                'status' => $this->user->status,
+                'permissions' => $this->user->getAllPermissionsSlugs(),
+            ] : null,
 
             'contact' => [
                 'email' => $this->email,
