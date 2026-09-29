@@ -1,44 +1,27 @@
 <template>
   <!-- Container Raiz Canônico Obrigatório (py-8 w-full space-y-6) -->
   <div class="py-8 w-full space-y-6 font-sans">
-    <!-- Linha 1 Canônica Obrigatória: BaseBreadcrumb em Box 100% -->
-    <BaseBreadcrumb
-      :items="[
+    <!-- Componente Canônico: 10. Topo de Página Padrão (Page Header & Breadcrumb) -->
+    <BasePageHeader
+      :breadcrumb-items="[
         { label: 'Início', href: '#people' },
         { label: 'Segurança & Governança', href: '#users' },
         { label: 'Usuários, Papéis & Permissões' },
       ]"
+      title="Gestão de Usuários & Acessos"
+      description="Administração de operadores, perfis de papéis, permissões granulares e acesso livre para Super Admin."
+      :icon="ShieldCheck"
+      icon-color-class="bg-indigo-600/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border-indigo-200/60 dark:border-indigo-800"
+      :badge-text="`${stats.users_total} Usuários`"
+      badge-variant="neutral"
     >
-      <template #right>
+      <template #breadcrumb-right>
         <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-900">
           Controle de Acesso (RBAC)
         </span>
       </template>
-    </BaseBreadcrumb>
 
-    <!-- Linha 2 Canônica: Cabeçalho da Página com Título H1, Badges e Botões de Ação -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-      <div class="flex items-center gap-3">
-        <div class="w-11 h-11 rounded-xl bg-indigo-600/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 border border-indigo-200/60 dark:border-indigo-800">
-          <ShieldCheck class="w-6 h-6" />
-        </div>
-        <div>
-          <div class="flex items-center gap-2">
-            <h1 class="text-xl sm:text-2xl font-bold font-heading text-slate-900 dark:text-slate-100 tracking-tight">
-              Gestão de Usuários & Acessos
-            </h1>
-            <span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-              {{ stats.users_total }} Usuários
-            </span>
-          </div>
-          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-            Administração de operadores, perfis de papéis, permissões granulares e acesso livre para Super Admin.
-          </p>
-        </div>
-      </div>
-
-      <!-- Botões de Ação Rápida -->
-      <div class="flex items-center gap-2.5 flex-wrap">
+      <template #actions>
         <button
           type="button"
           @click="openNewRoleModal"
@@ -56,8 +39,8 @@
           <UserPlus class="w-4 h-4" />
           <span>Novo Usuário</span>
         </button>
-      </div>
-    </div>
+      </template>
+    </BasePageHeader>
 
     <!-- Linha 3: Cards de Indicadores / Estatísticas Rápidas -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -842,7 +825,7 @@ import {
   Eye,
   EyeOff,
 } from 'lucide-vue-next';
-import BaseBreadcrumb from '../components/common/BaseBreadcrumb.vue';
+import BasePageHeader from '../components/common/BasePageHeader.vue';
 import BaseModal from '../components/common/BaseModal.vue';
 import PersonSearchSelect from '../components/common/PersonSearchSelect.vue';
 import TablePagination from '../components/common/TablePagination.vue';

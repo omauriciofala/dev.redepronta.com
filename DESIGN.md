@@ -168,67 +168,84 @@ Toda tela do ERP Rede Pronta deve respeitar rigorosamente a arquitetura perimetr
 
 ---
 
-## 6. Topo de Página Padrão (Linha 1 e Linha 2)
+## 6. Topo de Página Padrão (Componente Canônico `BasePageHeader`) ⭐
 
-O topo de cada página é composto de duas linhas canônicas indissociáveis:
+O topo de toda e qualquer tela do ERP Rede Pronta é padronizado pelo componente oficial **[`BasePageHeader.vue`](file:///var/www/dev.redepronta.com/resources/js/components/common/BasePageHeader.vue)**.
+É **proibido** recriar divs manuais ou montar estruturas separadas de breadcrumb e cabeçalho em novas views.
 
-### Linha 1: Box 100% Horizontal do `BaseBreadcrumb`
-O breadcrumb deve ser sempre renderizado através do componente oficial [`BaseBreadcrumb.vue`](file:///var/www/dev.redepronta.com/resources/js/components/common/BaseBreadcrumb.vue):
+### 6.1 Anatomia Canônica do `BasePageHeader`:
+1. **Linha 1 (Integrada):** [`BaseBreadcrumb.vue`](file:///var/www/dev.redepronta.com/resources/js/components/common/BaseBreadcrumb.vue) em Box 100% horizontal (`w-full`), cantos `rounded-xl`, borda e sombra sutil.
+2. **Linha 2 (Integrada):** Cabeçalho com ícone institucional em container `rounded-xl` (`w-11 h-11`), título H1 em fonte Kanit 600, descrição em Montserrat 500, badge contextual opcional e slot `#actions` para botões de ação à direita.
+3. **Linha 3 (Opcional):** Slot `#tabs` para módulos que possuem navegação interna por abas (ex: Suprimentos & WMS).
+
+### 6.2 Propriedades (Props API):
+
+| Prop | Tipo | Padrão | Descrição |
+| :--- | :--- | :--- | :--- |
+| `breadcrumbItems` | `BreadcrumbItem[]` | **Obrigatório** | Lista de níveis da navegação (`{ label, href?, to?, icon? }`) |
+| `title` | `string` | **Obrigatório** | Título principal da página (renderizado em H1 Kanit 600) |
+| `description` | `string` | `undefined` | Subtítulo explicativo e ergonômico da tela |
+| `icon` | `Component` | `undefined` | Componente de ícone Lucide a ser exibido no box contextual |
+| `iconColorClass` | `string` | `bg-indigo-600/10 ...` | Classes de cor e fundo do container do ícone |
+| `badgeText` | `string \| number`| `undefined` | Texto de badge ou contador ao lado do título H1 |
+| `badgeVariant` | `'neutral'\|'success'\|...` | `'neutral'` | Estilo semântico do badge (`neutral`, `info`, `success`, `warning`, `danger`, `primary`) |
+| `showHomeIcon` | `boolean` | `false` | Se exibe o ícone de Home no primeiro item do breadcrumb |
+
+### 6.3 Slots Disponíveis:
+- `#actions`: Botões de ação rápida e comandos do topo (ex: botão primário `.btn-primary` Laranja, filtros ou menus auxiliares).
+- `#tabs`: Barra de abas horizontais do módulo.
+- `#breadcrumb-right`: Slot à direita no box do breadcrumb (ex: tag de protocolo, RBAC ou status rápido).
+- `#title-extra`: Badges complexos ou controles adicionais ao lado do título.
+- `#description`: Descrições ricas com tags HTML ou dados complementares.
+- `#bottom`: Conteúdo extra fixado abaixo do cabeçalho.
+
+### 6.4 Exemplo de Uso Canônico em Páginas:
 
 ```html
-<BaseBreadcrumb
-  :items="[
-    { label: 'Início', href: '#people' },
-    { label: 'Segurança & Governança', href: '#users' },
-    { label: 'Usuários, Papéis & Permissões' },
-  ]"
->
-  <template #right>
-    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-900">
-      Controle de Acesso (RBAC)
-    </span>
-  </template>
-</BaseBreadcrumb>
-```
-
-- **Características do Box:** Largura 100% (`w-full`), altura compacta com `px-4 py-2.5`, borda suave `border border-slate-200/80 dark:border-slate-800`, cantos `rounded-xl`, superfície em card com sombra sutil `shadow-2xs`.
-- **Navegabilidade:** O primeiro item é a raiz; os itens intermediários são links clicáveis com efeito hover no Laranja Institucional (`hover:text-[#FC6714]`); o último item representa a tela ativa em negrito sem link.
-
-### Linha 2: Cabeçalho Canônico da Tela (Header)
-Localizado imediatamente abaixo do breadcrumb, composto por:
-1. **Ícone Temático em Badge/Box**: Caixa quadrada de `w-11 h-11` com cantos `rounded-xl`, fundo translúcido contextual e ícone Lucide centralizado de `w-6 h-6`.
-2. **Título H1**: Fonte Kanit, peso 600, tamanho 24px (`text-2xl font-bold font-heading`), acompanhado opcionalmente de badge contador (`rounded-md text-[11px] font-bold`).
-3. **Descrição Curta**: Subtítulo explicativo em `text-xs sm:text-sm text-slate-500 dark:text-slate-400`.
-4. **Grupo de Botões de Ação Rápida**: Alinhados à direita no desktop, com ação primária em Laranja `#FC6714` e botões secundários em outline/card.
-
-```html
-<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-  <div class="flex items-center gap-3">
-    <div class="w-11 h-11 rounded-xl bg-orange-500/10 text-[#FC6714] flex items-center justify-center shrink-0 border border-orange-200 dark:border-orange-900/50">
-      <Users class="w-6 h-6" />
-    </div>
-    <div>
-      <div class="flex items-center gap-2">
-        <h1 class="text-xl sm:text-2xl font-bold font-heading text-slate-900 dark:text-slate-100 tracking-tight">
-          Gestão de Usuários & Acessos
-        </h1>
-        <span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-          {{ stats.total }} Usuários
+<template>
+  <!-- Container Raiz Canônico Obrigatório: py-8 w-full space-y-6 -->
+  <div class="py-8 w-full space-y-6">
+    <!-- Componente Canônico Obrigatório: Topo de Página Padrão -->
+    <BasePageHeader
+      :breadcrumb-items="[
+        { label: 'Início', href: '#people' },
+        { label: 'Segurança & Governança', href: '#users' },
+        { label: 'Gestão de Usuários' },
+      ]"
+      title="Gestão de Usuários & Acessos"
+      description="Administração de operadores, perfis de papéis e controle granular de permissões."
+      :icon="ShieldCheck"
+      icon-color-class="bg-indigo-600/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800"
+      :badge-text="`${stats.total} Usuários`"
+      badge-variant="neutral"
+    >
+      <template #breadcrumb-right>
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-900">
+          Controle de Acesso (RBAC)
         </span>
-      </div>
-      <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-        Administração de operadores, perfis de papéis e permissões granulares.
-      </p>
-    </div>
-  </div>
+      </template>
 
-  <div class="flex items-center gap-2.5">
-    <button type="button" class="btn-primary inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg shadow-sm">
-      <Plus class="w-4 h-4" />
-      <span>Novo Usuário</span>
-    </button>
+      <template #actions>
+        <button
+          type="button"
+          @click="openCreateModal"
+          class="btn-primary inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg shadow-sm"
+        >
+          <Plus class="w-4 h-4" />
+          <span>Novo Usuário</span>
+        </button>
+      </template>
+    </BasePageHeader>
+
+    <!-- Conteúdo da Página: Filtros, Tabelas, Cards ou Métricas -->
+    ...
   </div>
-</div>
+</template>
+
+<script setup lang="ts">
+import { ShieldCheck, Plus } from 'lucide-vue-next';
+import BasePageHeader from '@/components/common/BasePageHeader.vue';
+</script>
 ```
 
 ---

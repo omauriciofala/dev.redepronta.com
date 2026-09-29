@@ -1,37 +1,20 @@
 <template>
   <div class="py-8 w-full space-y-6">
-    <!-- Linha 1 Canônica Obrigatória: BaseBreadcrumb -->
-    <BaseBreadcrumb :items="[
-      { label: 'Início', href: '#people' },
-      { label: 'Configurações', href: '#integrations' },
-      { label: 'APIs & Conectores' }
-    ]" />
-
-    <!-- Cabeçalho da Página -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-slate-200 dark:border-slate-800">
-      <div>
-        <div class="flex items-center gap-3">
-          <div class="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 shadow-2xs">
-            <Network class="w-6 h-6" />
-          </div>
-          <div>
-            <div class="flex items-center gap-2.5">
-              <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
-                APIs & Integrações
-              </h1>
-              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                4 APIs Operacionais
-              </span>
-            </div>
-            <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-              Hub central de gerenciamento, documentação técnica e testes interativos das integrações do ERP.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-3">
+    <!-- Componente Canônico: 10. Topo de Página Padrão (Page Header & Breadcrumb) -->
+    <BasePageHeader
+      :breadcrumb-items="[
+        { label: 'Início', href: '#people' },
+        { label: 'Configurações', href: '#integrations' },
+        { label: 'APIs & Conectores' }
+      ]"
+      title="APIs & Integrações"
+      description="Hub central de gerenciamento, documentação técnica e testes interativos das integrações do ERP."
+      :icon="Network"
+      icon-color-class="bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400"
+      badge-text="4 APIs Operacionais"
+      badge-variant="success"
+    >
+      <template #actions>
         <button
           type="button"
           @click="fetchIntegrations"
@@ -41,8 +24,8 @@
           <RefreshCw class="w-4 h-4" :class="{ 'animate-spin': refreshing }" />
           <span>{{ refreshing ? 'Verificando...' : 'Atualizar Status' }}</span>
         </button>
-      </div>
-    </div>
+      </template>
+    </BasePageHeader>
 
     <!-- Cards de Métricas e Saúde -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -392,7 +375,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import BaseBreadcrumb from '../components/common/BaseBreadcrumb.vue';
+import BasePageHeader from '../components/common/BasePageHeader.vue';
 import {
   Network,
   Globe,

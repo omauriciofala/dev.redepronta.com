@@ -38,11 +38,15 @@
    - **Proibição Estrita:** O cabeçalho de uma tela NUNCA deve encostar no teto da tela (sem `py-8`). O respiro superior de `32px` (`py-8` / `pt-8`) é mandatório para todas as páginas criadas no sistema.
 2. **Simetria Lateral de 60px**:
    - A margem horizontal é garantida exclusivamente pelo layout mestre (`px-[60px]` no `AppLayout.vue`).
-3. **Linha 1 Canônica Obrigatória (`BaseBreadcrumb` em Box 100%)**:
-   - A primeira linha de conteúdo dentro do container raiz (`<div class="py-8 w-full space-y-6">`) de qualquer view **DEVE OBRIGATORIAMENTE ser o componente canônico `<BaseBreadcrumb :items="[...]" />`**.
-   - O Breadcrumb é exibido dentro de um **box 100% horizontal (`w-full`)** na área de conteúdo, com borda sutil, superfície em card e cantos arredondados (`rounded-xl`).
-   - O cabeçalho da página (Título H1, ícone, badges e botões de ação) passa a ser a **Linha 2** da tela.
-   - O breadcrumb garante orientação espacial em todos os níveis de navegação sem quebrar o ritmo vertical (`space-y-6`).
+3. **Topo de Página Canônico Obrigatório (`BasePageHeader`)**:
+   - Toda e qualquer tela criada **DEVE OBRIGATORIAMENTE** utilizar o componente canônico oficial:
+     `<BasePageHeader :breadcrumb-items="[...]" title="..." description="..." :icon="..." />`
+     ([BasePageHeader.vue](file:///var/www/dev.redepronta.com/resources/js/components/common/BasePageHeader.vue)).
+   - O `BasePageHeader` encapsula harmoniosamente:
+     - **Linha 1:** O `BaseBreadcrumb` em Box 100% horizontal na área de conteúdo, com borda sutil e cantos `rounded-xl`.
+     - **Linha 2:** O cabeçalho com ícone contextual, título H1 em Kanit 600, badge contador e slot `#actions` para botões à direita.
+     - **Linha 3 (Opcional):** Slot `#tabs` para módulos que possuem abas de navegação.
+   - **Proibição Estrita:** É terminantemente proibido montar topos de tela com divs manuais dispersas ou recriar cabeçalhos fora do componente canônico.
 4. **Cantos Menos Arredondados no Layout Inteiro (Escala Enterprise Sóbria)**:
    - Todo o sistema adota cantos mais retos, discretos e sóbrios, evitando arredondamentos excessivos.
    - Escala oficial configurada no `@theme` (`resources/css/app.css`):

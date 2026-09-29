@@ -1,37 +1,20 @@
 <template>
   <div class="py-8 w-full space-y-6">
-    <!-- Linha 1 Canônica Obrigatória: BaseBreadcrumb -->
-    <BaseBreadcrumb :items="[
-      { label: 'Início', href: '#people' },
-      { label: 'Desenvolvedor', href: '#developer' },
-      { label: 'Ferramentas & Sandbox' }
-    ]" />
-
-    <!-- Cabeçalho da Página -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-slate-200 dark:border-slate-800">
-      <div>
-        <div class="flex items-center gap-3">
-          <div class="p-2.5 rounded-xl bg-orange-50 dark:bg-[#FC6714]/15 border border-orange-200 dark:border-[#FC6714]/30 text-[#FC6714] shadow-2xs">
-            <Terminal class="w-6 h-6" />
-          </div>
-          <div>
-            <div class="flex items-center gap-2.5 flex-wrap">
-              <h1 class="text-2xl font-bold font-heading tracking-tight text-slate-900 dark:text-slate-100">
-                Painel do Desenvolvedor
-              </h1>
-              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-emerald-100 dark:bg-emerald-950/70 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                Ambiente de Desenvolvimento
-              </span>
-            </div>
-            <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-              Utilitários operacionais para reset do banco de dados, geração em massa de cadastros fictícios e inspeção de integridade.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-3">
+    <!-- Componente Canônico: 10. Topo de Página Padrão (Page Header & Breadcrumb) -->
+    <BasePageHeader
+      :breadcrumb-items="[
+        { label: 'Início', href: '#people' },
+        { label: 'Desenvolvedor', href: '#developer' },
+        { label: 'Ferramentas & Utilitários' }
+      ]"
+      title="Painel do Desenvolvedor"
+      description="Utilitários operacionais para reset do banco de dados, geração em massa de cadastros fictícios e inspeção de integridade."
+      :icon="Terminal"
+      icon-color-class="bg-orange-50 dark:bg-[#FC6714]/15 border border-orange-200 dark:border-[#FC6714]/30 text-[#FC6714]"
+      badge-text="Ambiente de Desenvolvimento"
+      badge-variant="success"
+    >
+      <template #actions>
         <button
           type="button"
           @click="fetchStats"
@@ -41,8 +24,8 @@
           <RefreshCw class="w-4 h-4" :class="{ 'animate-spin': isLoadingStats }" />
           <span>{{ isLoadingStats ? 'Atualizando...' : 'Atualizar Métricas' }}</span>
         </button>
-      </div>
-    </div>
+      </template>
+    </BasePageHeader>
 
     <!-- Cards de Métricas em Tempo Real -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -409,7 +392,7 @@ import {
   Loader2,
 } from 'lucide-vue-next';
 import BaseModal from '../components/common/BaseModal.vue';
-import BaseBreadcrumb from '../components/common/BaseBreadcrumb.vue';
+import BasePageHeader from '../components/common/BasePageHeader.vue';
 import { useNavigation } from '../composables/useNavigation';
 
 const { setView } = useNavigation();

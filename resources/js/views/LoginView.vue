@@ -38,14 +38,11 @@
             Acesse seu painel integrado para gerenciar operações, contratos, pessoas, suprimentos, depósitos e ordens de serviço com máxima segurança.
           </p>
 
-          <div class="mt-6 flex items-center gap-3">
-            <a
-              href="#developer"
-              class="inline-flex items-center justify-center px-4 py-2 rounded-lg border border-white/30 text-white hover:bg-white/10 text-xs font-bold tracking-wider uppercase transition cursor-pointer hover:border-white/60 focus:outline-none focus:ring-2 focus:ring-[#FC6714]"
-            >
-              Ambiente Sandbox
-            </a>
-            <span class="text-[11px] text-slate-400">v2.4 Enterprise</span>
+          <div class="mt-6 flex items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium bg-white/5 border border-white/10 text-slate-300">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              v2.4 Enterprise
+            </span>
           </div>
         </div>
 

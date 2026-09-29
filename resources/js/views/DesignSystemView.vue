@@ -1,35 +1,20 @@
 <template>
   <div class="py-8 w-full space-y-12">
-    <!-- Linha 1 Canônica Obrigatória: BaseBreadcrumb -->
-    <BaseBreadcrumb :items="[
-      { label: 'Início', href: '#people' },
-      { label: 'Desenvolvedor', href: '#developer' },
-      { label: 'Design System & BrandBook' }
-    ]" />
-
-    <!-- Header Principal do Design System -->
-    <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-800/80">
-      <div>
-        <div class="flex items-center gap-3">
-          <div class="p-2 rounded-xl bg-blue-600/10 dark:bg-blue-500/10 text-[#FC6714] dark:text-orange-400">
-            <Palette class="w-6 h-6" />
-          </div>
-          <div>
-            <div class="flex items-center gap-2.5">
-              <h1 class="text-2xl font-heading font-semibold tracking-tight text-[#06064D] dark:text-white">Design System & BrandBook</h1>
-              <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
-                v1.1 Modais & Fullscreen
-              </span>
-            </div>
-            <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-              Tokens visuais, tipografia ergonômica, superfícies adaptáveis e biblioteca de modais do ERP Rede Pronta.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Ações do Header -->
-      <div class="flex items-center gap-3">
+    <!-- Componente Canônico: 10. Topo de Página Padrão (Page Header & Breadcrumb) -->
+    <BasePageHeader
+      :breadcrumb-items="[
+        { label: 'Início', href: '#people' },
+        { label: 'Desenvolvedor', href: '#developer' },
+        { label: 'Design System & BrandBook' }
+      ]"
+      title="Design System & BrandBook"
+      description="Tokens visuais, tipografia ergonômica, superfícies adaptáveis e biblioteca de modais do ERP Rede Pronta."
+      :icon="Palette"
+      icon-color-class="bg-blue-600/10 dark:bg-blue-500/10 text-[#FC6714] dark:text-orange-400 border border-blue-200 dark:border-blue-800"
+      badge-text="v1.2 Componentes Canônicos"
+      badge-variant="info"
+    >
+      <template #actions>
         <button
           type="button"
           @click="toggleTheme"
@@ -39,8 +24,8 @@
           <Moon v-else class="w-4 h-4 text-slate-600" />
           <span>Alternar: {{ theme === 'dark' ? 'Tema Escuro Ativo' : 'Tema Claro Ativo' }}</span>
         </button>
-      </div>
-    </header>
+      </template>
+    </BasePageHeader>
 
     <!-- Navegação Interna por Âncoras -->
     <nav class="flex flex-wrap items-center gap-2 p-1.5 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800/80 text-sm">
@@ -889,33 +874,20 @@
             <span class="text-xs font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Módulos Multi-Aba (ex: Suprimentos)</span>
           </div>
 
-          <!-- Demonstração Viva -->
-          <div class="p-6 rounded-xl bg-slate-50 dark:bg-[#03032E] border border-slate-200/80 dark:border-[#14147A]/70 space-y-5">
-            <!-- Linha 1: BaseBreadcrumb -->
-            <BaseBreadcrumb :items="[
-              { label: 'Início', href: '#people' },
-              { label: 'Operações', href: '#supplies' },
-              { label: 'Suprimentos & WMS' }
-            ]" />
-
-            <!-- Linha 2: Cabeçalho Canônico -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div class="flex items-center gap-3">
-                <div class="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 shadow-2xs shrink-0">
-                  <Boxes class="w-6 h-6" />
-                </div>
-                <div>
-                  <h1 class="text-2xl font-semibold font-heading text-[#06064D] dark:text-white tracking-tight">
-                    Suprimentos & WMS
-                  </h1>
-                  <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
-                    Catálogo de materiais, rastreabilidade serial e movimentação de estoque
-                  </p>
-                </div>
-              </div>
-
-              <!-- Ações do Cabeçalho -->
-              <div class="flex items-center gap-2 shrink-0">
+          <!-- Demonstração Viva com BasePageHeader Canônico -->
+          <div class="p-6 rounded-xl bg-slate-50 dark:bg-[#03032E] border border-slate-200/80 dark:border-[#14147A]/70">
+            <BasePageHeader
+              :breadcrumb-items="[
+                { label: 'Início', href: '#people' },
+                { label: 'Operações', href: '#supplies' },
+                { label: 'Suprimentos & WMS' }
+              ]"
+              title="Suprimentos & WMS"
+              description="Catálogo de materiais, rastreabilidade serial e movimentação de estoque"
+              :icon="Boxes"
+              icon-color-class="bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400"
+            >
+              <template #actions>
                 <button
                   type="button"
                   class="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-[#FC6714] hover:bg-[#E0530A] active:bg-[#C94605] text-white text-sm font-semibold shadow-sm transition active:scale-98 cursor-pointer"
@@ -935,50 +907,52 @@
                     <circle cx="12" cy="19" r="2"></circle>
                   </svg>
                 </button>
-              </div>
-            </div>
+              </template>
 
-            <!-- Linha 3: Barra de Abas do Módulo -->
-            <div class="flex border-b border-slate-200 dark:border-[#14147A] gap-6 overflow-x-auto select-none pt-2">
-              <button
-                type="button"
-                @click="demoActiveModuleTab = 'materiais'"
-                :class="demoActiveModuleTab === 'materiais'
-                  ? 'border-[#FC6714] text-[#FC6714] font-bold'
-                  : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white font-medium'"
-                class="pb-3 border-b-2 text-sm flex items-center gap-2 transition cursor-pointer shrink-0"
-              >
-                <Boxes class="w-4 h-4" />
-                <span>Materiais</span>
-                <span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-[#FC6714]/15 text-[#FC6714]">248</span>
-              </button>
+              <!-- Linha 3: Barra de Abas do Módulo -->
+              <template #tabs>
+                <div class="flex border-b border-slate-200 dark:border-[#14147A] gap-6 overflow-x-auto select-none pt-2">
+                  <button
+                    type="button"
+                    @click="demoActiveModuleTab = 'materiais'"
+                    :class="demoActiveModuleTab === 'materiais'
+                      ? 'border-[#FC6714] text-[#FC6714] font-bold'
+                      : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white font-medium'"
+                    class="pb-3 border-b-2 text-sm flex items-center gap-2 transition cursor-pointer shrink-0"
+                  >
+                    <Boxes class="w-4 h-4" />
+                    <span>Materiais</span>
+                    <span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-[#FC6714]/15 text-[#FC6714]">248</span>
+                  </button>
 
-              <button
-                type="button"
-                @click="demoActiveModuleTab = 'seriais'"
-                :class="demoActiveModuleTab === 'seriais'
-                  ? 'border-[#FC6714] text-[#FC6714] font-bold'
-                  : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white font-medium'"
-                class="pb-3 border-b-2 text-sm flex items-center gap-2 transition cursor-pointer shrink-0"
-              >
-                <Tag class="w-4 h-4" />
-                <span>Serializado</span>
-                <span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300">120</span>
-              </button>
+                  <button
+                    type="button"
+                    @click="demoActiveModuleTab = 'seriais'"
+                    :class="demoActiveModuleTab === 'seriais'
+                      ? 'border-[#FC6714] text-[#FC6714] font-bold'
+                      : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white font-medium'"
+                    class="pb-3 border-b-2 text-sm flex items-center gap-2 transition cursor-pointer shrink-0"
+                  >
+                    <Tag class="w-4 h-4" />
+                    <span>Serializado</span>
+                    <span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300">120</span>
+                  </button>
 
-              <button
-                type="button"
-                @click="demoActiveModuleTab = 'movimento'"
-                :class="demoActiveModuleTab === 'movimento'
-                  ? 'border-[#FC6714] text-[#FC6714] font-bold'
-                  : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white font-medium'"
-                class="pb-3 border-b-2 text-sm flex items-center gap-2 transition cursor-pointer shrink-0"
-              >
-                <LayoutTemplate class="w-4 h-4" />
-                <span>Movimento</span>
-                <span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300">15</span>
-              </button>
-            </div>
+                  <button
+                    type="button"
+                    @click="demoActiveModuleTab = 'movimento'"
+                    :class="demoActiveModuleTab === 'movimento'
+                      ? 'border-[#FC6714] text-[#FC6714] font-bold'
+                      : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white font-medium'"
+                    class="pb-3 border-b-2 text-sm flex items-center gap-2 transition cursor-pointer shrink-0"
+                  >
+                    <LayoutTemplate class="w-4 h-4" />
+                    <span>Movimento</span>
+                    <span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300">15</span>
+                  </button>
+                </div>
+              </template>
+            </BasePageHeader>
           </div>
         </div>
 
@@ -989,33 +963,20 @@
             <span class="text-xs font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Telas Cadastrais (ex: Pessoas)</span>
           </div>
 
-          <!-- Demonstração Viva -->
-          <div class="p-6 rounded-xl bg-slate-50 dark:bg-[#03032E] border border-slate-200/80 dark:border-[#14147A]/70 space-y-5">
-            <!-- Linha 1: BaseBreadcrumb -->
-            <BaseBreadcrumb :items="[
-              { label: 'Início', href: '#people' },
-              { label: 'Cadastros', href: '#people' },
-              { label: 'Pessoas & Entidades' }
-            ]" />
-
-            <!-- Linha 2: Cabeçalho Canônico -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div class="flex items-center gap-3">
-                <div class="p-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 shadow-2xs shrink-0">
-                  <Users class="w-6 h-6" />
-                </div>
-                <div>
-                  <h1 class="text-2xl font-semibold font-heading text-[#06064D] dark:text-white tracking-tight">
-                    Pessoas & Entidades
-                  </h1>
-                  <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
-                    Base unificada de clientes, fornecedores, parceiros e colaboradores
-                  </p>
-                </div>
-              </div>
-
-              <!-- Ações do Cabeçalho -->
-              <div class="flex items-center gap-2 shrink-0">
+          <!-- Demonstração Viva com BasePageHeader Canônico -->
+          <div class="p-6 rounded-xl bg-slate-50 dark:bg-[#03032E] border border-slate-200/80 dark:border-[#14147A]/70">
+            <BasePageHeader
+              :breadcrumb-items="[
+                { label: 'Início', href: '#people' },
+                { label: 'Cadastros', href: '#people' },
+                { label: 'Pessoas & Entidades' }
+              ]"
+              title="Pessoas & Entidades"
+              description="Base unificada de clientes, fornecedores, parceiros e colaboradores"
+              :icon="Users"
+              icon-color-class="bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400"
+            >
+              <template #actions>
                 <button
                   type="button"
                   class="inline-flex items-center gap-2 h-10 px-3.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/80 text-sm font-medium transition cursor-pointer shadow-2xs"
@@ -1031,8 +992,8 @@
                   <Plus class="w-4 h-4" />
                   <span>Nova Pessoa</span>
                 </button>
-              </div>
-            </div>
+              </template>
+            </BasePageHeader>
           </div>
         </div>
 
@@ -1043,38 +1004,27 @@
             <span class="text-xs font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Telas de Detalhe / FSM</span>
           </div>
 
-          <!-- Demonstração Viva -->
-          <div class="p-6 rounded-xl bg-slate-50 dark:bg-[#03032E] border border-slate-200/80 dark:border-[#14147A]/70 space-y-5">
-            <!-- Linha 1: BaseBreadcrumb -->
-            <BaseBreadcrumb :items="[
-              { label: 'Início', href: '#people' },
-              { label: 'Faturamento & Contratos', href: '#integrations' },
-              { label: 'Termo de Adesão #2609-001' }
-            ]" />
+          <!-- Demonstração Viva com BasePageHeader Canônico -->
+          <div class="p-6 rounded-xl bg-slate-50 dark:bg-[#03032E] border border-slate-200/80 dark:border-[#14147A]/70">
+            <BasePageHeader
+              :breadcrumb-items="[
+                { label: 'Início', href: '#people' },
+                { label: 'Faturamento & Contratos', href: '#integrations' },
+                { label: 'Termo de Adesão #2609-001' }
+              ]"
+              title="Contrato de Custódia PoliFibra"
+              :icon="FileCheck"
+              icon-color-class="bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400"
+              badge-text="ATIVO / EM VIGOR"
+              badge-variant="success"
+            >
+              <template #description>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
+                  Protocolo: <strong>260929-POLI01</strong> • Solicitante: <strong>ALLOHA / GIGA+</strong> • Posição: <strong>Belém - PA</strong>
+                </p>
+              </template>
 
-            <!-- Linha 2: Cabeçalho Canônico -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div class="flex items-center gap-3">
-                <div class="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 shadow-2xs shrink-0">
-                  <FileCheck class="w-6 h-6" />
-                </div>
-                <div>
-                  <div class="flex items-center gap-2.5 flex-wrap">
-                    <h1 class="text-2xl font-semibold font-heading text-[#06064D] dark:text-white tracking-tight">
-                      Contrato de Custódia PoliFibra
-                    </h1>
-                    <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                      ATIVO / EM VIGOR
-                    </span>
-                  </div>
-                  <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
-                    Protocolo: <strong>260929-POLI01</strong> • Solicitante: <strong>ALLOHA / GIGA+</strong> • Posição: <strong>Belém - PA</strong>
-                  </p>
-                </div>
-              </div>
-
-              <!-- Ações do Cabeçalho -->
-              <div class="flex items-center gap-2 shrink-0">
+              <template #actions>
                 <button
                   type="button"
                   class="inline-flex items-center gap-2 h-10 px-3.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/80 text-sm font-medium transition cursor-pointer shadow-2xs"
@@ -1089,8 +1039,8 @@
                 >
                   <span>Editar Contrato</span>
                 </button>
-              </div>
-            </div>
+              </template>
+            </BasePageHeader>
           </div>
         </div>
 
@@ -1115,42 +1065,35 @@
           </div>
 
           <pre class="font-mono text-xs text-slate-300 overflow-x-auto leading-relaxed p-2"><code>&lt;template&gt;
-  &lt;!-- Container Raiz Obrigatório: py-8 w-full space-y-6 --&gt;
+  &lt;!-- Container Raiz Canônico Obrigatório: py-8 w-full space-y-6 --&gt;
   &lt;div class="py-8 w-full space-y-6"&gt;
 
-    &lt;!-- Linha 1 Obrigatória: BaseBreadcrumb Canônico (em Box 100% horizontal) --&gt;
-    &lt;BaseBreadcrumb :items="[
-      { label: 'Início', href: '#people' },
-      { label: 'Domínio / Módulo', href: '#modulo' },
-      { label: 'Nome da Tela Atual' }
-    ]" /&gt;
-
-    &lt;!-- Linha 2 Obrigatória: Cabeçalho Canônico com Ícone e Ações --&gt;
-    &lt;div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4"&gt;
-      &lt;div class="flex items-center gap-3"&gt;
-        &lt;div class="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 shadow-2xs shrink-0"&gt;
-          &lt;ComponenteIcone class="w-6 h-6" /&gt;
-        &lt;/div&gt;
-        &lt;div&gt;
-          &lt;h1 class="text-2xl font-semibold font-heading text-[#06064D] dark:text-white tracking-tight"&gt;
-            Título da Tela
-          &lt;/h1&gt;
-          &lt;p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5 font-medium"&gt;
-            Descrição técnica orientada ao operador e propósito da tela
-          &lt;/p&gt;
-        &lt;/div&gt;
-      &lt;/div&gt;
-
-      &lt;!-- Botão Primário Laranja (#FC6714) e Ações --&gt;
-      &lt;div class="flex items-center gap-2 shrink-0"&gt;
-        &lt;button type="button" class="h-10 px-4 rounded-lg bg-[#FC6714] text-white text-sm font-semibold shadow-sm hover:bg-[#E0530A] transition"&gt;
-          &lt;Plus class="w-4 h-4 inline mr-1.5" /&gt;
-          Ação Primária
+    &lt;!-- Componente Canônico: 10. Topo de Página Padrão (BasePageHeader) --&gt;
+    &lt;BasePageHeader
+      :breadcrumb-items="[
+        { label: 'Início', href: '#people' },
+        { label: 'Domínio / Módulo', href: '#modulo' },
+        { label: 'Nome da Tela Atual' }
+      ]"
+      title="Título da Tela"
+      description="Descrição técnica orientada ao operador e propósito da tela"
+      :icon="Boxes"
+      badge-text="12 Itens"
+      badge-variant="neutral"
+    &gt;
+      &lt;!-- Ações Rápidas à Direita --&gt;
+      &lt;template #actions&gt;
+        &lt;button type="button" class="btn-primary inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg shadow-sm"&gt;
+          &lt;Plus class="w-4 h-4" /&gt;
+          &lt;span&gt;Ação Primária&lt;/span&gt;
         &lt;/button&gt;
-      &lt;/div&gt;
-    &lt;/div&gt;
+      &lt;/template&gt;
 
-    &lt;!-- Linha 3: Conteúdo da View (Filtros, Grid, Cards, Paginação) --&gt;
+      &lt;!-- Linha 3 Opcional: Abas do Módulo --&gt;
+      &lt;!-- &lt;template #tabs&gt; ... &lt;/template&gt; --&gt;
+    &lt;/BasePageHeader&gt;
+
+    &lt;!-- Linha 3+: Conteúdo da View (Filtros, Tabela, Cards, Paginação) --&gt;
     ...
   &lt;/div&gt;
 &lt;/template&gt;</code></pre>
@@ -1544,6 +1487,7 @@ import {
   FileCheck, Boxes, Copy, Home
 } from 'lucide-vue-next';
 import { useTheme } from '../composables/useTheme';
+import BasePageHeader from '../components/common/BasePageHeader.vue';
 import BaseBreadcrumb from '../components/common/BaseBreadcrumb.vue';
 import BaseModal from '../components/common/BaseModal.vue';
 import CitySearchSelect from '../components/common/CitySearchSelect.vue';
@@ -1563,42 +1507,35 @@ const copiedSnippet = ref(false);
 
 function copyCanonicalCode() {
   const code = `<template>
-  <!-- Container Raiz Obrigatório: py-8 w-full space-y-6 -->
+  <!-- Container Raiz Canônico Obrigatório: py-8 w-full space-y-6 -->
   <div class="py-8 w-full space-y-6">
 
-    <!-- Linha 1 Obrigatória: BaseBreadcrumb Canônico (em Box 100% horizontal) -->
-    <BaseBreadcrumb :items="[
-      { label: 'Início', href: '#people' },
-      { label: 'Domínio / Módulo', href: '#modulo' },
-      { label: 'Nome da Tela Atual' }
-    ]" />
-
-    <!-- Linha 2 Obrigatória: Cabeçalho Canônico com Ícone e Ações -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-      <div class="flex items-center gap-3">
-        <div class="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 shadow-2xs shrink-0">
-          <ComponenteIcone class="w-6 h-6" />
-        </div>
-        <div>
-          <h1 class="text-2xl font-semibold font-heading text-[#06064D] dark:text-white tracking-tight">
-            Título da Tela
-          </h1>
-          <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
-            Descrição técnica orientada ao operador e propósito da tela
-          </p>
-        </div>
-      </div>
-
-      <!-- Botão Primário Laranja (#FC6714) e Ações -->
-      <div class="flex items-center gap-2 shrink-0">
-        <button type="button" class="h-10 px-4 rounded-lg bg-[#FC6714] text-white text-sm font-semibold shadow-sm hover:bg-[#E0530A] transition">
-          <Plus class="w-4 h-4 inline mr-1.5" />
-          Ação Primária
+    <!-- Componente Canônico: 10. Topo de Página Padrão (BasePageHeader) -->
+    <BasePageHeader
+      :breadcrumb-items="[
+        { label: 'Início', href: '#people' },
+        { label: 'Domínio / Módulo', href: '#modulo' },
+        { label: 'Nome da Tela Atual' }
+      ]"
+      title="Título da Tela"
+      description="Descrição técnica orientada ao operador e propósito da tela"
+      :icon="Boxes"
+      badge-text="12 Itens"
+      badge-variant="neutral"
+    >
+      <!-- Ações Rápidas à Direita -->
+      <template #actions>
+        <button type="button" class="btn-primary inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg shadow-sm">
+          <Plus class="w-4 h-4" />
+          <span>Ação Primária</span>
         </button>
-      </div>
-    </div>
+      </template>
 
-    <!-- Linha 3: Conteúdo da View (Filtros, Grid, Cards, Paginação) -->
+      <!-- Linha 3 Opcional: Abas do Módulo -->
+      <!-- <template #tabs> ... </template> -->
+    </BasePageHeader>
+
+    <!-- Linha 3+: Conteúdo da View (Filtros, Tabela, Cards, Paginação) -->
     ...
   </div>
 </template>`;

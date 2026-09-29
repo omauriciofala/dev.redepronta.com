@@ -1,35 +1,20 @@
 <template>
   <div class="py-8 w-full space-y-8">
-    <!-- Linha 1 Canônica Obrigatória: BaseBreadcrumb -->
-    <BaseBreadcrumb :items="[
-      { label: 'Início', href: '#people' },
-      { label: 'Sistema', href: '#changelog' },
-      { label: 'Change-log Vivo' }
-    ]" />
-
-    <!-- Header do Change-log -->
-    <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-800/80">
-      <div>
-        <div class="flex items-center gap-3">
-          <div class="p-2.5 rounded-xl bg-purple-600/10 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400">
-            <History class="w-6 h-6" />
-          </div>
-          <div>
-            <div class="flex items-center gap-2.5">
-              <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Change-log do Sistema</h1>
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-semibold bg-purple-100 dark:bg-purple-950/70 text-purple-700 dark:text-purple-400 border border-purple-200 dark:border-purple-800">
-                Histórico Vivo de Commits
-              </span>
-            </div>
-            <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-              Registro cronológico e rastreabilidade total de cada modificação e evolução do ERP Rede Pronta.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Ações do Header -->
-      <div class="flex items-center gap-3">
+    <!-- Componente Canônico: 10. Topo de Página Padrão (Page Header & Breadcrumb) -->
+    <BasePageHeader
+      :breadcrumb-items="[
+        { label: 'Início', href: '#people' },
+        { label: 'Sistema', href: '#changelog' },
+        { label: 'Change-log Vivo' }
+      ]"
+      title="Change-log do Sistema"
+      description="Registro cronológico e rastreabilidade total de cada modificação e evolução do ERP Rede Pronta."
+      :icon="History"
+      icon-color-class="bg-purple-600/10 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800"
+      badge-text="Histórico Vivo de Commits"
+      badge-variant="info"
+    >
+      <template #actions>
         <button
           type="button"
           @click="fetchChangelog"
@@ -40,8 +25,8 @@
           <RefreshCw class="w-4 h-4" :class="{ 'animate-spin': isLoading }" />
           <span>Recarregar</span>
         </button>
-      </div>
-    </header>
+      </template>
+    </BasePageHeader>
 
     <!-- Cards de Métricas / Resumo dos Commits -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -197,7 +182,7 @@ import {
   Check, Loader2, ShieldCheck
 } from 'lucide-vue-next';
 import axios from 'axios';
-import BaseBreadcrumb from '../components/common/BaseBreadcrumb.vue';
+import BasePageHeader from '../components/common/BasePageHeader.vue';
 
 interface CommitItem {
   hash: string;

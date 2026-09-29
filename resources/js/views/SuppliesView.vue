@@ -1,32 +1,18 @@
 <template>
   <div class="py-8 w-full space-y-6">
-    <!-- Linha 1 Canônica Obrigatória: BaseBreadcrumb -->
-    <BaseBreadcrumb :items="[
-      { label: 'Início', href: '#people' },
-      { label: 'Operações', href: '#supplies' },
-      { label: 'Suprimentos & WMS' }
-    ]" />
-
-    <!-- ============================================================================= -->
-    <!-- CABEÇALHO PADRÃO DO MÓDULO (DESIGN SYSTEM CANÔNICO) -->
-    <!-- ============================================================================= -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-      <div class="flex items-center gap-3">
-        <div class="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 shadow-2xs shrink-0">
-          <Package class="w-6 h-6" />
-        </div>
-        <div>
-          <h1 class="text-2xl font-semibold font-heading text-[#06064D] dark:text-white tracking-tight">
-            Suprimentos & WMS
-          </h1>
-          <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
-            Catálogo de materiais, rastreabilidade serial e movimentação de estoque
-          </p>
-        </div>
-      </div>
-
-      <!-- Ações do Cabeçalho -->
-      <div class="flex items-center gap-2 shrink-0">
+    <!-- Componente Canônico: 10. Topo de Página Padrão (Page Header & Breadcrumb) -->
+    <BasePageHeader
+      :breadcrumb-items="[
+        { label: 'Início', href: '#people' },
+        { label: 'Operações', href: '#supplies' },
+        { label: 'Suprimentos & WMS' }
+      ]"
+      title="Suprimentos & WMS"
+      description="Catálogo de materiais, rastreabilidade serial e movimentação de estoque"
+      :icon="Package"
+      icon-color-class="bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400"
+    >
+      <template #actions>
         <!-- Botão Primário Laranja (#FC6714) -->
         <button
           type="button"
@@ -172,13 +158,11 @@
         >
           <RefreshCw class="w-4 h-4 text-slate-500 dark:text-slate-400" :class="{ 'animate-spin text-[#FC6714]': loading }" />
         </button>
-      </div>
-    </div>
+      </template>
 
-    <!-- ============================================================================= -->
-    <!-- BARRA DE ABAS DO MÓDULO (DESIGN SYSTEM) -->
-    <!-- ============================================================================= -->
-    <div class="flex border-b border-slate-200 dark:border-[#14147A] gap-6 overflow-x-auto select-none">
+      <!-- Linha 3: Barra de Abas do Módulo -->
+      <template #tabs>
+        <div class="flex border-b border-slate-200 dark:border-[#14147A] gap-6 overflow-x-auto select-none">
       <button
         type="button"
         @click="activeTab = 'materials'"
@@ -255,6 +239,8 @@
         </span>
       </button>
     </div>
+  </template>
+</BasePageHeader>
 
     <!-- ============================================================================= -->
     <!-- ABA: MATERIAIS -->
@@ -1547,7 +1533,7 @@ import {
   AlertCircle, CheckCircle2, Menu, MapPin, Edit2, Tags, FolderTree, Scale, UserCheck,
   FileSpreadsheet, ExternalLink, Eye, FileText, ChevronDown, ChevronRight, FileStack
 } from 'lucide-vue-next';
-import BaseBreadcrumb from '@/components/common/BaseBreadcrumb.vue';
+import BasePageHeader from '@/components/common/BasePageHeader.vue';
 import TablePagination from '@/components/common/TablePagination.vue';
 import MovementModal from '@/components/supplies/MovementModal.vue';
 import MovementDetailsModal from '@/components/supplies/MovementDetailsModal.vue';
