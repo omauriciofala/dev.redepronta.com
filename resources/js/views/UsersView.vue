@@ -22,16 +22,6 @@
       </template>
 
       <template #actions>
-        <!-- Botão Secundário: Novo Papel (Role) -->
-        <button
-          type="button"
-          @click="openNewRoleModal"
-          class="inline-flex items-center gap-2 h-10 px-3.5 rounded-lg border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-200 text-sm font-semibold shadow-2xs transition cursor-pointer focus:ring-2 focus:ring-[#FC6714] focus:outline-none"
-        >
-          <Plus class="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-          <span>Novo Papel (Role)</span>
-        </button>
-
         <!-- Botão Primário Laranja (#FC6714): Novo Usuário -->
         <button
           type="button"
@@ -129,6 +119,18 @@
             </div>
           </Transition>
         </div>
+
+        <!-- Menu Hambúrguer (☰) — Abre Drawer Lateral do Módulo -->
+        <button
+          type="button"
+          @click="isModuleDrawerOpen = true"
+          class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition shadow-2xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#FC6714]"
+          :class="{ 'bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white ring-2 ring-[#FC6714]/30': isModuleDrawerOpen }"
+          title="Gestão de Usuários (☰)"
+          aria-label="Gestão de Usuários"
+        >
+          <Menu class="w-5 h-5" />
+        </button>
 
         <!-- Botão de Recarregar Dados -->
         <button
@@ -913,6 +915,18 @@
         </div>
       </form>
     </BaseModal>
+
+    <!-- Drawer Lateral do Módulo (☰) -->
+    <UsersModuleDrawer
+      v-model="isModuleDrawerOpen"
+      :total-users="stats.users_total"
+      :active-users="stats.users_active"
+      :super-admins-count="stats.users_super_admin"
+      :roles-count="rolesList.length"
+      :permissions-count="stats.permissions_total"
+      @navigate="(tab) => setTab(tab)"
+      @action="handleDrawerAction"
+    />
   </div>
 </template>
 
@@ -929,6 +943,7 @@ import {
   Search,
   RotateCcw,
   RefreshCw,
+  Menu,
   Pencil,
   Power,
   Trash2,
@@ -944,6 +959,7 @@ import BasePageHeader from '../components/common/BasePageHeader.vue';
 import BaseModal from '../components/common/BaseModal.vue';
 import PersonSearchSelect from '../components/common/PersonSearchSelect.vue';
 import TablePagination from '../components/common/TablePagination.vue';
+import UsersModuleDrawer from '../components/users/UsersModuleDrawer.vue';
 
 type TabKey = 'users' | 'roles' | 'permissions';
 
@@ -1026,6 +1042,21 @@ async function refreshAllData() {
     ]);
   } finally {
     isLoadingUsers.value = false;
+  }
+}
+
+// Drawer Lateral do Módulo (Menu Hambúrguer ☰)
+const isModuleDrawerOpen = ref(false);
+
+function handleDrawerAction(action: 'new-user' | 'new-role' | 'filter-super-admins' | 'refresh-all') {
+  if (action === 'new-user') {
+    openNewUserModal();
+  } else if (action === 'new-role') {
+    openNewRoleModal();
+  } else if (action === 'filter-super-admins') {
+    filterSuperAdmins();
+  } else if (action === 'refresh-all') {
+    refreshAllData();
   }
 }
 
