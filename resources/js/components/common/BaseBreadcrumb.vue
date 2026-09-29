@@ -45,11 +45,6 @@
           </template>
         </li>
       </ol>
-
-      <!-- Slot Opcional à Direita (ex: Metadados, Ações Rápidas ou Status) -->
-      <div v-if="$slots.right" class="shrink-0 flex items-center gap-2">
-        <slot name="right" />
-      </div>
     </nav>
   </div>
 </template>

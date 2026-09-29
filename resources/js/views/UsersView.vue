@@ -15,12 +15,6 @@
       :badge-text="`${stats.users_total} Usuários`"
       badge-variant="neutral"
     >
-      <template #breadcrumb-right>
-        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-900">
-          Controle de Acesso (RBAC)
-        </span>
-      </template>
-
       <template #actions>
         <button
           type="button"

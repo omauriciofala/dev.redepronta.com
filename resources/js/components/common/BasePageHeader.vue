@@ -5,11 +5,7 @@
   <!-- ============================================================================= -->
   <div class="w-full space-y-4 sm:space-y-5">
     <!-- Linha 1 Canônica Obrigatória: BaseBreadcrumb em Box 100% -->
-    <BaseBreadcrumb :items="breadcrumbItems" :show-home-icon="showHomeIcon">
-      <template v-if="$slots['breadcrumb-right']" #right>
-        <slot name="breadcrumb-right" />
-      </template>
-    </BaseBreadcrumb>
+    <BaseBreadcrumb :items="breadcrumbItems" :show-home-icon="showHomeIcon" />
 
     <!-- Linha 2 Canônica: Cabeçalho Principal da Página -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
