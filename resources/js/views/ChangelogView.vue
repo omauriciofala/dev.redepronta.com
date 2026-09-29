@@ -1,5 +1,12 @@
 <template>
   <div class="py-8 w-full space-y-8">
+    <!-- Linha 1 Canônica Obrigatória: BaseBreadcrumb -->
+    <BaseBreadcrumb :items="[
+      { label: 'Início', href: '#people' },
+      { label: 'Sistema', href: '#changelog' },
+      { label: 'Change-log Vivo' }
+    ]" />
+
     <!-- Header do Change-log -->
     <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-800/80">
       <div>
@@ -190,6 +197,7 @@ import {
   Check, Loader2, ShieldCheck
 } from 'lucide-vue-next';
 import axios from 'axios';
+import BaseBreadcrumb from '../components/common/BaseBreadcrumb.vue';
 
 interface CommitItem {
   hash: string;

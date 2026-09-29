@@ -61,4 +61,6 @@ trigger: manual
 - **Container Raiz Mandatório**: Toda view Vue renderizada no `<main>` do `AppLayout.vue` **DEVE OBRIGATORIAMENTE** iniciar com `<div class="py-8 w-full space-y-6">` (ou `space-y-8` em páginas editoriais).
 - **Proibição de Cabeçalho Colado no Topo**: O cabeçalho de uma view nunca deve encostar no teto da tela (`py-8` / `pt-8` de 32px é obrigatório).
 - **Simetria Lateral de 60px**: A margem horizontal é provida exclusivamente pelo `px-[60px]` do `AppLayout.vue`.
+- **Linha 1 Mandatória (`BaseBreadcrumb`)**: Toda tela deve ter como seu primeiro elemento visual filho do container raiz o componente canônico `<BaseBreadcrumb :items="[...]" />`. O título/cabeçalho da tela é a Linha 2.
+
 

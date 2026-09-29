@@ -1,5 +1,12 @@
 <template>
   <div class="py-8 w-full space-y-6">
+    <!-- Linha 1 Canônica Obrigatória: BaseBreadcrumb -->
+    <BaseBreadcrumb :items="[
+      { label: 'Início', href: '#people' },
+      { label: 'Desenvolvedor', href: '#developer' },
+      { label: 'Ferramentas & Sandbox' }
+    ]" />
+
     <!-- Cabeçalho da Página -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-slate-200 dark:border-slate-800">
       <div>
@@ -402,6 +409,7 @@ import {
   Loader2,
 } from 'lucide-vue-next';
 import BaseModal from '../components/common/BaseModal.vue';
+import BaseBreadcrumb from '../components/common/BaseBreadcrumb.vue';
 import { useNavigation } from '../composables/useNavigation';
 
 const { setView } = useNavigation();

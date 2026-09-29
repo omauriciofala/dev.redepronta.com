@@ -1,5 +1,12 @@
 <template>
   <div class="py-8 w-full space-y-6">
+    <!-- Linha 1 Canônica Obrigatória: BaseBreadcrumb -->
+    <BaseBreadcrumb :items="[
+      { label: 'Início', href: '#people' },
+      { label: 'Cadastros', href: '#people' },
+      { label: 'Pessoas & Entidades' }
+    ]" />
+
     <!-- Cabeçalho Confortável Integrado (Sem Top Bar) -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div class="flex items-center gap-3">
@@ -935,6 +942,7 @@ import {
   Trash2, AlertTriangle, Loader2, AlertCircle, Menu
 } from 'lucide-vue-next';
 import axios from 'axios';
+import BaseBreadcrumb from '../components/common/BaseBreadcrumb.vue';
 import BaseModal from '../components/common/BaseModal.vue';
 import PersonModal from '../components/people/PersonModal.vue';
 import PeopleModuleDrawer from '../components/people/PeopleModuleDrawer.vue';

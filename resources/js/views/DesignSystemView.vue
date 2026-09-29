@@ -1,5 +1,12 @@
 <template>
   <div class="py-8 w-full space-y-12">
+    <!-- Linha 1 Canônica Obrigatória: BaseBreadcrumb -->
+    <BaseBreadcrumb :items="[
+      { label: 'Início', href: '#people' },
+      { label: 'Desenvolvedor', href: '#developer' },
+      { label: 'Design System & BrandBook' }
+    ]" />
+
     <!-- Header Principal do Design System -->
     <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-800/80">
       <div>
@@ -702,92 +709,418 @@
       </div>
       <p class="text-sm text-slate-500 dark:text-slate-400">
         Padrão obrigatório de margens, respiros perimetrais e estrutura de cabeçalho para todas as telas do ERP.
-        <strong>É expressamente proibido colar o cabeçalho no topo da viewport.</strong>
+        <strong>É expressamente obrigatório que a Linha 1 de toda tela seja o BaseBreadcrumb</strong>, seguido do cabeçalho da página, sem colar no topo da viewport.
       </p>
 
       <!-- Grid com Diretrizes e Demonstração do Page Shell -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Card 1: Margem Superior & Inferior -->
-        <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 space-y-3 shadow-xs">
+        <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 space-y-2.5 shadow-xs">
           <div class="flex items-center gap-2 text-slate-900 dark:text-slate-100 font-bold text-sm">
             <span class="w-2.5 h-2.5 rounded-full bg-[#FC6714]"></span>
             <span>1. Margem Superior (py-8)</span>
           </div>
           <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-            O container raiz de toda view Vue DEVE conter a classe <code class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[#FC6714] font-mono text-[11px]">py-8 w-full</code> (32px de respiro no topo e na base).
+            O container raiz de toda view Vue DEVE conter <code class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[#FC6714] font-mono text-[11px]">py-8 w-full</code> (32px de respiro no topo e na base).
           </p>
-          <div class="p-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 font-mono text-xs text-slate-600 dark:text-slate-300">
+          <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 font-mono text-[11px] text-slate-600 dark:text-slate-300">
             &lt;div class="py-8 w-full space-y-6"&gt;
           </div>
         </div>
 
-        <!-- Card 2: Simetria Horizontal de 60px -->
-        <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 space-y-3 shadow-xs">
+        <!-- Card 2: Linha 1 Obrigatória (Breadcrumb) -->
+        <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 space-y-2.5 shadow-xs">
           <div class="flex items-center gap-2 text-slate-900 dark:text-slate-100 font-bold text-sm">
-            <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
-            <span>2. Margem Lateral (px-[60px])</span>
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+            <span>2. Linha 1: BaseBreadcrumb</span>
           </div>
           <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-            A área de conteúdo (<code class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-blue-600 dark:text-blue-400 font-mono text-[11px]">&lt;main&gt;</code>) no <code class="font-mono text-[11px]">AppLayout.vue</code> garante rigorosamente <strong>60px à esquerda e 60px à direita</strong>.
+            O primeiro elemento renderizado no container é <strong>obrigatoriamente o BaseBreadcrumb</strong> para localização hierárquica do operador.
           </p>
-          <div class="p-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 font-mono text-xs text-slate-600 dark:text-slate-300">
+          <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 font-mono text-[11px] text-amber-700 dark:text-amber-400">
+            &lt;BaseBreadcrumb :items="..." /&gt;
+          </div>
+        </div>
+
+        <!-- Card 3: Simetria Horizontal de 60px -->
+        <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 space-y-2.5 shadow-xs">
+          <div class="flex items-center gap-2 text-slate-900 dark:text-slate-100 font-bold text-sm">
+            <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+            <span>3. Margem Lateral (px-[60px])</span>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+            A área de conteúdo (<code class="font-mono text-[11px]">&lt;main&gt;</code>) no <code class="font-mono text-[11px]">AppLayout.vue</code> garante <strong>60px à esquerda e à direita</strong>.
+          </p>
+          <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 font-mono text-[11px] text-slate-600 dark:text-slate-300">
             &lt;main class="... px-[60px] pb-12"&gt;
           </div>
         </div>
 
-        <!-- Card 3: Espaçamento Vertical Entre Blocos -->
-        <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 space-y-3 shadow-xs">
+        <!-- Card 4: Ritmo Vertical Entre Blocos -->
+        <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 space-y-2.5 shadow-xs">
           <div class="flex items-center gap-2 text-slate-900 dark:text-slate-100 font-bold text-sm">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-            <span>3. Ritmo Vertical (space-y-6 / 8)</span>
+            <span>4. Ritmo (space-y-6 / 8)</span>
           </div>
           <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-            Utilize <code class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 font-mono text-[11px]">space-y-6</code> (24px) para telas operacionais e <code class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 font-mono text-[11px]">space-y-8</code> (32px) para telas editoriais/relatórios.
+            Utilize <code class="font-mono text-[11px]">space-y-6</code> (24px) para fluxos operacionais e <code class="font-mono text-[11px]">space-y-8</code> (32px) para telas analíticas e cadastros.
           </p>
-          <div class="p-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 font-mono text-xs text-slate-600 dark:text-slate-300">
-            Cabeçalho ➔ Filtros ➔ Grid ➔ Paginação
+          <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 font-mono text-[11px] text-slate-600 dark:text-slate-300">
+            Breadcrumb ➔ Topo ➔ Filtros ➔ Grid
           </div>
         </div>
       </div>
 
-      <!-- Diagrama Visual Interativo do Page Shell -->
+      <!-- Diagrama Visual Interativo do Page Shell com Breadcrumb -->
       <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 space-y-4 shadow-xs">
         <h3 class="text-sm font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
-          <span>Esquema Anatômico do Page Shell</span>
-          <span class="text-xs font-normal text-slate-400">(Visão com réguas de espaçamento padronizadas)</span>
+          <span>Esquema Anatômico do Page Shell com Breadcrumb</span>
+          <span class="text-xs font-normal text-slate-400">(Visão perimétrica oficial do ERP Rede Pronta)</span>
         </h3>
 
         <!-- Mockup Visual de Tela -->
         <div class="p-4 rounded-xl bg-slate-100 dark:bg-slate-950 border border-dashed border-slate-300 dark:border-slate-700 relative overflow-hidden">
           <!-- Régua Superior (py-8 = 32px) -->
-          <div class="mb-2 py-1.5 px-3 rounded bg-orange-100 dark:bg-[#FC6714]/20 border border-orange-300 dark:border-[#FC6714]/40 text-center text-xs font-mono font-bold text-[#FC6714] flex items-center justify-center gap-2">
-            <span>▲ Margem Superior Obrigatória: py-8 (32px de respiro no topo para não colar o cabeçalho) ▲</span>
+          <div class="mb-3 py-1.5 px-3 rounded bg-orange-100 dark:bg-[#FC6714]/20 border border-orange-300 dark:border-[#FC6714]/40 text-center text-xs font-mono font-bold text-[#FC6714] flex items-center justify-center gap-2">
+            <span>▲ Margem Superior Obrigatória: py-8 (32px de respiro perimetral no topo) ▲</span>
           </div>
 
           <!-- Conteúdo Simulado da View -->
           <div class="bg-white dark:bg-slate-900 rounded-lg p-5 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
-            <!-- Cabeçalho Simulado -->
+            <!-- Linha 1 Simulada: Breadcrumb -->
+            <div class="py-1 px-2.5 rounded bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/60 flex items-center justify-between">
+              <div class="flex items-center gap-1.5 text-[11px] font-mono">
+                <span class="text-[#FC6714] font-bold flex items-center gap-1">
+                  <Home class="w-3 h-3" /> Início
+                </span>
+                <span class="text-slate-400">›</span>
+                <span class="text-slate-500">Módulo</span>
+                <span class="text-slate-400">›</span>
+                <span class="text-slate-900 dark:text-slate-100 font-bold">Página Atual</span>
+              </div>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 font-bold border border-amber-200 dark:border-amber-800">
+                Linha 1 Obrigatória (BaseBreadcrumb)
+              </span>
+            </div>
+
+            <!-- Linha 2 Simulada: Cabeçalho Canônico -->
             <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-              <div class="space-y-1">
-                <div class="h-5 w-48 bg-slate-200 dark:bg-slate-700 rounded"></div>
-                <div class="h-3 w-80 bg-slate-100 dark:bg-slate-800 rounded"></div>
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-950/80 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-xs">
+                  Ícone
+                </div>
+                <div class="space-y-1">
+                  <div class="h-5 w-48 bg-slate-200 dark:bg-slate-700 rounded"></div>
+                  <div class="h-3 w-72 bg-slate-100 dark:bg-slate-800 rounded"></div>
+                </div>
               </div>
               <div class="flex items-center gap-2">
-                <div class="h-8 w-28 bg-[#FC6714] rounded-lg"></div>
-                <div class="h-8 w-8 bg-slate-200 dark:bg-slate-700 rounded-lg"></div>
+                <div class="h-9 px-3.5 bg-[#FC6714] text-white text-xs font-semibold rounded-lg flex items-center">
+                  Ação Primária
+                </div>
+                <div class="h-9 w-9 bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700"></div>
               </div>
             </div>
 
-            <!-- Corpo Simulado (Grid/Filtros) -->
+            <!-- Linha 3 Simulada: Corpo / Filtros / Grid -->
             <div class="h-16 bg-slate-50 dark:bg-slate-800/40 rounded-lg border border-dashed border-slate-200 dark:border-slate-700 flex items-center justify-center text-xs text-slate-400 font-mono">
-              Conteúdo da View (Filtros, Cards, Tabelas, Paginação) • Espaçamento vertical: space-y-6
+              Conteúdo da View (Filtros, Cards de Métricas, Grid de Dados, Paginação) • space-y-6
             </div>
           </div>
 
           <!-- Régua Inferior (pb-12 = 48px) -->
-          <div class="mt-2 py-1.5 px-3 rounded bg-blue-100 dark:bg-blue-950/40 border border-blue-300 dark:border-blue-800 text-center text-xs font-mono font-bold text-blue-600 dark:text-blue-400 flex items-center justify-center gap-2">
+          <div class="mt-3 py-1.5 px-3 rounded bg-blue-100 dark:bg-blue-950/40 border border-blue-300 dark:border-blue-800 text-center text-xs font-mono font-bold text-blue-600 dark:text-blue-400 flex items-center justify-center gap-2">
             <span>▼ Margem Inferior: pb-12 (48px no layout principal) + py-8 (32px na view) ▼</span>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 10: TOPO DE PÁGINA PADRÃO (PAGE HEADER & BREADCRUMB) -->
+    <section id="topo-pagina-padrao" class="space-y-6">
+      <div class="flex items-center gap-2.5">
+        <Compass class="w-5 h-5 text-[#FC6714] dark:text-orange-400" />
+        <h2 class="text-lg font-heading font-semibold text-[#06064D] dark:text-white">10. Topo de Página Padrão (Page Header & Breadcrumb) ⭐</h2>
+      </div>
+      <p class="text-sm text-slate-500 dark:text-slate-400">
+        Padrão canônico de composição do topo de tela no ERP Rede Pronta. Toda página do sistema deve apresentar harmoniosamente
+        o <strong>Breadcrumb na Linha 1</strong> e o <strong>Cabeçalho Principal na Linha 2</strong>, garantindo orientação espacial, consistência semântica e ergonomia operacional.
+      </p>
+
+      <!-- Exemplos Vivos / Múltiplas Variações -->
+      <div class="space-y-6">
+        <!-- Variação 1: Topo Completo com Barra de Abas do Módulo (Padrão Suprimentos & WMS) -->
+        <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 space-y-5 shadow-xs">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800/80">
+            <span class="text-xs font-bold uppercase tracking-wider text-[#FC6714]">Variação 1: Topo Completo com Barra de Abas do Módulo</span>
+            <span class="text-xs font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Módulos Multi-Aba (ex: Suprimentos)</span>
+          </div>
+
+          <!-- Demonstração Viva -->
+          <div class="p-6 rounded-xl bg-slate-50 dark:bg-[#03032E] border border-slate-200/80 dark:border-[#14147A]/70 space-y-5">
+            <!-- Linha 1: BaseBreadcrumb -->
+            <BaseBreadcrumb :items="[
+              { label: 'Início', href: '#people' },
+              { label: 'Operações', href: '#supplies' },
+              { label: 'Suprimentos & WMS' }
+            ]" />
+
+            <!-- Linha 2: Cabeçalho Canônico -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div class="flex items-center gap-3">
+                <div class="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 shadow-2xs shrink-0">
+                  <Boxes class="w-6 h-6" />
+                </div>
+                <div>
+                  <h1 class="text-2xl font-semibold font-heading text-[#06064D] dark:text-white tracking-tight">
+                    Suprimentos & WMS
+                  </h1>
+                  <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
+                    Catálogo de materiais, rastreabilidade serial e movimentação de estoque
+                  </p>
+                </div>
+              </div>
+
+              <!-- Ações do Cabeçalho -->
+              <div class="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  class="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-[#FC6714] hover:bg-[#E0530A] active:bg-[#C94605] text-white text-sm font-semibold shadow-sm transition active:scale-98 cursor-pointer"
+                >
+                  <Plus class="w-4 h-4" />
+                  <span>Nova Movimentação</span>
+                </button>
+
+                <button
+                  type="button"
+                  class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition shadow-2xs cursor-pointer"
+                  title="Cadastros de Apoio"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5" viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="5" r="2"></circle>
+                    <circle cx="12" cy="12" r="2"></circle>
+                    <circle cx="12" cy="19" r="2"></circle>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Linha 3: Barra de Abas do Módulo -->
+            <div class="flex border-b border-slate-200 dark:border-[#14147A] gap-6 overflow-x-auto select-none pt-2">
+              <button
+                type="button"
+                @click="demoActiveModuleTab = 'materiais'"
+                :class="demoActiveModuleTab === 'materiais'
+                  ? 'border-[#FC6714] text-[#FC6714] font-bold'
+                  : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white font-medium'"
+                class="pb-3 border-b-2 text-sm flex items-center gap-2 transition cursor-pointer shrink-0"
+              >
+                <Boxes class="w-4 h-4" />
+                <span>Materiais</span>
+                <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#FC6714]/15 text-[#FC6714]">248</span>
+              </button>
+
+              <button
+                type="button"
+                @click="demoActiveModuleTab = 'seriais'"
+                :class="demoActiveModuleTab === 'seriais'
+                  ? 'border-[#FC6714] text-[#FC6714] font-bold'
+                  : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white font-medium'"
+                class="pb-3 border-b-2 text-sm flex items-center gap-2 transition cursor-pointer shrink-0"
+              >
+                <Tag class="w-4 h-4" />
+                <span>Serializado</span>
+                <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300">120</span>
+              </button>
+
+              <button
+                type="button"
+                @click="demoActiveModuleTab = 'movimento'"
+                :class="demoActiveModuleTab === 'movimento'
+                  ? 'border-[#FC6714] text-[#FC6714] font-bold'
+                  : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white font-medium'"
+                class="pb-3 border-b-2 text-sm flex items-center gap-2 transition cursor-pointer shrink-0"
+              >
+                <LayoutTemplate class="w-4 h-4" />
+                <span>Movimento</span>
+                <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300">15</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Variação 2: Topo Operacional Simples com Ações Primárias e Secundárias (Padrão Pessoas) -->
+        <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 space-y-5 shadow-xs">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800/80">
+            <span class="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Variação 2: Topo Operacional com Ações Primárias & Secundárias</span>
+            <span class="text-xs font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Telas Cadastrais (ex: Pessoas)</span>
+          </div>
+
+          <!-- Demonstração Viva -->
+          <div class="p-6 rounded-xl bg-slate-50 dark:bg-[#03032E] border border-slate-200/80 dark:border-[#14147A]/70 space-y-5">
+            <!-- Linha 1: BaseBreadcrumb -->
+            <BaseBreadcrumb :items="[
+              { label: 'Início', href: '#people' },
+              { label: 'Cadastros', href: '#people' },
+              { label: 'Pessoas & Entidades' }
+            ]" />
+
+            <!-- Linha 2: Cabeçalho Canônico -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div class="flex items-center gap-3">
+                <div class="p-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 shadow-2xs shrink-0">
+                  <Users class="w-6 h-6" />
+                </div>
+                <div>
+                  <h1 class="text-2xl font-semibold font-heading text-[#06064D] dark:text-white tracking-tight">
+                    Pessoas & Entidades
+                  </h1>
+                  <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
+                    Base unificada de clientes, fornecedores, parceiros e colaboradores
+                  </p>
+                </div>
+              </div>
+
+              <!-- Ações do Cabeçalho -->
+              <div class="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  class="inline-flex items-center gap-2 h-10 px-3.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/80 text-sm font-medium transition cursor-pointer shadow-2xs"
+                >
+                  <FileSpreadsheet class="w-4 h-4 text-emerald-600" />
+                  <span>Exportar</span>
+                </button>
+
+                <button
+                  type="button"
+                  class="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-[#FC6714] hover:bg-[#E0530A] active:bg-[#C94605] text-white text-sm font-semibold shadow-sm transition active:scale-98 cursor-pointer"
+                >
+                  <Plus class="w-4 h-4" />
+                  <span>Nova Pessoa</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Variação 3: Topo Editorial com Badges de Status & Metadados (Padrão Contratos / FSM) -->
+        <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 space-y-5 shadow-xs">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800/80">
+            <span class="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Variação 3: Topo de Detalhe com Badge de Status & Metadados</span>
+            <span class="text-xs font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Telas de Detalhe / FSM</span>
+          </div>
+
+          <!-- Demonstração Viva -->
+          <div class="p-6 rounded-xl bg-slate-50 dark:bg-[#03032E] border border-slate-200/80 dark:border-[#14147A]/70 space-y-5">
+            <!-- Linha 1: BaseBreadcrumb -->
+            <BaseBreadcrumb :items="[
+              { label: 'Início', href: '#people' },
+              { label: 'Faturamento & Contratos', href: '#integrations' },
+              { label: 'Termo de Adesão #2609-001' }
+            ]" />
+
+            <!-- Linha 2: Cabeçalho Canônico -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div class="flex items-center gap-3">
+                <div class="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 shadow-2xs shrink-0">
+                  <FileCheck class="w-6 h-6" />
+                </div>
+                <div>
+                  <div class="flex items-center gap-2.5 flex-wrap">
+                    <h1 class="text-2xl font-semibold font-heading text-[#06064D] dark:text-white tracking-tight">
+                      Contrato de Custódia PoliFibra
+                    </h1>
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                      ATIVO / EM VIGOR
+                    </span>
+                  </div>
+                  <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
+                    Protocolo: <strong>260929-POLI01</strong> • Solicitante: <strong>ALLOHA / GIGA+</strong> • Posição: <strong>Belém - PA</strong>
+                  </p>
+                </div>
+              </div>
+
+              <!-- Ações do Cabeçalho -->
+              <div class="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  class="inline-flex items-center gap-2 h-10 px-3.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/80 text-sm font-medium transition cursor-pointer shadow-2xs"
+                >
+                  <FileText class="w-4 h-4 text-slate-400" />
+                  <span>Imprimir Termo</span>
+                </button>
+
+                <button
+                  type="button"
+                  class="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-[#FC6714] hover:bg-[#E0530A] active:bg-[#C94605] text-white text-sm font-semibold shadow-sm transition active:scale-98 cursor-pointer"
+                >
+                  <span>Editar Contrato</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bloco de Código Vue Canônico (Copiar e Colar) -->
+        <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-900 text-slate-100 p-5 space-y-3 shadow-lg">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-red-500/80"></span>
+              <span class="w-3 h-3 rounded-full bg-amber-500/80"></span>
+              <span class="w-3 h-3 rounded-full bg-emerald-500/80"></span>
+              <span class="text-xs font-mono text-slate-400 ml-2">Template Canônico Obrigatório (PageTop.vue)</span>
+            </div>
+            <button
+              type="button"
+              @click="copyCanonicalCode"
+              class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs font-mono text-[#FC6714] hover:text-white transition flex items-center gap-1.5 cursor-pointer"
+            >
+              <Check v-if="copiedSnippet" class="w-3.5 h-3.5 text-emerald-400" />
+              <Copy v-else class="w-3.5 h-3.5" />
+              <span>{{ copiedSnippet ? 'Copiado!' : 'Copiar Código' }}</span>
+            </button>
+          </div>
+
+          <pre class="font-mono text-xs text-slate-300 overflow-x-auto leading-relaxed p-2"><code>&lt;template&gt;
+  &lt;!-- Container Raiz Obrigatório: py-8 w-full space-y-6 --&gt;
+  &lt;div class="py-8 w-full space-y-6"&gt;
+
+    &lt;!-- Linha 1 Obrigatória: BaseBreadcrumb Canônico --&gt;
+    &lt;BaseBreadcrumb :items="[
+      { label: 'Início', href: '#people' },
+      { label: 'Domínio / Módulo', href: '#modulo' },
+      { label: 'Nome da Tela Atual' }
+    ]" /&gt;
+
+    &lt;!-- Linha 2 Obrigatória: Cabeçalho Canônico com Ícone e Ações --&gt;
+    &lt;div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4"&gt;
+      &lt;div class="flex items-center gap-3"&gt;
+        &lt;div class="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 shadow-2xs shrink-0"&gt;
+          &lt;ComponenteIcone class="w-6 h-6" /&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;h1 class="text-2xl font-semibold font-heading text-[#06064D] dark:text-white tracking-tight"&gt;
+            Título da Tela
+          &lt;/h1&gt;
+          &lt;p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5 font-medium"&gt;
+            Descrição técnica orientada ao operador e propósito da tela
+          &lt;/p&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;!-- Botão Primário Laranja (#FC6714) e Ações --&gt;
+      &lt;div class="flex items-center gap-2 shrink-0"&gt;
+        &lt;button type="button" class="h-10 px-4 rounded-lg bg-[#FC6714] text-white text-sm font-semibold shadow-sm hover:bg-[#E0530A] transition"&gt;
+          &lt;Plus class="w-4 h-4 inline mr-1.5" /&gt;
+          Ação Primária
+        &lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;!-- Linha 3: Conteúdo da View (Filtros, Grid, Cards, Paginação) --&gt;
+    ...
+  &lt;/div&gt;
+&lt;/template&gt;</code></pre>
         </div>
       </div>
     </section>
@@ -1174,9 +1507,11 @@ import {
   Sun, Moon, Plus, RefreshCw, Check, Trash2, ExternalLink,
   Loader2, Settings, Search, CheckCircle2, Info, AlertTriangle,
   Maximize2, AlertCircle, Layers, Sidebar as SidebarIcon, FileText,
-  DollarSign, Wrench, LayoutTemplate
+  DollarSign, Wrench, LayoutTemplate, Compass, Users, FileSpreadsheet,
+  FileCheck, Boxes, Copy, Home
 } from 'lucide-vue-next';
 import { useTheme } from '../composables/useTheme';
+import BaseBreadcrumb from '../components/common/BaseBreadcrumb.vue';
 import BaseModal from '../components/common/BaseModal.vue';
 import CitySearchSelect from '../components/common/CitySearchSelect.vue';
 import DateInput from '../components/common/DateInput.vue';
@@ -1188,6 +1523,60 @@ const demoSwitch = ref(true);
 const demoCityId = ref<number | null>(null);
 const demoDate = ref('25/12/1990');
 const demoSelect = ref('3106200');
+
+// Estados para a Seção 10: Topo de Página Padrão
+const demoActiveModuleTab = ref('materiais');
+const copiedSnippet = ref(false);
+
+function copyCanonicalCode() {
+  const code = `<template>
+  <!-- Container Raiz Obrigatório: py-8 w-full space-y-6 -->
+  <div class="py-8 w-full space-y-6">
+
+    <!-- Linha 1 Obrigatória: BaseBreadcrumb Canônico -->
+    <BaseBreadcrumb :items="[
+      { label: 'Início', href: '#people' },
+      { label: 'Domínio / Módulo', href: '#modulo' },
+      { label: 'Nome da Tela Atual' }
+    ]" />
+
+    <!-- Linha 2 Obrigatória: Cabeçalho Canônico com Ícone e Ações -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 shadow-2xs shrink-0">
+          <ComponenteIcone class="w-6 h-6" />
+        </div>
+        <div>
+          <h1 class="text-2xl font-semibold font-heading text-[#06064D] dark:text-white tracking-tight">
+            Título da Tela
+          </h1>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
+            Descrição técnica orientada ao operador e propósito da tela
+          </p>
+        </div>
+      </div>
+
+      <!-- Botão Primário Laranja (#FC6714) e Ações -->
+      <div class="flex items-center gap-2 shrink-0">
+        <button type="button" class="h-10 px-4 rounded-lg bg-[#FC6714] text-white text-sm font-semibold shadow-sm hover:bg-[#E0530A] transition">
+          <Plus class="w-4 h-4 inline mr-1.5" />
+          Ação Primária
+        </button>
+      </div>
+    </div>
+
+    <!-- Linha 3: Conteúdo da View (Filtros, Grid, Cards, Paginação) -->
+    ...
+  </div>
+</template>`;
+
+  if (navigator?.clipboard?.writeText) {
+    navigator.clipboard.writeText(code).then(() => {
+      copiedSnippet.value = true;
+      setTimeout(() => { copiedSnippet.value = false; }, 2500);
+    });
+  }
+}
 
 // Estados de abertura de modais
 const openModalSm = ref(false);
@@ -1214,5 +1603,6 @@ const sections = [
   { id: 'tabelas', label: '7. Tabelas' },
   { id: 'modais', label: '8. Modais & Fullscreen ⭐' },
   { id: 'layout-paginas', label: '9. Layout & Margens ⭐' },
+  { id: 'topo-pagina-padrao', label: '10. Topo de Página Padrão ⭐' },
 ];
 </script>

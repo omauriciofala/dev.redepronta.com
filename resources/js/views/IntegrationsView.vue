@@ -1,5 +1,12 @@
 <template>
   <div class="py-8 w-full space-y-6">
+    <!-- Linha 1 Canônica Obrigatória: BaseBreadcrumb -->
+    <BaseBreadcrumb :items="[
+      { label: 'Início', href: '#people' },
+      { label: 'Configurações', href: '#integrations' },
+      { label: 'APIs & Conectores' }
+    ]" />
+
     <!-- Cabeçalho da Página -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-slate-200 dark:border-slate-800">
       <div>
@@ -385,6 +392,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import BaseBreadcrumb from '../components/common/BaseBreadcrumb.vue';
 import {
   Network,
   Globe,

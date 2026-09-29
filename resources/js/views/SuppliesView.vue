@@ -1,5 +1,12 @@
 <template>
   <div class="py-8 w-full space-y-6">
+    <!-- Linha 1 Canônica Obrigatória: BaseBreadcrumb -->
+    <BaseBreadcrumb :items="[
+      { label: 'Início', href: '#people' },
+      { label: 'Operações', href: '#supplies' },
+      { label: 'Suprimentos & WMS' }
+    ]" />
+
     <!-- ============================================================================= -->
     <!-- CABEÇALHO PADRÃO DO MÓDULO (DESIGN SYSTEM CANÔNICO) -->
     <!-- ============================================================================= -->
@@ -1172,6 +1179,7 @@ import {
   AlertCircle, CheckCircle2, Menu, MapPin, Edit2, Tags, FolderTree, Scale, UserCheck,
   FileSpreadsheet, ExternalLink, Eye, FileText
 } from 'lucide-vue-next';
+import BaseBreadcrumb from '@/components/common/BaseBreadcrumb.vue';
 import TablePagination from '@/components/common/TablePagination.vue';
 import MovementModal from '@/components/supplies/MovementModal.vue';
 import MovementDetailsModal from '@/components/supplies/MovementDetailsModal.vue';
