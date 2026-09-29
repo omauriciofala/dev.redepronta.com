@@ -1808,6 +1808,14 @@ function formatTime(dateStr?: string): string {
   return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 }
 
+function formatDate(dateStr?: string): string {
+  if (!dateStr) return '-';
+  const clean = dateStr.split('T')[0];
+  const parts = clean.split('-');
+  if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  return dateStr;
+}
+
 // ─── AÇÕES DE MODAL: MOVIMENTAÇÃO DE ESTOQUE ────────────────────────────────
 function openMovementModal(
   material?: any,
