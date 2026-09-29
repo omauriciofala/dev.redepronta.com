@@ -15,6 +15,7 @@ class StockMovement extends Model
         'destination_depot_id',
         'user_id',
         'movement_type',
+        'protocol',
         'quantity',
         'document_ref',
         'document_number',

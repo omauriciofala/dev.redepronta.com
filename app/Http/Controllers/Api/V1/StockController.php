@@ -193,7 +193,7 @@ class StockController extends Controller
     }
 
     /**
-     * Histórico de Movimentações para Auditoria.
+     * Histórico de Movimentações para Auditoria e Visão de Operações.
      */
     public function movements(Request $request): JsonResponse
     {
@@ -201,14 +201,33 @@ class StockController extends Controller
         $query = StockMovement::where('account_id', $accountId)
             ->with([
                 'material.unit',
-                'sourceDepot',
-                'destinationDepot',
+                'sourceDepot.cluster',
+                'destinationDepot.cluster',
                 'user',
                 'serials',
                 'receiver',
                 'driver',
                 'attachments',
             ]);
+
+        // Busca global por texto (protocolo, documento, SKU, nome do material, notas ou serial)
+        if ($request->filled('search')) {
+            $search = trim($request->query('search'));
+            $query->where(function ($q) use ($search) {
+                $q->where('protocol', 'like', "%{$search}%")
+                  ->orWhere('document_number', 'like', "%{$search}%")
+                  ->orWhere('document_ref', 'like', "%{$search}%")
+                  ->orWhere('notes', 'like', "%{$search}%")
+                  ->orWhereHas('material', function ($mq) use ($search) {
+                      $mq->where('name', 'like', "%{$search}%")
+                         ->orWhere('code', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('serials', function ($sq) use ($search) {
+                      $sq->where('serial_number', 'like', "%{$search}%")
+                         ->orWhere('mac_address', 'like', "%{$search}%");
+                  });
+            });
+        }
 
         if ($request->filled('material_id')) {
             $query->where('material_id', $request->query('material_id'));
@@ -218,7 +237,46 @@ class StockController extends Controller
             $query->where('movement_type', $request->query('movement_type'));
         }
 
-        $movements = $query->orderByDesc('created_at')->paginate($request->integer('per_page', 20));
+        // Filtro unificado de depósito (origem ou destino)
+        if ($request->filled('depot_id')) {
+            $depotId = $request->query('depot_id');
+            $query->where(function ($dq) use ($depotId) {
+                $dq->where('source_depot_id', $depotId)
+                   ->orWhere('destination_depot_id', $depotId);
+            });
+        }
+
+        if ($request->filled('source_depot_id')) {
+            $query->where('source_depot_id', $request->query('source_depot_id'));
+        }
+
+        if ($request->filled('destination_depot_id')) {
+            $query->where('destination_depot_id', $request->query('destination_depot_id'));
+        }
+
+        // Filtro por período de datas
+        if ($request->filled('start_date')) {
+            $startDate = $request->query('start_date');
+            $query->where(function ($dq) use ($startDate) {
+                $dq->whereDate('movement_date', '>=', $startDate)
+                   ->orWhere(function ($sub) use ($startDate) {
+                       $sub->whereNull('movement_date')->whereDate('created_at', '>=', $startDate);
+                   });
+            });
+        }
+
+        if ($request->filled('end_date')) {
+            $endDate = $request->query('end_date');
+            $query->where(function ($dq) use ($endDate) {
+                $dq->whereDate('movement_date', '<=', $endDate)
+                   ->orWhere(function ($sub) use ($endDate) {
+                       $sub->whereNull('movement_date')->whereDate('created_at', '<=', $endDate);
+                   });
+            });
+        }
+
+        $perPage = min($request->integer('per_page', 20), 100);
+        $movements = $query->orderByDesc('id')->paginate($perPage);
 
         return response()->json($movements);
     }

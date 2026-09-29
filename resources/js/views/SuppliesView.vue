@@ -209,6 +209,25 @@
           {{ serialsList.length }}
         </span>
       </button>
+
+      <button
+        type="button"
+        @click="activeTab = 'movements'"
+        :class="activeTab === 'movements'
+          ? 'border-[#FC6714] text-[#FC6714] font-bold'
+          : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium'"
+        class="pb-3 border-b-2 text-sm flex items-center gap-2 transition cursor-pointer shrink-0"
+      >
+        <ArrowLeftRight class="w-4 h-4" />
+        <span>Movimento</span>
+        <span
+          v-if="movementsTotal > 0"
+          class="px-2 py-0.5 rounded-full text-[11px] font-bold"
+          :class="activeTab === 'movements' ? 'bg-[#FC6714]/15 text-[#FC6714]' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'"
+        >
+          {{ movementsTotal }}
+        </span>
+      </button>
     </div>
 
     <!-- ============================================================================= -->
@@ -737,8 +756,292 @@
     </div>
 
     <!-- ============================================================================= -->
+    <!-- ABA: MOVIMENTO (GRID DE MOVIMENTAÇÕES DE TODOS OS TIPOS) -->
+    <!-- ============================================================================= -->
+    <div v-if="activeTab === 'movements'" class="space-y-4">
+      <!-- Barra de Filtros e Busca de Movimentações -->
+      <div class="p-4 bg-white dark:bg-[#06064D]/50 rounded-xl border border-slate-200 dark:border-[#14147A] flex flex-wrap items-center justify-between gap-4 text-sm shadow-2xs">
+        <div class="relative flex-1 min-w-[280px]">
+          <Search class="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400 pointer-events-none" />
+          <input
+            type="text"
+            v-model="movementSearch"
+            @input="debounceLoadMovements"
+            placeholder="Buscar por protocolo, documento (NF/OS), SKU, material ou serial..."
+            class="w-full h-11 pl-10 pr-10 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 text-sm transition"
+          />
+          <button
+            v-if="movementSearch"
+            @click="clearMovementSearch"
+            class="absolute right-3 top-3 p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition cursor-pointer"
+            title="Limpar busca"
+          >
+            <X class="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        <div class="flex items-center gap-3 flex-wrap">
+          <!-- Filtro de Tipo de Movimentação -->
+          <select
+            v-model="movementTypeFilter"
+            class="h-11 px-3 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-xs font-semibold focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer"
+          >
+            <option value="">Todos os Tipos</option>
+            <option value="ENTRY">Entrada</option>
+            <option value="EXIT">Saída</option>
+            <option value="TRANSFER">Transferência</option>
+            <option value="RETURN">Devolução</option>
+            <option value="ADJUSTMENT">Ajuste</option>
+          </select>
+
+          <!-- Filtro de Depósito -->
+          <select
+            v-model="movementDepotFilter"
+            class="h-11 px-3 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-xs font-semibold focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer max-w-[200px] truncate"
+          >
+            <option value="">Todos os Depósitos</option>
+            <option v-for="d in depots" :key="d.id" :value="d.id">
+              {{ d.name }}
+            </option>
+          </select>
+
+          <!-- Período: Data Inicial -->
+          <div class="flex items-center gap-1.5 bg-slate-50 dark:bg-[#03032E] px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-[#14147A]">
+            <span class="text-[11px] font-bold text-slate-400 uppercase">De:</span>
+            <input
+              type="date"
+              v-model="movementStartDate"
+              class="bg-transparent text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none"
+            />
+          </div>
+
+          <!-- Período: Data Final -->
+          <div class="flex items-center gap-1.5 bg-slate-50 dark:bg-[#03032E] px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-[#14147A]">
+            <span class="text-[11px] font-bold text-slate-400 uppercase">Até:</span>
+            <input
+              type="date"
+              v-model="movementEndDate"
+              class="bg-transparent text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none"
+            />
+          </div>
+
+          <button
+            v-if="movementSearch || movementTypeFilter || movementDepotFilter || movementStartDate || movementEndDate"
+            type="button"
+            @click="clearAllMovementFilters"
+            class="h-11 px-3 rounded-lg border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] text-slate-600 dark:text-slate-300 hover:text-[#FC6714] text-xs font-semibold transition cursor-pointer flex items-center gap-1"
+            title="Limpar todos os filtros"
+          >
+            <X class="w-3.5 h-3.5" />
+            <span>Limpar</span>
+          </button>
+
+          <span class="text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
+            {{ movementsTotal }} movimentações
+          </span>
+        </div>
+      </div>
+
+      <!-- TABELA CONFORTÁVEL: MOVIMENTAÇÕES (DESIGN SYSTEM CANÔNICO) -->
+      <div class="rounded-xl border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D]/50 shadow-xs overflow-hidden transition-colors duration-200">
+        <div class="overflow-x-auto min-h-[280px]">
+          <table class="w-full text-left border-collapse text-sm">
+            <thead>
+              <tr class="border-b border-slate-200 dark:border-[#14147A] bg-slate-50/80 dark:bg-[#03032E]/70 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider select-none">
+                <th class="py-3.5 px-5">Data / Hora</th>
+                <th class="py-3.5 px-5">Protocolo & Doc</th>
+                <th class="py-3.5 px-5 text-center">Tipo</th>
+                <th class="py-3.5 px-5">Material (SKU / Descrição)</th>
+                <th class="py-3.5 px-5 text-right">Qtd</th>
+                <th class="py-3.5 px-5">Origem ➔ Destino</th>
+                <th class="py-3.5 px-5 text-center">Rastreio</th>
+                <th class="py-3.5 px-5 text-right">Ações</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-[#14147A]/50">
+              <tr v-if="loadingMovements">
+                <td colspan="8" class="py-12 text-center text-slate-400">
+                  <div class="flex items-center justify-center gap-2">
+                    <RefreshCw class="w-5 h-5 animate-spin text-[#FC6714]" />
+                    <span>Carregando movimentações...</span>
+                  </div>
+                </td>
+              </tr>
+              <tr v-else-if="movementsList.length === 0">
+                <td colspan="8" class="py-12 text-center text-slate-400 dark:text-slate-500">
+                  <Boxes class="w-8 h-8 mx-auto mb-2 opacity-40 text-slate-400" />
+                  <p class="font-medium text-sm">Nenhuma movimentação de estoque encontrada.</p>
+                  <p class="text-xs text-slate-400 mt-1">Utilize o botão "Nova Movimentação" para registrar entradas, transferências e saídas.</p>
+                </td>
+              </tr>
+              <tr
+                v-else
+                v-for="mv in movementsList"
+                :key="mv.id"
+                class="hover:bg-slate-50/80 dark:hover:bg-white/[0.03] transition-colors group cursor-pointer"
+                @click="openMovementDetails(mv)"
+              >
+                <!-- Data / Hora -->
+                <td class="py-4 px-5 whitespace-nowrap text-xs text-slate-600 dark:text-slate-300">
+                  <div class="font-semibold text-slate-800 dark:text-slate-200">
+                    {{ formatDate(mv.movement_date || mv.created_at) }}
+                  </div>
+                  <div class="text-[11px] text-slate-400 mt-0.5">
+                    {{ formatTime(mv.created_at) }}
+                  </div>
+                </td>
+
+                <!-- Protocolo & Documento -->
+                <td class="py-4 px-5">
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-mono font-bold text-xs text-slate-900 dark:text-white">
+                      {{ mv.protocol || `#${mv.id}` }}
+                    </span>
+                    <button
+                      v-if="mv.protocol"
+                      type="button"
+                      @click.stop="copyToClipboard(mv.protocol, `prot-${mv.id}`)"
+                      class="opacity-0 group-hover:opacity-100 hover:text-[#FC6714] text-slate-400 transition cursor-pointer p-0.5"
+                      title="Copiar Protocolo"
+                    >
+                      <Check v-if="copiedKey === `prot-${mv.id}`" class="w-3.5 h-3.5 text-emerald-500" />
+                      <Copy v-else class="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  <div class="text-[11px] text-slate-400 truncate max-w-[160px]" :title="mv.document_number || mv.document_ref">
+                    Doc: {{ mv.document_number || mv.document_ref || '-' }}
+                  </div>
+                </td>
+
+                <!-- Tipo com Badge -->
+                <td class="py-4 px-5 text-center whitespace-nowrap">
+                  <span
+                    class="inline-block px-2.5 py-1 rounded-md text-xs font-semibold border"
+                    :class="formatMovementTypeBadge(mv.movement_type)"
+                  >
+                    {{ formatMovementTypeLabel(mv.movement_type) }}
+                  </span>
+                </td>
+
+                <!-- Material (SKU e Nome) -->
+                <td class="py-4 px-5 max-w-[300px]">
+                  <div class="font-mono text-xs font-bold text-[#FC6714] dark:text-orange-400">
+                    {{ mv.material?.code || '-' }}
+                  </div>
+                  <div class="font-medium text-slate-900 dark:text-slate-100 text-sm truncate" :title="mv.material?.name">
+                    {{ mv.material?.name || 'Material' }}
+                  </div>
+                </td>
+
+                <!-- Quantidade -->
+                <td class="py-4 px-5 text-right whitespace-nowrap">
+                  <div class="font-bold text-slate-900 dark:text-white text-sm">
+                    {{ formatNumber(mv.quantity) }}
+                  </div>
+                  <div class="text-[11px] text-slate-400 font-mono">
+                    {{ mv.material?.unit?.code || 'UND' }}
+                  </div>
+                </td>
+
+                <!-- Origem ➔ Destino -->
+                <td class="py-4 px-5 text-xs text-slate-700 dark:text-slate-300">
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="font-medium truncate max-w-[120px]" :title="mv.source_depot?.name || 'Fornecedor/Entrada'">
+                      {{ mv.source_depot?.name || (mv.movement_type === 'ENTRY' ? 'Entrada Externa' : '-') }}
+                    </span>
+                    <span class="text-slate-400">➔</span>
+                    <span class="font-medium text-slate-900 dark:text-white truncate max-w-[120px]" :title="mv.destination_depot?.name || 'Consumo/Saída'">
+                      {{ mv.destination_depot?.name || (mv.movement_type === 'EXIT' ? 'Saída Externa' : '-') }}
+                    </span>
+                  </div>
+                  <div v-if="mv.destination_depot?.cluster || mv.source_depot?.cluster" class="text-[10px] text-slate-400 mt-0.5">
+                    Regional: {{ mv.destination_depot?.cluster?.name || mv.source_depot?.cluster?.name }}
+                  </div>
+                </td>
+
+                <!-- Rastreio: Seriais e Anexos -->
+                <td class="py-4 px-5 text-center whitespace-nowrap">
+                  <div class="inline-flex items-center gap-1.5">
+                    <span
+                      v-if="mv.serials && mv.serials.length > 0"
+                      class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800"
+                      :title="`${mv.serials.length} seriais vinculados`"
+                    >
+                      <QrCode class="w-3 h-3 inline mr-1" />
+                      {{ mv.serials.length }}
+                    </span>
+                    <span
+                      v-if="mv.attachments && mv.attachments.length > 0"
+                      class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
+                      :title="`${mv.attachments.length} arquivos/comprovantes anexados`"
+                    >
+                      <FileText class="w-3 h-3 inline mr-1" />
+                      {{ mv.attachments.length }}
+                    </span>
+                    <span v-if="(!mv.serials || mv.serials.length === 0) && (!mv.attachments || mv.attachments.length === 0)" class="text-slate-400 text-xs">
+                      -
+                    </span>
+                  </div>
+                </td>
+
+                <!-- Ações -->
+                <td class="py-4 px-5 text-right whitespace-nowrap" @click.stop>
+                  <div class="inline-flex items-center gap-1.5">
+                    <!-- Botão Reconf Externo -->
+                    <a
+                      v-if="mv.protocol"
+                      :href="`/u/reconf/${mv.protocol}`"
+                      target="_blank"
+                      class="h-8 px-2.5 text-xs font-semibold rounded-md border border-orange-200 dark:border-orange-800/80 bg-orange-50/60 dark:bg-orange-950/40 text-[#FC6714] hover:bg-[#FC6714] hover:text-white transition cursor-pointer inline-flex items-center gap-1"
+                      title="Abrir página pública de conferência (Reconf)"
+                    >
+                      <FileText class="w-3.5 h-3.5" />
+                      <span>Reconf</span>
+                      <ExternalLink class="w-3 h-3" />
+                    </a>
+
+                    <!-- Botão Ver Detalhes -->
+                    <button
+                      type="button"
+                      @click="openMovementDetails(mv)"
+                      class="h-8 px-2.5 text-xs font-medium rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition cursor-pointer inline-flex items-center gap-1"
+                      title="Ver detalhes completos da movimentação"
+                    >
+                      <Eye class="w-3.5 h-3.5" />
+                      <span>Detalhes</span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Rodapé de Paginação Confortável -->
+        <TablePagination
+          v-model:currentPage="movementCurrentPage"
+          v-model:perPage="movementPerPage"
+          :lastPage="movementsLastPage"
+          :totalRecords="movementsTotal"
+          :fromRecord="movementFromRecord"
+          :toRecord="movementToRecord"
+          :loading="loadingMovements"
+          @changePage="(p) => { movementCurrentPage = p; loadMovements(); }"
+          @changePerPage="(pp) => { movementPerPage = pp; movementCurrentPage = 1; loadMovements(); }"
+        />
+      </div>
+    </div>
+
+    <!-- ============================================================================= -->
     <!-- COMPONENTES MODAIS INTEGRADOS (BASE MODAL CANÔNICO) -->
     <!-- ============================================================================= -->
+
+    <!-- Modal de Detalhes da Movimentação -->
+    <MovementDetailsModal
+      :is-open="isMovementDetailsModalOpen"
+      :movement="selectedMovementForDetails"
+      @close="isMovementDetailsModalOpen = false"
+    />
 
     <!-- Modal 1: Movimentação de Estoque (Entrada, Saída, Devolução, Transferência) -->
     <MovementModal
@@ -864,13 +1167,14 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import {
-  Package, ArrowRightLeft, Plus, Layers, Boxes, Box, Warehouse, QrCode, RefreshCw,
+  Package, ArrowRightLeft, ArrowLeftRight, Plus, Layers, Boxes, Box, Warehouse, QrCode, RefreshCw,
   X, Search, ArrowUp, ArrowDown, ArrowUpDown, Copy, Check,
   AlertCircle, CheckCircle2, Menu, MapPin, Edit2, Tags, FolderTree, Scale, UserCheck,
-  FileSpreadsheet
+  FileSpreadsheet, ExternalLink, Eye, FileText
 } from 'lucide-vue-next';
 import TablePagination from '@/components/common/TablePagination.vue';
 import MovementModal from '@/components/supplies/MovementModal.vue';
+import MovementDetailsModal from '@/components/supplies/MovementDetailsModal.vue';
 import MaterialModal from '@/components/supplies/MaterialModal.vue';
 import MaterialImportModal from '@/components/supplies/MaterialImportModal.vue';
 import ClusterCrudModal from '@/components/supplies/auxiliary/ClusterCrudModal.vue';
@@ -925,7 +1229,7 @@ interface Material {
   unit_cost: number;
   min_stock: number;
   tracking_type?: string;
-  has_serial: boolean;
+  has_serial?: boolean;
   track_batch?: boolean;
   unit?: { id: number; code: string; name: string };
 }
@@ -937,8 +1241,8 @@ interface Unit {
 }
 
 // ─── ESTADOS GERAIS DO MÓDULO ────────────────────────────────────────────────
-type TabKey = 'materials' | 'serials';
-const VALID_TABS: TabKey[] = ['materials', 'serials'];
+type TabKey = 'materials' | 'serials' | 'movements';
+const VALID_TABS: TabKey[] = ['materials', 'serials', 'movements'];
 
 function getInitialTab(): TabKey {
   try {
@@ -1377,6 +1681,133 @@ async function loadSerials() {
   }
 }
 
+// ─── ABA MOVIMENTAÇÕES DE ESTOQUE ───────────────────────────────────────────
+const loadingMovements = ref(false);
+const movementsList = ref<any[]>([]);
+const movementsTotal = ref(0);
+const movementsLastPage = ref(1);
+const movementCurrentPage = ref(1);
+const movementPerPage = ref(20);
+const movementSearch = ref('');
+const movementTypeFilter = ref('');
+const movementDepotFilter = ref('');
+const movementStartDate = ref('');
+const movementEndDate = ref('');
+const isMovementDetailsModalOpen = ref(false);
+const selectedMovementForDetails = ref<any>(null);
+
+let movementDebounceTimeout: any = null;
+function debounceLoadMovements() {
+  clearTimeout(movementDebounceTimeout);
+  movementDebounceTimeout = setTimeout(() => {
+    movementCurrentPage.value = 1;
+    loadMovements();
+  }, 300);
+}
+
+function clearMovementSearch() {
+  movementSearch.value = '';
+  movementCurrentPage.value = 1;
+  loadMovements();
+}
+
+function clearAllMovementFilters() {
+  movementSearch.value = '';
+  movementTypeFilter.value = '';
+  movementDepotFilter.value = '';
+  movementStartDate.value = '';
+  movementEndDate.value = '';
+  movementCurrentPage.value = 1;
+  loadMovements();
+}
+
+const movementFromRecord = computed(() => {
+  if (movementsTotal.value === 0) return 0;
+  return (movementCurrentPage.value - 1) * movementPerPage.value + 1;
+});
+
+const movementToRecord = computed(() => {
+  return Math.min(movementCurrentPage.value * movementPerPage.value, movementsTotal.value);
+});
+
+async function loadMovements() {
+  loadingMovements.value = true;
+  try {
+    const params = new URLSearchParams();
+    params.append('page', String(movementCurrentPage.value));
+    params.append('per_page', String(movementPerPage.value));
+
+    if (movementSearch.value.trim()) params.append('search', movementSearch.value.trim());
+    if (movementTypeFilter.value) params.append('movement_type', movementTypeFilter.value);
+    if (movementDepotFilter.value) params.append('depot_id', movementDepotFilter.value);
+    if (movementStartDate.value) params.append('start_date', movementStartDate.value);
+    if (movementEndDate.value) params.append('end_date', movementEndDate.value);
+
+    const url = `/api/v1/stock/movements?${params.toString()}`;
+    const res = await fetch(url);
+    const json = await res.json();
+
+    movementsList.value = json.data || [];
+    movementsTotal.value = json.total || (json.data ? json.data.length : 0);
+    movementsLastPage.value = json.last_page || 1;
+  } catch (err) {
+    console.error('Erro ao carregar movimentações:', err);
+  } finally {
+    loadingMovements.value = false;
+  }
+}
+
+watch([movementTypeFilter, movementDepotFilter, movementStartDate, movementEndDate], () => {
+  movementCurrentPage.value = 1;
+  loadMovements();
+});
+
+watch(activeTab, (newTab) => {
+  if (newTab === 'movements') {
+    loadMovements();
+  }
+});
+
+function openMovementDetails(mv: any) {
+  selectedMovementForDetails.value = mv;
+  isMovementDetailsModalOpen.value = true;
+}
+
+function formatMovementTypeLabel(type?: string): string {
+  switch (type) {
+    case 'ENTRY': return 'Entrada';
+    case 'EXIT': return 'Saída';
+    case 'TRANSFER': return 'Transferência';
+    case 'RETURN': return 'Devolução';
+    case 'ADJUSTMENT': return 'Ajuste';
+    default: return type || 'Movimentação';
+  }
+}
+
+function formatMovementTypeBadge(type?: string): string {
+  switch (type) {
+    case 'ENTRY':
+      return 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800';
+    case 'EXIT':
+      return 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800';
+    case 'TRANSFER':
+      return 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800';
+    case 'RETURN':
+      return 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800';
+    case 'ADJUSTMENT':
+      return 'bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800';
+    default:
+      return 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700';
+  }
+}
+
+function formatTime(dateStr?: string): string {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return '';
+  return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+}
+
 // ─── AÇÕES DE MODAL: MOVIMENTAÇÃO DE ESTOQUE ────────────────────────────────
 function openMovementModal(
   material?: any,
@@ -1420,6 +1851,7 @@ async function onMovementSuccess(movement?: any) {
     loadMaterials(),
     loadDepots(),
     loadSerials(),
+    loadMovements(),
   ]);
 }
 
@@ -1588,6 +2020,7 @@ async function refreshCurrentTab() {
       loadUnits(),
       loadDepots(),
       loadSerials(),
+      loadMovements(),
     ]);
     await loadRegionalStock();
     showToast('Dados de suprimentos atualizados com sucesso!');
@@ -1617,6 +2050,7 @@ onMounted(async () => {
     loadUnits(),
     loadDepots(),
     loadSerials(),
+    loadMovements(),
   ]);
   loadRegionalStock();
 });

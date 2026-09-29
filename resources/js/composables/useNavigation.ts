@@ -10,7 +10,7 @@ export function useNavigation() {
     if (view === 'supplies') {
       try {
         const savedTab = localStorage.getItem('rp_supplies_active_tab');
-        if (savedTab && ['materials', 'serials'].includes(savedTab)) {
+        if (savedTab && ['materials', 'serials', 'movements'].includes(savedTab)) {
           window.location.hash = `${view}?tab=${savedTab}`;
           return;
         }

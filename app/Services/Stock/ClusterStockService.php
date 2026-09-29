@@ -577,14 +577,16 @@ class ClusterStockService
     public function processMovement(array $data, int $accountId, ?int $userId = null): StockMovement|array
     {
         $type = strtoupper($data['movement_type'] ?? 'TRANSFER');
+        $batchProtocol = $data['protocol'] ?? (date('ymdHis') . '-' . mt_rand(100, 999));
 
         if (!empty($data['items']) && is_array($data['items'])) {
-            return DB::transaction(function () use ($data, $accountId, $userId, $type) {
+            return DB::transaction(function () use ($data, $accountId, $userId, $type, $batchProtocol) {
                 $createdMovements = [];
                 foreach ($data['items'] as $item) {
                     $itemPayload = array_merge($data, $item);
                     unset($itemPayload['items']);
                     $itemPayload['movement_type'] = $type;
+                    $itemPayload['protocol'] = $batchProtocol;
 
                     $movement = match ($type) {
                         'TRANSFER' => $this->transfer($itemPayload, $accountId, $userId),
@@ -601,6 +603,7 @@ class ClusterStockService
             });
         }
 
+        $data['protocol'] = $batchProtocol;
         return match ($type) {
             'TRANSFER' => $this->transfer($data, $accountId, $userId),
             'ENTRY' => $this->entry($data, $accountId, $userId),
@@ -661,6 +664,7 @@ class ClusterStockService
             'destination_depot_id' => $destinationDepotId,
             'user_id' => $userId,
             'movement_type' => $type,
+            'protocol' => $data['protocol'] ?? (date('ymdHis') . '-' . mt_rand(100, 999)),
             'quantity' => $quantity,
             'document_ref' => $data['document_ref'] ?? $data['document_number'] ?? null,
             'document_number' => $data['document_number'] ?? $data['document_ref'] ?? null,

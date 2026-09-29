@@ -51,7 +51,7 @@
           <Layers class="w-3.5 h-3.5 text-[#FC6714]" />
           <span>Visões do Módulo</span>
         </h4>
-        <div class="grid grid-cols-2 gap-2">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
           <button
             type="button"
             @click="navigateToTab('materials')"
@@ -62,7 +62,7 @@
             </div>
             <div class="truncate">
               <div class="font-bold text-slate-800 dark:text-slate-200 truncate">Materiais</div>
-              <div class="text-[10px] text-slate-400">SKUs e Especificações</div>
+              <div class="text-[10px] text-slate-400">SKUs e Estoque</div>
             </div>
           </button>
 
@@ -76,7 +76,21 @@
             </div>
             <div class="truncate">
               <div class="font-bold text-slate-800 dark:text-slate-200 truncate">Serializado</div>
-              <div class="text-[10px] text-slate-400">Rastreabilidade e Seriais</div>
+              <div class="text-[10px] text-slate-400">Rastreabilidade</div>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            @click="navigateToTab('movements')"
+            class="p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-orange-300 dark:hover:border-[#FC6714]/50 bg-white dark:bg-slate-900 hover:bg-orange-50/50 dark:hover:bg-[#FC6714]/10 transition flex items-center gap-2.5 text-left cursor-pointer group shadow-2xs"
+          >
+            <div class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition">
+              <ArrowLeftRight class="w-4 h-4" />
+            </div>
+            <div class="truncate">
+              <div class="font-bold text-slate-800 dark:text-slate-200 truncate">Movimento</div>
+              <div class="text-[10px] text-slate-400">Histórico de Cargas</div>
             </div>
           </button>
         </div>
@@ -212,7 +226,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import {
-  Layers, Boxes, Warehouse, QrCode, ArrowRightLeft, Plus,
+  Layers, Boxes, Warehouse, QrCode, ArrowRightLeft, ArrowLeftRight, Plus,
   MapPin, Zap, ArrowUpRight, AlertTriangle, FileSpreadsheet
 } from 'lucide-vue-next';
 import BaseModal from '@/components/common/BaseModal.vue';
@@ -227,7 +241,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void;
-  (e: 'navigate', tab: 'materials' | 'serials'): void;
+  (e: 'navigate', tab: 'materials' | 'serials' | 'movements'): void;
   (e: 'action', action: 'transfer' | 'material' | 'depot' | 'cluster' | 'import-materials'): void;
 }>();
 
@@ -240,7 +254,7 @@ function close() {
   emit('update:modelValue', false);
 }
 
-function navigateToTab(tab: 'materials' | 'serials') {
+function navigateToTab(tab: 'materials' | 'serials' | 'movements') {
   emit('navigate', tab);
   close();
 }
