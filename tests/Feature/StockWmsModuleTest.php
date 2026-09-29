@@ -1351,6 +1351,80 @@ class StockWmsModuleTest extends TestCase
         $this->assertContains($this->materialCable->code, $typeCodes);
         $this->assertNotContains($this->materialOnu->code, $typeCodes);
     }
+
+    /**
+     * Testa endpoints da API de Documentos de Estoque agrupados por protocolo.
+     */
+    public function test_stock_documents_api_endpoints(): void
+    {
+        $protocol = 'DOC-TEST-' . time();
+
+        // Cria duas movimentações sob o mesmo protocolo
+        StockMovement::create([
+            'account_id' => $this->account->id,
+            'movement_type' => 'ENTRY',
+            'material_id' => $this->materialOnu->id,
+            'destination_depot_id' => $this->centralDepot->id,
+            'quantity' => 5,
+            'protocol' => $protocol,
+            'document_number' => 'NF-99881',
+            'notes' => 'Carga de ONUs',
+            'created_at' => now(),
+        ]);
+
+        StockMovement::create([
+            'account_id' => $this->account->id,
+            'movement_type' => 'ENTRY',
+            'material_id' => $this->materialCable->id,
+            'destination_depot_id' => $this->centralDepot->id,
+            'quantity' => 100,
+            'protocol' => $protocol,
+            'document_number' => 'NF-99881',
+            'notes' => 'Bobinas de cabo',
+            'created_at' => now(),
+        ]);
+
+        // 1. Listagem de documentos paginada
+        $response = $this->getJson('/api/v1/stock/documents?search=' . $protocol);
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'data' => [
+                '*' => [
+                    'key',
+                    'protocol',
+                    'document_number',
+                    'movement_type',
+                    'items_count',
+                    'total_quantity',
+                    'items',
+                ]
+            ],
+            'total',
+            'current_page',
+        ]);
+
+        $this->assertEquals(1, $response->json('total'));
+        $doc = $response->json('data.0');
+        $this->assertEquals($protocol, $doc['protocol']);
+        $this->assertEquals(2, $doc['items_count']);
+        $this->assertEquals(105, $doc['total_quantity']);
+        $this->assertCount(2, $doc['items']);
+
+        // 2. Detalhes de documento por protocolo
+        $responseDetail = $this->getJson('/api/v1/stock/documents/' . $protocol);
+        $responseDetail->assertStatus(200);
+        $responseDetail->assertJson([
+            'protocol' => $protocol,
+            'document_number' => 'NF-99881',
+            'items_count' => 2,
+            'total_quantity' => 105,
+        ]);
+        $this->assertCount(2, $responseDetail->json('items'));
+
+        // 3. Documento inexistente deve retornar 404
+        $response404 = $this->getJson('/api/v1/stock/documents/PROTOCOLO_INEXISTENTE_999');
+        $response404->assertStatus(404);
+    }
 }
 
 

@@ -766,6 +766,56 @@
     <!-- ABA: MOVIMENTO (GRID DE MOVIMENTAÇÕES DE TODOS OS TIPOS) -->
     <!-- ============================================================================= -->
     <div v-if="activeTab === 'movements'" class="space-y-4">
+      <!-- Barra Superior da Aba: Alternador de Visualização (Itens Corridos vs. Por Documentos) -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-white dark:bg-[#06064D]/50 rounded-xl border border-slate-200 dark:border-[#14147A] shadow-2xs">
+        <div class="inline-flex p-1 rounded-lg bg-slate-100 dark:bg-[#03032E] border border-slate-200 dark:border-[#14147A] shrink-0">
+          <button
+            type="button"
+            @click="setMovementViewMode('items')"
+            :class="movementViewMode === 'items'
+              ? 'bg-white dark:bg-[#06064D] text-[#FC6714] shadow-xs font-bold'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium'"
+            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-md text-xs transition cursor-pointer"
+          >
+            <Boxes class="w-3.5 h-3.5" />
+            <span>Itens Corridos</span>
+            <span
+              class="px-1.5 py-0.5 rounded text-[10px] font-bold"
+              :class="movementViewMode === 'items' ? 'bg-[#FC6714]/15 text-[#FC6714]' : 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400'"
+            >
+              {{ movementsTotal }}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            @click="setMovementViewMode('documents')"
+            :class="movementViewMode === 'documents'
+              ? 'bg-white dark:bg-[#06064D] text-[#FC6714] shadow-xs font-bold'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium'"
+            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-md text-xs transition cursor-pointer"
+          >
+            <FileStack class="w-3.5 h-3.5" />
+            <span>Por Documentos</span>
+            <span
+              class="px-1.5 py-0.5 rounded text-[10px] font-bold"
+              :class="movementViewMode === 'documents' ? 'bg-[#FC6714]/15 text-[#FC6714]' : 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400'"
+            >
+              {{ documentsTotal }}
+            </span>
+          </button>
+        </div>
+
+        <div class="text-xs text-slate-500 dark:text-slate-400 font-medium">
+          <span v-if="movementViewMode === 'items'">
+            Visualização detalhada linha por linha de cada movimentação individual
+          </span>
+          <span v-else>
+            Visualização consolidada por documento / protocolo com sanfona de itens
+          </span>
+        </div>
+      </div>
+
       <!-- Barra de Filtros e Busca de Movimentações -->
       <div class="p-4 bg-white dark:bg-[#06064D]/50 rounded-xl border border-slate-200 dark:border-[#14147A] flex flex-wrap items-center justify-between gap-4 text-sm shadow-2xs">
         <div class="relative flex-1 min-w-[280px]">
@@ -844,13 +894,13 @@
           </button>
 
           <span class="text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
-            {{ movementsTotal }} movimentações
+            {{ movementViewMode === 'items' ? `${movementsTotal} movimentações` : `${documentsTotal} documentos` }}
           </span>
         </div>
       </div>
 
-      <!-- TABELA CONFORTÁVEL: MOVIMENTAÇÕES (DESIGN SYSTEM CANÔNICO) -->
-      <div class="rounded-xl border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D]/50 shadow-xs overflow-hidden transition-colors duration-200">
+      <!-- TABELA CONFORTÁVEL: MOVIMENTAÇÕES ITENS CORRIDOS (DESIGN SYSTEM CANÔNICO) -->
+      <div v-if="movementViewMode === 'items'" class="rounded-xl border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D]/50 shadow-xs overflow-hidden transition-colors duration-200">
         <div class="overflow-x-auto min-h-[280px]">
           <table class="w-full text-left border-collapse text-sm">
             <thead>
@@ -1037,17 +1087,316 @@
           @changePerPage="(pp) => { movementPerPage = pp; movementCurrentPage = 1; loadMovements(); }"
         />
       </div>
+
+      <!-- TABELA CONFORTÁVEL: DOCUMENTOS CONSOLIDADOS (DESIGN SYSTEM CANÔNICO) -->
+      <div v-else-if="movementViewMode === 'documents'" class="rounded-xl border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D]/50 shadow-xs overflow-hidden transition-colors duration-200">
+        <div class="overflow-x-auto min-h-[280px]">
+          <table class="w-full text-left border-collapse text-sm">
+            <thead>
+              <tr class="border-b border-slate-200 dark:border-[#14147A] bg-slate-50/80 dark:bg-[#03032E]/70 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider select-none">
+                <th class="py-3.5 px-3 w-10 text-center"></th>
+                <th class="py-3.5 px-5">Data / Hora</th>
+                <th class="py-3.5 px-5">Protocolo & Documento</th>
+                <th class="py-3.5 px-5 text-center">Tipo</th>
+                <th class="py-3.5 px-5">Origem ➔ Destino</th>
+                <th class="py-3.5 px-5">Resumo de Itens</th>
+                <th class="py-3.5 px-5 text-center">Rastreio</th>
+                <th class="py-3.5 px-5 text-right">Ações</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-[#14147A]/50">
+              <tr v-if="loadingDocuments">
+                <td colspan="8" class="py-12 text-center text-slate-400">
+                  <div class="flex items-center justify-center gap-2">
+                    <RefreshCw class="w-5 h-5 animate-spin text-[#FC6714]" />
+                    <span>Carregando documentos de movimentação...</span>
+                  </div>
+                </td>
+              </tr>
+              <tr v-else-if="documentsList.length === 0">
+                <td colspan="8" class="py-12 text-center text-slate-400 dark:text-slate-500">
+                  <FileStack class="w-8 h-8 mx-auto mb-2 opacity-40 text-slate-400" />
+                  <p class="font-medium text-sm">Nenhum documento de movimentação encontrado.</p>
+                  <p class="text-xs text-slate-400 mt-1">Utilize o botão "Nova Movimentação" para gerar documentos de entrada, transferência e saída com múltiplos itens.</p>
+                </td>
+              </tr>
+              <template v-else v-for="doc in documentsList" :key="doc.key">
+                <!-- Linha Principal do Documento -->
+                <tr
+                  class="hover:bg-slate-50/80 dark:hover:bg-white/[0.03] transition-colors group cursor-pointer"
+                  :class="{ 'bg-orange-50/30 dark:bg-orange-950/15': expandedDocumentKeys.has(doc.key) }"
+                  @click="toggleDocumentExpanded(doc.key)"
+                >
+                  <!-- Botão Expansor / Sanfona -->
+                  <td class="py-4 px-3 text-center" @click.stop="toggleDocumentExpanded(doc.key)">
+                    <button
+                      type="button"
+                      class="inline-flex items-center justify-center w-7 h-7 rounded-md text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-white/10 transition cursor-pointer"
+                      :title="expandedDocumentKeys.has(doc.key) ? 'Recolher itens deste documento' : 'Expandir e ver itens deste documento'"
+                    >
+                      <ChevronDown v-if="expandedDocumentKeys.has(doc.key)" class="w-4 h-4 text-[#FC6714]" />
+                      <ChevronRight v-else class="w-4 h-4" />
+                    </button>
+                  </td>
+
+                  <!-- Data / Hora -->
+                  <td class="py-4 px-5 whitespace-nowrap text-xs text-slate-600 dark:text-slate-300">
+                    <div class="font-semibold text-slate-800 dark:text-slate-200">
+                      {{ formatDate(doc.movement_date || doc.created_at) }}
+                    </div>
+                    <div class="text-[11px] text-slate-400 mt-0.5">
+                      {{ formatTime(doc.created_at) }}
+                    </div>
+                  </td>
+
+                  <!-- Protocolo & Documento -->
+                  <td class="py-4 px-5">
+                    <div class="flex items-center gap-1.5">
+                      <span class="font-mono font-bold text-xs text-slate-900 dark:text-white">
+                        {{ doc.protocol || doc.key }}
+                      </span>
+                      <button
+                        v-if="doc.protocol"
+                        type="button"
+                        @click.stop="copyToClipboard(doc.protocol, `doc-prot-${doc.key}`)"
+                        class="opacity-0 group-hover:opacity-100 hover:text-[#FC6714] text-slate-400 transition cursor-pointer p-0.5"
+                        title="Copiar Protocolo"
+                      >
+                        <Check v-if="copiedKey === `doc-prot-${doc.key}`" class="w-3.5 h-3.5 text-emerald-500" />
+                        <Copy v-else class="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                    <div class="text-[11px] text-slate-400 truncate max-w-[180px]" :title="doc.document_number || doc.document_ref">
+                      Doc: <strong class="text-slate-600 dark:text-slate-300 font-semibold">{{ doc.document_number || doc.document_ref || '-' }}</strong>
+                    </div>
+                  </td>
+
+                  <!-- Tipo com Badge -->
+                  <td class="py-4 px-5 text-center whitespace-nowrap">
+                    <span
+                      class="inline-block px-2.5 py-1 rounded-md text-xs font-semibold border"
+                      :class="formatMovementTypeBadge(doc.movement_type)"
+                    >
+                      {{ formatMovementTypeLabel(doc.movement_type) }}
+                    </span>
+                  </td>
+
+                  <!-- Origem ➔ Destino -->
+                  <td class="py-4 px-5 text-xs text-slate-700 dark:text-slate-300">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <span class="font-medium truncate max-w-[130px]" :title="doc.source_depot?.name || (doc.movement_type === 'ENTRY' ? 'Entrada Externa / Fornecedor' : '-')">
+                        {{ doc.source_depot?.name || (doc.movement_type === 'ENTRY' ? 'Entrada Externa' : '-') }}
+                      </span>
+                      <span class="text-slate-400">➔</span>
+                      <span class="font-semibold text-slate-900 dark:text-white truncate max-w-[130px]" :title="doc.destination_depot?.name || (doc.movement_type === 'EXIT' ? 'Saída Externa / Consumo' : '-')">
+                        {{ doc.destination_depot?.name || (doc.movement_type === 'EXIT' ? 'Saída Externa' : '-') }}
+                      </span>
+                    </div>
+                    <div v-if="doc.destination_depot?.cluster || doc.source_depot?.cluster" class="text-[10px] text-slate-400 mt-0.5">
+                      Regional: {{ doc.destination_depot?.cluster?.name || doc.source_depot?.cluster?.name }}
+                    </div>
+                  </td>
+
+                  <!-- Resumo de Itens e Volume -->
+                  <td class="py-4 px-5 whitespace-nowrap">
+                    <div class="flex items-center gap-2">
+                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700">
+                        <Boxes class="w-3.5 h-3.5 text-slate-500" />
+                        {{ doc.items_count }} {{ doc.items_count === 1 ? 'material' : 'materiais' }}
+                      </span>
+                    </div>
+                    <div class="text-[11px] text-slate-400 font-medium mt-1">
+                      Volume: <strong class="text-slate-700 dark:text-slate-200">{{ formatNumber(doc.total_quantity) }}</strong> un.
+                    </div>
+                  </td>
+
+                  <!-- Rastreio (Seriais & Anexos) -->
+                  <td class="py-4 px-5 text-center whitespace-nowrap">
+                    <div class="inline-flex items-center gap-1.5">
+                      <span
+                        v-if="doc.serials_count > 0"
+                        class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800"
+                        :title="`${doc.serials_count} seriais vinculados ao documento`"
+                      >
+                        <QrCode class="w-3 h-3 inline mr-1" />
+                        {{ doc.serials_count }}
+                      </span>
+                      <span
+                        v-if="doc.attachments_count > 0"
+                        class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
+                        :title="`${doc.attachments_count} arquivos / comprovantes anexados`"
+                      >
+                        <FileText class="w-3 h-3 inline mr-1" />
+                        {{ doc.attachments_count }}
+                      </span>
+                      <span v-if="doc.serials_count === 0 && doc.attachments_count === 0" class="text-slate-400 text-xs">
+                        -
+                      </span>
+                    </div>
+                  </td>
+
+                  <!-- Ações -->
+                  <td class="py-4 px-5 text-right whitespace-nowrap" @click.stop>
+                    <div class="inline-flex items-center gap-1.5">
+                      <!-- Atalho Reconf Externo -->
+                      <a
+                        v-if="doc.protocol"
+                        :href="`/u/reconf/${doc.protocol}`"
+                        target="_blank"
+                        class="h-8 px-2.5 text-xs font-semibold rounded-md border border-orange-200 dark:border-orange-800/80 bg-orange-50/60 dark:bg-orange-950/40 text-[#FC6714] hover:bg-[#FC6714] hover:text-white transition cursor-pointer inline-flex items-center gap-1"
+                        title="Abrir conferência Reconf em nova guia"
+                      >
+                        <FileText class="w-3.5 h-3.5" />
+                        <span>Reconf</span>
+                        <ExternalLink class="w-3 h-3" />
+                      </a>
+
+                      <!-- Botão Detalhes Completos -->
+                      <button
+                        type="button"
+                        @click="openDocumentDetails(doc)"
+                        class="h-8 px-2.5 text-xs font-semibold rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition cursor-pointer inline-flex items-center gap-1"
+                        title="Ver detalhes consolidados do documento"
+                      >
+                        <Eye class="w-3.5 h-3.5" />
+                        <span>Detalhes</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Linha de Sanfona / Accordion (Itens do Documento) -->
+                <tr
+                  v-if="expandedDocumentKeys.has(doc.key)"
+                  class="bg-slate-50/80 dark:bg-[#03032E]/90 border-t border-b border-orange-200/60 dark:border-orange-900/40"
+                >
+                  <td colspan="8" class="p-4 sm:p-5">
+                    <div class="space-y-3 pl-8 pr-2">
+                      <div class="flex items-center justify-between gap-4 flex-wrap">
+                        <div class="flex items-center gap-2">
+                          <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                            Materiais deste Documento
+                          </span>
+                          <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#FC6714]/15 text-[#FC6714]">
+                            {{ doc.items?.length || 0 }} {{ (doc.items?.length || 0) === 1 ? 'item' : 'itens' }}
+                          </span>
+                        </div>
+                        <div v-if="doc.receiver?.name || doc.driver?.name" class="text-xs text-slate-500 dark:text-slate-400">
+                          <span v-if="doc.driver?.name" class="mr-3">Motorista: <strong class="text-slate-700 dark:text-slate-200">{{ doc.driver.name }}</strong></span>
+                          <span v-if="doc.receiver?.name">Recebedor: <strong class="text-slate-700 dark:text-slate-200">{{ doc.receiver.name }}</strong></span>
+                        </div>
+                      </div>
+
+                      <!-- Sub-tabela de Itens do Documento -->
+                      <div class="rounded-lg border border-slate-200 dark:border-[#14147A] overflow-hidden bg-white dark:bg-[#06064D]/70 shadow-2xs">
+                        <table class="w-full text-left text-xs border-collapse">
+                          <thead>
+                            <tr class="border-b border-slate-200 dark:border-[#14147A] bg-slate-100/70 dark:bg-[#03032E] text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                              <th class="py-2.5 px-4">SKU / Código</th>
+                              <th class="py-2.5 px-4">Material</th>
+                              <th class="py-2.5 px-4 text-right">Quantidade</th>
+                              <th class="py-2.5 px-4">Rastreabilidade Serial</th>
+                              <th class="py-2.5 px-4 text-right">Anexos</th>
+                            </tr>
+                          </thead>
+                          <tbody class="divide-y divide-slate-100 dark:divide-[#14147A]/50">
+                            <tr v-for="item in doc.items" :key="item.id" class="hover:bg-slate-50/50 dark:hover:bg-white/[0.02]">
+                              <!-- SKU -->
+                              <td class="py-2.5 px-4 font-mono font-bold text-[#FC6714] dark:text-orange-400 whitespace-nowrap">
+                                {{ item.material?.code || '-' }}
+                              </td>
+
+                              <!-- Material -->
+                              <td class="py-2.5 px-4 font-medium text-slate-800 dark:text-slate-200">
+                                <div>{{ item.material?.name || 'Material' }}</div>
+                                <div v-if="item.material?.category" class="text-[10px] text-slate-400 mt-0.5">
+                                  {{ item.material.category }}
+                                </div>
+                              </td>
+
+                              <!-- Quantidade -->
+                              <td class="py-2.5 px-4 text-right font-bold text-slate-900 dark:text-white whitespace-nowrap">
+                                {{ formatNumber(item.quantity) }}
+                                <span class="font-normal text-[10px] text-slate-400 font-mono ml-0.5">
+                                  {{ item.material?.unit?.code || 'UND' }}
+                                </span>
+                              </td>
+
+                              <!-- Rastreabilidade Serial -->
+                              <td class="py-2.5 px-4">
+                                <div v-if="item.serials && item.serials.length > 0" class="flex flex-wrap items-center gap-1 max-w-md">
+                                  <span
+                                    v-for="(s, sIdx) in item.serials.slice(0, 4)"
+                                    :key="s.id || sIdx"
+                                    class="inline-block px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800"
+                                  >
+                                    {{ s.serial_number }}
+                                  </span>
+                                  <span
+                                    v-if="item.serials.length > 4"
+                                    class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
+                                    :title="`${item.serials.length - 4} seriais adicionais. Clique em Detalhes para ver todos.`"
+                                  >
+                                    +{{ item.serials.length - 4 }}
+                                  </span>
+                                </div>
+                                <span v-else class="text-slate-400 text-[11px] italic">Sem seriais</span>
+                              </td>
+
+                              <!-- Anexos do Item -->
+                              <td class="py-2.5 px-4 text-right whitespace-nowrap">
+                                <span
+                                  v-if="item.attachments && item.attachments.length > 0"
+                                  class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
+                                >
+                                  <FileText class="w-3 h-3" />
+                                  {{ item.attachments.length }}
+                                </span>
+                                <span v-else class="text-slate-400 text-[11px]">-</span>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Rodapé de Paginação de Documentos -->
+        <TablePagination
+          v-model:currentPage="documentCurrentPage"
+          v-model:perPage="documentPerPage"
+          :lastPage="documentsLastPage"
+          :totalRecords="documentsTotal"
+          :fromRecord="documentFromRecord"
+          :toRecord="documentToRecord"
+          :loading="loadingDocuments"
+          @changePage="(p) => { documentCurrentPage = p; loadDocuments(); }"
+          @changePerPage="(pp) => { documentPerPage = pp; documentCurrentPage = 1; loadDocuments(); }"
+        />
+      </div>
     </div>
 
     <!-- ============================================================================= -->
     <!-- COMPONENTES MODAIS INTEGRADOS (BASE MODAL CANÔNICO) -->
     <!-- ============================================================================= -->
 
-    <!-- Modal de Detalhes da Movimentação -->
+    <!-- Modal de Detalhes da Movimentação Individual -->
     <MovementDetailsModal
       :is-open="isMovementDetailsModalOpen"
       :movement="selectedMovementForDetails"
       @close="isMovementDetailsModalOpen = false"
+    />
+
+    <!-- Modal de Detalhes do Documento / Protocolo Consolidado -->
+    <DocumentDetailsModal
+      :is-open="isDocumentDetailsModalOpen"
+      :document-data="selectedDocumentForDetails"
+      @close="isDocumentDetailsModalOpen = false"
     />
 
     <!-- Modal 1: Movimentação de Estoque (Entrada, Saída, Devolução, Transferência) -->
@@ -1177,12 +1526,13 @@ import {
   Package, ArrowRightLeft, ArrowLeftRight, Plus, Layers, Boxes, Box, Warehouse, QrCode, RefreshCw,
   X, Search, ArrowUp, ArrowDown, ArrowUpDown, Copy, Check,
   AlertCircle, CheckCircle2, Menu, MapPin, Edit2, Tags, FolderTree, Scale, UserCheck,
-  FileSpreadsheet, ExternalLink, Eye, FileText
+  FileSpreadsheet, ExternalLink, Eye, FileText, ChevronDown, ChevronRight, FileStack
 } from 'lucide-vue-next';
 import BaseBreadcrumb from '@/components/common/BaseBreadcrumb.vue';
 import TablePagination from '@/components/common/TablePagination.vue';
 import MovementModal from '@/components/supplies/MovementModal.vue';
 import MovementDetailsModal from '@/components/supplies/MovementDetailsModal.vue';
+import DocumentDetailsModal from '@/components/supplies/DocumentDetailsModal.vue';
 import MaterialModal from '@/components/supplies/MaterialModal.vue';
 import MaterialImportModal from '@/components/supplies/MaterialImportModal.vue';
 import ClusterCrudModal from '@/components/supplies/auxiliary/ClusterCrudModal.vue';
@@ -1252,6 +1602,29 @@ interface Unit {
 type TabKey = 'materials' | 'serials' | 'movements';
 const VALID_TABS: TabKey[] = ['materials', 'serials', 'movements'];
 
+type MovementViewMode = 'items' | 'documents';
+
+function getInitialMovementViewMode(): MovementViewMode {
+  try {
+    const hash = window.location.hash;
+    if (hash && hash.includes('?')) {
+      const queryPart = hash.split('?')[1];
+      const params = new URLSearchParams(queryPart);
+      const view = params.get('view') as MovementViewMode;
+      if (view === 'documents' || view === 'items') {
+        return view;
+      }
+    }
+    const saved = localStorage.getItem('rp_supplies_movement_view_mode') as MovementViewMode;
+    if (saved === 'documents' || saved === 'items') {
+      return saved;
+    }
+  } catch (e) {
+    // Fallback silencioso
+  }
+  return 'items';
+}
+
 function getInitialTab(): TabKey {
   try {
     const hash = window.location.hash;
@@ -1282,13 +1655,17 @@ function getInitialTab(): TabKey {
 }
 
 const activeTab = ref<TabKey>(getInitialTab());
+const movementViewMode = ref<MovementViewMode>(getInitialMovementViewMode());
 
 function updateTabInUrlAndStorage(tab: TabKey) {
   try {
     localStorage.setItem('rp_supplies_active_tab', tab);
 
     const currentHash = window.location.hash.replace(/^#\/?/, '').split('?')[0].split('/')[0] || 'supplies';
-    const newHash = `${currentHash}?tab=${tab}`;
+    let newHash = `${currentHash}?tab=${tab}`;
+    if (tab === 'movements' && movementViewMode.value === 'documents') {
+      newHash += '&view=documents';
+    }
     if (window.location.hash !== `#${newHash}`) {
       history.replaceState(null, '', `#${newHash}`);
     }
@@ -1690,12 +2067,39 @@ async function loadSerials() {
 }
 
 // ─── ABA MOVIMENTAÇÕES DE ESTOQUE ───────────────────────────────────────────
+function setMovementViewMode(mode: MovementViewMode) {
+  movementViewMode.value = mode;
+  try {
+    localStorage.setItem('rp_supplies_movement_view_mode', mode);
+    updateTabInUrlAndStorage(activeTab.value);
+  } catch (e) {
+    // Silencioso
+  }
+  if (mode === 'documents' && documentsList.value.length === 0) {
+    loadDocuments();
+  }
+}
+
+// Estados de Itens Corridos
 const loadingMovements = ref(false);
 const movementsList = ref<any[]>([]);
 const movementsTotal = ref(0);
 const movementsLastPage = ref(1);
 const movementCurrentPage = ref(1);
 const movementPerPage = ref(20);
+
+// Estados de Agrupamento por Documentos
+const loadingDocuments = ref(false);
+const documentsList = ref<any[]>([]);
+const documentsTotal = ref(0);
+const documentsLastPage = ref(1);
+const documentCurrentPage = ref(1);
+const documentPerPage = ref(15);
+const expandedDocumentKeys = ref<Set<string>>(new Set());
+const isDocumentDetailsModalOpen = ref(false);
+const selectedDocumentForDetails = ref<any>(null);
+
+// Filtros compartilhados
 const movementSearch = ref('');
 const movementTypeFilter = ref('');
 const movementDepotFilter = ref('');
@@ -1709,14 +2113,18 @@ function debounceLoadMovements() {
   clearTimeout(movementDebounceTimeout);
   movementDebounceTimeout = setTimeout(() => {
     movementCurrentPage.value = 1;
+    documentCurrentPage.value = 1;
     loadMovements();
+    loadDocuments();
   }, 300);
 }
 
 function clearMovementSearch() {
   movementSearch.value = '';
   movementCurrentPage.value = 1;
+  documentCurrentPage.value = 1;
   loadMovements();
+  loadDocuments();
 }
 
 function clearAllMovementFilters() {
@@ -1726,7 +2134,9 @@ function clearAllMovementFilters() {
   movementStartDate.value = '';
   movementEndDate.value = '';
   movementCurrentPage.value = 1;
+  documentCurrentPage.value = 1;
   loadMovements();
+  loadDocuments();
 }
 
 const movementFromRecord = computed(() => {
@@ -1736,6 +2146,15 @@ const movementFromRecord = computed(() => {
 
 const movementToRecord = computed(() => {
   return Math.min(movementCurrentPage.value * movementPerPage.value, movementsTotal.value);
+});
+
+const documentFromRecord = computed(() => {
+  if (documentsTotal.value === 0) return 0;
+  return (documentCurrentPage.value - 1) * documentPerPage.value + 1;
+});
+
+const documentToRecord = computed(() => {
+  return Math.min(documentCurrentPage.value * documentPerPage.value, documentsTotal.value);
 });
 
 async function loadMovements() {
@@ -1765,14 +2184,59 @@ async function loadMovements() {
   }
 }
 
+async function loadDocuments() {
+  loadingDocuments.value = true;
+  try {
+    const params = new URLSearchParams();
+    params.append('page', String(documentCurrentPage.value));
+    params.append('per_page', String(documentPerPage.value));
+
+    if (movementSearch.value.trim()) params.append('search', movementSearch.value.trim());
+    if (movementTypeFilter.value) params.append('movement_type', movementTypeFilter.value);
+    if (movementDepotFilter.value) params.append('depot_id', movementDepotFilter.value);
+    if (movementStartDate.value) params.append('start_date', movementStartDate.value);
+    if (movementEndDate.value) params.append('end_date', movementEndDate.value);
+
+    const url = `/api/v1/stock/documents?${params.toString()}`;
+    const res = await fetch(url);
+    const json = await res.json();
+
+    documentsList.value = json.data || [];
+    documentsTotal.value = json.total || (json.data ? json.data.length : 0);
+    documentsLastPage.value = json.last_page || 1;
+  } catch (err) {
+    console.error('Erro ao carregar documentos de movimentação:', err);
+  } finally {
+    loadingDocuments.value = false;
+  }
+}
+
+function toggleDocumentExpanded(key: string) {
+  const set = new Set(expandedDocumentKeys.value);
+  if (set.has(key)) {
+    set.delete(key);
+  } else {
+    set.add(key);
+  }
+  expandedDocumentKeys.value = set;
+}
+
+function openDocumentDetails(doc: any) {
+  selectedDocumentForDetails.value = doc;
+  isDocumentDetailsModalOpen.value = true;
+}
+
 watch([movementTypeFilter, movementDepotFilter, movementStartDate, movementEndDate], () => {
   movementCurrentPage.value = 1;
+  documentCurrentPage.value = 1;
   loadMovements();
+  loadDocuments();
 });
 
 watch(activeTab, (newTab) => {
   if (newTab === 'movements') {
     loadMovements();
+    loadDocuments();
   }
 });
 
@@ -1868,6 +2332,7 @@ async function onMovementSuccess(movement?: any) {
     loadDepots(),
     loadSerials(),
     loadMovements(),
+    loadDocuments(),
   ]);
 }
 
@@ -2037,6 +2502,7 @@ async function refreshCurrentTab() {
       loadDepots(),
       loadSerials(),
       loadMovements(),
+      loadDocuments(),
     ]);
     await loadRegionalStock();
     showToast('Dados de suprimentos atualizados com sucesso!');
@@ -2050,6 +2516,10 @@ function handleHashChangeForTabs() {
   const currentTabInHash = getInitialTab();
   if (currentTabInHash && currentTabInHash !== activeTab.value) {
     activeTab.value = currentTabInHash;
+  }
+  const currentViewInHash = getInitialMovementViewMode();
+  if (currentViewInHash && currentViewInHash !== movementViewMode.value) {
+    movementViewMode.value = currentViewInHash;
   }
 }
 
@@ -2067,6 +2537,7 @@ onMounted(async () => {
     loadDepots(),
     loadSerials(),
     loadMovements(),
+    loadDocuments(),
   ]);
   loadRegionalStock();
 });

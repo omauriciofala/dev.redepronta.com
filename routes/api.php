@@ -75,6 +75,8 @@ Route::prefix('v1')->group(function () {
         Route::post('entry', [StockController::class, 'entry']);
         Route::post('attachments', [StockController::class, 'uploadAttachment']);
         Route::get('movements', [StockController::class, 'movements']);
+        Route::get('documents', [StockController::class, 'documents']);
+        Route::get('documents/{protocol}', [StockController::class, 'documentDetail']);
     });
 
     // Change-log Vivo

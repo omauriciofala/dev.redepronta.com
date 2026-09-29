@@ -280,4 +280,226 @@ class StockController extends Controller
 
         return response()->json($movements);
     }
+
+    /**
+     * Listagem agregada de Movimentações agrupadas por Documento / Protocolo.
+     */
+    public function documents(Request $request): JsonResponse
+    {
+        $accountId = $this->getAccountId();
+        $query = StockMovement::where('account_id', $accountId);
+
+        // Busca global por texto (protocolo, documento, número, material, serial ou notas)
+        if ($request->filled('search')) {
+            $search = trim($request->query('search'));
+            $query->where(function ($q) use ($search) {
+                $q->where('protocol', 'like', "%{$search}%")
+                  ->orWhere('document_number', 'like', "%{$search}%")
+                  ->orWhere('document_ref', 'like', "%{$search}%")
+                  ->orWhere('notes', 'like', "%{$search}%")
+                  ->orWhereHas('material', function ($mq) use ($search) {
+                      $mq->where('name', 'like', "%{$search}%")
+                         ->orWhere('code', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('serials', function ($sq) use ($search) {
+                      $sq->where('serial_number', 'like', "%{$search}%")
+                         ->orWhere('mac_address', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        if ($request->filled('material_id')) {
+            $query->where('material_id', $request->query('material_id'));
+        }
+
+        if ($request->filled('movement_type')) {
+            $query->where('movement_type', $request->query('movement_type'));
+        }
+
+        if ($request->filled('depot_id')) {
+            $depotId = $request->query('depot_id');
+            $query->where(function ($dq) use ($depotId) {
+                $dq->where('source_depot_id', $depotId)
+                   ->orWhere('destination_depot_id', $depotId);
+            });
+        }
+
+        if ($request->filled('source_depot_id')) {
+            $query->where('source_depot_id', $request->query('source_depot_id'));
+        }
+
+        if ($request->filled('destination_depot_id')) {
+            $query->where('destination_depot_id', $request->query('destination_depot_id'));
+        }
+
+        if ($request->filled('start_date')) {
+            $startDate = $request->query('start_date');
+            $query->where(function ($dq) use ($startDate) {
+                $dq->whereDate('movement_date', '>=', $startDate)
+                   ->orWhere(function ($sub) use ($startDate) {
+                       $sub->whereNull('movement_date')->whereDate('created_at', '>=', $startDate);
+                   });
+            });
+        }
+
+        if ($request->filled('end_date')) {
+            $endDate = $request->query('end_date');
+            $query->where(function ($dq) use ($endDate) {
+                $dq->whereDate('movement_date', '<=', $endDate)
+                   ->orWhere(function ($sub) use ($endDate) {
+                       $sub->whereNull('movement_date')->whereDate('created_at', '<=', $endDate);
+                   });
+            });
+        }
+
+        // Agrupamento por documento/protocolo
+        $protocolQuery = (clone $query)
+            ->selectRaw("COALESCE(NULLIF(protocol, ''), CONCAT('MOV-', id)) as doc_key, MAX(id) as max_id")
+            ->groupBy('doc_key')
+            ->orderByDesc('max_id');
+
+        $perPage = min($request->integer('per_page', 20), 100);
+        $paginatedKeys = $protocolQuery->paginate($perPage);
+
+        $docKeys = collect($paginatedKeys->items())->pluck('doc_key')->toArray();
+
+        if (empty($docKeys)) {
+            return response()->json([
+                'data' => [],
+                'current_page' => $paginatedKeys->currentPage(),
+                'last_page' => $paginatedKeys->lastPage(),
+                'total' => $paginatedKeys->total(),
+                'per_page' => $paginatedKeys->perPage(),
+                'from' => $paginatedKeys->firstItem(),
+                'to' => $paginatedKeys->lastItem(),
+            ]);
+        }
+
+        // Carrega as movimentações de todos os protocolos da página atual
+        $movements = StockMovement::where('account_id', $accountId)
+            ->where(function ($q) use ($docKeys) {
+                $q->whereIn('protocol', $docKeys)
+                  ->orWhereIn('id', array_filter(array_map(function ($k) {
+                      return str_starts_with($k, 'MOV-') ? (int) substr($k, 4) : null;
+                  }, $docKeys)));
+            })
+            ->with([
+                'material.unit',
+                'sourceDepot.cluster',
+                'destinationDepot.cluster',
+                'user',
+                'serials',
+                'receiver',
+                'driver',
+                'attachments',
+            ])
+            ->orderByDesc('id')
+            ->get();
+
+        $grouped = $movements->groupBy(function ($m) {
+            return !empty($m->protocol) ? $m->protocol : 'MOV-' . $m->id;
+        });
+
+        $documents = [];
+        foreach ($docKeys as $key) {
+            if (!isset($grouped[$key])) {
+                continue;
+            }
+            $items = $grouped[$key];
+            $first = $items->first();
+
+            $documents[] = [
+                'key' => $key,
+                'protocol' => $first->protocol,
+                'document_number' => $first->document_number,
+                'document_ref' => $first->document_ref,
+                'movement_type' => $first->movement_type,
+                'movement_date' => $first->movement_date ?? $first->created_at,
+                'document_date' => $first->document_date,
+                'created_at' => $first->created_at,
+                'source_depot' => $first->sourceDepot,
+                'destination_depot' => $first->destinationDepot,
+                'receiver' => $first->receiver,
+                'driver' => $first->driver,
+                'user' => $first->user,
+                'notes' => $first->notes,
+                'items_count' => $items->count(),
+                'total_quantity' => (float) $items->sum('quantity'),
+                'serials_count' => $items->flatMap->serials->unique('id')->count(),
+                'attachments_count' => $items->flatMap->attachments->unique('id')->count(),
+                'items' => $items->map(function ($m) {
+                    return [
+                        'id' => $m->id,
+                        'material' => $m->material,
+                        'quantity' => (float) $m->quantity,
+                        'serials' => $m->serials,
+                        'attachments' => $m->attachments,
+                    ];
+                })->values(),
+            ];
+        }
+
+        return response()->json([
+            'data' => $documents,
+            'current_page' => $paginatedKeys->currentPage(),
+            'last_page' => $paginatedKeys->lastPage(),
+            'total' => $paginatedKeys->total(),
+            'per_page' => $paginatedKeys->perPage(),
+            'from' => $paginatedKeys->firstItem(),
+            'to' => $paginatedKeys->lastItem(),
+        ]);
+    }
+
+    /**
+     * Detalhes de um Documento de Movimentação por Protocolo.
+     */
+    public function documentDetail(string $protocol): JsonResponse
+    {
+        $accountId = $this->getAccountId();
+        $items = StockMovement::where('account_id', $accountId)
+            ->where(function ($q) use ($protocol) {
+                $q->where('protocol', $protocol)
+                  ->orWhere('document_number', $protocol);
+            })
+            ->with([
+                'material.unit',
+                'sourceDepot.cluster',
+                'destinationDepot.cluster',
+                'user',
+                'serials',
+                'receiver',
+                'driver',
+                'attachments',
+            ])
+            ->orderBy('id')
+            ->get();
+
+        if ($items->isEmpty()) {
+            return response()->json(['message' => 'Documento de movimentação não encontrado.'], 404);
+        }
+
+        $first = $items->first();
+
+        return response()->json([
+            'protocol' => $first->protocol,
+            'document_number' => $first->document_number,
+            'document_ref' => $first->document_ref,
+            'movement_type' => $first->movement_type,
+            'movement_date' => $first->movement_date ?? $first->created_at,
+            'document_date' => $first->document_date,
+            'created_at' => $first->created_at,
+            'source_depot' => $first->sourceDepot,
+            'destination_depot' => $first->destinationDepot,
+            'receiver' => $first->receiver,
+            'driver' => $first->driver,
+            'user' => $first->user,
+            'notes' => $first->notes,
+            'items_count' => $items->count(),
+            'total_quantity' => (float) $items->sum('quantity'),
+            'serials_count' => $items->flatMap->serials->unique('id')->count(),
+            'attachments_count' => $items->flatMap->attachments->unique('id')->count(),
+            'items' => $items->values(),
+        ]);
+    }
 }
+
