@@ -4,6 +4,7 @@
 - **Produto:** ERP Rede Pronta
 - **Domínio:** ERP Integrado, FSM (Field Service Management), Estoque/WMS com serial e Faturamento/Contratos.
 - **Arquitetura:** Laravel 13 (PHP 8.4) + Vue 3 + Tailwind CSS v4 + MariaDB.
+- **Design System & BrandBook:** [DESIGN.md](file:///var/www/dev.redepronta.com/DESIGN.md) *(Consulte para tokens visuais, componentes, paleta, tipografia e diretrizes de UI/UX)*.
 
 ---
 
@@ -50,6 +51,13 @@
      - `rounded-2xl` (8px): Modais centrais e drawer lateral.
      - `rounded-md` (4px): Badges, tags e contadores numéricos.
      - `rounded-sm` (2px): Checkboxes e pequenos detalhes.
+
+---
+
+## 🎨 GUIA VISUAL & DESIGN SYSTEM
+- Para especificações completas de tokens cromáticos, tipografia (Kanit e Montserrat), componentes de formulário, modais, tabelas e anatomia de telas, consulte o documento normativo:
+  👉 **[DESIGN.md](file:///var/www/dev.redepronta.com/DESIGN.md)**
+
 
 
 
