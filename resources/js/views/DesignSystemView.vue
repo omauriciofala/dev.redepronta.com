@@ -728,14 +728,14 @@
           </div>
         </div>
 
-        <!-- Card 2: Linha 1 Obrigatória (Breadcrumb) -->
+        <!-- Card 2: Linha 1 Obrigatória (Breadcrumb em Box 100%) -->
         <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 space-y-2.5 shadow-xs">
           <div class="flex items-center gap-2 text-slate-900 dark:text-slate-100 font-bold text-sm">
             <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-            <span>2. Linha 1: BaseBreadcrumb</span>
+            <span>2. Linha 1: Box de Breadcrumb (100%)</span>
           </div>
           <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-            O primeiro elemento renderizado no container é <strong>obrigatoriamente o BaseBreadcrumb</strong> para localização hierárquica do operador.
+            O primeiro elemento é o <code class="font-mono text-[11px]">&lt;BaseBreadcrumb&gt;</code>, encapsulado em um <strong>box de 100% de largura</strong> com borda e superfície elegante.
           </p>
           <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 font-mono text-[11px] text-amber-700 dark:text-amber-400">
             &lt;BaseBreadcrumb :items="..." /&gt;
@@ -787,8 +787,8 @@
 
           <!-- Conteúdo Simulado da View -->
           <div class="bg-white dark:bg-slate-900 rounded-lg p-5 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
-            <!-- Linha 1 Simulada: Breadcrumb -->
-            <div class="py-1 px-2.5 rounded bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/60 flex items-center justify-between">
+            <!-- Linha 1 Simulada: Box do Breadcrumb 100% -->
+            <div class="w-full py-2 px-3.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700 shadow-2xs flex items-center justify-between">
               <div class="flex items-center gap-1.5 text-[11px] font-mono">
                 <span class="text-[#FC6714] font-bold flex items-center gap-1">
                   <Home class="w-3 h-3" /> Início
@@ -799,7 +799,7 @@
                 <span class="text-slate-900 dark:text-slate-100 font-bold">Página Atual</span>
               </div>
               <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 font-bold border border-amber-200 dark:border-amber-800">
-                Linha 1 Obrigatória (BaseBreadcrumb)
+                Box 100% Horizontal (Linha 1)
               </span>
             </div>
 
@@ -844,7 +844,7 @@
       </div>
       <p class="text-sm text-slate-500 dark:text-slate-400">
         Padrão canônico de composição do topo de tela no ERP Rede Pronta. Toda página do sistema deve apresentar harmoniosamente
-        o <strong>Breadcrumb na Linha 1</strong> e o <strong>Cabeçalho Principal na Linha 2</strong>, garantindo orientação espacial, consistência semântica e ergonomia operacional.
+        o <strong>Breadcrumb em Box 100% horizontal na Linha 1</strong> e o <strong>Cabeçalho Principal na Linha 2</strong>, garantindo orientação espacial, consistência semântica e ergonomia operacional.
       </p>
 
       <!-- Exemplos Vivos / Múltiplas Variações -->
@@ -1085,7 +1085,7 @@
   &lt;!-- Container Raiz Obrigatório: py-8 w-full space-y-6 --&gt;
   &lt;div class="py-8 w-full space-y-6"&gt;
 
-    &lt;!-- Linha 1 Obrigatória: BaseBreadcrumb Canônico --&gt;
+    &lt;!-- Linha 1 Obrigatória: BaseBreadcrumb Canônico (em Box 100% horizontal) --&gt;
     &lt;BaseBreadcrumb :items="[
       { label: 'Início', href: '#people' },
       { label: 'Domínio / Módulo', href: '#modulo' },
@@ -1533,7 +1533,7 @@ function copyCanonicalCode() {
   <!-- Container Raiz Obrigatório: py-8 w-full space-y-6 -->
   <div class="py-8 w-full space-y-6">
 
-    <!-- Linha 1 Obrigatória: BaseBreadcrumb Canônico -->
+    <!-- Linha 1 Obrigatória: BaseBreadcrumb Canônico (em Box 100% horizontal) -->
     <BaseBreadcrumb :items="[
       { label: 'Início', href: '#people' },
       { label: 'Domínio / Módulo', href: '#modulo' },

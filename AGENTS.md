@@ -37,9 +37,11 @@
    - **Proibição Estrita:** O cabeçalho de uma tela NUNCA deve encostar no teto da tela (sem `py-8`). O respiro superior de `32px` (`py-8` / `pt-8`) é mandatório para todas as páginas criadas no sistema.
 2. **Simetria Lateral de 60px**:
    - A margem horizontal é garantida exclusivamente pelo layout mestre (`px-[60px]` no `AppLayout.vue`).
-3. **Linha 1 Canônica Obrigatória (`BaseBreadcrumb`)**:
+3. **Linha 1 Canônica Obrigatória (`BaseBreadcrumb` em Box 100%)**:
    - A primeira linha de conteúdo dentro do container raiz (`<div class="py-8 w-full space-y-6">`) de qualquer view **DEVE OBRIGATORIAMENTE ser o componente canônico `<BaseBreadcrumb :items="[...]" />`**.
+   - O Breadcrumb é exibido dentro de um **box 100% horizontal (`w-full`)** na área de conteúdo, com borda sutil, superfície em card e cantos arredondados (`rounded-xl`).
    - O cabeçalho da página (Título H1, ícone, badges e botões de ação) passa a ser a **Linha 2** da tela.
    - O breadcrumb garante orientação espacial em todos os níveis de navegação sem quebrar o ritmo vertical (`space-y-6`).
+
 
 
