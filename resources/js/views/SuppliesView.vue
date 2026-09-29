@@ -219,20 +219,39 @@
 
       <button
         type="button"
-        @click="activeTab = 'movements'"
-        :class="activeTab === 'movements'
+        @click="setActiveTabAndMode('movements', 'items')"
+        :class="activeTab === 'movements' && movementViewMode === 'items'
           ? 'border-[#FC6714] text-[#FC6714] font-bold'
           : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium'"
         class="pb-3 border-b-2 text-sm flex items-center gap-2 transition cursor-pointer shrink-0"
       >
         <ArrowLeftRight class="w-4 h-4" />
-        <span>Movimento</span>
+        <span>Movimento (Itens)</span>
         <span
           v-if="movementsTotal > 0"
           class="px-2 py-0.5 rounded-md text-[11px] font-bold"
-          :class="activeTab === 'movements' ? 'bg-[#FC6714]/15 text-[#FC6714]' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'"
+          :class="activeTab === 'movements' && movementViewMode === 'items' ? 'bg-[#FC6714]/15 text-[#FC6714]' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'"
         >
           {{ movementsTotal }}
+        </span>
+      </button>
+
+      <button
+        type="button"
+        @click="setActiveTabAndMode('movements', 'documents')"
+        :class="activeTab === 'movements' && movementViewMode === 'documents'
+          ? 'border-[#FC6714] text-[#FC6714] font-bold'
+          : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium'"
+        class="pb-3 border-b-2 text-sm flex items-center gap-2 transition cursor-pointer shrink-0"
+      >
+        <FileStack class="w-4 h-4" />
+        <span>Documentos</span>
+        <span
+          v-if="documentsTotal > 0"
+          class="px-2 py-0.5 rounded-md text-[11px] font-bold"
+          :class="activeTab === 'movements' && movementViewMode === 'documents' ? 'bg-[#FC6714]/15 text-[#FC6714]' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'"
+        >
+          {{ documentsTotal }}
         </span>
       </button>
     </div>
@@ -1490,7 +1509,7 @@
       :total-base-items="Number(currentClusterSummary.total_items_count) || 0"
       :total-serials-in-stock="Number(currentClusterSummary.total_serials_in_stock) || 0"
       :depots-count="Number(currentClusterSummary.depots_count) || 0"
-      @navigate="(tab) => activeTab = tab"
+      @navigate="(tab, mode) => setActiveTabAndMode(tab, mode)"
       @action="handleDrawerAction"
     />
 
@@ -1600,7 +1619,7 @@ interface Unit {
 
 // ─── ESTADOS GERAIS DO MÓDULO ────────────────────────────────────────────────
 type TabKey = 'materials' | 'serials' | 'movements';
-const VALID_TABS: TabKey[] = ['materials', 'serials', 'movements'];
+const VALID_TABS: string[] = ['materials', 'serials', 'movements', 'documents'];
 
 type MovementViewMode = 'items' | 'documents';
 
@@ -1610,9 +1629,11 @@ function getInitialMovementViewMode(): MovementViewMode {
     if (hash && hash.includes('?')) {
       const queryPart = hash.split('?')[1];
       const params = new URLSearchParams(queryPart);
-      const view = params.get('view') as MovementViewMode;
-      if (view === 'documents' || view === 'items') {
-        return view;
+      if (params.get('tab') === 'documents' || params.get('view') === 'documents') {
+        return 'documents';
+      }
+      if (params.get('view') === 'items') {
+        return 'items';
       }
     }
     const saved = localStorage.getItem('rp_supplies_movement_view_mode') as MovementViewMode;
@@ -1632,19 +1653,27 @@ function getInitialTab(): TabKey {
       if (hash.includes('?')) {
         const queryPart = hash.split('?')[1];
         const params = new URLSearchParams(queryPart);
-        const tab = params.get('tab') as TabKey;
-        if (VALID_TABS.includes(tab)) {
-          return tab;
+        const tab = params.get('tab');
+        if (tab === 'documents') {
+          return 'movements';
+        }
+        if (tab && ['materials', 'serials', 'movements'].includes(tab)) {
+          return tab as TabKey;
         }
       }
       const slashParts = hash.replace(/^#\/?/, '').split('?')[0].split('/');
-      if (slashParts.length > 1 && VALID_TABS.includes(slashParts[1] as TabKey)) {
-        return slashParts[1] as TabKey;
+      if (slashParts.length > 1) {
+        if (slashParts[1] === 'documents') {
+          return 'movements';
+        }
+        if (['materials', 'serials', 'movements'].includes(slashParts[1])) {
+          return slashParts[1] as TabKey;
+        }
       }
     }
 
     const saved = localStorage.getItem('rp_supplies_active_tab') as TabKey;
-    if (saved && VALID_TABS.includes(saved)) {
+    if (saved && ['materials', 'serials', 'movements'].includes(saved)) {
       return saved;
     }
   } catch (e) {
@@ -1657,14 +1686,23 @@ function getInitialTab(): TabKey {
 const activeTab = ref<TabKey>(getInitialTab());
 const movementViewMode = ref<MovementViewMode>(getInitialMovementViewMode());
 
+function setActiveTabAndMode(tab: TabKey, mode?: MovementViewMode) {
+  activeTab.value = tab;
+  if (tab === 'movements' && mode) {
+    setMovementViewMode(mode);
+  } else {
+    updateTabInUrlAndStorage(tab);
+  }
+}
+
 function updateTabInUrlAndStorage(tab: TabKey) {
   try {
     localStorage.setItem('rp_supplies_active_tab', tab);
 
     const currentHash = window.location.hash.replace(/^#\/?/, '').split('?')[0].split('/')[0] || 'supplies';
     let newHash = `${currentHash}?tab=${tab}`;
-    if (tab === 'movements' && movementViewMode.value === 'documents') {
-      newHash += '&view=documents';
+    if (tab === 'movements') {
+      newHash += `&view=${movementViewMode.value}`;
     }
     if (window.location.hash !== `#${newHash}`) {
       history.replaceState(null, '', `#${newHash}`);
@@ -2077,6 +2115,8 @@ function setMovementViewMode(mode: MovementViewMode) {
   }
   if (mode === 'documents' && documentsList.value.length === 0) {
     loadDocuments();
+  } else if (mode === 'items' && movementsList.value.length === 0) {
+    loadMovements();
   }
 }
 
