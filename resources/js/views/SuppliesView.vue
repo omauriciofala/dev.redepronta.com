@@ -203,39 +203,20 @@
 
       <button
         type="button"
-        @click="setActiveTabAndMode('movements', 'items')"
-        :class="activeTab === 'movements' && movementViewMode === 'items'
+        @click="activeTab = 'movements'"
+        :class="activeTab === 'movements'
           ? 'border-[#FC6714] text-[#FC6714] font-bold'
           : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium'"
         class="pb-3 border-b-2 text-sm flex items-center gap-2 transition cursor-pointer shrink-0"
       >
-        <ArrowLeftRight class="w-4 h-4" />
-        <span>Movimento (Itens)</span>
+        <ArrowUpDown class="w-4 h-4" />
+        <span>Movimentos</span>
         <span
-          v-if="movementsTotal > 0"
+          v-if="movementsTotal > 0 || documentsTotal > 0"
           class="px-2 py-0.5 rounded-md text-[11px] font-bold"
-          :class="activeTab === 'movements' && movementViewMode === 'items' ? 'bg-[#FC6714]/15 text-[#FC6714]' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'"
+          :class="activeTab === 'movements' ? 'bg-[#FC6714]/15 text-[#FC6714]' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'"
         >
-          {{ movementsTotal }}
-        </span>
-      </button>
-
-      <button
-        type="button"
-        @click="setActiveTabAndMode('movements', 'documents')"
-        :class="activeTab === 'movements' && movementViewMode === 'documents'
-          ? 'border-[#FC6714] text-[#FC6714] font-bold'
-          : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium'"
-        class="pb-3 border-b-2 text-sm flex items-center gap-2 transition cursor-pointer shrink-0"
-      >
-        <FileStack class="w-4 h-4" />
-        <span>Documentos</span>
-        <span
-          v-if="documentsTotal > 0"
-          class="px-2 py-0.5 rounded-md text-[11px] font-bold"
-          :class="activeTab === 'movements' && movementViewMode === 'documents' ? 'bg-[#FC6714]/15 text-[#FC6714]' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'"
-        >
-          {{ documentsTotal }}
+          {{ movementViewMode === 'items' ? movementsTotal : documentsTotal }}
         </span>
       </button>
     </div>

@@ -89,8 +89,8 @@
               <ArrowLeftRight class="w-4 h-4" />
             </div>
             <div class="truncate">
-              <div class="font-bold text-slate-800 dark:text-slate-200 truncate">Movimento</div>
-              <div class="text-[10px] text-slate-400">Itens Corridos</div>
+              <div class="font-bold text-slate-800 dark:text-slate-200 truncate">Por Itens</div>
+              <div class="text-[10px] text-slate-400">Sub-aba de Movimento</div>
             </div>
           </button>
 
@@ -103,8 +103,8 @@
               <FileStack class="w-4 h-4" />
             </div>
             <div class="truncate">
-              <div class="font-bold text-slate-800 dark:text-slate-200 truncate">Documentos</div>
-              <div class="text-[10px] text-slate-400">Lotes & NF/OS</div>
+              <div class="font-bold text-slate-800 dark:text-slate-200 truncate">Por Documentos</div>
+              <div class="text-[10px] text-slate-400">Sub-aba de Movimento</div>
             </div>
           </button>
         </div>
