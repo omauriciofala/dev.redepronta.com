@@ -188,7 +188,7 @@
             <span>Filtros</span>
             <span
               v-if="activeFilterKeys.length > 0"
-              class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-[#FC6714] text-white"
+              class="px-1.5 py-0.2 rounded-md text-[10px] font-bold bg-[#FC6714] text-white"
             >
               {{ activeFilterKeys.length }}
             </span>
@@ -270,7 +270,7 @@
               <span class="text-xs font-semibold font-heading uppercase tracking-wider text-slate-800 dark:text-slate-200">
                 Filtros Selecionados
               </span>
-              <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#FC6714]/15 text-[#FC6714]">
+              <span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-[#FC6714]/15 text-[#FC6714]">
                 {{ activeFilterKeys.length }} campo{{ activeFilterKeys.length > 1 ? 's' : '' }} ativo{{ activeFilterKeys.length > 1 ? 's' : '' }}
               </span>
             </div>

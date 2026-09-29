@@ -17,7 +17,7 @@
           <div>
             <div class="flex items-center gap-2.5">
               <h1 class="text-2xl font-heading font-semibold tracking-tight text-[#06064D] dark:text-white">Design System & BrandBook</h1>
-              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
+              <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
                 v1.1 Modais & Fullscreen
               </span>
             </div>
@@ -189,6 +189,39 @@
             </div>
             <p class="text-xs font-mono mt-2">red-600 (#dc2626)</p>
             <p class="text-xs text-red-700/80 dark:text-red-400/80 mt-1">Inativo, Bloqueio, Exclusão</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Escala Canônica de Cantos & Raios Reduzidos (Enterprise Radius) -->
+      <div class="space-y-2 pt-2">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Escala de Cantos & Raios de Borda (Layout Sóbrio)</h3>
+        <p class="text-xs text-slate-500 dark:text-slate-400">
+          Cantos menos arredondados calibrados globalmente via Tailwind v4 para uma identidade corporativa limpa, técnica e moderna.
+        </p>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
+          <div class="p-3.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xs">
+            <span class="text-xs font-bold text-slate-900 dark:text-slate-100">rounded-lg (5px)</span>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Botões, inputs, selects e dropdowns</p>
+            <div class="mt-2.5 h-6 w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg flex items-center justify-center text-[10px] font-mono text-slate-500">5px</div>
+          </div>
+
+          <div class="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xs">
+            <span class="text-xs font-bold text-slate-900 dark:text-slate-100">rounded-xl (6px)</span>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Cards, containers e box breadcrumb</p>
+            <div class="mt-2.5 h-6 w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-center text-[10px] font-mono text-slate-500">6px</div>
+          </div>
+
+          <div class="p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xs">
+            <span class="text-xs font-bold text-slate-900 dark:text-slate-100">rounded-2xl (8px)</span>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Modais centrais e drawer lateral</p>
+            <div class="mt-2.5 h-6 w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl flex items-center justify-center text-[10px] font-mono text-slate-500">8px</div>
+          </div>
+
+          <div class="p-3.5 rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xs">
+            <span class="text-xs font-bold text-slate-900 dark:text-slate-100">rounded-md (4px)</span>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Badges, tags, pílulas e contadores</p>
+            <div class="mt-2.5 h-6 w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md flex items-center justify-center text-[10px] font-mono text-slate-500">4px</div>
           </div>
         </div>
       </div>
@@ -917,7 +950,7 @@
               >
                 <Boxes class="w-4 h-4" />
                 <span>Materiais</span>
-                <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#FC6714]/15 text-[#FC6714]">248</span>
+                <span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-[#FC6714]/15 text-[#FC6714]">248</span>
               </button>
 
               <button
@@ -930,7 +963,7 @@
               >
                 <Tag class="w-4 h-4" />
                 <span>Serializado</span>
-                <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300">120</span>
+                <span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300">120</span>
               </button>
 
               <button
@@ -943,7 +976,7 @@
               >
                 <LayoutTemplate class="w-4 h-4" />
                 <span>Movimento</span>
-                <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300">15</span>
+                <span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300">15</span>
               </button>
             </div>
           </div>
@@ -1030,7 +1063,7 @@
                     <h1 class="text-2xl font-semibold font-heading text-[#06064D] dark:text-white tracking-tight">
                       Contrato de Custódia PoliFibra
                     </h1>
-                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                    <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
                       ATIVO / EM VIGOR
                     </span>
                   </div>

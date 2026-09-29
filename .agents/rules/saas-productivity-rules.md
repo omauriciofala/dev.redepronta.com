@@ -62,6 +62,8 @@ trigger: manual
 - **Proibição de Cabeçalho Colado no Topo**: O cabeçalho de uma view nunca deve encostar no teto da tela (`py-8` / `pt-8` de 32px é obrigatório).
 - **Simetria Lateral de 60px**: A margem horizontal é provida exclusivamente pelo `px-[60px]` do `AppLayout.vue`.
 - **Linha 1 Mandatória (`BaseBreadcrumb` em Box 100%)**: Toda tela deve ter como seu primeiro elemento visual filho do container raiz o componente canônico `<BaseBreadcrumb :items="[...]" />`, renderizado em um **box horizontal de 100% de largura** na área de conteúdo. O título/cabeçalho da tela é a Linha 2.
+- **Cantos Menos Arredondados (Escala Sóbria)**: Todos os elementos visuais do layout adotam cantos retos e elegantes (5px botões/inputs, 6px cards/boxes, 8px modais, 4px badges).
+
 
 
 

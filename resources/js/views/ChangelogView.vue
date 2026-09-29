@@ -17,7 +17,7 @@
           <div>
             <div class="flex items-center gap-2.5">
               <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Change-log do Sistema</h1>
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-100 dark:bg-purple-950/70 text-purple-700 dark:text-purple-400 border border-purple-200 dark:border-purple-800">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-semibold bg-purple-100 dark:bg-purple-950/70 text-purple-700 dark:text-purple-400 border border-purple-200 dark:border-purple-800">
                 Histórico Vivo de Commits
               </span>
             </div>

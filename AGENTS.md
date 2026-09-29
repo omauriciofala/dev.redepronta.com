@@ -42,6 +42,15 @@
    - O Breadcrumb é exibido dentro de um **box 100% horizontal (`w-full`)** na área de conteúdo, com borda sutil, superfície em card e cantos arredondados (`rounded-xl`).
    - O cabeçalho da página (Título H1, ícone, badges e botões de ação) passa a ser a **Linha 2** da tela.
    - O breadcrumb garante orientação espacial em todos os níveis de navegação sem quebrar o ritmo vertical (`space-y-6`).
+4. **Cantos Menos Arredondados no Layout Inteiro (Escala Enterprise Sóbria)**:
+   - Todo o sistema adota cantos mais retos, discretos e sóbrios, evitando arredondamentos excessivos.
+   - Escala oficial configurada no `@theme` (`resources/css/app.css`):
+     - `rounded-lg` (5px): Botões, inputs, selects, textareas e dropdowns.
+     - `rounded-xl` (6px): Cards, containers de dados, tabelas e caixas de breadcrumb.
+     - `rounded-2xl` (8px): Modais centrais e drawer lateral.
+     - `rounded-md` (4px): Badges, tags e contadores numéricos.
+     - `rounded-sm` (2px): Checkboxes e pequenos detalhes.
+
 
 
 

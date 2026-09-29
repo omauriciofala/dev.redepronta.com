@@ -191,7 +191,7 @@
         <span>Materiais</span>
         <span
           v-if="materials.length > 0"
-          class="px-2 py-0.5 rounded-full text-[11px] font-bold"
+          class="px-2 py-0.5 rounded-md text-[11px] font-bold"
           :class="activeTab === 'materials' ? 'bg-[#FC6714]/15 text-[#FC6714]' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'"
         >
           {{ materials.length }}
@@ -210,7 +210,7 @@
         <span>Serializado</span>
         <span
           v-if="serialsList.length > 0"
-          class="px-2 py-0.5 rounded-full text-[11px] font-bold"
+          class="px-2 py-0.5 rounded-md text-[11px] font-bold"
           :class="activeTab === 'serials' ? 'bg-[#FC6714]/15 text-[#FC6714]' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'"
         >
           {{ serialsList.length }}
@@ -229,7 +229,7 @@
         <span>Movimento</span>
         <span
           v-if="movementsTotal > 0"
-          class="px-2 py-0.5 rounded-full text-[11px] font-bold"
+          class="px-2 py-0.5 rounded-md text-[11px] font-bold"
           :class="activeTab === 'movements' ? 'bg-[#FC6714]/15 text-[#FC6714]' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'"
         >
           {{ movementsTotal }}
@@ -971,7 +971,7 @@
                   <div class="inline-flex items-center gap-1.5">
                     <span
                       v-if="mv.serials && mv.serials.length > 0"
-                      class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800"
+                      class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800"
                       :title="`${mv.serials.length} seriais vinculados`"
                     >
                       <QrCode class="w-3 h-3 inline mr-1" />
@@ -979,7 +979,7 @@
                     </span>
                     <span
                       v-if="mv.attachments && mv.attachments.length > 0"
-                      class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
+                      class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
                       :title="`${mv.attachments.length} arquivos/comprovantes anexados`"
                     >
                       <FileText class="w-3 h-3 inline mr-1" />
