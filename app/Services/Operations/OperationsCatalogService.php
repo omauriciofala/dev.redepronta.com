@@ -8,6 +8,7 @@ use App\Models\TicketReason;
 use App\Models\Person;
 use App\Models\Depot;
 use App\Models\City;
+use App\Models\User;
 
 class OperationsCatalogService
 {
@@ -29,6 +30,12 @@ class OperationsCatalogService
             ->orderBy('name')
             ->get();
 
+        $operators = User::where('account_id', $accountId)
+            ->where('status', 'active')
+            ->select('id', 'name', 'email')
+            ->orderBy('name')
+            ->get();
+
         $depots = Depot::with('cluster')
             ->where('account_id', $accountId)
             ->where('is_active', true)
@@ -39,6 +46,7 @@ class OperationsCatalogService
         return [
             'departments' => $departments,
             'workers' => $workers,
+            'operators' => $operators,
             'depots' => $depots,
         ];
     }

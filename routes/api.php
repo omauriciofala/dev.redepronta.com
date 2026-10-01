@@ -101,7 +101,11 @@ Route::prefix('v1')->group(function () {
     Route::prefix('operations')->group(function () {
         Route::get('catalogs', [\App\Http\Controllers\Api\V1\Operations\OperationsCatalogController::class, 'index']);
 
-        // Tarefas (Inbox Universal)
+        // Tarefas (Inbox Universal & Kanban)
+        Route::get('tasks/{id}/comments', [\App\Http\Controllers\Api\V1\Operations\TaskController::class, 'comments']);
+        Route::post('tasks/{id}/comments', [\App\Http\Controllers\Api\V1\Operations\TaskController::class, 'addComment']);
+        Route::patch('tasks/{id}/assign', [\App\Http\Controllers\Api\V1\Operations\TaskController::class, 'assign']);
+        Route::patch('tasks/{id}/status', [\App\Http\Controllers\Api\V1\Operations\TaskController::class, 'updateStatus']);
         Route::post('tasks/{id}/promote', [\App\Http\Controllers\Api\V1\Operations\TaskController::class, 'promote']);
         Route::apiResource('tasks', \App\Http\Controllers\Api\V1\Operations\TaskController::class);
 

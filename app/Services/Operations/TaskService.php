@@ -3,6 +3,7 @@
 namespace App\Services\Operations;
 
 use App\Models\Task;
+use App\Models\TaskComment;
 use App\Models\Ticket;
 use App\Models\TicketReason;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +14,7 @@ class TaskService
     public function list(array $filters, int $accountId)
     {
         $query = Task::with(['assignedUser', 'customerPerson', 'ticket'])
+            ->withCount('comments')
             ->where('account_id', $accountId);
 
         if (!empty($filters['status']) && $filters['status'] !== 'ALL') {
@@ -27,6 +29,14 @@ class TaskService
             $query->where('source', $filters['source']);
         }
 
+        if (!empty($filters['assigned_user_id']) && $filters['assigned_user_id'] !== 'ALL') {
+            if ($filters['assigned_user_id'] === 'UNASSIGNED') {
+                $query->whereNull('assigned_user_id');
+            } else {
+                $query->where('assigned_user_id', $filters['assigned_user_id']);
+            }
+        }
+
         if (!empty($filters['search'])) {
             $term = '%' . trim($filters['search']) . '%';
             $query->where(function ($q) use ($term) {
@@ -36,7 +46,12 @@ class TaskService
             });
         }
 
-        return $query->orderBy('created_at', 'desc')->paginate($filters['per_page'] ?? 15);
+        $perPage = $filters['per_page'] ?? 15;
+        if ((int)$perPage === -1) {
+            return $query->orderBy('created_at', 'desc')->get();
+        }
+
+        return $query->orderBy('created_at', 'desc')->paginate($perPage);
     }
 
     public function create(array $data, int $accountId): Task
@@ -147,6 +162,60 @@ class TaskService
 
             return $ticket->fresh(['customerPerson', 'city', 'department', 'category', 'reason', 'originTask']);
         });
+    }
+
+    public function addComment(int $taskId, string $comment, int $userId, int $accountId): TaskComment
+    {
+        $task = Task::where('account_id', $accountId)->findOrFail($taskId);
+
+        return TaskComment::create([
+            'account_id' => $accountId,
+            'task_id' => $task->id,
+            'user_id' => $userId,
+            'comment' => trim($comment),
+        ])->load('user');
+    }
+
+    public function getComments(int $taskId, int $accountId)
+    {
+        $task = Task::where('account_id', $accountId)->findOrFail($taskId);
+
+        return $task->comments()->with('user')->orderBy('created_at', 'asc')->get();
+    }
+
+    public function assignUser(int $taskId, ?int $userId, int $accountId): Task
+    {
+        $task = Task::where('account_id', $accountId)->findOrFail($taskId);
+
+        $task->assigned_user_id = $userId;
+        if ($userId && $task->status === 'INBOX') {
+            $task->status = 'TRIAGED';
+        }
+        $task->save();
+
+        return $task->fresh(['assignedUser', 'customerPerson']);
+    }
+
+    public function updateStatus(int $taskId, string $status, int $accountId): Task
+    {
+        $validStatuses = ['INBOX', 'TRIAGED', 'PROMOTED_TICKET', 'RESOLVED_INTERNAL', 'CANCELED'];
+        if (!in_array($status, $validStatuses)) {
+            throw ValidationException::withMessages(['status' => 'Status da tarefa inválido.']);
+        }
+
+        $task = Task::where('account_id', $accountId)->findOrFail($taskId);
+
+        if ($task->status === 'PROMOTED_TICKET' && $status !== 'PROMOTED_TICKET') {
+            throw ValidationException::withMessages(['status' => 'Não é permitido alterar o status de uma tarefa já promovida para Chamado.']);
+        }
+
+        $task->status = $status;
+        if ($status === 'RESOLVED_INTERNAL' && !$task->resolved_at) {
+            $task->resolved_at = now();
+        }
+        $task->save();
+
+        return $task->fresh(['assignedUser', 'customerPerson']);
     }
 
     public function getCounts(int $accountId): array

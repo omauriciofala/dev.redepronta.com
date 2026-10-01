@@ -47,4 +47,9 @@ class Task extends Model
     {
         return $this->hasOne(Ticket::class, 'origin_task_id');
     }
+
+    public function comments()
+    {
+        return $this->hasMany(TaskComment::class)->orderBy('created_at', 'asc');
+    }
 }
