@@ -14,7 +14,10 @@ class PersonService
 {
     public function list(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        $query = Person::with(['city.state', 'gender', 'group']);
+        $accountId = session('active_account_id') ?? \App\Models\Account::first()?->id ?? 1;
+
+        $query = Person::with(['city.state', 'gender', 'group'])
+            ->where('people.account_id', $accountId);
 
         if (!empty($filters['search'])) {
             $query->search($filters['search']);
