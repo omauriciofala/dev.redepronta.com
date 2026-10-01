@@ -15,7 +15,7 @@
             v-model="searchTerm"
             type="text"
             placeholder="Buscar CNAE por código ou descrição..."
-            class="w-full h-10 pl-9 pr-4 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714] focus:outline-none transition"
+            class="w-full h-10 pl-9 pr-4 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714] focus:outline-none transition"
           />
         </div>
 
@@ -130,10 +130,10 @@
       </div>
 
       <!-- Tabela de CNAEs -->
-      <div class="border border-slate-200 dark:border-[#14147A] rounded-xl overflow-hidden shadow-2xs">
+      <div class="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-2xs">
         <div class="overflow-x-auto max-h-[380px]">
           <table class="w-full text-left border-collapse text-xs">
-            <thead class="sticky top-0 bg-slate-100/90 dark:bg-[#03032E]/90 backdrop-blur-xs border-b border-slate-200 dark:border-[#14147A] text-slate-600 dark:text-slate-300 uppercase tracking-wider font-bold z-10">
+            <thead class="sticky top-0 bg-slate-100/90 dark:bg-slate-900/90 backdrop-blur-xs border-b border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 uppercase tracking-wider font-bold z-10">
               <tr>
                 <th class="py-2.5 px-4 w-32">Código</th>
                 <th class="py-2.5 px-4">Descrição da Atividade</th>
@@ -141,7 +141,7 @@
                 <th class="py-2.5 px-4 text-right w-28">Ações</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-100 dark:divide-[#14147A]/60">
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
               <tr v-if="loading">
                 <td colspan="4" class="py-8 text-center text-slate-400">
                   <span class="inline-block animate-spin mr-1.5 text-[#FC6714]">⟳</span> Carregando CNAEs...

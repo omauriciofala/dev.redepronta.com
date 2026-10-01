@@ -12,7 +12,7 @@
           </div>
           <div>
             <div class="flex items-center gap-2 flex-wrap">
-              <h3 class="text-lg font-heading font-semibold text-[#06064D] dark:text-white">
+              <h3 class="text-lg font-heading font-semibold text-[#172554] dark:text-slate-100">
                 Detalhes da Movimentação
               </h3>
               <span
@@ -56,7 +56,7 @@
 
     <div v-if="movement" class="space-y-6">
       <!-- 1. BLOCO DE RESUMO / CABEÇALHO DA OPERAÇÃO -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-xl bg-slate-50 dark:bg-[#03032E] border border-slate-200/80 dark:border-[#14147A]/70">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800">
         <div>
           <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Documento / Ref</div>
           <div class="font-semibold text-slate-800 dark:text-slate-200 text-sm mt-0.5 font-mono truncate">
@@ -87,7 +87,7 @@
       </div>
 
       <!-- 2. FLUXO: ORIGEM -> DESTINO -->
-      <div class="p-4 rounded-xl bg-white dark:bg-[#06064D]/40 border border-slate-200 dark:border-[#14147A] shadow-2xs">
+      <div class="p-4 rounded-xl bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 shadow-2xs">
         <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-1.5">
           <Warehouse class="w-4 h-4 text-[#FC6714]" />
           <span>Origem & Destino do Material</span>
@@ -118,13 +118,13 @@
       </div>
 
       <!-- 3. MATERIAL & QUANTIDADE -->
-      <div class="p-4 rounded-xl bg-white dark:bg-[#06064D]/40 border border-slate-200 dark:border-[#14147A] shadow-2xs">
+      <div class="p-4 rounded-xl bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 shadow-2xs">
         <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-1.5">
           <Boxes class="w-4 h-4 text-[#FC6714]" />
           <span>Material Movimentado</span>
         </h4>
 
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-3.5 rounded-lg bg-slate-50 dark:bg-[#03032E] border border-slate-200/80 dark:border-[#14147A]/60">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-3.5 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800">
           <div>
             <div class="font-mono text-xs font-bold text-[#FC6714] dark:text-orange-400">
               SKU: {{ movement.material?.code || '-' }}
@@ -148,7 +148,7 @@
       </div>
 
       <!-- 4. RASTREABILIDADE SERIAL (SE HOUVER) -->
-      <div v-if="movement.serials && movement.serials.length > 0" class="p-4 rounded-xl bg-white dark:bg-[#06064D]/40 border border-slate-200 dark:border-[#14147A] shadow-2xs">
+      <div v-if="movement.serials && movement.serials.length > 0" class="p-4 rounded-xl bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 shadow-2xs">
         <div class="flex items-center justify-between mb-3">
           <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
             <QrCode class="w-4 h-4 text-[#FC6714]" />
@@ -192,7 +192,7 @@
       </div>
 
       <!-- 5. TRANSPORTE & AUDITORIA -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 rounded-xl bg-slate-50 dark:bg-[#03032E] border border-slate-200/80 dark:border-[#14147A]/70 text-xs">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-xs">
         <div>
           <span class="font-bold text-slate-400 uppercase tracking-wider block text-[10px]">Motorista</span>
           <span class="font-semibold text-slate-800 dark:text-slate-200 mt-1 block">
@@ -220,7 +220,7 @@
       </div>
 
       <!-- 7. ANEXOS / COMPROVANTES (SE HOUVER) -->
-      <div v-if="movement.attachments && movement.attachments.length > 0" class="p-4 rounded-xl bg-white dark:bg-[#06064D]/40 border border-slate-200 dark:border-[#14147A] shadow-2xs">
+      <div v-if="movement.attachments && movement.attachments.length > 0" class="p-4 rounded-xl bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 shadow-2xs">
         <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-1.5">
           <FileText class="w-4 h-4 text-[#FC6714]" />
           <span>Comprovantes & Anexos ({{ movement.attachments.length }})</span>

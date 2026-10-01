@@ -26,7 +26,7 @@
         <div>
           <div class="flex items-center gap-2.5 flex-wrap">
             <slot name="title">
-              <h1 class="text-xl sm:text-2xl font-bold font-heading text-slate-900 dark:text-slate-100 tracking-tight">
+              <h1 class="text-xl sm:text-2xl font-bold font-heading text-[#172554] dark:text-slate-100 tracking-tight">
                 {{ title }}
               </h1>
             </slot>

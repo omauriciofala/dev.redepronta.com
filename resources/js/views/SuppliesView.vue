@@ -28,7 +28,7 @@
           <button
             type="button"
             @click.stop="isHeaderMenuOpen = !isHeaderMenuOpen"
-            class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition shadow-2xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#FC6714]"
+            class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition shadow-2xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#FC6714]"
             :class="{ 'bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white ring-2 ring-[#FC6714]/30': isHeaderMenuOpen }"
             title="Cadastros de Apoio e Tabelas Base"
             aria-label="Cadastros de Apoio e Tabelas Base"
@@ -54,7 +54,7 @@
             <div
               v-if="isHeaderMenuOpen"
               @click.stop
-              class="absolute right-0 mt-2 w-56 rounded-xl bg-white dark:bg-[#06064D] border border-slate-200 dark:border-[#14147A] shadow-2xl z-50 py-1 text-xs font-medium divide-y divide-slate-100 dark:divide-[#14147A]/60 focus:outline-hidden"
+              class="absolute right-0 mt-2 w-56 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl z-50 py-1 text-xs font-medium divide-y divide-slate-100 dark:divide-slate-800 focus:outline-hidden"
             >
               <div class="px-3.5 py-2 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">
                 <span>Cadastros de Apoio</span>
@@ -140,7 +140,7 @@
         <button
           type="button"
           @click="isModuleDrawerOpen = true"
-          class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition shadow-2xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#FC6714]"
+          class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition shadow-2xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#FC6714]"
           :class="{ 'bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white ring-2 ring-[#FC6714]/30': isModuleDrawerOpen }"
           title="Suprimentos & WMS (☰)"
           aria-label="Suprimentos & WMS"
@@ -153,7 +153,7 @@
           type="button"
           @click="refreshCurrentTab()"
           :disabled="loading"
-          class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition shadow-2xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#FC6714]"
+          class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition shadow-2xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#FC6714]"
           title="Recarregar dados da tela"
         >
           <RefreshCw class="w-4 h-4 text-slate-500 dark:text-slate-400" :class="{ 'animate-spin text-[#FC6714]': loading }" />
@@ -162,7 +162,7 @@
 
       <!-- Linha 3: Barra de Abas do Módulo -->
       <template #tabs>
-        <div class="flex border-b border-slate-200 dark:border-[#14147A] gap-6 overflow-x-auto select-none">
+        <div class="flex border-b border-slate-200 dark:border-slate-800 gap-6 overflow-x-auto select-none">
       <button
         type="button"
         @click="activeTab = 'materials'"
@@ -228,14 +228,14 @@
     <!-- ============================================================================= -->
     <div v-if="activeTab === 'materials'" class="space-y-4">
       <!-- Barra de Filtros e Busca de Materiais -->
-      <div class="p-4 bg-white dark:bg-[#06064D]/50 rounded-xl border border-slate-200 dark:border-[#14147A] flex flex-wrap items-center justify-between gap-4 text-sm shadow-2xs">
+      <div class="p-4 bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-4 text-sm shadow-2xs">
         <div class="relative flex-1 min-w-[280px]">
           <Search class="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400 pointer-events-none" />
           <input
             type="text"
             v-model="materialSearch"
             placeholder="Buscar por nome do item, código SKU ou categoria..."
-            class="w-full h-11 pl-10 pr-10 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 text-sm transition"
+            class="w-full h-11 pl-10 pr-10 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 text-sm transition"
           />
           <button
             v-if="materialSearch"
@@ -251,7 +251,7 @@
           <!-- Filtro por Proprietário / Solicitante (Catálogo De/Para) -->
           <select
             v-model="materialFilterOwner"
-            class="h-11 px-3 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-xs font-semibold focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer"
+            class="h-11 px-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-xs font-semibold focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer"
             title="Filtrar por Proprietário para visualizar códigos e nomes do catálogo dele"
           >
             <option value="">Proprietários</option>
@@ -263,7 +263,7 @@
           <!-- Filtro por Categoria -->
           <select
             v-model="materialFilterCategory"
-            class="h-11 px-3 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-xs font-semibold focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer"
+            class="h-11 px-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-xs font-semibold focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer"
           >
             <option value="all">Todas as Categorias</option>
             <option v-for="c in materialCategoriesList" :key="c.id" :value="c.name">
@@ -274,7 +274,7 @@
           <!-- Filtro de Tipo de Rastreio -->
           <select
             v-model="materialFilterType"
-            class="h-11 px-3 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-xs font-semibold focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer"
+            class="h-11 px-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-xs font-semibold focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer"
           >
             <option value="all">Todos os Tipos de Rastreio</option>
             <option value="serialized">Serializado</option>
@@ -316,11 +316,11 @@
       </div>
 
       <!-- TABELA CONFORTÁVEL 2: CATÁLOGO DE MATERIAIS (SEÇÃO 7 DESIGN SYSTEM) -->
-      <div class="rounded-xl border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D]/50 shadow-xs overflow-hidden transition-colors duration-200">
+      <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 shadow-xs overflow-hidden transition-colors duration-200">
         <div class="overflow-x-auto min-h-[280px]">
           <table class="w-full text-left border-collapse text-sm">
             <thead>
-              <tr class="border-b border-slate-200 dark:border-[#14147A] bg-slate-50/80 dark:bg-[#03032E]/70 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider select-none">
+              <tr class="border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/70 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider select-none">
                 <!-- Código SKU -->
                 <th
                   @click="toggleSortMaterial('code')"
@@ -362,7 +362,7 @@
                 <th class="py-3.5 px-5 text-right">Ações</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-100 dark:divide-[#14147A]/60">
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
               <tr v-if="filteredMaterials.length === 0">
                 <td colspan="6" class="py-12 text-center text-slate-400 text-sm">
                   <div class="max-w-sm mx-auto space-y-2">
@@ -487,7 +487,7 @@
                       <div
                         v-if="activeDropdownMaterialId === m.id"
                         @click.stop
-                        class="absolute right-0 w-48 rounded-xl bg-white dark:bg-[#06064D] border border-slate-200 dark:border-[#14147A] shadow-2xl z-50 py-1 text-xs font-medium divide-y divide-slate-100 dark:divide-[#14147A]/60 focus:outline-hidden"
+                        class="absolute right-0 w-48 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl z-50 py-1 text-xs font-medium divide-y divide-slate-100 dark:divide-slate-800 focus:outline-hidden"
                         :class="index >= paginatedMaterials.length - 2 && paginatedMaterials.length > 2 ? 'bottom-full mb-1.5' : 'top-full mt-1.5'"
                       >
                         <div class="py-1">
@@ -538,7 +538,7 @@
     <!-- ============================================================================= -->
     <div v-if="activeTab === 'serials'" class="space-y-4">
       <!-- Barra de Filtros e Busca de Seriais -->
-      <div class="p-4 bg-white dark:bg-[#06064D]/50 rounded-xl border border-slate-200 dark:border-[#14147A] flex flex-wrap items-center justify-between gap-4 text-sm shadow-2xs">
+      <div class="p-4 bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-4 text-sm shadow-2xs">
         <div class="relative flex-1 min-w-[280px]">
           <Search class="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400 pointer-events-none" />
           <input
@@ -546,7 +546,7 @@
             v-model="serialSearch"
             @input="debounceLoadSerials"
             placeholder="Buscar por número de série ou endereço MAC..."
-            class="w-full h-11 pl-10 pr-10 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 text-sm transition"
+            class="w-full h-11 pl-10 pr-10 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 text-sm transition"
           />
           <button
             v-if="serialSearch"
@@ -563,7 +563,7 @@
           <select
             v-model="serialStatusFilter"
             @change="loadSerials"
-            class="h-11 px-3 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-xs font-semibold focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer"
+            class="h-11 px-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-xs font-semibold focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer"
           >
             <option value="">Todos os Status</option>
             <option value="IN_STOCK">Em Estoque (Disponível)</option>
@@ -580,11 +580,11 @@
       </div>
 
       <!-- TABELA CONFORTÁVEL 4: SERIALIZADO (SEÇÃO 7 DESIGN SYSTEM) -->
-      <div class="rounded-xl border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D]/50 shadow-xs overflow-hidden transition-colors duration-200">
+      <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 shadow-xs overflow-hidden transition-colors duration-200">
         <div class="overflow-x-auto min-h-[280px]">
           <table class="w-full text-left border-collapse text-sm">
             <thead>
-              <tr class="border-b border-slate-200 dark:border-[#14147A] bg-slate-50/80 dark:bg-[#03032E]/70 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider select-none">
+              <tr class="border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/70 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider select-none">
                 <!-- Número de Série -->
                 <th
                   @click="toggleSortSerial('serial_number')"
@@ -629,7 +629,7 @@
                 <th class="py-3.5 px-5 text-right">Ação</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-100 dark:divide-[#14147A]/60">
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
               <tr v-if="filteredSerials.length === 0">
                 <td colspan="7" class="py-12 text-center text-slate-400 text-sm">
                   <div class="max-w-sm mx-auto space-y-2">
@@ -753,13 +753,13 @@
     <!-- ============================================================================= -->
     <div v-if="activeTab === 'movements'" class="space-y-4">
       <!-- Barra Superior da Aba: Alternador de Visualização (Itens Corridos vs. Por Documentos) -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-white dark:bg-[#06064D]/50 rounded-xl border border-slate-200 dark:border-[#14147A] shadow-2xs">
-        <div class="inline-flex p-1 rounded-lg bg-slate-100 dark:bg-[#03032E] border border-slate-200 dark:border-[#14147A] shrink-0">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs">
+        <div class="inline-flex p-1 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shrink-0">
           <button
             type="button"
             @click="setMovementViewMode('items')"
             :class="movementViewMode === 'items'
-              ? 'bg-white dark:bg-[#06064D] text-[#FC6714] shadow-xs font-bold'
+              ? 'bg-white dark:bg-slate-900 text-[#FC6714] shadow-xs font-bold'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium'"
             class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-md text-xs transition cursor-pointer"
           >
@@ -777,7 +777,7 @@
             type="button"
             @click="setMovementViewMode('documents')"
             :class="movementViewMode === 'documents'
-              ? 'bg-white dark:bg-[#06064D] text-[#FC6714] shadow-xs font-bold'
+              ? 'bg-white dark:bg-slate-900 text-[#FC6714] shadow-xs font-bold'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium'"
             class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-md text-xs transition cursor-pointer"
           >
@@ -803,7 +803,7 @@
       </div>
 
       <!-- Barra de Filtros e Busca de Movimentações -->
-      <div class="p-4 bg-white dark:bg-[#06064D]/50 rounded-xl border border-slate-200 dark:border-[#14147A] flex flex-wrap items-center justify-between gap-4 text-sm shadow-2xs">
+      <div class="p-4 bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-4 text-sm shadow-2xs">
         <div class="relative flex-1 min-w-[280px]">
           <Search class="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400 pointer-events-none" />
           <input
@@ -811,7 +811,7 @@
             v-model="movementSearch"
             @input="debounceLoadMovements"
             placeholder="Buscar por protocolo, documento (NF/OS), SKU, material ou serial..."
-            class="w-full h-11 pl-10 pr-10 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 text-sm transition"
+            class="w-full h-11 pl-10 pr-10 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 text-sm transition"
           />
           <button
             v-if="movementSearch"
@@ -827,7 +827,7 @@
           <!-- Filtro de Tipo de Movimentação -->
           <select
             v-model="movementTypeFilter"
-            class="h-11 px-3 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-xs font-semibold focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer"
+            class="h-11 px-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-xs font-semibold focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer"
           >
             <option value="">Todos os Tipos</option>
             <option value="ENTRY">Entrada</option>
@@ -840,7 +840,7 @@
           <!-- Filtro de Depósito -->
           <select
             v-model="movementDepotFilter"
-            class="h-11 px-3 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-xs font-semibold focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer max-w-[200px] truncate"
+            class="h-11 px-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-xs font-semibold focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer max-w-[200px] truncate"
           >
             <option value="">Todos os Depósitos</option>
             <option v-for="d in depots" :key="d.id" :value="d.id">
@@ -849,7 +849,7 @@
           </select>
 
           <!-- Período: Data Inicial -->
-          <div class="flex items-center gap-1.5 bg-slate-50 dark:bg-[#03032E] px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-[#14147A]">
+          <div class="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-900 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800">
             <span class="text-[11px] font-bold text-slate-400 uppercase">De:</span>
             <input
               type="date"
@@ -859,7 +859,7 @@
           </div>
 
           <!-- Período: Data Final -->
-          <div class="flex items-center gap-1.5 bg-slate-50 dark:bg-[#03032E] px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-[#14147A]">
+          <div class="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-900 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800">
             <span class="text-[11px] font-bold text-slate-400 uppercase">Até:</span>
             <input
               type="date"
@@ -872,7 +872,7 @@
             v-if="movementSearch || movementTypeFilter || movementDepotFilter || movementStartDate || movementEndDate"
             type="button"
             @click="clearAllMovementFilters"
-            class="h-11 px-3 rounded-lg border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] text-slate-600 dark:text-slate-300 hover:text-[#FC6714] text-xs font-semibold transition cursor-pointer flex items-center gap-1"
+            class="h-11 px-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:text-[#FC6714] text-xs font-semibold transition cursor-pointer flex items-center gap-1"
             title="Limpar todos os filtros"
           >
             <X class="w-3.5 h-3.5" />
@@ -886,11 +886,11 @@
       </div>
 
       <!-- TABELA CONFORTÁVEL: MOVIMENTAÇÕES ITENS CORRIDOS (DESIGN SYSTEM CANÔNICO) -->
-      <div v-if="movementViewMode === 'items'" class="rounded-xl border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D]/50 shadow-xs overflow-hidden transition-colors duration-200">
+      <div v-if="movementViewMode === 'items'" class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 shadow-xs overflow-hidden transition-colors duration-200">
         <div class="overflow-x-auto min-h-[280px]">
           <table class="w-full text-left border-collapse text-sm">
             <thead>
-              <tr class="border-b border-slate-200 dark:border-[#14147A] bg-slate-50/80 dark:bg-[#03032E]/70 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider select-none">
+              <tr class="border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/70 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider select-none">
                 <th class="py-3.5 px-5">Data / Hora</th>
                 <th class="py-3.5 px-5">Protocolo & Doc</th>
                 <th class="py-3.5 px-5 text-center">Tipo</th>
@@ -901,7 +901,7 @@
                 <th class="py-3.5 px-5 text-right">Ações</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-100 dark:divide-[#14147A]/50">
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
               <tr v-if="loadingMovements">
                 <td colspan="8" class="py-12 text-center text-slate-400">
                   <div class="flex items-center justify-center gap-2">
@@ -1075,11 +1075,11 @@
       </div>
 
       <!-- TABELA CONFORTÁVEL: DOCUMENTOS CONSOLIDADOS (DESIGN SYSTEM CANÔNICO) -->
-      <div v-else-if="movementViewMode === 'documents'" class="rounded-xl border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D]/50 shadow-xs overflow-hidden transition-colors duration-200">
+      <div v-else-if="movementViewMode === 'documents'" class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 shadow-xs overflow-hidden transition-colors duration-200">
         <div class="overflow-x-auto min-h-[280px]">
           <table class="w-full text-left border-collapse text-sm">
             <thead>
-              <tr class="border-b border-slate-200 dark:border-[#14147A] bg-slate-50/80 dark:bg-[#03032E]/70 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider select-none">
+              <tr class="border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/70 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider select-none">
                 <th class="py-3.5 px-3 w-10 text-center"></th>
                 <th class="py-3.5 px-5">Data / Hora</th>
                 <th class="py-3.5 px-5">Protocolo & Documento</th>
@@ -1090,7 +1090,7 @@
                 <th class="py-3.5 px-5 text-right">Ações</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-100 dark:divide-[#14147A]/50">
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
               <tr v-if="loadingDocuments">
                 <td colspan="8" class="py-12 text-center text-slate-400">
                   <div class="flex items-center justify-center gap-2">
@@ -1254,7 +1254,7 @@
                 <!-- Linha de Sanfona / Accordion (Itens do Documento) -->
                 <tr
                   v-if="expandedDocumentKeys.has(doc.key)"
-                  class="bg-slate-50/80 dark:bg-[#03032E]/90 border-t border-b border-orange-200/60 dark:border-orange-900/40"
+                  class="bg-slate-50/80 dark:bg-slate-900/90 border-t border-b border-orange-200/60 dark:border-orange-900/40"
                 >
                   <td colspan="8" class="p-4 sm:p-5">
                     <div class="space-y-3 pl-8 pr-2">
@@ -1274,10 +1274,10 @@
                       </div>
 
                       <!-- Sub-tabela de Itens do Documento -->
-                      <div class="rounded-lg border border-slate-200 dark:border-[#14147A] overflow-hidden bg-white dark:bg-[#06064D]/70 shadow-2xs">
+                      <div class="rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden bg-white dark:bg-slate-900/70 shadow-2xs">
                         <table class="w-full text-left text-xs border-collapse">
                           <thead>
-                            <tr class="border-b border-slate-200 dark:border-[#14147A] bg-slate-100/70 dark:bg-[#03032E] text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                            <tr class="border-b border-slate-200 dark:border-slate-800 bg-slate-100/70 dark:bg-slate-900 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                               <th class="py-2.5 px-4">SKU / Código</th>
                               <th class="py-2.5 px-4">Material</th>
                               <th class="py-2.5 px-4 text-right">Quantidade</th>
@@ -1285,7 +1285,7 @@
                               <th class="py-2.5 px-4 text-right">Anexos</th>
                             </tr>
                           </thead>
-                          <tbody class="divide-y divide-slate-100 dark:divide-[#14147A]/50">
+                          <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                             <tr v-for="item in doc.items" :key="item.id" class="hover:bg-slate-50/50 dark:hover:bg-white/[0.02]">
                               <!-- SKU -->
                               <td class="py-2.5 px-4 font-mono font-bold text-[#FC6714] dark:text-orange-400 whitespace-nowrap">

@@ -43,7 +43,7 @@
     <section id="tipografia" class="space-y-4">
       <div class="flex items-center gap-2.5">
         <Type class="w-5 h-5 text-[#FC6714] dark:text-orange-400" />
-        <h2 class="text-lg font-heading font-semibold text-[#06064D] dark:text-white">1. Escala Tipográfica Ergonômica</h2>
+        <h2 class="text-lg font-heading font-semibold text-[#172554] dark:text-slate-100">1. Escala Tipográfica Ergonômica</h2>
       </div>
       <p class="text-sm text-slate-500 dark:text-slate-400">
         Desenvolvida para operadores de rotina contínua. Fontes microscópicas foram banidas; a leitura padrão do ERP opera entre 14px e 16px.
@@ -107,7 +107,7 @@
     <section id="cores" class="space-y-4">
       <div class="flex items-center gap-2.5">
         <Palette class="w-5 h-5 text-[#FC6714] dark:text-orange-400" />
-        <h2 class="text-lg font-heading font-semibold text-[#06064D] dark:text-white">2. Paleta de Cores & Tokens Semânticos</h2>
+        <h2 class="text-lg font-heading font-semibold text-[#172554] dark:text-slate-100">2. Paleta de Cores & Tokens Semânticos</h2>
       </div>
       <p class="text-sm text-slate-500 dark:text-slate-400">
         Cores calibradas para garantir conformidade de contraste WCAG AA tanto no modo escuro quanto no modo claro.
@@ -216,7 +216,7 @@
     <section id="botoes" class="space-y-4">
       <div class="flex items-center gap-2.5">
         <MousePointerClick class="w-5 h-5 text-[#FC6714] dark:text-orange-400" />
-        <h2 class="text-lg font-heading font-semibold text-[#06064D] dark:text-white">3. Botões & Ações Interativas</h2>
+        <h2 class="text-lg font-heading font-semibold text-[#172554] dark:text-slate-100">3. Botões & Ações Interativas</h2>
       </div>
       <p class="text-sm text-slate-500 dark:text-slate-400">
         Altura ergonômica mínima de 40px (`h-10`) para cliques seguros e operação rápida em telas sensíveis ou de alta resolução.
@@ -277,7 +277,7 @@
     <section id="formularios" class="space-y-4">
       <div class="flex items-center gap-2.5">
         <Sliders class="w-5 h-5 text-[#FC6714] dark:text-orange-400" />
-        <h2 class="text-lg font-heading font-semibold text-[#06064D] dark:text-white">4. Formulários & Inputs Ergonômicos</h2>
+        <h2 class="text-lg font-heading font-semibold text-[#172554] dark:text-slate-100">4. Formulários & Inputs Ergonômicos</h2>
       </div>
       <p class="text-sm text-slate-500 dark:text-slate-400">
         Labels destacadas, inputs de altura confortável `h-10`, texto em `text-sm` e contraste nítido em ambos os temas.
@@ -450,7 +450,7 @@
     <section id="badges" class="space-y-4">
       <div class="flex items-center gap-2.5">
         <Tag class="w-5 h-5 text-[#FC6714] dark:text-orange-400" />
-        <h2 class="text-lg font-heading font-semibold text-[#06064D] dark:text-white">5. Badges & Personas do ERP</h2>
+        <h2 class="text-lg font-heading font-semibold text-[#172554] dark:text-slate-100">5. Badges & Personas do ERP</h2>
       </div>
       <p class="text-sm text-slate-500 dark:text-slate-400">
         Tamanho ergonômico `text-xs font-semibold` com espaçamento interno generoso (`px-2.5 py-1`). Evita textos colados e ilegíveis.
@@ -503,7 +503,7 @@
     <section id="alertas" class="space-y-4">
       <div class="flex items-center gap-2.5">
         <Bell class="w-5 h-5 text-[#FC6714] dark:text-orange-400" />
-        <h2 class="text-lg font-heading font-semibold text-[#06064D] dark:text-white">6. Banners de Alerta & Notificação</h2>
+        <h2 class="text-lg font-heading font-semibold text-[#172554] dark:text-slate-100">6. Banners de Alerta & Notificação</h2>
       </div>
       <p class="text-sm text-slate-500 dark:text-slate-400">
         Comunicação clara de erros, avisos e confirmações operacionais sem sobrecarregar o usuário.
@@ -540,7 +540,7 @@
     <section id="tabelas" class="space-y-4">
       <div class="flex items-center gap-2.5">
         <Table class="w-5 h-5 text-[#FC6714] dark:text-orange-400" />
-        <h2 class="text-lg font-heading font-semibold text-[#06064D] dark:text-white">7. Padrão de Tabelas Confortáveis</h2>
+        <h2 class="text-lg font-heading font-semibold text-[#172554] dark:text-slate-100">7. Padrão de Tabelas Confortáveis</h2>
       </div>
       <p class="text-sm text-slate-500 dark:text-slate-400">
         Linhas com padding generoso (`py-4 px-5`), fontes `text-sm` e contraste nítido entre linhas.
@@ -591,7 +591,7 @@
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2.5">
           <Maximize2 class="w-5 h-5 text-[#FC6714] dark:text-orange-400" />
-          <h2 class="text-lg font-heading font-semibold text-[#06064D] dark:text-white">8. Modais, Diálogos & Formulários em Tela Cheia</h2>
+          <h2 class="text-lg font-heading font-semibold text-[#172554] dark:text-slate-100">8. Modais, Diálogos & Formulários em Tela Cheia</h2>
         </div>
         <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
           Biblioteca Canônica
@@ -723,7 +723,7 @@
     <section id="layout-paginas" class="space-y-4">
       <div class="flex items-center gap-2.5">
         <LayoutTemplate class="w-5 h-5 text-[#FC6714] dark:text-orange-400" />
-        <h2 class="text-lg font-heading font-semibold text-[#06064D] dark:text-white">9. Estrutura de Páginas & Margens (Page Shell & Spacing) ⭐</h2>
+        <h2 class="text-lg font-heading font-semibold text-[#172554] dark:text-slate-100">9. Estrutura de Páginas & Margens (Page Shell & Spacing) ⭐</h2>
       </div>
       <p class="text-sm text-slate-500 dark:text-slate-400">
         Padrão obrigatório de margens, respiros perimetrais e estrutura de cabeçalho para todas as telas do ERP.
@@ -858,7 +858,7 @@
     <section id="topo-pagina-padrao" class="space-y-6">
       <div class="flex items-center gap-2.5">
         <Compass class="w-5 h-5 text-[#FC6714] dark:text-orange-400" />
-        <h2 class="text-lg font-heading font-semibold text-[#06064D] dark:text-white">10. Topo de Página Padrão (Page Header & Breadcrumb) ⭐</h2>
+        <h2 class="text-lg font-heading font-semibold text-[#172554] dark:text-slate-100">10. Topo de Página Padrão (Page Header & Breadcrumb) ⭐</h2>
       </div>
       <p class="text-sm text-slate-500 dark:text-slate-400">
         Padrão canônico de composição do topo de tela no ERP Rede Pronta. Toda página do sistema deve apresentar harmoniosamente
@@ -875,7 +875,7 @@
           </div>
 
           <!-- Demonstração Viva com BasePageHeader Canônico -->
-          <div class="p-6 rounded-xl bg-slate-50 dark:bg-[#03032E] border border-slate-200/80 dark:border-[#14147A]/70">
+          <div class="p-6 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800">
             <BasePageHeader
               :breadcrumb-items="[
                 { label: 'Início', href: '#people' },
@@ -898,7 +898,7 @@
 
                 <button
                   type="button"
-                  class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition shadow-2xs cursor-pointer"
+                  class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition shadow-2xs cursor-pointer"
                   title="Cadastros de Apoio"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5" viewBox="0 0 24 24" fill="currentColor">
@@ -911,7 +911,7 @@
 
               <!-- Linha 3: Barra de Abas do Módulo -->
               <template #tabs>
-                <div class="flex border-b border-slate-200 dark:border-[#14147A] gap-6 overflow-x-auto select-none pt-2">
+                <div class="flex border-b border-slate-200 dark:border-slate-800 gap-6 overflow-x-auto select-none pt-2">
                   <button
                     type="button"
                     @click="demoActiveModuleTab = 'materiais'"
@@ -964,7 +964,7 @@
           </div>
 
           <!-- Demonstração Viva com BasePageHeader Canônico -->
-          <div class="p-6 rounded-xl bg-slate-50 dark:bg-[#03032E] border border-slate-200/80 dark:border-[#14147A]/70">
+          <div class="p-6 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800">
             <BasePageHeader
               :breadcrumb-items="[
                 { label: 'Início', href: '#people' },
@@ -1005,7 +1005,7 @@
           </div>
 
           <!-- Demonstração Viva com BasePageHeader Canônico -->
-          <div class="p-6 rounded-xl bg-slate-50 dark:bg-[#03032E] border border-slate-200/80 dark:border-[#14147A]/70">
+          <div class="p-6 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800">
             <BasePageHeader
               :breadcrumb-items="[
                 { label: 'Início', href: '#people' },

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-screen w-screen overflow-hidden bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans antialiased">
+  <div class="flex h-screen w-screen overflow-hidden bg-slate-50 dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100 font-sans antialiased">
     <!-- Sidebar Fixa com 240px -->
     <Sidebar />
 

@@ -30,7 +30,7 @@ O **ERP Rede Pronta** é um sistema de missão crítica para gestão integrada d
 - **Sobriedade Enterprise**: Ausência de elementos infantis, cantos excessivamente arredondados ou decorações desnecessárias. A interface prioriza densidade informacional equilibrada e organização lógica.
 - **Ergonomia Operacional**: Desenhado para operadores com turnos prolongados de digitação e consulta. Espaçamentos generosos no topo da página, textos legíveis (mínimo de 14px para leitura regular) e contraste em conformidade com normas WCAG AA.
 - **Hierarquia Visual Imediata**: O usuário deve identificar em menos de 1 segundo em qual módulo se encontra, qual é a hierarquia de navegação e quais são os botões de ação primária.
-- **Harmonia Multi-Tema**: Suporte nativo completo a Modo Claro (*Light*) e Modo Escuro (*Dark*), preservando as cores institucionais Laranja `#FC6714` e Azul Navy `#06064D`.
+- **Harmonia Multi-Tema**: Suporte nativo completo a Modo Claro (*Light*) e Modo Escuro (*Dark*), combinando o Laranja Oficial da marca `#FC6714`, o Azul Grafite Corporativo suave (`#172554` / `#0F172A`) e a base noturna em Deep Slate (`#0B0F19` e `#070B14`).
 
 ---
 
@@ -67,27 +67,29 @@ A tipografia do sistema é rigorosamente dividida entre duas famílias de fontes
 As cores oficiais do BrandBook Rede Pronta e os tokens do Tailwind CSS v4 (`resources/css/app.css`):
 
 ### 3.1 Cores Institucionais Canônicas
-- **Laranja Oficial (Primary Action):**
-  - Base: `#FC6714` (`--color-brand-orange`)
+- **Laranja Oficial (Primary Action & Accent):**
+  - Base: `#FC6714` (`--color-brand-orange`) — Exclusivo para ações primárias, CTAs ("Nova Tarefa", "Salvar"), badges de destaque e acentos selecionados.
   - Hover: `#E0530A` (`--color-brand-orange-hover`)
   - Active: `#C94605` (`--color-brand-orange-active`)
-  - Fundo Sutil (Subtle): `rgba(252, 103, 20, 0.12)` (`--color-brand-orange-subtle`)
-- **Azul Navy Institucional (Deep Foundation):**
-  - Base: `#06064D` (`--color-brand-navy`)
-  - Light: `#0B0B68` (`--color-brand-navy-light`)
-  - Dark Canvas: `#03032E` (`--color-brand-navy-dark`)
-  - Borda Dark: `#14147A` (`--color-brand-navy-border`)
+  - Acento Refinado (Subtle / Active Nav): `rgba(252, 103, 20, 0.15)` com texto `#FC6714` e barra de destaque à esquerda (`border-l-2 border-[#FC6714]`).
+- **Azul Grafite Corporativo (Corporate Navy & Deep Slate):**
+  - Títulos Light Mode (Navy Suave): `#172554` / `#0F172A` (elegante, com máxima legibilidade e sem peso visual excessivo).
+  - Canvas Noturno (Deep Slate Canvas): `#0B0F19` (grafite com subtom frio imperceptível, extremamente confortável para longas jornadas).
+  - Sidebar Noturna Unificada: `#070B14` com bordas sutis `#1E293B` e rodapé `#05080E`.
+  - Superfícies Dark (Cards e Caixas): `#111827` / `slate-900`.
+  - Bordas Dark: `#1F293D` / `slate-800`.
 
 ### 3.2 Superfícies e Contrastes por Tema
 
 | Token / Função | Tema Claro (Light) | Tema Escuro (Dark) | Aplicação |
 | :--- | :--- | :--- | :--- |
-| **Canvas de Fundo** | `#f8fafc` (`slate-50`) | `#03032E` / `#020617` | Fundo principal da janela e do `<main>` |
-| **Superfície Card** | `#ffffff` | `#06064D` / `slate-900` | Cards, caixas de breadcrumb, modais |
-| **Superfície Hover** | `#f1f5f9` (`slate-100`) | `#0B0B68` / `slate-800` | Linhas de tabelas e menus ao passar o mouse |
-| **Bordas Sutis** | `#e2e8f0` (`slate-200`) | `#14147A` / `slate-800` | Divisores de blocos, contornos de cards |
-| **Texto Título** | `#06064D` | `#ffffff` | Títulos H1, H2 e números em destaque |
-| **Texto Primário** | `#0f172a` (`slate-900`) | `#f8fafc` (`slate-100`) | Textos corridos, inputs, valores |
+| **Canvas de Fundo** | `#f8fafc` (`slate-50`) | `#0B0F19` (Deep Slate) | Fundo principal da janela e do `<main>` |
+| **Sidebar Unificada** | `#070B14` (Deep Slate) | `#070B14` (Deep Slate) | Barra lateral de navegação fixa com borda `#1E293B` |
+| **Superfície Card** | `#ffffff` | `#111827` (`slate-900`) | Cards, caixas de breadcrumb, modais |
+| **Superfície Hover** | `#f1f5f9` (`slate-100`) | `#1e293b` (`slate-800`) | Linhas de tabelas e menus ao passar o mouse |
+| **Bordas Sutis** | `#e2e8f0` (`slate-200`) | `#1f293d` (`slate-800`) | Divisores de blocos, contornos de cards |
+| **Texto Título** | `#172554` (Navy Suave) | `#f8fafc` (`slate-100`) | Títulos H1, H2 e números em destaque |
+| **Texto Primário** | `#0f172a` (`slate-900`) | `#cbd5e1` (`slate-300`) | Textos corridos, inputs, valores |
 | **Texto Secundário** | `#64748b` (`slate-500`) | `#94a3b8` (`slate-400`) | Descrições de apoio, labels secundárias |
 
 ---

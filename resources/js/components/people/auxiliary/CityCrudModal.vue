@@ -15,7 +15,7 @@
             <select
               v-model="filterStateId"
               @change="onStateFilterChange"
-              class="w-full h-10 px-2.5 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714] outline-none"
+              class="w-full h-10 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714] outline-none"
             >
               <option value="">Todas as UFs</option>
               <option v-for="st in states" :key="st.id" :value="st.id">
@@ -32,7 +32,7 @@
               @input="onSearchInput"
               type="text"
               placeholder="Buscar cidade por nome ou código IBGE..."
-              class="w-full h-10 pl-9 pr-8 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714] focus:outline-none transition"
+              class="w-full h-10 pl-9 pr-8 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714] focus:outline-none transition"
             />
             <button
               v-if="searchTerm"
@@ -161,10 +161,10 @@
       </div>
 
       <!-- Tabela de Cidades -->
-      <div class="border border-slate-200 dark:border-[#14147A] rounded-xl overflow-hidden shadow-2xs">
+      <div class="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-2xs">
         <div class="overflow-x-auto max-h-[380px]">
           <table class="w-full text-left border-collapse text-xs">
-            <thead class="sticky top-0 bg-slate-100/90 dark:bg-[#03032E]/90 backdrop-blur-xs border-b border-slate-200 dark:border-[#14147A] text-slate-600 dark:text-slate-300 uppercase tracking-wider font-bold z-10">
+            <thead class="sticky top-0 bg-slate-100/90 dark:bg-slate-900/90 backdrop-blur-xs border-b border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 uppercase tracking-wider font-bold z-10">
               <tr>
                 <th class="py-2.5 px-4 w-28">Código IBGE</th>
                 <th class="py-2.5 px-4">Nome do Município</th>
@@ -172,7 +172,7 @@
                 <th class="py-2.5 px-4 text-right w-28">Ações</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-100 dark:divide-[#14147A]/60">
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
               <tr v-if="loading">
                 <td colspan="4" class="py-8 text-center text-slate-400">
                   <span class="inline-block animate-spin mr-1.5 text-[#FC6714]">⟳</span> Carregando cidades...
@@ -225,7 +225,7 @@
         </div>
 
         <!-- Barra de Paginação da Tabela de Cidades -->
-        <div class="px-4 py-2.5 border-t border-slate-200 dark:border-[#14147A] flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600 dark:text-slate-400 bg-slate-50/70 dark:bg-[#03032E]/60">
+        <div class="px-4 py-2.5 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600 dark:text-slate-400 bg-slate-50/70 dark:bg-slate-900/60">
           <div class="flex items-center gap-2">
             <span>
               Exibindo <strong>{{ fromRecord }}-{{ toRecord }}</strong> de <strong>{{ totalCities.toLocaleString('pt-BR') }}</strong> cidades
@@ -233,7 +233,7 @@
             <select
               v-model="perPage"
               @change="currentPage = 1; loadCities()"
-              class="h-7 px-2 rounded-md border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D] text-slate-700 dark:text-slate-300 text-xs focus:ring-2 focus:ring-[#FC6714] outline-none cursor-pointer"
+              class="h-7 px-2 rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 text-xs focus:ring-2 focus:ring-[#FC6714] outline-none cursor-pointer"
             >
               <option :value="10">10 por pág.</option>
               <option :value="15">15 por pág.</option>
@@ -247,7 +247,7 @@
               type="button"
               :disabled="currentPage <= 1 || loading"
               @click="changePage(1)"
-              class="px-2 py-1 rounded-md border border-slate-200 dark:border-[#14147A] hover:bg-white dark:hover:bg-[#06064D] hover:border-[#FC6714] hover:text-[#FC6714] disabled:opacity-40 font-medium transition cursor-pointer"
+              class="px-2 py-1 rounded-md border border-slate-200 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-800 hover:border-[#FC6714] hover:text-[#FC6714] disabled:opacity-40 font-medium transition cursor-pointer"
               title="Primeira página"
             >
               &laquo;
@@ -256,7 +256,7 @@
               type="button"
               :disabled="currentPage <= 1 || loading"
               @click="changePage(currentPage - 1)"
-              class="px-2.5 py-1 rounded-md border border-slate-200 dark:border-[#14147A] hover:bg-white dark:hover:bg-[#06064D] hover:border-[#FC6714] hover:text-[#FC6714] disabled:opacity-40 font-medium transition cursor-pointer"
+              class="px-2.5 py-1 rounded-md border border-slate-200 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-800 hover:border-[#FC6714] hover:text-[#FC6714] disabled:opacity-40 font-medium transition cursor-pointer"
             >
               Anterior
             </button>
@@ -267,7 +267,7 @@
               type="button"
               :disabled="currentPage >= lastPage || loading"
               @click="changePage(currentPage + 1)"
-              class="px-2.5 py-1 rounded-md border border-slate-200 dark:border-[#14147A] hover:bg-white dark:hover:bg-[#06064D] hover:border-[#FC6714] hover:text-[#FC6714] disabled:opacity-40 font-medium transition cursor-pointer"
+              class="px-2.5 py-1 rounded-md border border-slate-200 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-800 hover:border-[#FC6714] hover:text-[#FC6714] disabled:opacity-40 font-medium transition cursor-pointer"
             >
               Próxima
             </button>
@@ -275,7 +275,7 @@
               type="button"
               :disabled="currentPage >= lastPage || loading"
               @click="changePage(lastPage)"
-              class="px-2 py-1 rounded-md border border-slate-200 dark:border-[#14147A] hover:bg-white dark:hover:bg-[#06064D] hover:border-[#FC6714] hover:text-[#FC6714] disabled:opacity-40 font-medium transition cursor-pointer"
+              class="px-2 py-1 rounded-md border border-slate-200 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-800 hover:border-[#FC6714] hover:text-[#FC6714] disabled:opacity-40 font-medium transition cursor-pointer"
               title="Última página"
             >
               &raquo;

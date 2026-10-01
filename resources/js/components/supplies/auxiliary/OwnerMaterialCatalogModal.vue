@@ -73,7 +73,7 @@
       <!-- Cabeçalho do Preview com Nome do Arquivo e Resumo Rápido -->
       <div class="p-3.5 rounded-xl bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-[#FC6714]/30 flex items-center justify-between gap-3">
         <div class="flex items-center gap-3">
-          <div class="p-2.5 rounded-lg bg-white dark:bg-[#03032E] text-[#FC6714] shadow-2xs">
+          <div class="p-2.5 rounded-lg bg-white dark:bg-slate-900 text-[#FC6714] shadow-2xs">
             <FileSpreadsheet class="w-5 h-5" />
           </div>
           <div>
@@ -97,7 +97,7 @@
 
       <!-- Cards de Métricas do Preview -->
       <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs">
-        <div class="p-3 rounded-xl border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] shadow-2xs">
+        <div class="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xs">
           <span class="text-[10px] uppercase font-bold text-slate-400 block">Total de Linhas</span>
           <span class="text-xl font-bold text-slate-800 dark:text-slate-100 mt-1 block">{{ previewSummary.total_rows }}</span>
         </div>
@@ -129,10 +129,10 @@
       </div>
 
       <!-- Tabela Panorâmica de Preview das Linhas em Tela Cheia -->
-      <div class="rounded-xl border border-slate-200 dark:border-[#14147A] overflow-hidden bg-white dark:bg-[#03032E] shadow-2xs">
+      <div class="rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden bg-white dark:bg-slate-900 shadow-2xs">
         <div class="max-h-[calc(100vh-340px)] min-h-[420px] overflow-y-auto overflow-x-auto">
           <table class="w-full text-left border-collapse text-xs">
-            <thead class="sticky top-0 bg-slate-50 dark:bg-[#06064D] border-b border-slate-200 dark:border-[#14147A] z-10">
+            <thead class="sticky top-0 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 z-10">
               <tr class="font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[11px]">
                 <th class="py-3 px-4 text-center w-14">Linha</th>
                 <th class="py-3 px-4">Cód. Sistema (Canônico)</th>
@@ -141,7 +141,7 @@
                 <th class="py-3 px-4 text-right">Ação Prevista</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-100 dark:divide-[#14147A]/60">
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
               <tr
                 v-for="row in previewRows"
                 :key="row.line"
@@ -247,7 +247,7 @@
             v-model="searchTerm"
             type="text"
             placeholder="Buscar por código do proprietário, nome ou SKU do sistema..."
-            class="w-full h-10 pl-9 pr-4 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714] focus:outline-none transition"
+            class="w-full h-10 pl-9 pr-4 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714] focus:outline-none transition"
           />
         </div>
 
@@ -257,7 +257,7 @@
           <button
             type="button"
             @click="downloadTemplate('xlsx')"
-            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-200 text-xs font-medium shadow-2xs transition cursor-pointer"
+            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-200 text-xs font-medium shadow-2xs transition cursor-pointer"
             title="Baixar planilha Excel modelo (.xlsx) com 3 colunas: COD., NOME DO MATERIAL, COD. PROP."
           >
             <Download class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
@@ -267,7 +267,7 @@
           <button
             type="button"
             @click="downloadTemplate('csv')"
-            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-200 text-xs font-medium shadow-2xs transition cursor-pointer"
+            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-200 text-xs font-medium shadow-2xs transition cursor-pointer"
             title="Baixar planilha CSV modelo (3 colunas: COD., NOME DO MATERIAL, COD. PROP.)"
           >
             <Download class="w-3.5 h-3.5 text-slate-400" />
@@ -276,7 +276,7 @@
 
           <!-- Importar Planilha com Preview -->
           <label
-            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-200 text-xs font-medium shadow-2xs transition cursor-pointer"
+            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-200 text-xs font-medium shadow-2xs transition cursor-pointer"
             title="Importar planilha Excel (.xlsx) ou CSV de materiais com pré-visualização"
           >
             <Loader2 v-if="isPreviewLoading" class="w-3.5 h-3.5 animate-spin text-[#FC6714]" />
@@ -430,7 +430,7 @@
       </Transition>
 
       <!-- Tabela do Catálogo De/Para -->
-      <div class="rounded-xl border border-slate-200 dark:border-[#14147A] overflow-hidden bg-white dark:bg-[#03032E] shadow-2xs">
+      <div class="rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden bg-white dark:bg-slate-900 shadow-2xs">
         <div v-if="isLoading" class="p-8 text-center text-slate-400">
           <Loader2 class="w-6 h-6 animate-spin mx-auto text-[#FC6714] mb-2" />
           <p class="text-xs">Carregando catálogo de materiais do proprietário...</p>
@@ -454,7 +454,7 @@
             <button
               type="button"
               @click="downloadTemplate"
-              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] text-slate-700 dark:text-slate-300 text-xs font-medium hover:bg-slate-50 transition cursor-pointer"
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 text-xs font-medium hover:bg-slate-50 transition cursor-pointer"
             >
               <Download class="w-3.5 h-3.5 text-slate-400" />
               <span>Baixar Modelo CSV (3 Colunas)</span>
@@ -465,7 +465,7 @@
         <div v-else class="overflow-x-auto">
           <table class="w-full text-left border-collapse text-xs">
             <thead>
-              <tr class="border-b border-slate-200 dark:border-[#14147A] bg-slate-50/75 dark:bg-[#06064D]/50 font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[11px]">
+              <tr class="border-b border-slate-200 dark:border-slate-800 bg-slate-50/75 dark:bg-slate-900/50 font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[11px]">
                 <th class="py-3 px-4">Código</th>
                 <th class="py-3 px-4">Nome no Proprietário</th>
                 <th class="py-3 px-4">Material no Sistema (SKU / Canônico)</th>
@@ -473,7 +473,7 @@
                 <th class="py-3 px-4 text-right">Ações</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-100 dark:divide-[#14147A]/60">
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
               <tr
                 v-for="item in filteredItems"
                 :key="item.id"

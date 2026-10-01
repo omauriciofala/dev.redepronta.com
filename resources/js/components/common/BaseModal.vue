@@ -29,7 +29,7 @@
           >
             <slot name="header">
               <div>
-                <h3 class="text-xl font-heading font-semibold text-[#06064D] dark:text-white tracking-tight flex items-center gap-2.5">
+                <h3 class="text-xl font-heading font-semibold text-[#172554] dark:text-slate-100 tracking-tight flex items-center gap-2.5">
                   {{ title }}
                   <slot name="header-badge" />
                 </h3>
@@ -87,7 +87,7 @@
           >
             <slot name="header">
               <div>
-                <h3 class="text-lg font-heading font-semibold text-[#06064D] dark:text-white tracking-tight flex items-center gap-2.5">
+                <h3 class="text-lg font-heading font-semibold text-[#172554] dark:text-slate-100 tracking-tight flex items-center gap-2.5">
                   {{ title }}
                   <slot name="header-badge" />
                 </h3>
@@ -144,7 +144,7 @@
             >
               <slot name="header">
                 <div>
-                  <h3 class="text-lg font-heading font-semibold text-[#06064D] dark:text-white tracking-tight flex items-center gap-2.5">
+                  <h3 class="text-lg font-heading font-semibold text-[#172554] dark:text-slate-100 tracking-tight flex items-center gap-2.5">
                     {{ title }}
                     <slot name="header-badge" />
                   </h3>

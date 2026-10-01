@@ -10,16 +10,16 @@
   --font-heading: 'Kanit', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-display: 'Kanit', -apple-system, BlinkMacSystemFont, sans-serif;
 
-  /* Paleta Institucional Canônica Rede Pronta (BrandBook) */
+  /* Paleta Institucional Canônica Rede Pronta (BrandBook Refinado) */
   --color-brand-orange: #FC6714;
   --color-brand-orange-hover: #E0530A;
   --color-brand-orange-active: #C94605;
   --color-brand-orange-subtle: rgba(252, 103, 20, 0.12);
 
-  --color-brand-navy: #06064D;
-  --color-brand-navy-light: #0B0B68;
-  --color-brand-navy-dark: #03032E;
-  --color-brand-navy-border: #14147A;
+  --color-brand-navy: #0F172A;
+  --color-brand-navy-light: #1E293B;
+  --color-brand-navy-dark: #0B0F19;
+  --color-brand-navy-border: #1E293B;
 
   /* Escala Canônica de Cantos Menos Arredondados (Design System Enterprise Sóbrio) */
   --radius-xs: 2px;
@@ -124,25 +124,25 @@ input[type="radio"] {
   --bg-surface: #ffffff;
   --bg-surface-hover: #f1f5f9;
   --border-subtle: #e2e8f0;
-  --text-main: #06064D;
+  --text-main: #172554;
   --text-body: #1e293b;
   --text-muted: #64748b;
   --primary: #FC6714;
   --primary-hover: #E0530A;
-  --brand-navy: #06064D;
+  --brand-navy: #172554;
 }
 
 .dark {
-  --bg-canvas: #03032E;
-  --bg-surface: #06064D;
-  --bg-surface-hover: #0B0B68;
-  --border-subtle: #14147A;
-  --text-main: #ffffff;
-  --text-body: #e2e8f0;
+  --bg-canvas: #0B0F19;
+  --bg-surface: #111827;
+  --bg-surface-hover: #1E293B;
+  --border-subtle: #1F293D;
+  --text-main: #f8fafc;
+  --text-body: #cbd5e1;
   --text-muted: #94a3b8;
   --primary: #FC6714;
   --primary-hover: #E0530A;
-  --brand-navy: #06064D;
+  --brand-navy: #1E293B;
 }
 
 /* Scrollbar minimalista */

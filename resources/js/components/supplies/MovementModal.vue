@@ -262,7 +262,7 @@
               v-model="form.notes"
               rows="3"
               :placeholder="notesPlaceholder"
-              class="w-full p-3.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none resize-none leading-relaxed"
+              class="w-full p-3.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714]/40 focus:border-[#FC6714] outline-none resize-none leading-relaxed"
             ></textarea>
           </div>
         </div>
@@ -273,7 +273,7 @@
       <!-- ========================================================================= -->
       <div v-show="currentTab === 'materials'" class="space-y-6">
         <!-- Linha de Inserção de Material -->
-        <div class="p-5 bg-white dark:bg-[#06064D]/50 rounded-2xl border border-slate-200 dark:border-[#14147A] shadow-xs space-y-4">
+        <div class="p-5 bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
           <div class="flex items-center justify-between gap-4">
             <div class="flex items-center gap-2">
               <Layers class="w-4 h-4 text-[#FC6714]" />
@@ -365,8 +365,8 @@
         </div>
 
         <!-- Grid de Conferência de Materiais -->
-        <div class="rounded-2xl border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D]/50 shadow-xs overflow-hidden">
-          <div class="p-4 border-b border-slate-200 dark:border-[#14147A] bg-slate-50/60 dark:bg-[#03032E]/70 flex items-center justify-between gap-4">
+        <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 shadow-xs overflow-hidden">
+          <div class="p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/70 flex items-center justify-between gap-4">
             <div class="flex items-center gap-3">
               <h4 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                 Materiais da Movimentação (Grid de Conferência)
@@ -397,7 +397,7 @@
           <div v-else class="overflow-x-auto">
             <table class="w-full text-left border-collapse text-xs">
               <thead>
-                <tr class="border-b border-slate-200 dark:border-[#14147A] bg-slate-100/50 dark:bg-[#03032E]/40 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider select-none">
+                <tr class="border-b border-slate-200 dark:border-slate-800 bg-slate-100/50 dark:bg-slate-900/40 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider select-none">
                   <th class="py-3 px-4 w-12 text-center">#</th>
                   <th class="py-3 px-4">Material / SKU</th>
                   <th class="py-3 px-4 w-36">Tipo de Rastreio</th>
@@ -483,7 +483,7 @@
           </div>
 
           <!-- Rodapé Interno da Grid com Totais -->
-          <div v-if="gridItems.length > 0" class="p-4 bg-slate-50/70 dark:bg-[#03032E]/60 border-t border-slate-200 dark:border-[#14147A] flex flex-wrap items-center justify-between gap-4 text-xs font-semibold">
+          <div v-if="gridItems.length > 0" class="p-4 bg-slate-50/70 dark:bg-slate-900/60 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-4 text-xs font-semibold">
             <div class="flex items-center gap-4 text-slate-600 dark:text-slate-400">
               <span>Total de Materiais: <strong>{{ gridItems.length }}</strong></span>
               <span>Total de Peças: <strong>{{ totalPiecesCount }}</strong></span>
@@ -509,7 +509,7 @@
         <!-- Se não houver itens serializados na grid -->
         <div
           v-if="serializedGridItems.length === 0"
-          class="p-12 bg-white dark:bg-[#06064D]/50 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 text-center space-y-4"
+          class="p-12 bg-white dark:bg-slate-900/50 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 text-center space-y-4"
         >
           <div class="w-16 h-16 rounded-2xl bg-purple-50 dark:bg-purple-950/50 text-purple-600 flex items-center justify-center mx-auto">
             <QrCode class="w-8 h-8" />
@@ -577,7 +577,7 @@
             <div
               v-for="item in serializedGridItems"
               :key="item.uid"
-              class="p-5 bg-white dark:bg-[#06064D]/50 rounded-2xl border transition-all duration-150 shadow-xs space-y-4"
+              class="p-5 bg-white dark:bg-slate-900/50 rounded-2xl border transition-all duration-150 shadow-xs space-y-4"
               :class="item.serials.length === item.quantity
                 ? 'border-emerald-300 dark:border-emerald-800/80 bg-emerald-50/20 dark:bg-emerald-950/10'
                 : 'border-purple-200 dark:border-purple-800/70'"
@@ -633,7 +633,7 @@
                       @keydown.enter.prevent="onScanBarcodeEnter(item)"
                       :placeholder="item.serials.length < item.quantity ? `Bipe o serial ${item.serials.length + 1} de ${item.quantity} ou digite e tecle Enter...` : 'Todos os seriais deste material já foram conferidos'"
                       :disabled="item.serials.length >= item.quantity"
-                      class="w-full h-10 pl-10 pr-3 rounded-xl border border-purple-300 dark:border-purple-700 bg-purple-50/40 dark:bg-[#03032E] text-xs font-mono font-medium focus:ring-2 focus:ring-purple-400 outline-none"
+                      class="w-full h-10 pl-10 pr-3 rounded-xl border border-purple-300 dark:border-purple-700 bg-purple-50/40 dark:bg-slate-900 text-xs font-mono font-medium focus:ring-2 focus:ring-purple-400 outline-none"
                     />
                   </div>
 
@@ -707,7 +707,7 @@
       <!-- ABA 4: ANEXOS (DOCUMENTOS E FOTOS) -->
       <!-- ========================================================================= -->
       <div v-show="currentTab === 'attachments'" class="space-y-6">
-        <div class="p-5 bg-white dark:bg-[#06064D]/50 rounded-2xl border border-slate-200 dark:border-[#14147A] shadow-xs space-y-4">
+        <div class="p-5 bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
           <div class="flex items-center justify-between gap-2">
             <div class="flex items-center gap-2">
               <Paperclip class="w-4 h-4 text-[#FC6714]" />
@@ -729,7 +729,7 @@
             class="p-8 rounded-2xl border-2 border-dashed transition cursor-pointer flex flex-col items-center justify-center text-center gap-2"
             :class="isDragging
               ? 'border-[#FC6714] bg-[#FC6714]/10 dark:bg-[#FC6714]/15'
-              : 'border-slate-300 dark:border-slate-700 bg-slate-50/60 dark:bg-[#03032E]/70 hover:border-[#FC6714]/60 hover:bg-slate-100/50 dark:hover:bg-slate-800/40'"
+              : 'border-slate-300 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-900/70 hover:border-[#FC6714]/60 hover:bg-slate-100/50 dark:hover:bg-slate-800/40'"
           >
             <input
               ref="fileInputRef"
@@ -767,7 +767,7 @@
               <div
                 v-for="(att, idx) in form.attachments"
                 :key="att.tempId || att.id || idx"
-                class="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-[#03032E] hover:border-slate-300 transition gap-3"
+                class="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900 hover:border-slate-300 transition gap-3"
               >
                 <div class="flex items-center gap-3 min-w-0">
                   <!-- Preview se for imagem -->

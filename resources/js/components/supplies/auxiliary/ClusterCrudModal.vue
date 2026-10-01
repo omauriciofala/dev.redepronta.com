@@ -15,7 +15,7 @@
             v-model="searchTerm"
             type="text"
             placeholder="Buscar posição regional por nome ou código..."
-            class="w-full h-10 pl-9 pr-4 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714] focus:outline-none transition"
+            class="w-full h-10 pl-9 pr-4 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-[#FC6714] focus:outline-none transition"
           />
         </div>
 
@@ -160,10 +160,10 @@
       </Transition>
 
       <!-- Tabela Confortável de Posições Regionais (Item 7 Design System) -->
-      <div class="border border-slate-200 dark:border-[#14147A] rounded-xl overflow-hidden shadow-2xs">
+      <div class="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-2xs">
         <div class="overflow-x-auto max-h-[380px]">
           <table class="w-full text-left border-collapse text-xs">
-            <thead class="sticky top-0 bg-slate-100/90 dark:bg-[#03032E]/90 backdrop-blur-xs border-b border-slate-200 dark:border-[#14147A] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-bold z-10">
+            <thead class="sticky top-0 bg-slate-100/90 dark:bg-slate-900/90 backdrop-blur-xs border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 uppercase tracking-wider font-bold z-10">
               <tr>
                 <th class="py-3 px-4 w-32">Código</th>
                 <th class="py-3 px-4">Posição Regional</th>
@@ -173,7 +173,7 @@
                 <th class="py-3 px-4 text-right w-24">Ações</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-100 dark:divide-[#14147A]/60">
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
               <tr v-if="loading">
                 <td colspan="6" class="py-8 text-center text-slate-400">
                   <span class="inline-block animate-spin mr-1.5 text-[#FC6714]">⟳</span> Carregando posições regionais...

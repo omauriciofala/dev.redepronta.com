@@ -12,7 +12,7 @@
           </div>
           <div>
             <div class="flex items-center gap-2 flex-wrap">
-              <h3 class="text-lg font-heading font-semibold text-[#06064D] dark:text-white">
+              <h3 class="text-lg font-heading font-semibold text-[#172554] dark:text-slate-100">
                 Documento de Movimentação
               </h3>
               <span
@@ -56,7 +56,7 @@
 
     <div v-if="documentData" class="space-y-6">
       <!-- 1. BLOCO DE RESUMO / CABEÇALHO DO DOCUMENTO -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-xl bg-slate-50 dark:bg-[#03032E] border border-slate-200/80 dark:border-[#14147A]/70">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800">
         <div>
           <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Documento / Ref</div>
           <div class="font-semibold text-slate-800 dark:text-slate-200 text-sm mt-0.5 font-mono truncate" :title="documentData.document_number || documentData.document_ref">
@@ -87,7 +87,7 @@
       </div>
 
       <!-- 2. FLUXO: ORIGEM -> DESTINO -->
-      <div class="p-4 rounded-xl bg-white dark:bg-[#06064D]/40 border border-slate-200 dark:border-[#14147A] shadow-2xs">
+      <div class="p-4 rounded-xl bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 shadow-2xs">
         <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-1.5">
           <Warehouse class="w-4 h-4 text-[#FC6714]" />
           <span>Origem & Destino da Operação</span>
@@ -120,7 +120,7 @@
       </div>
 
       <!-- 3. GRADE DE ITENS / MATERIAIS DO DOCUMENTO -->
-      <div class="rounded-xl border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#06064D]/40 shadow-2xs overflow-hidden">
+      <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 shadow-2xs overflow-hidden">
         <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <div class="flex items-center gap-2">
             <Boxes class="w-4 h-4 text-[#FC6714]" />
@@ -135,7 +135,7 @@
 
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse text-xs">
-            <thead class="bg-slate-50 dark:bg-[#03032E]/60 border-b border-slate-200 dark:border-[#14147A] text-slate-500 dark:text-slate-400 font-bold uppercase">
+            <thead class="bg-slate-50 dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold uppercase">
               <tr>
                 <th class="py-2.5 px-4">#</th>
                 <th class="py-2.5 px-4">SKU / Código</th>
@@ -186,7 +186,7 @@
       </div>
 
       <!-- 4. RASTREABILIDADE SERIAL TOTAL DO DOCUMENTO -->
-      <div v-if="allDocumentSerials.length > 0" class="p-4 rounded-xl bg-white dark:bg-[#06064D]/40 border border-slate-200 dark:border-[#14147A] shadow-2xs">
+      <div v-if="allDocumentSerials.length > 0" class="p-4 rounded-xl bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 shadow-2xs">
         <div class="flex items-center justify-between mb-3">
           <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
             <QrCode class="w-4 h-4 text-[#FC6714]" />
@@ -230,7 +230,7 @@
       </div>
 
       <!-- 5. TRANSPORTE & RESPONSÁVEIS -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 rounded-xl bg-slate-50 dark:bg-[#03032E] border border-slate-200/80 dark:border-[#14147A]/70 text-xs">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-xs">
         <div>
           <span class="font-bold text-slate-400 uppercase tracking-wider block text-[10px]">Motorista / Transportador</span>
           <span class="font-semibold text-slate-800 dark:text-slate-200 mt-1 block">
@@ -252,7 +252,7 @@
       </div>
 
       <!-- 6. ANEXOS / COMPROVANTES DO DOCUMENTO -->
-      <div v-if="allDocumentAttachments.length > 0" class="p-4 rounded-xl bg-white dark:bg-[#06064D]/40 border border-slate-200 dark:border-[#14147A] shadow-2xs">
+      <div v-if="allDocumentAttachments.length > 0" class="p-4 rounded-xl bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 shadow-2xs">
         <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-1.5">
           <FileText class="w-4 h-4 text-[#FC6714]" />
           <span>Comprovantes & Documentos Anexados ({{ allDocumentAttachments.length }})</span>

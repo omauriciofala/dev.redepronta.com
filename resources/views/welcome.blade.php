@@ -22,7 +22,7 @@
     </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 font-sans antialiased overflow-hidden">
+<body class="bg-slate-50 dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100 font-sans antialiased overflow-hidden">
     <div id="app"></div>
 </body>
 </html>

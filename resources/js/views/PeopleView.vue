@@ -27,7 +27,7 @@
           <button
             type="button"
             @click.stop="isHeaderMenuOpen = !isHeaderMenuOpen"
-            class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition shadow-2xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#FC6714]"
+            class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition shadow-2xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#FC6714]"
             :class="{ 'bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white ring-2 ring-[#FC6714]/30': isHeaderMenuOpen }"
             title="Cadastros de Apoio e Tabelas Base"
             aria-label="Cadastros de Apoio e Tabelas Base"
@@ -54,7 +54,7 @@
             <div
               v-if="isHeaderMenuOpen"
               @click.stop
-              class="absolute right-0 mt-2 w-56 rounded-xl bg-white dark:bg-[#06064D] border border-slate-200 dark:border-[#14147A] shadow-2xl z-50 py-1 text-xs font-medium divide-y divide-slate-100 dark:divide-[#14147A]/60 focus:outline-hidden"
+              class="absolute right-0 mt-2 w-56 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl z-50 py-1 text-xs font-medium divide-y divide-slate-100 dark:divide-slate-800 focus:outline-hidden"
             >
               <div class="px-3.5 py-2 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">
                 <span>Cadastros de Apoio</span>
@@ -113,7 +113,7 @@
         <button
           type="button"
           @click="isModuleDrawerOpen = true"
-          class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 dark:border-[#14147A] bg-white dark:bg-[#03032E] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition shadow-2xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#FC6714]"
+          class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition shadow-2xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#FC6714]"
           :class="{ 'bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white ring-2 ring-[#FC6714]/30': isModuleDrawerOpen }"
           title="Pessoas (☰)"
           aria-label="Pessoas"
@@ -126,7 +126,7 @@
 
     <!-- Barra de Filtros e Busca Principal -->
     <div class="space-y-3">
-      <div class="p-4 bg-white dark:bg-[#06064D]/50 rounded-xl border border-slate-200 dark:border-[#14147A] flex flex-wrap items-center justify-between gap-4 text-sm shadow-2xs transition-colors duration-200">
+      <div class="p-4 bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-4 text-sm shadow-2xs transition-colors duration-200">
         <!-- Busca Textual com Suporte a Atalho (Ctrl+K ou /) e Botão Limpar (X) -->
         <div class="relative flex-1 min-w-[280px]">
           <Search class="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400 pointer-events-none" />
@@ -136,7 +136,7 @@
             v-model="search"
             @input="debounceSearch"
             placeholder="Buscar por nome, CPF/CNPJ, e-mail ou telefone..."
-            class="w-full h-11 pl-10 pr-20 rounded-lg border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 text-sm transition"
+            class="w-full h-11 pl-10 pr-20 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 text-sm transition"
           />
 
           <!-- Canto Direito da Busca: Botão Limpar (X) e Indicador de Atalho (Ctrl K) -->
@@ -166,7 +166,7 @@
             @click.stop="isFiltersMenuOpen = !isFiltersMenuOpen"
             :class="activeFilterKeys.length > 0
               ? 'bg-[#FC6714]/10 text-[#FC6714] border-[#FC6714] font-semibold ring-2 ring-[#FC6714]/20'
-              : 'bg-white dark:bg-[#03032E] text-slate-700 dark:text-slate-300 border-slate-200 dark:border-[#14147A] hover:bg-slate-50 dark:hover:bg-white/5'"
+              : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-white/5'"
             class="inline-flex items-center gap-2 h-11 px-4 rounded-lg border text-sm font-medium transition shadow-2xs cursor-pointer focus:ring-2 focus:ring-[#FC6714] focus:outline-none"
             title="Escolher campos para filtrar a listagem"
             aria-haspopup="true"
@@ -198,7 +198,7 @@
             <div
               v-if="isFiltersMenuOpen"
               @click.stop
-              class="absolute right-0 mt-2 w-64 rounded-xl bg-white dark:bg-[#06064D] border border-slate-200 dark:border-[#14147A] shadow-2xl z-50 py-1.5 text-xs font-medium divide-y divide-slate-100 dark:divide-[#14147A]/60 focus:outline-hidden"
+              class="absolute right-0 mt-2 w-64 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl z-50 py-1.5 text-xs font-medium divide-y divide-slate-100 dark:divide-slate-800 focus:outline-hidden"
             >
               <div class="px-3.5 py-2 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 <span>Adicionar Campo de Filtro</span>
@@ -249,7 +249,7 @@
       >
         <div
           v-if="activeFilterKeys.length > 0"
-          class="p-4 bg-slate-50 dark:bg-[#06064D]/30 rounded-xl border border-slate-200 dark:border-[#14147A] shadow-2xs transition-all space-y-3"
+          class="p-4 bg-slate-50 dark:bg-slate-900/30 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs transition-all space-y-3"
         >
           <!-- Barra Superior: Indicador de Filtros Ativos e Ações -->
           <div class="flex items-center justify-between">
@@ -292,7 +292,7 @@
             <!-- 0. Filtro: Papel -->
             <div
               v-if="isFilterActive('role')"
-              class="p-3 bg-white dark:bg-[#03032E] rounded-lg border border-slate-200 dark:border-[#14147A] shadow-2xs space-y-1.5 transition-all relative group"
+              class="p-3 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-2xs space-y-1.5 transition-all relative group"
             >
               <div class="flex items-center justify-between text-slate-700 dark:text-slate-300">
                 <span class="font-bold uppercase tracking-wider text-[11px] flex items-center gap-1.5">
@@ -311,7 +311,7 @@
               <select
                 v-model="filterRole"
                 @change="applySecondaryFilters"
-                class="w-full h-9 px-2.5 rounded-md border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#06064D]/50 text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer text-xs truncate"
+                class="w-full h-9 px-2.5 rounded-md border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer text-xs truncate"
               >
                 <option value="">Todos os Papéis</option>
                 <option v-for="r in roleOptions" :key="r.value" :value="r.value">
@@ -323,7 +323,7 @@
             <!-- 1. Filtro: Status -->
             <div
               v-if="isFilterActive('status')"
-              class="p-3 bg-white dark:bg-[#03032E] rounded-lg border border-slate-200 dark:border-[#14147A] shadow-2xs space-y-1.5 transition-all relative group"
+              class="p-3 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-2xs space-y-1.5 transition-all relative group"
             >
               <div class="flex items-center justify-between text-slate-700 dark:text-slate-300">
                 <span class="font-bold uppercase tracking-wider text-[11px] flex items-center gap-1.5">
@@ -342,7 +342,7 @@
               <select
                 v-model="filterStatus"
                 @change="applySecondaryFilters"
-                class="w-full h-9 px-2.5 rounded-md border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#06064D]/50 text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer text-xs"
+                class="w-full h-9 px-2.5 rounded-md border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer text-xs"
               >
                 <option value="">Todos os Status</option>
                 <option value="active">● Apenas Ativos</option>
@@ -353,7 +353,7 @@
             <!-- 2. Filtro: Tipo de Pessoa -->
             <div
               v-if="isFilterActive('person_type')"
-              class="p-3 bg-white dark:bg-[#03032E] rounded-lg border border-slate-200 dark:border-[#14147A] shadow-2xs space-y-1.5 transition-all relative group"
+              class="p-3 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-2xs space-y-1.5 transition-all relative group"
             >
               <div class="flex items-center justify-between text-slate-700 dark:text-slate-300">
                 <span class="font-bold uppercase tracking-wider text-[11px] flex items-center gap-1.5">
@@ -372,7 +372,7 @@
               <select
                 v-model="filterPersonType"
                 @change="applySecondaryFilters"
-                class="w-full h-9 px-2.5 rounded-md border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#06064D]/50 text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer text-xs"
+                class="w-full h-9 px-2.5 rounded-md border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer text-xs"
               >
                 <option value="">Todos os Tipos</option>
                 <option value="individual">Pessoa Física (PF)</option>
@@ -383,7 +383,7 @@
             <!-- 3. Filtro: Estado (UF) -->
             <div
               v-if="isFilterActive('state')"
-              class="p-3 bg-white dark:bg-[#03032E] rounded-lg border border-slate-200 dark:border-[#14147A] shadow-2xs space-y-1.5 transition-all relative group"
+              class="p-3 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-2xs space-y-1.5 transition-all relative group"
             >
               <div class="flex items-center justify-between text-slate-700 dark:text-slate-300">
                 <span class="font-bold uppercase tracking-wider text-[11px] flex items-center gap-1.5">
@@ -402,7 +402,7 @@
               <select
                 v-model="filterStateId"
                 @change="handleStateChange"
-                class="w-full h-9 px-2.5 rounded-md border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#06064D]/50 text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer text-xs truncate"
+                class="w-full h-9 px-2.5 rounded-md border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer text-xs truncate"
               >
                 <option value="">Todos os Estados</option>
                 <option v-for="st in statesList" :key="st.id" :value="st.id">
@@ -414,7 +414,7 @@
             <!-- 4. Filtro: Município -->
             <div
               v-if="isFilterActive('city')"
-              class="p-3 bg-white dark:bg-[#03032E] rounded-lg border border-slate-200 dark:border-[#14147A] shadow-2xs space-y-1.5 transition-all relative group"
+              class="p-3 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-2xs space-y-1.5 transition-all relative group"
             >
               <div class="flex items-center justify-between text-slate-700 dark:text-slate-300">
                 <span class="font-bold uppercase tracking-wider text-[11px] flex items-center gap-1.5">
@@ -434,7 +434,7 @@
                 v-if="filterStateId && citiesList.length > 0"
                 v-model="filterCityId"
                 @change="applySecondaryFilters"
-                class="w-full h-9 px-2.5 rounded-md border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#06064D]/50 text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer text-xs truncate"
+                class="w-full h-9 px-2.5 rounded-md border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer text-xs truncate"
               >
                 <option value="">Todas as Cidades de {{ selectedStateCode }}</option>
                 <option v-for="ct in citiesList" :key="ct.id" :value="ct.id">
@@ -454,7 +454,7 @@
             <!-- 5. Filtro: Grupo -->
             <div
               v-if="isFilterActive('group')"
-              class="p-3 bg-white dark:bg-[#03032E] rounded-lg border border-slate-200 dark:border-[#14147A] shadow-2xs space-y-1.5 transition-all relative group"
+              class="p-3 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-2xs space-y-1.5 transition-all relative group"
             >
               <div class="flex items-center justify-between text-slate-700 dark:text-slate-300">
                 <span class="font-bold uppercase tracking-wider text-[11px] flex items-center gap-1.5">
@@ -473,7 +473,7 @@
               <select
                 v-model="filterGroup"
                 @change="applySecondaryFilters"
-                class="w-full h-9 px-2.5 rounded-md border border-slate-200 dark:border-[#14147A] bg-slate-50 dark:bg-[#06064D]/50 text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer text-xs truncate"
+                class="w-full h-9 px-2.5 rounded-md border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-[#FC6714] focus:ring-2 focus:ring-[#FC6714]/25 cursor-pointer text-xs truncate"
               >
                 <option value="">Todos os Grupos</option>
                 <option v-for="g in groupsList" :key="g.id" :value="g.id">
@@ -487,11 +487,11 @@
     </div>
 
     <!-- Tabela Confortável com Linhas Finas e Ordenação Clicável nos Cabeçalhos -->
-    <div class="bg-white dark:bg-[#06064D]/50 rounded-xl border border-slate-200 dark:border-[#14147A] overflow-hidden shadow-xs transition-colors duration-200">
+    <div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs transition-colors duration-200">
       <div class="overflow-x-auto min-h-[280px]">
         <table class="w-full text-left border-collapse text-sm">
           <thead>
-            <tr class="border-b border-slate-200 dark:border-[#14147A] bg-slate-50/80 dark:bg-[#03032E]/70 text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider select-none">
+            <tr class="border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/70 text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider select-none">
               <!-- Coluna 1: Nome (Ordenável) -->
               <th
                 @click="toggleSort('name')"
@@ -533,7 +533,7 @@
               <th class="py-3.5 px-5 text-right">Ação</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-slate-100 dark:divide-[#14147A]/60">
+          <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
             <!-- Loading -->
             <tr v-if="loading">
               <td colspan="5" class="py-12 text-center text-slate-400 text-sm">
@@ -604,7 +604,7 @@
                     <!-- Tooltip temporário -->
                     <span
                       v-if="copiedKey === 'doc-' + person.id"
-                      class="absolute -top-7 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-[#06064D] text-white text-[10px] font-medium shadow-md whitespace-nowrap z-20 pointer-events-none"
+                      class="absolute -top-7 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-slate-900 text-white text-[10px] font-medium shadow-md whitespace-nowrap z-20 pointer-events-none"
                     >
                       Copiado!
                     </span>
@@ -719,7 +719,7 @@
                     <div
                       v-if="activeDropdownPersonId === person.id"
                       @click.stop
-                      class="absolute right-0 w-48 rounded-xl bg-white dark:bg-[#06064D] border border-slate-200 dark:border-[#14147A] shadow-2xl z-50 py-1 text-xs font-medium divide-y divide-slate-100 dark:divide-[#14147A]/60 focus:outline-hidden"
+                      class="absolute right-0 w-48 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl z-50 py-1 text-xs font-medium divide-y divide-slate-100 dark:divide-slate-800 focus:outline-hidden"
                       :class="index >= people.length - 2 && people.length > 2 ? 'bottom-full mb-1.5' : 'top-full mt-1.5'"
                     >
                       <div class="py-1">
@@ -735,7 +735,7 @@
                         <button
                           type="button"
                           @click="handleActionToggleStatus(person)"
-                          class="w-full text-left px-3.5 py-2 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#14147A]/50 transition cursor-pointer"
+                          class="w-full text-left px-3.5 py-2 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
                         >
                           <Power class="w-3.5 h-3.5" :class="person.status === 'active' ? 'text-amber-500' : 'text-emerald-500'" />
                           <span>{{ person.status === 'active' ? 'Inativar pessoa' : 'Ativar pessoa' }}</span>
@@ -746,14 +746,14 @@
                         <button
                           type="button"
                           @click="handleActionCopyId(person)"
-                          class="w-full text-left px-3.5 py-2 flex items-center gap-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-[#14147A]/50 hover:text-slate-700 dark:text-slate-300 transition cursor-pointer"
+                          class="w-full text-left px-3.5 py-2 flex items-center gap-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700 dark:text-slate-300 transition cursor-pointer"
                         >
                           <Copy class="w-3.5 h-3.5" />
                           <span>Copiar ID (#{{ person.id }})</span>
                         </button>
                       </div>
 
-                      <div class="py-1 border-t border-slate-100 dark:border-[#14147A]/60">
+                      <div class="py-1 border-t border-slate-100 dark:border-slate-800">
                         <button
                           type="button"
                           @click="handleActionDelete(person)"

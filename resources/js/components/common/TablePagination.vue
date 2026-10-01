@@ -1,5 +1,5 @@
 <template>
-  <div class="px-4 py-3 border-t border-slate-200 dark:border-[#14147A] flex flex-col md:flex-row items-center justify-between gap-3.5 text-xs text-slate-600 dark:text-slate-400 bg-slate-50/60 dark:bg-[#03032E]/70 transition-colors duration-200">
+  <div class="px-4 py-3 border-t border-slate-200 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-3.5 text-xs text-slate-600 dark:text-slate-400 bg-slate-50/60 dark:bg-slate-900/70 transition-colors duration-200">
     
     <!-- BLOCO ESQUERDO: QUANTIDADE DE REGISTROS POR PÁGINA -->
     <div class="flex items-center gap-2 order-2 md:order-1">

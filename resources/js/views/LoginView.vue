@@ -1,10 +1,10 @@
 <template>
-  <div class="min-h-screen w-screen flex flex-col items-center justify-center p-4 sm:p-6 bg-slate-100 dark:bg-[#03032E] text-slate-900 dark:text-slate-100 font-sans selection:bg-[#FC6714] selection:text-white transition-colors duration-300">
+  <div class="min-h-screen w-screen flex flex-col items-center justify-center p-4 sm:p-6 bg-slate-100 dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-sans selection:bg-[#FC6714] selection:text-white transition-colors duration-300">
     <!-- Card Principal de Login com Split Layout Institucional -->
     <main class="w-full max-w-[920px] min-h-[520px] rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col md:flex-row overflow-hidden relative transition-all duration-300">
       
       <!-- Coluna Esquerda: Institucional / Identidade Rede Pronta -->
-      <section class="w-full md:w-[46%] bg-gradient-to-br from-[#06064D] via-[#04043b] to-[#020224] text-white p-8 sm:p-10 flex flex-col justify-between relative overflow-hidden select-none">
+      <section class="w-full md:w-[46%] bg-gradient-to-br from-[#0B0F19] via-[#070B14] to-[#030712] text-white p-8 sm:p-10 flex flex-col justify-between relative overflow-hidden select-none border-r border-[#1E293B]">
         <!-- Elementos Luminosos de Ambientação de Fundo -->
         <div class="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-[#FC6714]/15 blur-3xl pointer-events-none"></div>
         <div class="absolute -bottom-20 -left-20 w-64 h-64 rounded-full bg-blue-600/10 blur-3xl pointer-events-none"></div>
