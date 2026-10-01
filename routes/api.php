@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\RoleController;
 use App\Http\Controllers\Api\V1\PermissionController;
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\OpenApiController;
 
 Route::prefix('v1')->group(function () {
     // APIs e Integrações (CNPJá, ViaCEP, Catálogo de Serviços)
@@ -98,6 +99,9 @@ Route::prefix('v1')->group(function () {
 
     // Change-log Vivo
     Route::get('changelog', [ChangelogController::class, 'index']);
+
+    // Documentação da API (OpenAPI 3.1)
+    Route::get('docs/openapi.json', [OpenApiController::class, 'spec']);
 
     // Ferramentas de Desenvolvedor / Sandbox
     Route::prefix('dev')->group(function () {

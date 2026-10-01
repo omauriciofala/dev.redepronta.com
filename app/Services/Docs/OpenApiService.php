@@ -1,0 +1,552 @@
+<?php
+
+namespace App\Services\Docs;
+
+class OpenApiService
+{
+    /**
+     * Retorna a especificação completa OpenAPI 3.1.0 para o ERP Rede Pronta.
+     */
+    public function getSpec(): array
+    {
+        return [
+            'openapi' => '3.1.0',
+            'info' => [
+                'title' => 'ERP Rede Pronta • API v1',
+                'version' => '1.0.0',
+                'description' => 'Documentação canônica dos serviços e endpoints RESTful da API v1 do SaaS Rede Pronta (FSM, CRM e WMS).',
+                'contact' => [
+                    'name' => 'Engenharia de Software Rede Pronta',
+                    'email' => 'suporte@redepronta.com',
+                    'url' => 'https://dev.redepronta.com',
+                ],
+            ],
+            'servers' => [
+                [
+                    'url' => '/api/v1',
+                    'description' => 'Servidor Local / Ambiente Atual da API v1',
+                ],
+            ],
+            'tags' => [
+                ['name' => 'Autenticação & Sessão', 'description' => 'Login, validação de credenciais, inspeção de usuário autenticado e logout'],
+                ['name' => 'Usuários & Permissões', 'description' => 'Administração de operadores, perfis de papéis (Roles) e matriz granular de permissões RBAC'],
+                ['name' => 'Pessoas & Clientes', 'description' => 'Cadastro central e unificado de pessoas físicas e jurídicas (PF/PJ), clientes, fornecedores e operadores'],
+                ['name' => 'Suprimentos & WMS', 'description' => 'Catálogo de materiais, posições regionais, depósitos físicos, rastreabilidade serial e saldos'],
+                ['name' => 'Movimentações de Estoque', 'description' => 'Entradas, saídas, devoluções, transferências atômicas e consultas por documento/protocolo'],
+                ['name' => 'Geografia & Referências', 'description' => 'Estados brasileiros, cidades do IBGE, consulta de CEP e cadastros auxiliares'],
+                ['name' => 'Desenvolvedor & Sistema', 'description' => 'Ferramentas de inspeção, métricas do banco, reset de testes e geração de massa fictícia'],
+            ],
+            'components' => [
+                'securitySchemes' => [
+                    'bearerAuth' => [
+                        'type' => 'http',
+                        'scheme' => 'bearer',
+                        'bearerFormat' => 'Sanctum Token',
+                        'description' => 'Autenticação baseada em token Bearer Sanctum ou sessão ativa do usuário.',
+                    ],
+                ],
+            ],
+            'paths' => $this->getPaths(),
+        ];
+    }
+
+    /**
+     * Retorna a matriz completa de rotas documentadas.
+     */
+    protected function getPaths(): array
+    {
+        return [
+            // ==============================================================
+            // AUTENTICAÇÃO & SESSÃO
+            // ==============================================================
+            '/auth/login' => [
+                'post' => [
+                    'tags' => ['Autenticação & Sessão'],
+                    'summary' => 'Autenticação de Usuário',
+                    'description' => 'Valida as credenciais do operador e inicia a sessão no sistema retornando os dados do usuário logado.',
+                    'requestBody' => [
+                        'required' => true,
+                        'content' => [
+                            'application/json' => [
+                                'example' => [
+                                    'email' => 'admin@redepronta.com',
+                                    'password' => 'password123',
+                                ],
+                            ],
+                        ],
+                    ],
+                    'responses' => [
+                        '200' => ['description' => 'Autenticação realizada com sucesso'],
+                        '422' => ['description' => 'Credenciais inválidas ou operador inativo'],
+                    ],
+                ],
+            ],
+            '/auth/me' => [
+                'get' => [
+                    'tags' => ['Autenticação & Sessão'],
+                    'summary' => 'Dados do Usuário Autenticado',
+                    'description' => 'Retorna as informações do usuário atual, incluindo perfil, permissões e pessoa vinculada.',
+                    'responses' => [
+                        '200' => ['description' => 'Dados do usuário autenticado'],
+                        '401' => ['description' => 'Não autenticado'],
+                    ],
+                ],
+            ],
+            '/auth/logout' => [
+                'post' => [
+                    'tags' => ['Autenticação & Sessão'],
+                    'summary' => 'Encerrar Sessão',
+                    'description' => 'Finaliza a sessão do operador e invalida os tokens de autenticação ativos.',
+                    'responses' => [
+                        '200' => ['description' => 'Logout efetuado com sucesso'],
+                    ],
+                ],
+            ],
+
+            // ==============================================================
+            // USUÁRIOS & RBAC
+            // ==============================================================
+            '/users' => [
+                'get' => [
+                    'tags' => ['Usuários & Permissões'],
+                    'summary' => 'Listar Usuários',
+                    'description' => 'Retorna a lista paginada de operadores com suporte a busca textual, filtro de status, papel e super admins.',
+                    'parameters' => [
+                        ['name' => 'search', 'in' => 'query', 'description' => 'Busca por nome, e-mail ou documento', 'schema' => ['type' => 'string']],
+                        ['name' => 'status', 'in' => 'query', 'description' => 'Filtro por status (active ou inactive)', 'schema' => ['type' => 'string']],
+                        ['name' => 'role_id', 'in' => 'query', 'description' => 'ID do papel associado', 'schema' => ['type' => 'integer']],
+                        ['name' => 'is_super_admin', 'in' => 'query', 'description' => 'Filtro de Super Admins (1 ou 0)', 'schema' => ['type' => 'string']],
+                        ['name' => 'page', 'in' => 'query', 'description' => 'Número da página', 'schema' => ['type' => 'integer', 'default' => 1]],
+                    ],
+                    'responses' => [
+                        '200' => ['description' => 'Listagem paginada de usuários'],
+                    ],
+                ],
+                'post' => [
+                    'tags' => ['Usuários & Permissões'],
+                    'summary' => 'Cadastrar Novo Usuário',
+                    'description' => 'Cria um novo operador no sistema com credenciais, papel e vínculo opcional a uma pessoa cadastrada.',
+                    'requestBody' => [
+                        'required' => true,
+                        'content' => [
+                            'application/json' => [
+                                'example' => [
+                                    'name' => 'Rafael Alcantara',
+                                    'email' => 'rafael.alcantara@redepronta.com',
+                                    'password' => 'SenhaForte@2026',
+                                    'role_id' => 1,
+                                    'person_id' => null,
+                                    'is_super_admin' => false,
+                                    'status' => 'active',
+                                ],
+                            ],
+                        ],
+                    ],
+                    'responses' => [
+                        '201' => ['description' => 'Usuário cadastrado com sucesso'],
+                        '422' => ['description' => 'Erro de validação (ex: e-mail já cadastrado)'],
+                    ],
+                ],
+            ],
+            '/users/{id}' => [
+                'get' => [
+                    'tags' => ['Usuários & Permissões'],
+                    'summary' => 'Detalhes do Usuário',
+                    'parameters' => [
+                        ['name' => 'id', 'in' => 'path', 'required' => true, 'schema' => ['type' => 'integer']],
+                    ],
+                    'responses' => [
+                        '200' => ['description' => 'Detalhes completos do usuário e suas permissões'],
+                        '404' => ['description' => 'Usuário não encontrado'],
+                    ],
+                ],
+                'put' => [
+                    'tags' => ['Usuários & Permissões'],
+                    'summary' => 'Atualizar Usuário',
+                    'parameters' => [
+                        ['name' => 'id', 'in' => 'path', 'required' => true, 'schema' => ['type' => 'integer']],
+                    ],
+                    'requestBody' => [
+                        'required' => true,
+                        'content' => [
+                            'application/json' => [
+                                'example' => [
+                                    'name' => 'Rafael Alcantara da Silva',
+                                    'email' => 'rafael.alcantara@redepronta.com',
+                                    'role_id' => 2,
+                                    'status' => 'active',
+                                ],
+                            ],
+                        ],
+                    ],
+                    'responses' => [
+                        '200' => ['description' => 'Usuário atualizado com sucesso'],
+                        '422' => ['description' => 'Erro de validação de dados'],
+                    ],
+                ],
+                'delete' => [
+                    'tags' => ['Usuários & Permissões'],
+                    'summary' => 'Excluir Usuário',
+                    'description' => 'Exclui o usuário da base, com proteção contra autoexclusão e exclusão do último Super Admin.',
+                    'parameters' => [
+                        ['name' => 'id', 'in' => 'path', 'required' => true, 'schema' => ['type' => 'integer']],
+                    ],
+                    'responses' => [
+                        '200' => ['description' => 'Usuário removido com sucesso'],
+                        '422' => ['description' => 'Ação bloqueada por regra de segurança'],
+                    ],
+                ],
+            ],
+            '/users/{id}/toggle-status' => [
+                'patch' => [
+                    'tags' => ['Usuários & Permissões'],
+                    'summary' => 'Alternar Status (Ativar/Inativar)',
+                    'parameters' => [
+                        ['name' => 'id', 'in' => 'path', 'required' => true, 'schema' => ['type' => 'integer']],
+                    ],
+                    'responses' => [
+                        '200' => ['description' => 'Status alterado com sucesso'],
+                    ],
+                ],
+            ],
+            '/roles' => [
+                'get' => [
+                    'tags' => ['Usuários & Permissões'],
+                    'summary' => 'Listar Papéis de Usuários (Roles)',
+                    'description' => 'Retorna a matriz de perfis de acesso cadastrados e contagem de operadores vinculados.',
+                    'responses' => [
+                        '200' => ['description' => 'Lista de papéis de usuários com permissões'],
+                    ],
+                ],
+                'post' => [
+                    'tags' => ['Usuários & Permissões'],
+                    'summary' => 'Criar Novo Papel (Role)',
+                    'requestBody' => [
+                        'required' => true,
+                        'content' => [
+                            'application/json' => [
+                                'example' => [
+                                    'name' => 'Supervisor Operacional WMS',
+                                    'slug' => 'supervisor_wms',
+                                    'description' => 'Acesso completo ao estoque, movimentações e relatórios de saldo',
+                                    'permissions' => ['supplies.view', 'supplies.movements.create', 'supplies.transfers.create'],
+                                ],
+                            ],
+                        ],
+                    ],
+                    'responses' => [
+                        '201' => ['description' => 'Papel criado com sucesso'],
+                        '422' => ['description' => 'Identificador (slug) duplicado'],
+                    ],
+                ],
+            ],
+            '/permissions' => [
+                'get' => [
+                    'tags' => ['Usuários & Permissões'],
+                    'summary' => 'Matriz de Permissões Catalogadas',
+                    'description' => 'Retorna todas as permissões do sistema agrupadas por módulo (Pessoas, Suprimentos, Usuários, etc.).',
+                    'responses' => [
+                        '200' => ['description' => 'Dicionário de permissões organizadas por módulo'],
+                    ],
+                ],
+            ],
+
+            // ==============================================================
+            // PESSOAS & CLIENTES
+            // ==============================================================
+            '/people' => [
+                'get' => [
+                    'tags' => ['Pessoas & Clientes'],
+                    'summary' => 'Listar Pessoas Cadastradas',
+                    'description' => 'Retorna listagem com paginação e filtros por tipo (PF/PJ), status, papel operacional e localização.',
+                    'parameters' => [
+                        ['name' => 'search', 'in' => 'query', 'description' => 'Nome, razão social ou CPF/CNPJ', 'schema' => ['type' => 'string']],
+                        ['name' => 'status', 'in' => 'query', 'description' => 'Filtro por status cadastral', 'schema' => ['type' => 'string']],
+                        ['name' => 'person_type', 'in' => 'query', 'description' => 'individual (PF) ou legal (PJ)', 'schema' => ['type' => 'string']],
+                        ['name' => 'role', 'in' => 'query', 'description' => 'Papel: client, supplier, employee, driver, etc.', 'schema' => ['type' => 'string']],
+                    ],
+                    'responses' => [
+                        '200' => ['description' => 'Coleção paginada de registros de pessoas'],
+                    ],
+                ],
+                'post' => [
+                    'tags' => ['Pessoas & Clientes'],
+                    'summary' => 'Cadastrar Pessoa',
+                    'description' => 'Cadastra pessoa com validação matemática estrita de CPF/CNPJ, endereços e papéis.',
+                    'requestBody' => [
+                        'required' => true,
+                        'content' => [
+                            'application/json' => [
+                                'example' => [
+                                    'name' => 'Telecomunicacoes Paulistana LTDA',
+                                    'trade_name' => 'TelePaulista',
+                                    'person_type' => 'legal',
+                                    'document_number' => '12345678000195',
+                                    'is_client' => true,
+                                    'is_supplier' => false,
+                                    'email' => 'contato@telepaulista.com.br',
+                                    'phone' => '11988887777',
+                                    'postal_code' => '05001-000',
+                                    'street' => 'Avenida Francisco Matarazzo',
+                                    'number' => '1500',
+                                    'neighborhood' => 'Água Branca',
+                                    'city_id' => 1,
+                                    'status' => 'active',
+                                ],
+                            ],
+                        ],
+                    ],
+                    'responses' => [
+                        '201' => ['description' => 'Pessoa criada com sucesso'],
+                        '422' => ['description' => 'Documento inválido ou campos obrigatórios ausentes'],
+                    ],
+                ],
+            ],
+            '/people/{id}' => [
+                'get' => [
+                    'tags' => ['Pessoas & Clientes'],
+                    'summary' => 'Exibir Pessoa',
+                    'parameters' => [
+                        ['name' => 'id', 'in' => 'path', 'required' => true, 'schema' => ['type' => 'integer']],
+                    ],
+                    'responses' => [
+                        '200' => ['description' => 'Dados completos do cadastro'],
+                        '404' => ['description' => 'Cadastro não encontrado'],
+                    ],
+                ],
+                'put' => [
+                    'tags' => ['Pessoas & Clientes'],
+                    'summary' => 'Atualizar Cadastro de Pessoa',
+                    'parameters' => [
+                        ['name' => 'id', 'in' => 'path', 'required' => true, 'schema' => ['type' => 'integer']],
+                    ],
+                    'responses' => [
+                        '200' => ['description' => 'Cadastro atualizado com sucesso'],
+                    ],
+                ],
+                'delete' => [
+                    'tags' => ['Pessoas & Clientes'],
+                    'summary' => 'Inativar ou Excluir Pessoa',
+                    'description' => 'Bloqueado por ON DELETE RESTRICT caso a pessoa possua vínculos operacionais ativos.',
+                    'parameters' => [
+                        ['name' => 'id', 'in' => 'path', 'required' => true, 'schema' => ['type' => 'integer']],
+                    ],
+                    'responses' => [
+                        '200' => ['description' => 'Pessoa inativada ou removida'],
+                        '422' => ['description' => 'Vínculos dependentes impedem exclusão física'],
+                    ],
+                ],
+            ],
+
+            // ==============================================================
+            // SUPRIMENTOS & WMS
+            // ==============================================================
+            '/materials' => [
+                'get' => [
+                    'tags' => ['Suprimentos & WMS'],
+                    'summary' => 'Catálogo de Materiais',
+                    'description' => 'Listagem de SKUs de materiais com filtros de categoria, tipo de controle (Serial, Lote ou Granel) e saldo.',
+                    'responses' => [
+                        '200' => ['description' => 'Catálogo de materiais cadastrados'],
+                    ],
+                ],
+                'post' => [
+                    'tags' => ['Suprimentos & WMS'],
+                    'summary' => 'Cadastrar Novo Material',
+                    'requestBody' => [
+                        'required' => true,
+                        'content' => [
+                            'application/json' => [
+                                'example' => [
+                                    'code' => 'ONU-FIBER-01',
+                                    'name' => 'ONU GPON Wi-Fi 6 Gigabit',
+                                    'category_id' => 1,
+                                    'unit_id' => 1,
+                                    'tracking_type' => 'SERIAL',
+                                    'min_stock' => 10,
+                                ],
+                            ],
+                        ],
+                    ],
+                    'responses' => [
+                        '201' => ['description' => 'Material cadastrado'],
+                    ],
+                ],
+            ],
+            '/depots' => [
+                'get' => [
+                    'tags' => ['Suprimentos & WMS'],
+                    'summary' => 'Listar Depósitos Físicos',
+                    'description' => 'Almoxarifados centrais, bases operacionais e depósitos vinculados a posições regionais.',
+                    'responses' => [
+                        '200' => ['description' => 'Lista de depósitos operacionais'],
+                    ],
+                ],
+            ],
+            '/clusters' => [
+                'get' => [
+                    'tags' => ['Suprimentos & WMS'],
+                    'summary' => 'Listar Posições Regionais',
+                    'description' => 'Agrupamentos geográficos que consolidam saldos físicos e inventários de depósitos da região.',
+                    'responses' => [
+                        '200' => ['description' => 'Posições regionais cadastradas'],
+                    ],
+                ],
+            ],
+
+            // ==============================================================
+            // MOVIMENTAÇÕES DE ESTOQUE
+            // ==============================================================
+            '/stock/movement' => [
+                'post' => [
+                    'tags' => ['Movimentações de Estoque'],
+                    'summary' => 'Executar Movimentação de Estoque',
+                    'description' => 'Endpoint unificado e transacional para registrar Entrada, Saída, Devolução ou Transferência com geração de protocolo.',
+                    'requestBody' => [
+                        'required' => true,
+                        'content' => [
+                            'application/json' => [
+                                'example' => [
+                                    'movement_type' => 'TRANSFER',
+                                    'source_depot_id' => 1,
+                                    'destination_depot_id' => 2,
+                                    'document_number' => 'NF-45892',
+                                    'notes' => 'Transferência para base de campo',
+                                    'items' => [
+                                        [
+                                            'material_id' => 1,
+                                            'quantity' => 100,
+                                        ],
+                                        [
+                                            'material_id' => 2,
+                                            'quantity' => 2,
+                                            'serial_ids' => [14, 15],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                    'responses' => [
+                        '201' => ['description' => 'Movimentação concluída e protocolo emitido com sucesso'],
+                        '422' => ['description' => 'Saldo insuficiente ou serial inválido'],
+                    ],
+                ],
+            ],
+            '/stock/documents' => [
+                'get' => [
+                    'tags' => ['Movimentações de Estoque'],
+                    'summary' => 'Histórico Agrupado por Documento / Protocolo',
+                    'description' => 'Visão consolidada para auditoria fiscal e rastreabilidade de guias de transferência.',
+                    'responses' => [
+                        '200' => ['description' => 'Lista paginada de documentos e protocolos'],
+                    ],
+                ],
+            ],
+            '/stock/documents/{protocol}' => [
+                'get' => [
+                    'tags' => ['Movimentações de Estoque'],
+                    'summary' => 'Detalhe do Documento por Protocolo',
+                    'parameters' => [
+                        ['name' => 'protocol', 'in' => 'path', 'required' => true, 'description' => 'Código do protocolo de movimentação', 'schema' => ['type' => 'string']],
+                    ],
+                    'responses' => [
+                        '200' => ['description' => 'Detalhes completos da movimentação, itens e assinaturas'],
+                        '404' => ['description' => 'Protocolo não encontrado'],
+                    ],
+                ],
+            ],
+            '/stock/regional-position' => [
+                'get' => [
+                    'tags' => ['Movimentações de Estoque'],
+                    'summary' => 'Saldo Consolidado da Posição Regional',
+                    'description' => 'Calcula em tempo real a soma dos saldos de todos os depósitos de cada posição regional.',
+                    'responses' => [
+                        '200' => ['description' => 'Matriz de saldo consolidado em tempo real'],
+                    ],
+                ],
+            ],
+
+            // ==============================================================
+            // GEOGRAFIA & REFERÊNCIAS
+            // ==============================================================
+            '/states' => [
+                'get' => [
+                    'tags' => ['Geografia & Referências'],
+                    'summary' => 'Estados Brasileiros (UF)',
+                    'responses' => [
+                        '200' => ['description' => 'Lista das 27 unidades federativas com código IBGE'],
+                    ],
+                ],
+            ],
+            '/cities' => [
+                'get' => [
+                    'tags' => ['Geografia & Referências'],
+                    'summary' => 'Buscar Cidades',
+                    'parameters' => [
+                        ['name' => 'search', 'in' => 'query', 'description' => 'Termo de busca do município', 'schema' => ['type' => 'string']],
+                        ['name' => 'state_id', 'in' => 'query', 'description' => 'ID do estado', 'schema' => ['type' => 'integer']],
+                    ],
+                    'responses' => [
+                        '200' => ['description' => 'Municípios catalogados'],
+                    ],
+                ],
+            ],
+            '/cep/{postal_code}' => [
+                'get' => [
+                    'tags' => ['Geografia & Referências'],
+                    'summary' => 'Consulta Automática de CEP',
+                    'description' => 'Resolve logradouro, bairro, cidade e estado em tempo real com fallback ViaCEP integrado.',
+                    'parameters' => [
+                        ['name' => 'postal_code', 'in' => 'path', 'required' => true, 'description' => 'CEP de 8 dígitos', 'schema' => ['type' => 'string']],
+                    ],
+                    'responses' => [
+                        '200' => ['description' => 'Endereço resolvido com sucesso'],
+                        '404' => ['description' => 'CEP não localizado'],
+                    ],
+                ],
+            ],
+
+            // ==============================================================
+            // DESENVOLVEDOR & SISTEMA
+            // ==============================================================
+            '/dev/stats' => [
+                'get' => [
+                    'tags' => ['Desenvolvedor & Sistema'],
+                    'summary' => 'Estatísticas Gerais do Ambiente',
+                    'description' => 'Métricas em tempo real de contagem de registros no banco de dados e versões do servidor.',
+                    'responses' => [
+                        '200' => ['description' => 'Métricas do sistema'],
+                    ],
+                ],
+            ],
+            '/dev/reset' => [
+                'post' => [
+                    'tags' => ['Desenvolvedor & Sistema'],
+                    'summary' => 'Reset do Banco de Dados para Testes',
+                    'description' => 'Restaura o sistema para o estado limpo inicial preservando configurações fundamentais.',
+                    'responses' => [
+                        '200' => ['description' => 'Sistema resetado com sucesso'],
+                    ],
+                ],
+            ],
+            '/dev/populate' => [
+                'post' => [
+                    'tags' => ['Desenvolvedor & Sistema'],
+                    'summary' => 'Geração em Massa de Pessoas Fictícias',
+                    'description' => 'Popula centenas ou milhares de cadastros PF/PJ realistas com documentos matematicamente válidos.',
+                    'requestBody' => [
+                        'content' => [
+                            'application/json' => [
+                                'example' => ['count' => 100],
+                            ],
+                        ],
+                    ],
+                    'responses' => [
+                        '200' => ['description' => 'Cadastros populados com sucesso'],
+                    ],
+                ],
+            ],
+        ];
+    }
+}

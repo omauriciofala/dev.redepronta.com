@@ -2,303 +2,405 @@
   <div class="py-8 w-full space-y-6">
     <!-- Componente Canônico: 10. Topo de Página Padrão (Page Header & Breadcrumb) -->
     <BasePageHeader
-      :breadcrumb-items="[
-        { label: 'Início', href: '#people' },
-        { label: 'Desenvolvedor', href: '#developer' },
-        { label: 'Ferramentas & Utilitários' }
-      ]"
+      :breadcrumb-items="breadcrumbItems"
       title="Painel do Desenvolvedor"
-      description="Utilitários operacionais para reset do banco de dados, geração em massa de cadastros fictícios e inspeção de integridade."
-      :icon="Terminal"
+      :description="headerDescription"
+      :icon="currentTab === 'docs' ? Code2 : Terminal"
       icon-color-class="bg-orange-50 dark:bg-[#FC6714]/15 border border-orange-200 dark:border-[#FC6714]/30 text-[#FC6714]"
-      badge-text="Ambiente de Desenvolvimento"
+      :badge-text="currentTab === 'docs' ? 'OpenAPI 3.1.0' : 'Ambiente de Desenvolvimento'"
       badge-variant="success"
     >
       <template #actions>
-        <button
-          type="button"
-          @click="fetchStats"
-          :disabled="isLoadingStats"
-          class="inline-flex items-center gap-2 px-3.5 py-2 text-sm font-medium rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition cursor-pointer disabled:opacity-50 shadow-2xs"
-        >
-          <RefreshCw class="w-4 h-4" :class="{ 'animate-spin': isLoadingStats }" />
-          <span>{{ isLoadingStats ? 'Atualizando...' : 'Atualizar Métricas' }}</span>
-        </button>
+        <template v-if="currentTab === 'utils'">
+          <button
+            type="button"
+            @click="fetchStats"
+            :disabled="isLoadingStats"
+            class="inline-flex items-center gap-2 px-3.5 py-2 text-sm font-medium rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition cursor-pointer disabled:opacity-50 shadow-2xs"
+          >
+            <RefreshCw class="w-4 h-4" :class="{ 'animate-spin': isLoadingStats }" />
+            <span>{{ isLoadingStats ? 'Atualizando...' : 'Atualizar Métricas' }}</span>
+          </button>
+        </template>
+
+        <template v-else-if="currentTab === 'docs'">
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              @click="fetchOpenApiSpec"
+              :disabled="isLoadingSpec"
+              class="inline-flex items-center gap-2 px-3.5 py-2 text-sm font-medium rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition cursor-pointer disabled:opacity-50 shadow-2xs"
+            >
+              <RefreshCw class="w-4 h-4" :class="{ 'animate-spin': isLoadingSpec }" />
+              <span>{{ isLoadingSpec ? 'Carregando Spec...' : 'Recarregar Spec' }}</span>
+            </button>
+
+            <a
+              href="/api/v1/docs/openapi.json"
+              download="redepronta_openapi_v1.json"
+              class="inline-flex items-center gap-2 px-3.5 py-2 text-sm font-semibold rounded-lg bg-[#FC6714] hover:bg-[#E0530A] active:bg-[#C94605] text-white transition shadow-xs cursor-pointer"
+              title="Baixar arquivo JSON completo da especificação para Postman ou Insomnia"
+            >
+              <FileDown class="w-4 h-4" />
+              <span>Baixar openapi.json</span>
+            </a>
+          </div>
+        </template>
+      </template>
+
+      <!-- Linha 3: Barra de Abas do Módulo (Variação 1) -->
+      <template #tabs>
+        <div class="flex border-b border-slate-200 dark:border-slate-800 gap-6 overflow-x-auto select-none pt-2">
+          <button
+            type="button"
+            @click="setTab('utils')"
+            :class="currentTab === 'utils'
+              ? 'border-[#FC6714] text-[#FC6714] font-bold border-b-2'
+              : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium border-b-2'"
+            class="pb-3 border-b-2 text-sm flex items-center gap-2 transition cursor-pointer shrink-0"
+          >
+            <Terminal class="w-4 h-4" />
+            <span>Ferramentas & Utilitários</span>
+          </button>
+
+          <button
+            type="button"
+            @click="setTab('docs')"
+            :class="currentTab === 'docs'
+              ? 'border-[#FC6714] text-[#FC6714] font-bold border-b-2'
+              : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium border-b-2'"
+            class="pb-3 border-b-2 text-sm flex items-center gap-2 transition cursor-pointer shrink-0"
+          >
+            <Code2 class="w-4 h-4" />
+            <span>Documentação da API (OpenAPI 3.1)</span>
+            <span
+              class="px-2 py-0.5 rounded-md text-[11px] font-bold transition"
+              :class="currentTab === 'docs' ? 'bg-[#FC6714]/15 text-[#FC6714]' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'"
+            >
+              v1.0
+            </span>
+          </button>
+        </div>
       </template>
     </BasePageHeader>
 
-    <!-- Cards de Métricas em Tempo Real -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <!-- Pessoas Cadastradas -->
-      <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total de Pessoas</span>
-          <div class="w-8 h-8 rounded-lg bg-orange-50 dark:bg-[#FC6714]/15 text-[#FC6714] flex items-center justify-center">
-            <Users class="w-4 h-4" />
-          </div>
-        </div>
-        <div class="mt-2 flex items-baseline gap-2">
-          <span class="text-2xl font-bold font-heading text-slate-900 dark:text-slate-100">
-            {{ stats.total_people.toLocaleString('pt-BR') }}
-          </span>
-          <span
-            class="text-xs font-semibold px-2 py-0.5 rounded-md"
-            :class="stats.total_people === 0 ? 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400' : 'bg-orange-100 dark:bg-orange-950/60 text-orange-700 dark:text-orange-300'"
-          >
-            {{ stats.total_people === 0 ? 'Sistema Limpo' : 'Cadastros Ativos' }}
-          </span>
-        </div>
-        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
-          {{ stats.individual_people }} PF • {{ stats.legal_people }} PJ
-        </p>
-      </div>
-
-      <!-- Status dos Cadastros -->
-      <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Situação Cadastral</span>
-          <div class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-            <CheckCircle2 class="w-4 h-4" />
-          </div>
-        </div>
-        <div class="mt-2 flex items-baseline gap-2">
-          <span class="text-2xl font-bold font-heading text-emerald-600 dark:text-emerald-400">
-            {{ stats.active_people.toLocaleString('pt-BR') }}
-          </span>
-          <span class="text-xs text-slate-500 dark:text-slate-400">
-            ativos
-          </span>
-        </div>
-        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
-          {{ stats.inactive_people }} inativos no sistema
-        </p>
-      </div>
-
-      <!-- Grupos de Pessoas -->
-      <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Grupos Canônicos</span>
-          <div class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
-            <FolderGit2 class="w-4 h-4" />
-          </div>
-        </div>
-        <div class="mt-2 flex items-baseline gap-2">
-          <span class="text-2xl font-bold font-heading text-slate-900 dark:text-slate-100">
-            {{ stats.total_groups }}
-          </span>
-          <span class="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
-            Preservados no Reset
-          </span>
-        </div>
-        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
-          VIP, Prestadores, Fornecedores, Geral
-        </p>
-      </div>
-
-      <!-- Geografia e Referência -->
-      <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Base IBGE</span>
-          <div class="w-8 h-8 rounded-lg bg-cyan-50 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 flex items-center justify-center">
-            <Database class="w-4 h-4" />
-          </div>
-        </div>
-        <div class="mt-2 flex items-baseline gap-2">
-          <span class="text-2xl font-bold font-heading text-slate-900 dark:text-slate-100">
-            {{ stats.total_cities.toLocaleString('pt-BR') }}
-          </span>
-          <span class="text-xs text-slate-500 dark:text-slate-400">
-            em {{ stats.total_states }} UFs
-          </span>
-        </div>
-        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
-          {{ stats.total_cnaes }} CNAEs cadastrados
-        </p>
-      </div>
-    </div>
-
-    <!-- Bloco de Ações Principais do Desenvolvedor -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <!-- CARD 1: RESETAR O SISTEMA -->
-      <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-red-200/80 dark:border-red-900/50 shadow-xs space-y-5 flex flex-col justify-between">
-        <div class="space-y-4">
-          <div class="flex items-center gap-3">
-            <div class="p-2.5 rounded-xl bg-red-100 dark:bg-red-950/80 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800">
-              <RotateCcw class="w-6 h-6" />
-            </div>
-            <div>
-              <h2 class="text-lg font-bold font-heading text-slate-900 dark:text-slate-100">
-                Resetar o Sistema
-              </h2>
-              <p class="text-xs text-slate-500 dark:text-slate-400">
-                Restaura o ambiente para o estado inicial sem cadastros de pessoas
-              </p>
+    <!-- ============================================================== -->
+    <!-- ABA 1: FERRAMENTAS & UTILITÁRIOS OPERACIONAIS                   -->
+    <!-- ============================================================== -->
+    <div v-show="currentTab === 'utils'" class="space-y-6">
+      <!-- Cards de Métricas em Tempo Real -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Pessoas Cadastradas -->
+        <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total de Pessoas</span>
+            <div class="w-8 h-8 rounded-lg bg-orange-50 dark:bg-[#FC6714]/15 text-[#FC6714] flex items-center justify-center">
+              <Users class="w-4 h-4" />
             </div>
           </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span class="text-2xl font-bold font-heading text-slate-900 dark:text-slate-100">
+              {{ stats.total_people.toLocaleString('pt-BR') }}
+            </span>
+            <span
+              class="text-xs font-semibold px-2 py-0.5 rounded-md"
+              :class="stats.total_people === 0 ? 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400' : 'bg-orange-100 dark:bg-orange-950/60 text-orange-700 dark:text-orange-300'"
+            >
+              {{ stats.total_people === 0 ? 'Sistema Limpo' : 'Cadastros Ativos' }}
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            {{ stats.individual_people }} PF • {{ stats.legal_people }} PJ
+          </p>
+        </div>
 
-          <div class="p-4 rounded-xl bg-red-50/70 dark:bg-red-950/30 border border-red-200 dark:border-red-900/60 space-y-2 text-xs leading-relaxed text-red-900 dark:text-red-200">
-            <div class="flex items-center gap-2 font-bold text-red-700 dark:text-red-300 text-sm">
-              <AlertTriangle class="w-4 h-4 shrink-0" />
-              <span>O que acontece ao resetar o sistema:</span>
+        <!-- Status dos Cadastros -->
+        <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Situação Cadastral</span>
+            <div class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+              <CheckCircle2 class="w-4 h-4" />
             </div>
-            <ul class="list-disc list-inside space-y-1 text-slate-700 dark:text-slate-300">
-              <li>Exclui <strong>todos os {{ stats.total_people }} cadastros de pessoas</strong> da base.</li>
-              <li>Reseta a sequência de identificadores (IDs) da tabela de pessoas.</li>
-              <li><strong>Preserva integralmente:</strong> Conta Matriz, Gêneros, Cidades, Estados (IBGE), CNAEs e Grupos de Pessoas canônicos.</li>
-              <li>Deixa o sistema pronto para novas rodadas de testes limpos.</li>
-            </ul>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span class="text-2xl font-bold font-heading text-emerald-600 dark:text-emerald-400">
+              {{ stats.active_people.toLocaleString('pt-BR') }}
+            </span>
+            <span class="text-xs text-slate-500 dark:text-slate-400">
+              ativos
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            {{ stats.inactive_people }} inativos no sistema
+          </p>
+        </div>
+
+        <!-- Grupos de Pessoas -->
+        <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Grupos Canônicos</span>
+            <div class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+              <FolderGit2 class="w-4 h-4" />
+            </div>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span class="text-2xl font-bold font-heading text-slate-900 dark:text-slate-100">
+              {{ stats.total_groups }}
+            </span>
+            <span class="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+              Preservados no Reset
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            VIP, Prestadores, Fornecedores, Geral
+          </p>
+        </div>
+
+        <!-- Geografia e Referência -->
+        <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Base IBGE</span>
+            <div class="w-8 h-8 rounded-lg bg-cyan-50 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 flex items-center justify-center">
+              <Database class="w-4 h-4" />
+            </div>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span class="text-2xl font-bold font-heading text-slate-900 dark:text-slate-100">
+              {{ stats.total_cities.toLocaleString('pt-BR') }}
+            </span>
+            <span class="text-xs text-slate-500 dark:text-slate-400">
+              em {{ stats.total_states }} UFs
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            {{ stats.total_cnaes }} CNAEs cadastrados
+          </p>
+        </div>
+      </div>
+
+      <!-- Bloco de Ações Principais do Desenvolvedor -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- CARD 1: RESETAR O SISTEMA -->
+        <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-red-200/80 dark:border-red-900/50 shadow-xs space-y-5 flex flex-col justify-between">
+          <div class="space-y-4">
+            <div class="flex items-center gap-3">
+              <div class="p-2.5 rounded-xl bg-red-100 dark:bg-red-950/80 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800">
+                <RotateCcw class="w-6 h-6" />
+              </div>
+              <div>
+                <h2 class="text-lg font-bold font-heading text-slate-900 dark:text-slate-100">
+                  Resetar o Sistema
+                </h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400">
+                  Restaura o ambiente para o estado inicial sem cadastros de pessoas
+                </p>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-xl bg-red-50/70 dark:bg-red-950/30 border border-red-200 dark:border-red-900/60 space-y-2 text-xs leading-relaxed text-red-900 dark:text-red-200">
+              <div class="flex items-center gap-2 font-bold text-red-700 dark:text-red-300 text-sm">
+                <AlertTriangle class="w-4 h-4 shrink-0" />
+                <span>O que acontece ao resetar o sistema:</span>
+              </div>
+              <ul class="list-disc list-inside space-y-1 text-slate-700 dark:text-slate-300">
+                <li>Exclui <strong>todos os {{ stats.total_people }} cadastros de pessoas</strong> da base.</li>
+                <li>Reseta a sequência de identificadores (IDs) da tabela de pessoas.</li>
+                <li><strong>Preserva integralmente:</strong> Conta Matriz, Gêneros, Cidades, Estados (IBGE), CNAEs e Grupos de Pessoas canônicos.</li>
+                <li>Deixa o sistema pronto para novas rodadas de testes limpos.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div>
+            <button
+              type="button"
+              @click="openResetConfirmModal"
+              :disabled="isResetting || isPopulating"
+              class="w-full h-11 px-4 rounded-xl bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-semibold text-sm shadow-xs transition flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50"
+            >
+              <RotateCcw class="w-4 h-4" />
+              <span>Resetar Sistema para o Padrão (Zerar Pessoas)</span>
+            </button>
           </div>
         </div>
 
-        <div>
+        <!-- CARD 2: POPULAR PESSOAS FICTÍCIAS -->
+        <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-5 flex flex-col justify-between">
+          <div class="space-y-4">
+            <div class="flex items-center gap-3">
+              <div class="p-2.5 rounded-xl bg-orange-100 dark:bg-[#FC6714]/20 text-[#FC6714] border border-orange-200 dark:border-[#FC6714]/40">
+                <UserPlus class="w-6 h-6" />
+              </div>
+              <div>
+                <h2 class="text-lg font-bold font-heading text-slate-900 dark:text-slate-100">
+                  Popular Pessoas Fictícias
+                </h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400">
+                  Geração em massa de dados realistas para testes de carga e filtros
+                </p>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 space-y-2 text-xs leading-relaxed text-slate-700 dark:text-slate-300">
+              <div class="flex items-center gap-2 font-bold text-slate-900 dark:text-white text-sm">
+                <CheckCircle2 class="w-4 h-4 text-emerald-500 shrink-0" />
+                <span>Características dos dados gerados:</span>
+              </div>
+              <ul class="list-disc list-inside space-y-1 text-slate-600 dark:text-slate-400">
+                <li><strong>50% PF / 50% PJ:</strong> Mix balanceado para validação de todas as abas e formulários.</li>
+                <li><strong>Documentos Válidos:</strong> CPFs (11 dígitos) e CNPJs (14 dígitos) com algoritmos matemáticos reais.</li>
+                <li><strong>Papéis Operacionais:</strong> Clientes, Fornecedores, Colaboradores, Terceirizados, Vendedores, Motoristas e Transportadoras.</li>
+                <li><strong>Geolocalização Nacional:</strong> Endereços reais em cidades e estados distribuídos por todo o Brasil.</li>
+              </ul>
+            </div>
+
+            <!-- Seletor de Quantidade -->
+            <div class="space-y-2">
+              <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Quantidade de pessoas a popular:
+              </label>
+              <div class="grid grid-cols-4 gap-2">
+                <button
+                  type="button"
+                  v-for="amt in [100, 500, 1000, 2000]"
+                  :key="amt"
+                  @click="populateCount = amt"
+                  :class="populateCount === amt
+                    ? 'bg-[#FC6714] text-white font-bold shadow-xs'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'"
+                  class="py-2 px-2 text-xs font-semibold rounded-lg transition cursor-pointer text-center"
+                >
+                  {{ amt.toLocaleString('pt-BR') }}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <button
+              type="button"
+              @click="executePopulatePeople"
+              :disabled="isPopulating || isResetting"
+              class="w-full h-11 px-4 rounded-xl bg-[#FC6714] hover:bg-[#e0580e] active:bg-[#c94d0b] text-white font-semibold text-sm shadow-xs transition flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50"
+            >
+              <Loader2 v-if="isPopulating" class="w-4 h-4 animate-spin" />
+              <UserPlus v-else class="w-4 h-4" />
+              <span>{{ isPopulating ? `Gerando ${populateCount} cadastros...` : `Popular ${populateCount.toLocaleString('pt-BR')} Pessoas Agora` }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seção de Atalhos Rápidos para Validação -->
+      <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-bold font-heading text-slate-900 dark:text-slate-100 flex items-center gap-2">
+            <Compass class="w-4 h-4 text-[#FC6714]" />
+            <span>Atalhos Rápidos de Inspeção do Sistema</span>
+          </h3>
+          <span class="text-xs text-slate-400">
+            Servidor: PHP {{ stats.php_version }} • Laravel {{ stats.laravel_version }}
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-1">
           <button
             type="button"
-            @click="openResetConfirmModal"
-            :disabled="isResetting || isPopulating"
-            class="w-full h-11 px-4 rounded-xl bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-semibold text-sm shadow-xs transition flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50"
+            @click="setView('people')"
+            class="p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-orange-300 dark:hover:border-[#FC6714]/50 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-orange-50/50 dark:hover:bg-[#FC6714]/10 transition flex items-center gap-3 text-left cursor-pointer group"
           >
-            <RotateCcw class="w-4 h-4" />
-            <span>Resetar Sistema para o Padrão (Zerar Pessoas)</span>
+            <div class="p-2 rounded-lg bg-orange-100 dark:bg-[#FC6714]/20 text-[#FC6714] group-hover:scale-105 transition">
+              <Users class="w-4 h-4" />
+            </div>
+            <div>
+              <div class="text-xs font-bold text-slate-900 dark:text-white">Gestão de Pessoas</div>
+              <div class="text-[11px] text-slate-500 dark:text-slate-400">Listagem, filtros e CRUD</div>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            @click="setView('supplies')"
+            class="p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-orange-300 dark:hover:border-[#FC6714]/50 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-orange-50/50 dark:hover:bg-[#FC6714]/10 transition flex items-center gap-3 text-left cursor-pointer group"
+          >
+            <div class="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 group-hover:scale-105 transition">
+              <Database class="w-4 h-4" />
+            </div>
+            <div>
+              <div class="text-xs font-bold text-slate-900 dark:text-white">Estoque & WMS</div>
+              <div class="text-[11px] text-slate-500 dark:text-slate-400">Materiais, seriais e docs</div>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            @click="setView('users')"
+            class="p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-orange-300 dark:hover:border-[#FC6714]/50 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-orange-50/50 dark:hover:bg-[#FC6714]/10 transition flex items-center gap-3 text-left cursor-pointer group"
+          >
+            <div class="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 group-hover:scale-105 transition">
+              <Users class="w-4 h-4" />
+            </div>
+            <div>
+              <div class="text-xs font-bold text-slate-900 dark:text-white">Usuários & Acessos</div>
+              <div class="text-[11px] text-slate-500 dark:text-slate-400">Papéis e permissões</div>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            @click="setView('changelog')"
+            class="p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-orange-300 dark:hover:border-[#FC6714]/50 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-orange-50/50 dark:hover:bg-[#FC6714]/10 transition flex items-center gap-3 text-left cursor-pointer group"
+          >
+            <div class="p-2 rounded-lg bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 group-hover:scale-105 transition">
+              <History class="w-4 h-4" />
+            </div>
+            <div>
+              <div class="text-xs font-bold text-slate-900 dark:text-white">Change-log Vivo</div>
+              <div class="text-[11px] text-slate-500 dark:text-slate-400">Histórico de commits</div>
+            </div>
           </button>
         </div>
       </div>
-
-      <!-- CARD 2: POPULAR PESSOAS FICTÍCIAS -->
-      <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-5 flex flex-col justify-between">
-        <div class="space-y-4">
-          <div class="flex items-center gap-3">
-            <div class="p-2.5 rounded-xl bg-orange-100 dark:bg-[#FC6714]/20 text-[#FC6714] border border-orange-200 dark:border-[#FC6714]/40">
-              <UserPlus class="w-6 h-6" />
-            </div>
-            <div>
-              <h2 class="text-lg font-bold font-heading text-slate-900 dark:text-slate-100">
-                Popular Pessoas Fictícias
-              </h2>
-              <p class="text-xs text-slate-500 dark:text-slate-400">
-                Geração em massa de dados realistas para testes de carga e filtros
-              </p>
-            </div>
-          </div>
-
-          <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 space-y-2 text-xs leading-relaxed text-slate-700 dark:text-slate-300">
-            <div class="flex items-center gap-2 font-bold text-slate-900 dark:text-white text-sm">
-              <CheckCircle2 class="w-4 h-4 text-emerald-500 shrink-0" />
-              <span>Características dos dados gerados:</span>
-            </div>
-            <ul class="list-disc list-inside space-y-1 text-slate-600 dark:text-slate-400">
-              <li><strong>50% PF / 50% PJ:</strong> Mix balanceado para validação de todas as abas e formulários.</li>
-              <li><strong>Documentos Válidos:</strong> CPFs (11 dígitos) e CNPJs (14 dígitos) com algoritmos matemáticos reais.</li>
-              <li><strong>Papéis Operacionais:</strong> Clientes, Fornecedores, Colaboradores, Terceirizados, Vendedores, Motoristas e Transportadoras.</li>
-              <li><strong>Geolocalização Nacional:</strong> Endereços reais em cidades e estados distribuídos por todo o Brasil.</li>
-            </ul>
-          </div>
-
-          <!-- Seletor de Quantidade -->
-          <div class="space-y-2">
-            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300">
-              Quantidade de pessoas a popular:
-            </label>
-            <div class="grid grid-cols-4 gap-2">
-              <button
-                type="button"
-                v-for="amt in [100, 500, 1000, 2000]"
-                :key="amt"
-                @click="populateCount = amt"
-                :class="populateCount === amt
-                  ? 'bg-[#FC6714] text-white font-bold shadow-xs'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'"
-                class="py-2 px-2 text-xs font-semibold rounded-lg transition cursor-pointer text-center"
-              >
-                {{ amt.toLocaleString('pt-BR') }}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <button
-            type="button"
-            @click="executePopulatePeople"
-            :disabled="isPopulating || isResetting"
-            class="w-full h-11 px-4 rounded-xl bg-[#FC6714] hover:bg-[#e0580e] active:bg-[#c94d0b] text-white font-semibold text-sm shadow-xs transition flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50"
-          >
-            <Loader2 v-if="isPopulating" class="w-4 h-4 animate-spin" />
-            <UserPlus v-else class="w-4 h-4" />
-            <span>{{ isPopulating ? `Gerando ${populateCount} cadastros...` : `Popular ${populateCount.toLocaleString('pt-BR')} Pessoas Agora` }}</span>
-          </button>
-        </div>
-      </div>
     </div>
 
-    <!-- Seção de Atalhos Rápidos para Validação -->
-    <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs space-y-3">
-      <div class="flex items-center justify-between">
-        <h3 class="text-sm font-bold font-heading text-slate-900 dark:text-slate-100 flex items-center gap-2">
-          <Compass class="w-4 h-4 text-[#FC6714]" />
-          <span>Atalhos Rápidos de Inspeção do Sistema</span>
-        </h3>
-        <span class="text-xs text-slate-400">
-          Servidor: PHP {{ stats.php_version }} • Laravel {{ stats.laravel_version }}
-        </span>
+    <!-- ============================================================== -->
+    <!-- ABA 2: DOCUMENTAÇÃO DA API (OPENAPI 3.1)                       -->
+    <!-- ============================================================== -->
+    <div v-show="currentTab === 'docs'" class="space-y-6">
+      <!-- Loading State da Spec -->
+      <div v-if="isLoadingSpec && !openApiSpec" class="p-12 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col items-center justify-center text-center space-y-3">
+        <Loader2 class="w-8 h-8 text-[#FC6714] animate-spin" />
+        <div class="text-sm font-bold text-slate-900 dark:text-slate-100 font-heading">
+          Carregando Catálogo da API v1 (OpenAPI 3.1)...
+        </div>
+        <p class="text-xs text-slate-500 dark:text-slate-400 max-w-sm">
+          Compilando esquemas de rotas, parâmetros, respostas e exemplos de integração em tempo real.
+        </p>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-1">
+      <!-- Erro ao Carregar Spec -->
+      <div v-else-if="specError" class="p-6 rounded-2xl bg-red-50/70 dark:bg-red-950/30 border border-red-200 dark:border-red-900/60 text-red-900 dark:text-red-200 space-y-3">
+        <div class="flex items-center gap-2.5 font-bold text-sm text-red-700 dark:text-red-300">
+          <AlertCircle class="w-5 h-5 shrink-0" />
+          <span>Não foi possível carregar a documentação OpenAPI</span>
+        </div>
+        <p class="text-xs text-slate-700 dark:text-slate-300">
+          {{ specError }}
+        </p>
         <button
           type="button"
-          @click="setView('people')"
-          class="p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-orange-300 dark:hover:border-[#FC6714]/50 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-orange-50/50 dark:hover:bg-[#FC6714]/10 transition flex items-center gap-3 text-left cursor-pointer group"
+          @click="fetchOpenApiSpec"
+          class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-semibold cursor-pointer shadow-xs transition"
         >
-          <div class="p-2 rounded-lg bg-orange-100 dark:bg-[#FC6714]/20 text-[#FC6714] group-hover:scale-105 transition">
-            <Users class="w-4 h-4" />
-          </div>
-          <div>
-            <div class="text-xs font-bold text-slate-900 dark:text-white">Gestão de Pessoas</div>
-            <div class="text-[11px] text-slate-500 dark:text-slate-400">Listagem, filtros e CRUD</div>
-          </div>
-        </button>
-
-        <button
-          type="button"
-          @click="setView('design-system')"
-          class="p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-orange-300 dark:hover:border-[#FC6714]/50 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-orange-50/50 dark:hover:bg-[#FC6714]/10 transition flex items-center gap-3 text-left cursor-pointer group"
-        >
-          <div class="p-2 rounded-lg bg-purple-100 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 group-hover:scale-105 transition">
-            <Palette class="w-4 h-4" />
-          </div>
-          <div>
-            <div class="text-xs font-bold text-slate-900 dark:text-white">Design System</div>
-            <div class="text-[11px] text-slate-500 dark:text-slate-400">Componentes e inputs</div>
-          </div>
-        </button>
-
-        <button
-          type="button"
-          @click="setView('changelog')"
-          class="p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-orange-300 dark:hover:border-[#FC6714]/50 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-orange-50/50 dark:hover:bg-[#FC6714]/10 transition flex items-center gap-3 text-left cursor-pointer group"
-        >
-          <div class="p-2 rounded-lg bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 group-hover:scale-105 transition">
-            <History class="w-4 h-4" />
-          </div>
-          <div>
-            <div class="text-xs font-bold text-slate-900 dark:text-white">Change-log Vivo</div>
-            <div class="text-[11px] text-slate-500 dark:text-slate-400">Histórico de commits</div>
-          </div>
-        </button>
-
-        <button
-          type="button"
-          @click="setView('integrations')"
-          class="p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-orange-300 dark:hover:border-[#FC6714]/50 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-orange-50/50 dark:hover:bg-[#FC6714]/10 transition flex items-center gap-3 text-left cursor-pointer group"
-        >
-          <div class="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 group-hover:scale-105 transition">
-            <Network class="w-4 h-4" />
-          </div>
-          <div>
-            <div class="text-xs font-bold text-slate-900 dark:text-white">APIs & Integrações</div>
-            <div class="text-[11px] text-slate-500 dark:text-slate-400">ViaCEP, CNPJá e IBGE</div>
-          </div>
+          Tentar Novamente
         </button>
       </div>
+
+      <!-- Visualizador Interativo OpenAPI 3.1 -->
+      <ApiDocumentationViewer
+        v-else-if="openApiSpec"
+        :spec="openApiSpec"
+      />
     </div>
 
     <!-- Toast de Notificação -->
@@ -372,7 +474,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, computed, onMounted, onUnmounted, watch } from 'vue';
 import axios from 'axios';
 import {
   Terminal,
@@ -386,16 +488,96 @@ import {
   FolderGit2,
   Database,
   Compass,
-  Palette,
   History,
-  Network,
   Loader2,
+  Code2,
+  FileDown,
 } from 'lucide-vue-next';
 import BaseModal from '../components/common/BaseModal.vue';
 import BasePageHeader from '../components/common/BasePageHeader.vue';
+import ApiDocumentationViewer from '../components/developer/ApiDocumentationViewer.vue';
 import { useNavigation } from '../composables/useNavigation';
 
 const { setView } = useNavigation();
+
+type TabKey = 'utils' | 'docs';
+
+function getInitialTab(): TabKey {
+  try {
+    const hash = window.location.hash || '';
+    const params = new URLSearchParams(hash.split('?')[1] || '');
+    const tabParam = params.get('tab') as TabKey;
+    if (tabParam && ['utils', 'docs'].includes(tabParam)) {
+      return tabParam;
+    }
+    const saved = localStorage.getItem('rp_dev_active_tab') as TabKey;
+    if (saved && ['utils', 'docs'].includes(saved)) {
+      return saved;
+    }
+  } catch (e) {
+    // Fallback silencioso
+  }
+  return 'utils';
+}
+
+const currentTab = ref<TabKey>(getInitialTab());
+
+function setTab(tab: TabKey) {
+  currentTab.value = tab;
+  updateTabInUrlAndStorage(tab);
+  if (tab === 'docs' && !openApiSpec.value) {
+    fetchOpenApiSpec();
+  }
+}
+
+function updateTabInUrlAndStorage(tab: TabKey) {
+  try {
+    localStorage.setItem('rp_dev_active_tab', tab);
+    const currentHash = window.location.hash.replace(/^#\/?/, '').split('?')[0].split('/')[0] || 'developer';
+    const newHash = `${currentHash}?tab=${tab}`;
+    if (window.location.hash !== `#${newHash}`) {
+      history.replaceState(null, '', `#${newHash}`);
+    }
+  } catch (e) {
+    // Fallback silencioso
+  }
+}
+
+watch(currentTab, (newTab) => {
+  updateTabInUrlAndStorage(newTab);
+});
+
+function handleHashChangeForTabs() {
+  const currentTabInHash = getInitialTab();
+  if (currentTabInHash && currentTabInHash !== currentTab.value) {
+    currentTab.value = currentTabInHash;
+    if (currentTab.value === 'docs' && !openApiSpec.value) {
+      fetchOpenApiSpec();
+    }
+  }
+}
+
+const breadcrumbItems = computed(() => {
+  if (currentTab.value === 'docs') {
+    return [
+      { label: 'Início', href: '#people' },
+      { label: 'Desenvolvedor', href: '#developer' },
+      { label: 'Documentação da API (OpenAPI 3.1)' },
+    ];
+  }
+  return [
+    { label: 'Início', href: '#people' },
+    { label: 'Desenvolvedor', href: '#developer' },
+    { label: 'Ferramentas & Utilitários' },
+  ];
+});
+
+const headerDescription = computed(() => {
+  if (currentTab.value === 'docs') {
+    return 'Catálogo interativo OpenAPI 3.1 da API v1 com esquemas de payload, parâmetros, filtros e comandos cURL.';
+  }
+  return 'Utilitários operacionais para reset do banco de dados, geração em massa de cadastros fictícios e inspeção de integridade.';
+});
 
 const stats = reactive({
   total_people: 0,
@@ -418,6 +600,11 @@ const isResetModalOpen = ref(false);
 const isResetting = ref(false);
 const isPopulating = ref(false);
 const populateCount = ref(1000);
+
+// Estado da Documentação OpenAPI 3.1
+const openApiSpec = ref<any>(null);
+const isLoadingSpec = ref(false);
+const specError = ref<string | null>(null);
 
 const toastMessage = ref('');
 const toastType = ref<'success' | 'error'>('success');
@@ -443,6 +630,22 @@ const fetchStats = async () => {
     showToast('Erro ao carregar métricas do sistema.', 'error');
   } finally {
     isLoadingStats.value = false;
+  }
+};
+
+const fetchOpenApiSpec = async () => {
+  isLoadingSpec.value = true;
+  specError.value = null;
+  try {
+    const res = await axios.get('/api/v1/docs/openapi.json');
+    if (res.data) {
+      openApiSpec.value = res.data;
+    }
+  } catch (err: any) {
+    specError.value = err.response?.data?.message || 'Falha ao buscar especificação OpenAPI do servidor.';
+    showToast('Erro ao carregar documentação da API.', 'error');
+  } finally {
+    isLoadingSpec.value = false;
   }
 };
 
@@ -481,5 +684,13 @@ const executePopulatePeople = async () => {
 
 onMounted(() => {
   fetchStats();
+  if (currentTab.value === 'docs') {
+    fetchOpenApiSpec();
+  }
+  window.addEventListener('hashchange', handleHashChangeForTabs);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('hashchange', handleHashChangeForTabs);
 });
 </script>

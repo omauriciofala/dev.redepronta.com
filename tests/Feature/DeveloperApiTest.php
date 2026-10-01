@@ -28,8 +28,24 @@ class DeveloperApiTest extends TestCase
                     'total_states',
                     'total_cnaes',
                     'server_time',
-                ]
+                ],
             ]);
+    }
+
+    public function test_can_fetch_openapi_specification(): void
+    {
+        $response = $this->getJson('/api/v1/docs/openapi.json');
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'openapi',
+                'info' => ['title', 'version'],
+                'paths',
+                'tags',
+            ]);
+
+        $this->assertEquals('3.1.0', $response->json('openapi'));
+        $this->assertNotEmpty($response->json('paths'));
     }
 
     public function test_can_reset_system(): void
