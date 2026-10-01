@@ -12,6 +12,8 @@ class DatabaseSeeder extends Seeder
             GenderSeeder::class,
             CanonicalGeographicSeeder::class,
             InitialAccountSeeder::class,
+            AccessControlSeeder::class,
+            OperationsCatalogSeeder::class,
         ]);
     }
 }

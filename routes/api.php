@@ -97,6 +97,23 @@ Route::prefix('v1')->group(function () {
         Route::get('documents/{protocol}', [StockController::class, 'documentDetail']);
     });
 
+    // Funil Operacional (Tarefas -> Chamados -> Acionamentos)
+    Route::prefix('operations')->group(function () {
+        Route::get('catalogs', [\App\Http\Controllers\Api\V1\Operations\OperationsCatalogController::class, 'index']);
+
+        // Tarefas (Inbox Universal)
+        Route::post('tasks/{id}/promote', [\App\Http\Controllers\Api\V1\Operations\TaskController::class, 'promote']);
+        Route::apiResource('tasks', \App\Http\Controllers\Api\V1\Operations\TaskController::class);
+
+        // Chamados (Tickets & SLA)
+        Route::post('tickets/{id}/dispatch', [\App\Http\Controllers\Api\V1\Operations\TicketController::class, 'dispatch']);
+        Route::apiResource('tickets', \App\Http\Controllers\Api\V1\Operations\TicketController::class);
+
+        // Acionamentos de Campo (Dispatches & FSM)
+        Route::patch('dispatches/{id}/advance-status', [\App\Http\Controllers\Api\V1\Operations\DispatchController::class, 'advanceStatus']);
+        Route::apiResource('dispatches', \App\Http\Controllers\Api\V1\Operations\DispatchController::class)->except(['update']);
+    });
+
     // Change-log Vivo
     Route::get('changelog', [ChangelogController::class, 'index']);
 

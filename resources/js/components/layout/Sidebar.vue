@@ -43,10 +43,23 @@
         <span>Usuários & Acessos</span>
       </button>
 
-      <!-- Operações & WMS (Sprint 2 Ativo) -->
+      <!-- Operações & WMS (Sprints 2 e 3 Ativos) -->
       <div class="pt-4 px-3 pb-2 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
         Operações & WMS
       </div>
+
+      <!-- Item Funil Operacional (FSM) -->
+      <button
+        type="button"
+        @click="setView('operations')"
+        :class="currentView === 'operations'
+          ? 'bg-[#FC6714] text-white font-bold shadow-xs'
+          : 'text-slate-300 hover:text-white hover:bg-white/10 font-medium'"
+        class="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm rounded-lg transition-colors cursor-pointer text-left focus:ring-2 focus:ring-[#FC6714] focus:outline-none"
+      >
+        <Activity class="w-5 h-5" :class="currentView === 'operations' ? 'text-white' : 'text-slate-300'" />
+        <span>Funil Operacional (FSM)</span>
+      </button>
 
       <!-- Item Suprimentos & WMS -->
       <button
@@ -124,11 +137,6 @@
       </div>
 
       <div class="flex items-center gap-3 px-3.5 py-2.5 text-sm font-normal text-slate-400/80 rounded-lg cursor-not-allowed">
-        <CheckSquare class="w-5 h-5 opacity-60" />
-        <span>Operações (FSM)</span>
-      </div>
-
-      <div class="flex items-center gap-3 px-3.5 py-2.5 text-sm font-normal text-slate-400/80 rounded-lg cursor-not-allowed">
         <CreditCard class="w-5 h-5 opacity-60" />
         <span>Financeiro</span>
       </div>
@@ -182,7 +190,7 @@
 </template>
 
 <script setup lang="ts">
-import { Users, Terminal, Palette, History, Network, Package, CheckSquare, CreditCard, MessageSquare, Sun, Moon, ShieldCheck, LogOut } from 'lucide-vue-next';
+import { Users, Terminal, Palette, History, Network, Package, Activity, CreditCard, MessageSquare, Sun, Moon, ShieldCheck, LogOut } from 'lucide-vue-next';
 import { useTheme } from '../../composables/useTheme';
 import { useNavigation } from '../../composables/useNavigation';
 import { useAuth } from '../../composables/useAuth';

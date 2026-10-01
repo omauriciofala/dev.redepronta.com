@@ -6,6 +6,7 @@
     <DesignSystemView v-else-if="currentView === 'design-system'" />
     <ChangelogView v-else-if="currentView === 'changelog'" />
     <IntegrationsView v-else-if="currentView === 'integrations'" />
+    <OperationsView v-else-if="currentView === 'operations'" />
     <SuppliesView v-else-if="currentView === 'supplies'" />
     <PeopleView v-else />
   </AppLayout>
@@ -22,6 +23,7 @@ import DeveloperView from './views/DeveloperView.vue';
 import DesignSystemView from './views/DesignSystemView.vue';
 import ChangelogView from './views/ChangelogView.vue';
 import IntegrationsView from './views/IntegrationsView.vue';
+import OperationsView from './views/OperationsView.vue';
 import { useNavigation } from './composables/useNavigation';
 import { useAuth } from './composables/useAuth';
 

@@ -1,6 +1,6 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 
-export type ActiveView = 'people' | 'supplies' | 'users' | 'design-system' | 'changelog' | 'integrations' | 'developer' | 'login';
+export type ActiveView = 'people' | 'supplies' | 'operations' | 'users' | 'design-system' | 'changelog' | 'integrations' | 'developer' | 'login';
 
 const currentView = ref<ActiveView>('people');
 
@@ -18,13 +18,24 @@ export function useNavigation() {
         // Fallback para hash limpo
       }
     }
+    if (view === 'operations') {
+      try {
+        const savedTab = localStorage.getItem('rp_operations_active_tab');
+        if (savedTab && ['tasks', 'tickets', 'dispatches'].includes(savedTab)) {
+          window.location.hash = `${view}?tab=${savedTab}`;
+          return;
+        }
+      } catch (e) {
+        // Fallback para hash limpo
+      }
+    }
     window.location.hash = view;
   };
 
   const syncHash = () => {
     const raw = window.location.hash.replace(/^#\/?/, '');
     const cleanView = raw.split('?')[0].split('/')[0].trim();
-    const validViews: ActiveView[] = ['design-system', 'people', 'supplies', 'users', 'changelog', 'integrations', 'developer', 'login'];
+    const validViews: ActiveView[] = ['design-system', 'people', 'supplies', 'operations', 'users', 'changelog', 'integrations', 'developer', 'login'];
     if (validViews.includes(cleanView as ActiveView)) {
       currentView.value = cleanView as ActiveView;
     }

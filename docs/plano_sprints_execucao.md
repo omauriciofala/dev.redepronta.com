@@ -83,11 +83,11 @@ Todas as Foreign Keys de entidades de negócio utilizam **`ON DELETE RESTRICT`**
 **Objetivo:** Construir a esteira operacional de 3 etapas com integridade relacional estrita (bloqueando exclusão de cadastros com chamados/acionamentos vinculados).
 
 #### Checklist de Tarefas:
-- [ ] Migrations `tasks`, `tickets` e `dispatches` com `ON DELETE RESTRICT` nas chaves de cliente, solicitante, departamento e cidade.
-- [ ] `TaskIngestionService` (recebe tarefas de APIs, IA, rotinas ou manual).
-- [ ] Endpoint de promoção de Tarefa para Chamado com SLA.
-- [ ] `DispatchCoordinationService` para criar Acionamento de campo alocando técnico e veículo.
-- [ ] Telas no Vue 3: Inbox de Tarefas, Lista de Chamados e Painel de Despacho.
+- [x] Migrations `tasks`, `tickets` e `dispatches` com `ON DELETE RESTRICT` nas chaves de cliente, solicitante, departamento e cidade.
+- [x] `TaskIngestionService` (recebe tarefas de APIs, IA, rotinas ou manual).
+- [x] Endpoint de promoção de Tarefa para Chamado com SLA.
+- [x] `DispatchCoordinationService` para criar Acionamento de campo alocando técnico e veículo.
+- [x] Telas no Vue 3: Inbox de Tarefas, Lista de Chamados e Painel de Despacho.
 
 > #### 💬 Prompt Curto para a IA (Sprint 3):
 > ```text

@@ -31,6 +31,7 @@ class OpenApiService
                 ['name' => 'Autenticação & Sessão', 'description' => 'Login, validação de credenciais, inspeção de usuário autenticado e logout'],
                 ['name' => 'Usuários & Permissões', 'description' => 'Administração de operadores, perfis de papéis (Roles) e matriz granular de permissões RBAC'],
                 ['name' => 'Pessoas & Clientes', 'description' => 'Cadastro central e unificado de pessoas físicas e jurídicas (PF/PJ), clientes, fornecedores e operadores'],
+                ['name' => 'Funil Operacional & FSM', 'description' => 'Tarefas de entrada (inbox), chamados com SLA e acionamentos de campo para técnicos'],
                 ['name' => 'Suprimentos & WMS', 'description' => 'Catálogo de materiais, posições regionais, depósitos físicos, rastreabilidade serial e saldos'],
                 ['name' => 'Movimentações de Estoque', 'description' => 'Entradas, saídas, devoluções, transferências atômicas e consultas por documento/protocolo'],
                 ['name' => 'Geografia & Referências', 'description' => 'Estados brasileiros, cidades do IBGE, consulta de CEP e cadastros auxiliares'],
@@ -463,6 +464,181 @@ class OpenApiService
                     'description' => 'Calcula em tempo real a soma dos saldos de todos os depósitos de cada posição regional.',
                     'responses' => [
                         '200' => ['description' => 'Matriz de saldo consolidado em tempo real'],
+                    ],
+                ],
+            ],
+
+            // ==============================================================
+            // FUNIL OPERACIONAL & FSM (TAREFAS -> CHAMADOS -> ACIONAMENTOS)
+            // ==============================================================
+            '/operations/catalogs' => [
+                'get' => [
+                    'tags' => ['Funil Operacional & FSM'],
+                    'summary' => 'Catálogos Operacionais (Departamentos, Motivos, Técnicos e Bases)',
+                    'description' => 'Retorna a estrutura hierárquica completa para triagem de chamados e despacho de técnicos.',
+                    'responses' => [
+                        '200' => ['description' => 'Catálogos do funil operacional'],
+                    ],
+                ],
+            ],
+            '/operations/tasks' => [
+                'get' => [
+                    'tags' => ['Funil Operacional & FSM'],
+                    'summary' => 'Listar Tarefas da Caixa de Entrada (Inbox)',
+                    'description' => 'Consulta paginada de demandas prévias oriundas de APIs, IA, WhatsApp, E-mail ou entrada manual.',
+                    'parameters' => [
+                        ['name' => 'status', 'in' => 'query', 'description' => 'INBOX, TRIAGED, PROMOTED_TICKET, RESOLVED_INTERNAL, CANCELED', 'schema' => ['type' => 'string']],
+                        ['name' => 'priority', 'in' => 'query', 'description' => 'LOW, MEDIUM, HIGH, CRITICAL', 'schema' => ['type' => 'string']],
+                        ['name' => 'source', 'in' => 'query', 'description' => 'MANUAL, API, AI, EMAIL, WHATSAPP', 'schema' => ['type' => 'string']],
+                    ],
+                    'responses' => [
+                        '200' => ['description' => 'Lista paginada de tarefas com metadados e contadores'],
+                    ],
+                ],
+                'post' => [
+                    'tags' => ['Funil Operacional & FSM'],
+                    'summary' => 'Criar Nova Tarefa no Inbox',
+                    'description' => 'Registra demanda não estruturada para triagem ou conversão posterior.',
+                    'requestBody' => [
+                        'content' => [
+                            'application/json' => [
+                                'example' => [
+                                    'title' => 'Sinal óptico atenuado relatado pelo cliente via WhatsApp',
+                                    'description' => 'Cliente informou que luz LOS está piscando.',
+                                    'source' => 'WHATSAPP',
+                                    'priority' => 'HIGH',
+                                    'customer_person_id' => 1,
+                                ],
+                            ],
+                        ],
+                    ],
+                    'responses' => [
+                        '201' => ['description' => 'Tarefa inserida com sucesso no Inbox'],
+                    ],
+                ],
+            ],
+            '/operations/tasks/{id}/promote' => [
+                'post' => [
+                    'tags' => ['Funil Operacional & FSM'],
+                    'summary' => 'Promover Tarefa para Chamado Formal (Ticket)',
+                    'description' => 'Operação atômica que cria o Chamado com protocolo oficial e cálculo automático de SLA, associando a tarefa.',
+                    'parameters' => [
+                        ['name' => 'id', 'in' => 'path', 'required' => true, 'description' => 'ID da tarefa de origem', 'schema' => ['type' => 'integer']],
+                    ],
+                    'requestBody' => [
+                        'content' => [
+                            'application/json' => [
+                                'example' => [
+                                    'customer_person_id' => 1,
+                                    'city_id' => 3550308,
+                                    'department_id' => 1,
+                                    'category_id' => 1,
+                                    'reason_id' => 1,
+                                    'priority' => 'CRITICAL',
+                                ],
+                            ],
+                        ],
+                    ],
+                    'responses' => [
+                        '201' => ['description' => 'Chamado formal emitido com protocolo auditável e SLA calculado'],
+                        '422' => ['description' => 'Tarefa já promovida ou dados incompletos'],
+                    ],
+                ],
+            ],
+            '/operations/tickets' => [
+                'get' => [
+                    'tags' => ['Funil Operacional & FSM'],
+                    'summary' => 'Listar Chamados Formais com SLA',
+                    'description' => 'Consulta paginada com acompanhamento de prazos, gravidade e status operacional.',
+                    'parameters' => [
+                        ['name' => 'status', 'in' => 'query', 'description' => 'OPEN, IN_TRIAGE, WAITING_DISPATCH, IN_FIELD, RESOLVED_REMOTE, CLOSED, CANCELED', 'schema' => ['type' => 'string']],
+                        ['name' => 'priority', 'in' => 'query', 'description' => 'LOW, MEDIUM, HIGH, CRITICAL', 'schema' => ['type' => 'string']],
+                    ],
+                    'responses' => [
+                        '200' => ['description' => 'Lista paginada de chamados com contadores e SLA'],
+                    ],
+                ],
+                'post' => [
+                    'tags' => ['Funil Operacional & FSM'],
+                    'summary' => 'Abrir Chamado Diretamente',
+                    'description' => 'Criação direta de chamado com protocolo TK-YYYY-XXXX e cálculo automático de SLA.',
+                    'requestBody' => [
+                        'content' => [
+                            'application/json' => [
+                                'example' => [
+                                    'title' => 'Rompimento de Fibra Troncal em Avenida Principal',
+                                    'customer_person_id' => 1,
+                                    'city_id' => 3550308,
+                                    'department_id' => 1,
+                                    'category_id' => 1,
+                                    'reason_id' => 1,
+                                    'priority' => 'CRITICAL',
+                                ],
+                            ],
+                        ],
+                    ],
+                    'responses' => [
+                        '201' => ['description' => 'Chamado registrado com sucesso'],
+                    ],
+                ],
+            ],
+            '/operations/tickets/{id}/dispatch' => [
+                'post' => [
+                    'tags' => ['Funil Operacional & FSM'],
+                    'summary' => 'Despachar Chamado para Técnico de Campo (Acionamento)',
+                    'description' => 'Cria um Acionamento (FSM) vinculando o chamado a um técnico e a uma base operacional, mudando o status para IN_FIELD.',
+                    'parameters' => [
+                        ['name' => 'id', 'in' => 'path', 'required' => true, 'description' => 'ID do chamado a acionar', 'schema' => ['type' => 'integer']],
+                    ],
+                    'requestBody' => [
+                        'content' => [
+                            'application/json' => [
+                                'example' => [
+                                    'worker_person_id' => 2,
+                                    'depot_id' => 1,
+                                    'notes' => 'Levar máquina de fusão e bobina de drop',
+                                ],
+                            ],
+                        ],
+                    ],
+                    'responses' => [
+                        '201' => ['description' => 'Acionamento de campo emitido com sucesso'],
+                    ],
+                ],
+            ],
+            '/operations/dispatches' => [
+                'get' => [
+                    'tags' => ['Funil Operacional & FSM'],
+                    'summary' => 'Listar Acionamentos de Campo (Painel de Despacho)',
+                    'description' => 'Visualização de ordens de serviço ativas em campo, status de deslocamento e execução.',
+                    'parameters' => [
+                        ['name' => 'status', 'in' => 'query', 'description' => 'DISPATCHED, ON_ROUTE, ARRIVED_SITE, IN_SERVICE, COMPLETED', 'schema' => ['type' => 'string']],
+                    ],
+                    'responses' => [
+                        '200' => ['description' => 'Lista paginada de acionamentos e técnicos em campo'],
+                    ],
+                ],
+            ],
+            '/operations/dispatches/{id}/advance-status' => [
+                'patch' => [
+                    'tags' => ['Funil Operacional & FSM'],
+                    'summary' => 'Avançar Status do Acionamento de Campo',
+                    'description' => 'Transição de status (Deslocamento, Chegada no local, Conclusão) com carimbo de horário e notas de campo.',
+                    'parameters' => [
+                        ['name' => 'id', 'in' => 'path', 'required' => true, 'description' => 'ID do acionamento', 'schema' => ['type' => 'integer']],
+                    ],
+                    'requestBody' => [
+                        'content' => [
+                            'application/json' => [
+                                'example' => [
+                                    'status' => 'ARRIVED_SITE',
+                                    'notes' => 'Técnico no local do cliente, iniciando testes ópticos.',
+                                ],
+                            ],
+                        ],
+                    ],
+                    'responses' => [
+                        '200' => ['description' => 'Status do acionamento atualizado com sucesso'],
                     ],
                 ],
             ],
