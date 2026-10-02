@@ -60,10 +60,19 @@ if (savedTenant?.favicon_url) {
   applyFavicon(savedTenant.favicon_url);
 }
 
+function isValidImageUrl(url?: string | null): string | null {
+  if (!url || typeof url !== 'string') return null;
+  const trimmed = url.trim();
+  if (trimmed === '' || trimmed === '/storage/' || trimmed === '/storage' || trimmed === 'null' || trimmed.endsWith('/')) {
+    return null;
+  }
+  return trimmed;
+}
+
 export function useTenant() {
   const tenantName = computed(() => currentTenant.value?.trading_name || currentTenant.value?.name || 'Rede Pronta');
-  const tenantLogo = computed(() => currentTenant.value?.logo_url || null);
-  const tenantFavicon = computed(() => currentTenant.value?.favicon_url || null);
+  const tenantLogo = computed(() => isValidImageUrl(currentTenant.value?.logo_url));
+  const tenantFavicon = computed(() => isValidImageUrl(currentTenant.value?.favicon_url));
 
   const fetchTenant = async () => {
     isLoadingTenant.value = true;

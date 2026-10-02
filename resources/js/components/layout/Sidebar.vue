@@ -4,17 +4,18 @@
     <div class="h-16 px-5 flex items-center border-b border-[#1E293B]">
       <!-- Quando houver imagem: substitui o texto, exibindo apenas a logo corporativa ajustada -->
       <div
-        v-if="tenantLogo"
+        v-if="tenantLogo && !logoHasError"
         class="w-full h-11 flex items-center justify-start overflow-hidden"
       >
         <img
           :src="tenantLogo"
           :alt="tenantName"
           class="max-h-11 max-w-[200px] object-contain object-left"
+          @error="logoHasError = true"
         />
       </div>
 
-      <!-- Fallback quando não houver imagem cadastrada: Ícone RP + Nome e Slogan -->
+      <!-- Fallback quando não houver imagem cadastrada ou falha: Ícone RP + Nome e Slogan -->
       <div v-else class="flex items-center gap-3 min-w-0">
         <div
           class="w-9 h-9 rounded-lg bg-[#FC6714] flex items-center justify-center text-white font-heading font-semibold text-base shadow-sm shrink-0"
@@ -239,7 +240,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { Users, Terminal, Palette, History, Network, Package, Activity, CheckSquare, CreditCard, MessageSquare, Sun, Moon, ShieldCheck, LogOut } from 'lucide-vue-next';
 import { useTheme } from '../../composables/useTheme';
 import { useNavigation } from '../../composables/useNavigation';
@@ -250,6 +251,11 @@ const { theme, toggleTheme } = useTheme();
 const { currentView, setView } = useNavigation();
 const { currentUser, logout } = useAuth();
 const { tenantName, tenantLogo, currentTenant, fetchTenant } = useTenant();
+
+const logoHasError = ref(false);
+watch(tenantLogo, () => {
+  logoHasError.value = false;
+});
 
 const goToProfile = () => {
   setView('settings', 'profile');

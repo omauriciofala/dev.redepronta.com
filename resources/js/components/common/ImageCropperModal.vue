@@ -27,13 +27,15 @@
 
             <!-- Imagem Manipulável -->
             <img
-              v-if="imageLoaded && imageSrc"
+              v-if="imageSrc"
               ref="imageElementRef"
               :src="imageSrc"
               alt="Imagem para recorte"
               class="absolute max-w-none pointer-events-none transition-transform duration-75 origin-center"
+              :class="{ 'opacity-0 pointer-events-none': !imageLoaded }"
               :style="imageTransformStyle"
               @load="onImageLoaded"
+              @error="onImageError"
             />
 
             <!-- Loading overlay se a imagem estiver carregando -->
@@ -604,17 +606,26 @@ function handleCancel() {
   emit('update:modelValue', false);
 }
 
+function onImageError() {
+  imageLoaded.value = false;
+}
+
 // Monitora alterações na imagem recebida ou abertura do modal
 watch(
-  () => props.modelValue,
-  (isOpen) => {
-    if (isOpen) {
-      imageLoaded.value = false;
+  () => [props.modelValue, props.imageSrc],
+  ([isOpen, src]) => {
+    if (isOpen && src) {
       nextTick(() => {
         calculateCropBoxDimensions();
+        if (imageElementRef.value?.complete && imageElementRef.value?.naturalWidth > 0) {
+          onImageLoaded();
+        }
       });
+    } else if (!isOpen) {
+      imageLoaded.value = false;
     }
-  }
+  },
+  { immediate: true }
 );
 
 watch(
@@ -633,6 +644,14 @@ function handleResize() {
 
 onMounted(() => {
   window.addEventListener('resize', handleResize);
+  if (props.modelValue && props.imageSrc) {
+    nextTick(() => {
+      calculateCropBoxDimensions();
+      if (imageElementRef.value?.complete && imageElementRef.value?.naturalWidth > 0) {
+        onImageLoaded();
+      }
+    });
+  }
 });
 
 onUnmounted(() => {

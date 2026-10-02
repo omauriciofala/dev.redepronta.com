@@ -453,10 +453,11 @@
                   <!-- Preview da Logo -->
                   <div class="h-24 rounded-lg border-2 border-dashed border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 flex items-center justify-center p-3 overflow-hidden">
                     <img
-                      v-if="tenantLogo"
+                      v-if="tenantLogo && !logoPreviewError"
                       :src="tenantLogo"
                       alt="Logotipo da Empresa"
                       class="max-h-full max-w-full object-contain"
+                      @error="logoPreviewError = true"
                     />
                     <div v-else class="flex items-center gap-2.5 text-slate-400">
                       <div class="w-9 h-9 rounded-lg bg-[#FC6714] text-white flex items-center justify-center font-heading font-bold text-sm">
@@ -1072,6 +1073,11 @@ const isUploadingLogo = ref(false);
 const isUploadingFavicon = ref(false);
 const logoInputRef = ref<HTMLInputElement | null>(null);
 const faviconInputRef = ref<HTMLInputElement | null>(null);
+const logoPreviewError = ref(false);
+
+watch(tenantLogo, () => {
+  logoPreviewError.value = false;
+});
 
 function triggerLogoUpload() {
   logoInputRef.value?.click();

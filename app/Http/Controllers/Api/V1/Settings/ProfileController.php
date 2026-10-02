@@ -188,15 +188,27 @@ class ProfileController extends Controller
             'avatar.max' => 'A imagem não pode exceder 2 MB.',
         ]);
 
+        $file = $request->file('avatar');
+        $extension = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'png');
+        $filename = 'avatar_' . $user->id . '_' . time() . '.' . $extension;
+
+        $disk = Storage::disk('public');
+        $disk->makeDirectory('avatars');
+
+        $path = $file->storeAs('avatars', $filename, 'public');
+
+        if (!$path) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Falha ao salvar a foto de perfil no servidor. Verifique as permissões de armazenamento.',
+            ], 500);
+        }
+
         // Se já tiver avatar anterior armazenado localmente, remove
         if ($user->avatar_url && str_contains($user->avatar_url, '/storage/avatars/')) {
             $oldPath = str_replace('/storage/', '', $user->avatar_url);
-            Storage::disk('public')->delete($oldPath);
+            $disk->delete($oldPath);
         }
-
-        $file = $request->file('avatar');
-        $filename = 'avatar_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
-        $path = $file->storeAs('avatars', $filename, 'public');
 
         $user->avatar_url = Storage::url($path);
         $user->save();

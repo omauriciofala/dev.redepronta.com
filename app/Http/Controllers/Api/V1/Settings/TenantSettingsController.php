@@ -195,15 +195,27 @@ class TenantSettingsController extends Controller
 
         $settings = $account->settings ?? [];
 
+        $file = $request->file('logo');
+        $extension = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'png');
+        $filename = 'logo_tenant_' . $account->id . '_' . time() . '.' . $extension;
+
+        $disk = Storage::disk('public');
+        $disk->makeDirectory('tenants/logos');
+
+        $path = $file->storeAs('tenants/logos', $filename, 'public');
+
+        if (!$path) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Falha ao salvar o logotipo no servidor. Verifique as permissões de armazenamento.',
+            ], 500);
+        }
+
         // Exclui logo anterior local se houver
         if (!empty($settings['logo_url']) && str_contains($settings['logo_url'], '/storage/tenants/logos/')) {
             $oldPath = str_replace('/storage/', '', $settings['logo_url']);
-            Storage::disk('public')->delete($oldPath);
+            $disk->delete($oldPath);
         }
-
-        $file = $request->file('logo');
-        $filename = 'logo_tenant_' . $account->id . '_' . time() . '.' . $file->getClientOriginalExtension();
-        $path = $file->storeAs('tenants/logos', $filename, 'public');
 
         $settings['logo_url'] = Storage::url($path);
         $account->settings = $settings;
@@ -285,15 +297,27 @@ class TenantSettingsController extends Controller
 
         $settings = $account->settings ?? [];
 
+        $file = $request->file('favicon');
+        $extension = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'ico');
+        $filename = 'favicon_tenant_' . $account->id . '_' . time() . '.' . $extension;
+
+        $disk = Storage::disk('public');
+        $disk->makeDirectory('tenants/favicons');
+
+        $path = $file->storeAs('tenants/favicons', $filename, 'public');
+
+        if (!$path) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Falha ao salvar o favicon no servidor. Verifique as permissões de armazenamento.',
+            ], 500);
+        }
+
         // Exclui favicon anterior local se houver
         if (!empty($settings['favicon_url']) && str_contains($settings['favicon_url'], '/storage/tenants/favicons/')) {
             $oldPath = str_replace('/storage/', '', $settings['favicon_url']);
-            Storage::disk('public')->delete($oldPath);
+            $disk->delete($oldPath);
         }
-
-        $file = $request->file('favicon');
-        $filename = 'favicon_tenant_' . $account->id . '_' . time() . '.' . $file->getClientOriginalExtension();
-        $path = $file->storeAs('tenants/favicons', $filename, 'public');
 
         $settings['favicon_url'] = Storage::url($path);
         $account->settings = $settings;
