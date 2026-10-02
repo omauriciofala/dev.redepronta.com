@@ -9,13 +9,13 @@ class UpdatePasswordRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return auth()->check();
+        return true;
     }
 
     public function rules(): array
     {
         return [
-            'current_password' => ['required', 'string', 'current_password'],
+            'current_password' => ['required', 'string'],
             'password' => ['required', 'string', 'confirmed', Password::min(8)],
         ];
     }

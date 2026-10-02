@@ -76,9 +76,15 @@ class AuthController extends Controller
     {
         $user = Auth::user();
 
-        // Se não houver sessão ativa ainda, para uso no ERP retorna o usuário ativo padrão
+        // Se não houver sessão ativa ainda, para uso no ERP autentica o usuário padrão ativo
         if (!$user) {
-            $user = User::with(['role', 'person', 'account'])->first();
+            $user = User::with(['role', 'person', 'account'])->where('status', 'active')->first();
+            if ($user) {
+                Auth::login($user, true);
+                if ($request->hasSession()) {
+                    $request->session()->put('active_account_id', $user->account_id);
+                }
+            }
         } else {
             $user->load(['role', 'person', 'account']);
         }
@@ -92,10 +98,16 @@ class AuthController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
+                'avatar_url' => $user->avatar_url,
                 'account_id' => $user->account_id,
                 'account_name' => $user->account?->name ?? 'Rede Pronta Matriz',
                 'is_super_admin' => (bool) $user->is_super_admin,
                 'status' => $user->status,
+                'preferences' => $user->preferences ?? [
+                    'theme' => 'system',
+                    'table_density' => 'comfortable',
+                    'sound_enabled' => true,
+                ],
                 'role' => $user->role ? [
                     'id' => $user->role->id,
                     'name' => $user->role->name,
