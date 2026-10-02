@@ -1,28 +1,35 @@
 <template>
   <aside class="w-[240px] h-screen flex flex-col bg-[#070B14] text-slate-200 border-r border-[#1E293B] select-none pb-12 shadow-xl transition-colors duration-200">
     <!-- Topo da Sidebar: Identidade do Produto com Laranja Institucional e Deep Slate -->
-    <div class="h-16 px-5 flex items-center gap-3 border-b border-[#1E293B]">
-      <!-- Logo do Tenant ou Fallback RP -->
+    <div class="h-16 px-5 flex items-center border-b border-[#1E293B]">
+      <!-- Quando houver imagem: substitui o texto, exibindo apenas a logo corporativa ajustada -->
       <div
         v-if="tenantLogo"
-        class="w-9 h-9 rounded-lg overflow-hidden bg-white/5 border border-white/10 flex items-center justify-center shrink-0 p-1"
+        class="w-full h-11 flex items-center justify-start overflow-hidden"
       >
-        <img :src="tenantLogo" :alt="tenantName" class="w-full h-full object-contain" />
-      </div>
-      <div
-        v-else
-        class="w-9 h-9 rounded-lg bg-[#FC6714] flex items-center justify-center text-white font-heading font-semibold text-base shadow-sm shrink-0"
-      >
-        RP
+        <img
+          :src="tenantLogo"
+          :alt="tenantName"
+          class="max-h-11 max-w-[200px] object-contain object-left"
+        />
       </div>
 
-      <div class="truncate">
-        <h1 class="text-sm font-semibold font-heading tracking-tight text-white uppercase truncate">
-          {{ tenantName }}
-        </h1>
-        <p class="text-[11px] text-slate-400 font-medium truncate">
-          {{ currentTenant?.slogan || 'ERP & Field Service' }}
-        </p>
+      <!-- Fallback quando não houver imagem cadastrada: Ícone RP + Nome e Slogan -->
+      <div v-else class="flex items-center gap-3 min-w-0">
+        <div
+          class="w-9 h-9 rounded-lg bg-[#FC6714] flex items-center justify-center text-white font-heading font-semibold text-base shadow-sm shrink-0"
+        >
+          RP
+        </div>
+
+        <div class="truncate">
+          <h1 class="text-sm font-semibold font-heading tracking-tight text-white uppercase truncate">
+            {{ tenantName }}
+          </h1>
+          <p class="text-[11px] text-slate-400 font-medium truncate">
+            {{ currentTenant?.slogan || 'ERP & Field Service' }}
+          </p>
+        </div>
       </div>
     </div>
 

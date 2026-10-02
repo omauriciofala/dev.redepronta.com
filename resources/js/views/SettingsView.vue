@@ -175,7 +175,7 @@
                 </div>
 
                 <p class="text-[11px] text-slate-400 leading-normal">
-                  Formatos aceitos: JPG, PNG, WEBP ou SVG. Tamanho máximo de 2 MB. Imagens quadradas recomendadas.
+                  Formatos aceitos: JPG, PNG, WEBP ou SVG até 2 MB. Um editor de corte quadrado (1:1) abrirá ao selecionar a foto.
                 </p>
 
                 <!-- Badges de Cargo e Privilégios -->
@@ -495,7 +495,7 @@
                       <Trash2 class="w-3.5 h-3.5" />
                     </button>
                   </div>
-                  <p class="text-[10px] text-slate-400">PNG, SVG ou JPG até 3 MB com fundo transparente.</p>
+                  <p class="text-[10px] text-slate-400">PNG, SVG ou JPG até 3 MB com fundo transparente. Editor de corte (4:1) abre ao selecionar.</p>
                 </div>
 
                 <!-- Seção 1.2: Favicon da Aba do Navegador -->
@@ -556,7 +556,7 @@
                       <Trash2 class="w-3.5 h-3.5" />
                     </button>
                   </div>
-                  <p class="text-[10px] text-slate-400">ICO, PNG ou SVG quadrado (32x32px ou 64x64px recomendado).</p>
+                  <p class="text-[10px] text-slate-400">ICO, PNG ou SVG. Editor de corte quadrado (1:1) abre ao selecionar.</p>
                 </div>
               </div>
 
@@ -719,6 +719,19 @@
         <span>{{ toastMessage }}</span>
       </div>
     </Transition>
+
+    <!-- Modal Canônico de Recorte de Imagem (Logo / Favicon / Avatar) -->
+    <ImageCropperModal
+      v-model="isCropperOpen"
+      :image-src="cropperImageSrc"
+      :aspect-ratio="cropperAspectRatio"
+      :crop-type="cropperType"
+      :title="cropperTitle"
+      :description="cropperDescription"
+      :is-processing="isUploadingCropped"
+      @crop="onCropperFinished"
+      @cancel="onCropperCancelled"
+    />
   </div>
 </template>
 
@@ -753,6 +766,7 @@ import {
   AlertCircle,
 } from 'lucide-vue-next';
 import BasePageHeader from '../components/common/BasePageHeader.vue';
+import ImageCropperModal from '../components/common/ImageCropperModal.vue';
 import { useAuth } from '../composables/useAuth';
 import { useTenant } from '../composables/useTenant';
 import { useTheme } from '../composables/useTheme';
@@ -841,36 +855,114 @@ const isSavingPassword = ref(false);
 const isUploadingAvatar = ref(false);
 const avatarInputRef = ref<HTMLInputElement | null>(null);
 
+// Estado e Ações do Cropper de Imagens
+const isCropperOpen = ref(false);
+const cropperImageSrc = ref('');
+const cropperAspectRatio = ref(4);
+const cropperType = ref<'logo' | 'favicon' | 'avatar'>('logo');
+const cropperTitle = ref('');
+const cropperDescription = ref('');
+const isUploadingCropped = ref(false);
+
+function openImageCropper(file: File, type: 'logo' | 'favicon' | 'avatar') {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    cropperImageSrc.value = e.target?.result as string;
+    cropperType.value = type;
+    if (type === 'logo') {
+      cropperAspectRatio.value = 4; // 4:1 proporção retangular para a Sidebar
+      cropperTitle.value = 'Enquadramento do Logotipo Institucional';
+      cropperDescription.value = 'Ajuste a marca na proporção 4:1 para exibição perfeita no topo da Sidebar do ERP.';
+    } else if (type === 'favicon') {
+      cropperAspectRatio.value = 1; // 1:1 quadrado
+      cropperTitle.value = 'Enquadramento do Favicon';
+      cropperDescription.value = 'Recorte o ícone quadrado (1:1) para exibição na aba do navegador.';
+    } else {
+      cropperAspectRatio.value = 1; // 1:1 quadrado
+      cropperTitle.value = 'Enquadramento da Foto de Perfil';
+      cropperDescription.value = 'Enquadre sua foto de perfil quadrada (1:1).';
+    }
+    isCropperOpen.value = true;
+  };
+  reader.readAsDataURL(file);
+}
+
+function onCropperCancelled() {
+  cropperImageSrc.value = '';
+}
+
+async function onCropperFinished(payload: { blob: Blob; file: File; dataUrl: string }) {
+  isUploadingCropped.value = true;
+  try {
+    if (cropperType.value === 'logo') {
+      const formData = new FormData();
+      formData.append('logo', payload.file);
+      isUploadingLogo.value = true;
+      const res = await axios.post('/api/v1/settings/tenant/logo', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      if (res.data?.data?.logo_url && currentTenant.value) {
+        setTenantData({
+          ...currentTenant.value,
+          logo_url: res.data.data.logo_url,
+        });
+        showToast('Logotipo atualizado e aplicado na Sidebar!', 'success');
+      }
+      isUploadingLogo.value = false;
+    } else if (cropperType.value === 'favicon') {
+      const formData = new FormData();
+      formData.append('favicon', payload.file);
+      isUploadingFavicon.value = true;
+      const res = await axios.post('/api/v1/settings/tenant/favicon', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      if (res.data?.data?.favicon_url && currentTenant.value) {
+        setTenantData({
+          ...currentTenant.value,
+          favicon_url: res.data.data.favicon_url,
+        });
+        applyFavicon(res.data.data.favicon_url);
+        showToast('Favicon atualizado na aba do navegador!', 'success');
+      }
+      isUploadingFavicon.value = false;
+    } else if (cropperType.value === 'avatar') {
+      const formData = new FormData();
+      formData.append('avatar', payload.file);
+      isUploadingAvatar.value = true;
+      const res = await axios.post('/api/v1/settings/profile/avatar', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      if (res.data?.data?.avatar_url && currentUser.value) {
+        setCurrentUser({
+          ...currentUser.value,
+          avatar_url: res.data.data.avatar_url,
+        });
+        showToast('Foto de perfil atualizada com sucesso!', 'success');
+      }
+      isUploadingAvatar.value = false;
+    }
+    isCropperOpen.value = false;
+    cropperImageSrc.value = '';
+  } catch (err: any) {
+    showToast(err.response?.data?.message || 'Erro ao processar e salvar imagem recortada.', 'error');
+  } finally {
+    isUploadingCropped.value = false;
+    isUploadingLogo.value = false;
+    isUploadingFavicon.value = false;
+    isUploadingAvatar.value = false;
+  }
+}
+
 function triggerAvatarUpload() {
   avatarInputRef.value?.click();
 }
 
-async function onAvatarFileSelected(event: Event) {
+function onAvatarFileSelected(event: Event) {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
   if (!file) return;
-
-  const formData = new FormData();
-  formData.append('avatar', file);
-
-  isUploadingAvatar.value = true;
-  try {
-    const res = await axios.post('/api/v1/settings/profile/avatar', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
-    if (res.data?.data?.avatar_url && currentUser.value) {
-      setCurrentUser({
-        ...currentUser.value,
-        avatar_url: res.data.data.avatar_url,
-      });
-      showToast('Foto de perfil atualizada com sucesso!', 'success');
-    }
-  } catch (err: any) {
-    showToast(err.response?.data?.message || 'Erro ao enviar foto de perfil.', 'error');
-  } finally {
-    isUploadingAvatar.value = false;
-    if (avatarInputRef.value) avatarInputRef.value.value = '';
-  }
+  openImageCropper(file, 'avatar');
+  target.value = '';
 }
 
 async function handleRemoveAvatar() {
@@ -989,32 +1081,12 @@ function triggerFaviconUpload() {
   faviconInputRef.value?.click();
 }
 
-async function onLogoFileSelected(event: Event) {
+function onLogoFileSelected(event: Event) {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
   if (!file) return;
-
-  const formData = new FormData();
-  formData.append('logo', file);
-
-  isUploadingLogo.value = true;
-  try {
-    const res = await axios.post('/api/v1/settings/tenant/logo', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
-    if (res.data?.data?.logo_url && currentTenant.value) {
-      setTenantData({
-        ...currentTenant.value,
-        logo_url: res.data.data.logo_url,
-      });
-      showToast('Logotipo atualizado e aplicado na Sidebar!', 'success');
-    }
-  } catch (err: any) {
-    showToast(err.response?.data?.message || 'Erro ao enviar logotipo.', 'error');
-  } finally {
-    isUploadingLogo.value = false;
-    if (logoInputRef.value) logoInputRef.value.value = '';
-  }
+  openImageCropper(file, 'logo');
+  target.value = '';
 }
 
 async function handleRemoveLogo() {
@@ -1036,33 +1108,12 @@ async function handleRemoveLogo() {
   }
 }
 
-async function onFaviconFileSelected(event: Event) {
+function onFaviconFileSelected(event: Event) {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
   if (!file) return;
-
-  const formData = new FormData();
-  formData.append('favicon', file);
-
-  isUploadingFavicon.value = true;
-  try {
-    const res = await axios.post('/api/v1/settings/tenant/favicon', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
-    if (res.data?.data?.favicon_url && currentTenant.value) {
-      setTenantData({
-        ...currentTenant.value,
-        favicon_url: res.data.data.favicon_url,
-      });
-      applyFavicon(res.data.data.favicon_url);
-      showToast('Favicon atualizado na aba do navegador!', 'success');
-    }
-  } catch (err: any) {
-    showToast(err.response?.data?.message || 'Erro ao enviar favicon.', 'error');
-  } finally {
-    isUploadingFavicon.value = false;
-    if (faviconInputRef.value) faviconInputRef.value.value = '';
-  }
+  openImageCropper(file, 'favicon');
+  target.value = '';
 }
 
 async function handleRemoveFavicon() {
