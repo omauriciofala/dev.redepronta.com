@@ -2,12 +2,27 @@
   <aside class="w-[240px] h-screen flex flex-col bg-[#070B14] text-slate-200 border-r border-[#1E293B] select-none pb-12 shadow-xl transition-colors duration-200">
     <!-- Topo da Sidebar: Identidade do Produto com Laranja Institucional e Deep Slate -->
     <div class="h-16 px-5 flex items-center gap-3 border-b border-[#1E293B]">
-      <div class="w-9 h-9 rounded-lg bg-[#FC6714] flex items-center justify-center text-white font-heading font-semibold text-base shadow-sm shrink-0">
+      <!-- Logo do Tenant ou Fallback RP -->
+      <div
+        v-if="tenantLogo"
+        class="w-9 h-9 rounded-lg overflow-hidden bg-white/5 border border-white/10 flex items-center justify-center shrink-0 p-1"
+      >
+        <img :src="tenantLogo" :alt="tenantName" class="w-full h-full object-contain" />
+      </div>
+      <div
+        v-else
+        class="w-9 h-9 rounded-lg bg-[#FC6714] flex items-center justify-center text-white font-heading font-semibold text-base shadow-sm shrink-0"
+      >
         RP
       </div>
-      <div>
-        <h1 class="text-sm font-semibold font-heading tracking-tight text-white uppercase">Rede Pronta</h1>
-        <p class="text-[11px] text-slate-400 font-medium">ERP & Field Service</p>
+
+      <div class="truncate">
+        <h1 class="text-sm font-semibold font-heading tracking-tight text-white uppercase truncate">
+          {{ tenantName }}
+        </h1>
+        <p class="text-[11px] text-slate-400 font-medium truncate">
+          {{ currentTenant?.slogan || 'ERP & Field Service' }}
+        </p>
       </div>
     </div>
 
@@ -162,19 +177,33 @@
 
     <!-- Rodapé Interno da Sidebar: Perfil do Usuário, Tema & Logout -->
     <div class="p-3.5 border-t border-[#1E293B] flex items-center justify-between bg-[#05080E]">
-      <div class="flex items-center gap-2.5 overflow-hidden flex-1 mr-2">
-        <div class="w-7 h-7 rounded-full bg-[#FC6714]/20 text-[#FC6714] border border-[#FC6714]/40 flex items-center justify-center text-xs font-bold shrink-0">
-          {{ (currentUser?.name || 'M').charAt(0).toUpperCase() }}
+      <!-- Perfil do Usuário Clicável -> Navega para Configurações (Meu Perfil) -->
+      <button
+        type="button"
+        @click="goToProfile"
+        class="flex items-center gap-2.5 overflow-hidden flex-1 mr-2 p-1.5 -ml-1.5 rounded-lg hover:bg-white/10 transition text-left cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#FC6714]"
+        title="Meu Perfil & Configurações"
+      >
+        <div class="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-[#FC6714]/40 flex items-center justify-center bg-[#FC6714]/20 text-[#FC6714]">
+          <img
+            v-if="currentUser?.avatar_url"
+            :src="currentUser.avatar_url"
+            alt="Avatar"
+            class="w-full h-full object-cover"
+          />
+          <span v-else class="text-xs font-bold font-heading">
+            {{ (currentUser?.name || 'M').charAt(0).toUpperCase() }}
+          </span>
         </div>
-        <div class="truncate">
-          <p class="text-xs font-semibold text-white truncate leading-tight">
+        <div class="truncate flex-1">
+          <p class="text-xs font-semibold text-white group-hover:text-[#FC6714] transition truncate leading-tight">
             {{ currentUser?.name || 'Administrador Matriz' }}
           </p>
           <p class="text-[11px] text-slate-400 truncate">
             {{ currentUser?.email || 'admin@redepronta.com' }}
           </p>
         </div>
-      </div>
+      </button>
 
       <div class="flex items-center gap-1 shrink-0">
         <!-- Botão Tema (Dark / Light) -->
@@ -203,18 +232,29 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from 'vue';
 import { Users, Terminal, Palette, History, Network, Package, Activity, CheckSquare, CreditCard, MessageSquare, Sun, Moon, ShieldCheck, LogOut } from 'lucide-vue-next';
 import { useTheme } from '../../composables/useTheme';
 import { useNavigation } from '../../composables/useNavigation';
 import { useAuth } from '../../composables/useAuth';
+import { useTenant } from '../../composables/useTenant';
 
 const { theme, toggleTheme } = useTheme();
 const { currentView, setView } = useNavigation();
 const { currentUser, logout } = useAuth();
+const { tenantName, tenantLogo, currentTenant, fetchTenant } = useTenant();
+
+const goToProfile = () => {
+  setView('settings', 'profile');
+};
 
 const handleLogout = async () => {
   if (confirm('Deseja realmente sair do sistema?')) {
     await logout();
   }
 };
+
+onMounted(() => {
+  fetchTenant();
+});
 </script>

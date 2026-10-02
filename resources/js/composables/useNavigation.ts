@@ -1,12 +1,21 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 
-export type ActiveView = 'people' | 'supplies' | 'operations' | 'tasks' | 'users' | 'design-system' | 'changelog' | 'integrations' | 'developer' | 'login';
+export type ActiveView = 'people' | 'supplies' | 'operations' | 'tasks' | 'users' | 'settings' | 'design-system' | 'changelog' | 'integrations' | 'developer' | 'login';
 
 const currentView = ref<ActiveView>('people');
 
 export function useNavigation() {
-  const setView = (view: ActiveView) => {
+  const setView = (view: ActiveView, tab?: string) => {
     currentView.value = view;
+    if (view === 'settings') {
+      try {
+        const targetTab = tab || localStorage.getItem('rp_settings_active_tab') || 'profile';
+        window.location.hash = `${view}?tab=${targetTab}`;
+        return;
+      } catch (e) {
+        // Fallback
+      }
+    }
     if (view === 'tasks') {
       try {
         const savedView = localStorage.getItem('rp_tasks_view_mode');
@@ -46,7 +55,7 @@ export function useNavigation() {
   const syncHash = () => {
     const raw = window.location.hash.replace(/^#\/?/, '');
     const cleanView = raw.split('?')[0].split('/')[0].trim();
-    const validViews: ActiveView[] = ['design-system', 'people', 'supplies', 'operations', 'tasks', 'users', 'changelog', 'integrations', 'developer', 'login'];
+    const validViews: ActiveView[] = ['design-system', 'people', 'supplies', 'operations', 'tasks', 'users', 'settings', 'changelog', 'integrations', 'developer', 'login'];
     if (validViews.includes(cleanView as ActiveView)) {
       currentView.value = cleanView as ActiveView;
     }

@@ -124,6 +124,24 @@ Route::prefix('v1')->group(function () {
     // Documentação da API (OpenAPI 3.1)
     Route::get('docs/openapi.json', [OpenApiController::class, 'spec']);
 
+    // Configurações do Sistema (Meu Perfil & Negócio / Tenant)
+    Route::prefix('settings')->group(function () {
+        // Perfil do Usuário Autenticado
+        Route::get('profile', [\App\Http\Controllers\Api\V1\Settings\ProfileController::class, 'show']);
+        Route::put('profile', [\App\Http\Controllers\Api\V1\Settings\ProfileController::class, 'update']);
+        Route::put('profile/password', [\App\Http\Controllers\Api\V1\Settings\ProfileController::class, 'updatePassword']);
+        Route::post('profile/avatar', [\App\Http\Controllers\Api\V1\Settings\ProfileController::class, 'uploadAvatar']);
+        Route::delete('profile/avatar', [\App\Http\Controllers\Api\V1\Settings\ProfileController::class, 'removeAvatar']);
+
+        // Negócio / Tenant (Empresa)
+        Route::get('tenant', [\App\Http\Controllers\Api\V1\Settings\TenantSettingsController::class, 'show']);
+        Route::put('tenant', [\App\Http\Controllers\Api\V1\Settings\TenantSettingsController::class, 'update']);
+        Route::post('tenant/logo', [\App\Http\Controllers\Api\V1\Settings\TenantSettingsController::class, 'uploadLogo']);
+        Route::delete('tenant/logo', [\App\Http\Controllers\Api\V1\Settings\TenantSettingsController::class, 'removeLogo']);
+        Route::post('tenant/favicon', [\App\Http\Controllers\Api\V1\Settings\TenantSettingsController::class, 'uploadFavicon']);
+        Route::delete('tenant/favicon', [\App\Http\Controllers\Api\V1\Settings\TenantSettingsController::class, 'removeFavicon']);
+    });
+
     // Ferramentas de Desenvolvedor / Sandbox
     Route::prefix('dev')->group(function () {
         Route::get('stats', [DeveloperController::class, 'stats']);

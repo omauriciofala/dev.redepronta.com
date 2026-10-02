@@ -18,8 +18,10 @@ class User extends Authenticatable
         'role_id',
         'name',
         'email',
+        'avatar_url',
         'password',
         'is_super_admin',
+        'preferences',
         'status',
     ];
 
@@ -34,6 +36,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_super_admin' => 'boolean',
+            'preferences' => 'array',
         ];
     }
 

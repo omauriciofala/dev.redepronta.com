@@ -11,12 +11,19 @@ export interface AuthUser {
   id: number;
   name: string;
   email: string;
+  avatar_url?: string | null;
   account_id: number;
   account_name: string;
   is_super_admin: boolean;
   status: string;
   role: UserRole | null;
   permissions: string[];
+  preferences?: {
+    theme?: 'system' | 'light' | 'dark';
+    table_density?: 'comfortable' | 'compact';
+    sound_enabled?: boolean;
+    [key: string]: any;
+  } | null;
 }
 
 const STORAGE_KEY = 'rp_auth_user';
@@ -97,6 +104,13 @@ export function useAuth() {
     }
   };
 
+  const setCurrentUser = (user: AuthUser) => {
+    currentUser.value = user;
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+    } catch (e) {}
+  };
+
   return {
     currentUser,
     isAuthenticated,
@@ -106,6 +120,7 @@ export function useAuth() {
     login,
     logout,
     fetchCurrentUser,
+    setCurrentUser,
     hasPermission,
   };
 }
